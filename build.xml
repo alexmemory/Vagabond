@@ -10,11 +10,12 @@
 	<property name="sourcedir" location="${basedir}/src" />
 	<property name="bundledir" location="${builddir}/TrampExplGen.app/Contents/MacOS" />
 	<property name="windir" location="${basedir}/build/TrampExplGenWin"/>
-	
 	<property name="schema" location="resource/xmlschema/mappingScenario.xsd" />
+	<property name="XBeansDir" location="${basedir}/xbeans" />
+	<property name="XBeansSrc" location="${XBeansDir}/src"/>
+	<property name="XBeansBin" location="${XBeansDir}/bin"/>
 	<property name="jarXMLName" value="trampJavaModel" />
-	<property name="jarXMLDestDir" location="lib/${jarXMLName}.jar" />
-	<property name="srcXMLDestDir" location="${resourcedir}/xmlsrc/"/>
+	<property name="XBeansJar" location="lib/${jarXMLName}.jar" />
 	
 	<path id="libraries">
 		<fileset dir="${librarydir}"/>
@@ -25,11 +26,13 @@
 		<pathelement path="lib/jsr173_1.0_api.jar" />
 	</path>
 	
-	<!-- targets -->
-
+	<!-- Task definitions -->
+	
 	<taskdef name="xmlbean" 
 			classname="org.apache.xmlbeans.impl.tool.XMLBean" 
 			classpathref="project.class.path.xml" />
+	
+	<!-- targets -->
 
 	<target name="CopyResources" depends="Clean">
 		<copy todir="${binarydir}">
@@ -100,7 +103,10 @@
 	<target name="GenerateJavaDoc">
 		<javadoc access="private" 
 			author="true" 
-			classpath="/Applications/eclipse/plugins/org.junit4_4.1.0.1/junit-4.1.jar:/Applications/eclipse/plugins/org.eclipse.swt.carbon.macosx_3.2.1.v3235.jar:../DBTools/postgresql-8.0-317.jdbc3.jar::/Applications/eclipse/plugins/org.eclipse.jface_3.2.1.M20060908-1000.jar" 
+			classpath="/Applications/eclipse/plugins/org.junit4_4.1.0.1/junit-4.1.jar:
+			/Applications/eclipse/plugins/org.eclipse.swt.carbon.macosx_3.2.1.v3235.jar:
+			../DBTools/postgresql-8.0-317.jdbc3.jar:
+			:/Applications/eclipse/plugins/org.eclipse.jface_3.2.1.M20060908-1000.jar" 
 			destdir="doc" 
 			nodeprecated="false" 
 			nodeprecatedlist="false"
@@ -113,25 +119,33 @@
 			splitindex="true" 
 			use="true" 
 			version="true">
-				<link href="file:${sesamutildir}/doc"/>
 		</javadoc>
 	</target>
 
 	<target name="GenerateXMLbindings">
-		<delete dir="${basedir}/src/org/sesam/xml/datamodel"/>
-		<delete dir="${basedir}/bin/org/sesam/xml/datamodel"/>
+		<!-- <delete dir="${basedir}/src/org/tramp/xml/datamodel"/>
+		<delete dir="${basedir}/bin/org/sesam/xml/datamodel"/> 
+		-->
 		<antcall target="GenerateXMLJar" />
 		<antcall target="GenerateXMLSourceCode" />
 	</target>
 
 	<target name="GenerateXMLSourceCode">
 		<description>This task generates the java source files from the xsd schema.</description>
-		<xmlbean schema="${schema}" classgendir="${basedir}/xmlbin" srcgendir="${srcXMLDestDir}" classpathref="project.class.path.xml" javasource="1.5" />
+		<xmlbean schema="${schema}" 
+				classgendir="${XBeansBin}" 
+				srcgendir="${XBeansSrc}" 
+				classpathref="project.class.path.xml" 
+				javasource="1.6" />
 	</target>
 
 	<target name="GenerateXMLJar">
 		<description>This task generates a jar file containing the classes generated from the xsd schema.</description>
-		<xmlbean schema="${schema}"  debug="on" destfile="${jarXMLDestDir}" classpathref="project.class.path.xml" javasource="1.5" />
+		<xmlbean schema="${schema}"  
+				debug="on" 
+				destfile="${XBeansJar}" 
+				classpathref="project.class.path.xml" 
+				javasource="1.6" />
 	</target>
 
 </project>

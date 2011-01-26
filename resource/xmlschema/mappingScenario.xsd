@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- The  -->
-<xs:schema xmlns:this="org/tramp" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/tramp">
+<xs:schema xmlns:this="org/tramp/xmlmodel" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/tramp/xmlmodel">
 	
 	<!-- ***************************************************** -->
 	<!--  -->
@@ -9,71 +9,67 @@
 	<xs:element name="MappingScenario">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="this:Schemas" minOccurs="1" maxOccurs="1"/>
-				<xs:element ref="this:Correspondences" minOccurs="1" maxOccurs="1"/>
-				<xs:element ref="this:Mappings" minOccurs="1" maxOccurs="1"/>
-				<xs:element ref="this:Transformations" minOccurs="0" maxOccurs="1"/>
-				<xs:element ref="this:ConnectionInfo" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Schemas" type="this:SchemasType" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="Correspondences" type="this:CorrespondencesType" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="Mappings" type="this:MappingsType" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="Transformations" type="this:TransformationsType" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="ConnectionInfo" type="this:ConnectionInfoType" minOccurs="0" maxOccurs="1"/>
 			</xs:sequence>
-		</xs:complexType><!--
-		<xs:keyref name="EmployeeRefersJobroles" refer="this:JobroleId">
-			<xs:selector xpath=".//Employees/Emplyoee"/>
-			<xs:field xpath="JobroleId"/>
-		</xs:keyref>
-		<xs:keyref name="StudySubjectRefersSubjectRole" refer="this:SubjectRoleId">
-			<xs:selector xpath=".//StudySubjects/StudySubject/InterSubjectRoles/InterSubjectRole"/>
-			<xs:field xpath="SubjectRoleId"/>
-		</xs:keyref>
-	--></xs:element>
+		</xs:complexType>
+		
+		<!-- ************* Key and Keyrefs **************** -->
+		<xs:key name="SourceRelId">
+			<xs:selector xpath=".//Schemas/SourceSchema/Relation"/>
+			<xs:field xpath="./@name"/>
+		</xs:key>
+		<xs:key name="TargetRelId">
+			<xs:selector xpath=".//Schemas/TargetSchema/Relation"/>
+			<xs:field xpath="./@name"/>
+		</xs:key>
+		<xs:key name="CorrespondenceId">
+			<xs:selector xpath=".//Correspondences/Correspondence"/>
+			<xs:field xpath="./@id"/>
+		</xs:key>
+		<xs:key name="MappingsId">
+			<xs:selector xpath=".//Mappings/Mapping"/>
+			<xs:field xpath="./@id"/>
+		</xs:key>
+		<xs:key name="TransformationsId">
+			<xs:selector xpath=".//Transformations/Transformation"/>
+			<xs:field xpath="./@id"/>
+		</xs:key>		
+	</xs:element>
 	
 	<!-- ***************************************************** -->
 	<!-- Elements for lists of entities -->
 	<!-- ***************************************************** -->
 	
-	<xs:element name="Schemas"> 
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="SourceSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
-				<xs:element name="TargetSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xs:complexType name="SchemasType">
+		<xs:sequence>
+			<xs:element name="SourceSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="TargetSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
 	
-	<xs:element name="Correspondences"> 
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="Correspondence" type="this:CorrespondenceType" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-		<xs:key name="CorrespondenceId">
-			<xs:selector xpath=".//Correspondence"/>
-			<xs:field xpath="Id"/>
-		</xs:key>
-	</xs:element>
+	<xs:complexType name="CorrespondencesType">
+		<xs:sequence>
+			<xs:element name="Correspondence" type="this:CorrespondenceType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
 	
-	<xs:element name="Mappings"> 
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="Mapping" type="this:MappingType" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-		<xs:key name="MappingId">
-			<xs:selector xpath=".//Mapping"/>
-			<xs:field xpath="Id"/>
-		</xs:key>
-	</xs:element>
+	<xs:complexType name="MappingsType">
+		<xs:sequence>
+			<xs:element name="Mapping" type="this:MappingType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>		
+	 
+	<xs:complexType name="TransformationsType">
+		<xs:sequence>
+			<xs:element name="Transformation" type="this:TransformationType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
 	
-	<xs:element name="Transformations"> 
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="Transformation" type="this:TransformationType" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-		<xs:key name="TransformationId">
-			<xs:selector xpath=".//Transformation"/>
-			<xs:field xpath="Id"/>
-		</xs:key>
-	</xs:element>
 	
 
 	<!-- ***************************************************** -->
@@ -100,7 +96,7 @@
 	<xs:complexType name="AttrDefType">
 		<xs:sequence>
 			<xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Type" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="DataType" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="NotNull" type="this:EmptyElementType" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
@@ -177,7 +173,7 @@
 	
 	<!-- ************ Connection Info Types ************************* -->
 	
-	<xs:complexType name="ConnectionInfo">
+	<xs:complexType name="ConnectionInfoType">
 		<xs:sequence>
 			<xs:element name="Host" type="xs:anyURI" />
 			<xs:element name="DB" type="xs:string"/>
