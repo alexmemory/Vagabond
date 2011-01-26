@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/tramp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="Person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>address</Name><DataType>INT32</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="Address">
+			<Attr><Name>id</Name><DataType>Int32</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>Id</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="personAddr">
+			<From tableref="Person"><Attr>address</Attr></From>
+			<To tableref="Address"><Attr>id</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="Employee">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="Person"><Attr>name</Attr></From>
+		<To tableref="Employee"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="Address"><Attr>city</Attr></From>
+		<To tableref="Employee"><Attr>city</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Foreach>
+			<Atom tableref="Person"><Var>a</Var><Var>b</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="Employee"><Var>a</Var><Var>c</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Foreach>
+			<Atom tableref="Person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="Address"><Var>b</Var><Var>c</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="Employee"><Var>a</Var><Var>c</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1">
+		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Code>
+			SELECT p.name AS name, a.city AS city
+			FROM
+				person p ANNOT('M1','M2') LEFT OUTER JOIN
+				address a ANNOT('M2') ON (p.address = a.id);
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>lordpretzel</User>
+	<Password/>
+</ConnectionInfo>
+</this:MappingScenario>

@@ -1,0 +1,137 @@
+<project name="TrampExGen" default="" basedir=".">
+	<description>
+		
+	</description>
+
+	<property name="binarydir" location="${basedir}/bin" />
+	<property name="builddir" location="${basedir}/build" />
+	<property name="librarydir" location="${basedir}/lib" />
+	<property name="resourcedir" location="${basedir}/resource" />
+	<property name="sourcedir" location="${basedir}/src" />
+	<property name="bundledir" location="${builddir}/TrampExplGen.app/Contents/MacOS" />
+	<property name="windir" location="${basedir}/build/TrampExplGenWin"/>
+	
+	<property name="schema" location="resource/xmlschema/mappingScenario.xsd" />
+	<property name="jarXMLName" value="trampJavaModel" />
+	<property name="jarXMLDestDir" location="lib/${jarXMLName}.jar" />
+	<property name="srcXMLDestDir" location="${resourcedir}/xmlsrc/"/>
+	
+	<path id="libraries">
+		<fileset dir="${librarydir}"/>
+	</path>
+
+	<path id="project.class.path.xml">
+		<pathelement path="lib/xbean.jar" />
+		<pathelement path="lib/jsr173_1.0_api.jar" />
+	</path>
+	
+	<!-- targets -->
+
+	<taskdef name="xmlbean" 
+			classname="org.apache.xmlbeans.impl.tool.XMLBean" 
+			classpathref="project.class.path.xml" />
+
+	<target name="CopyResources" depends="Clean">
+		<copy todir="${binarydir}">
+			<fileset dir="${sourcedir}">
+				<exclude name="**/*.java" />
+				<exclude name=".svn"/>
+			</fileset>
+		</copy>
+		<copy todir="${windir}/resource">
+			<fileset dir="${resourcedir}"> 
+				<exclude name=".svn"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="Compile" depends="CopyResources">
+		<javac srcdir="${sourcedir}" destdir="${binarydir}" classpathref="libraries" debug="on">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+	</target>
+	
+	<target name="Clean">
+		<delete includeemptydirs="true">
+		    <fileset dir="${binarydir}" includes="**/*"/>
+		 </delete>
+		<mkdir dir="${binarydir}" />
+		<mkdir dir="${builddir}" />
+	</target>
+
+	<target name="CreateApplicationBundle" depends="Jar">		
+		<mkdir dir="${bundledir}/lib"/>
+		<copy todir="${bundledir}/lib">
+			<fileset dir="${librarydir}">
+				<exclude name=".svn"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="Jar" depends="Compile,GenerateXMLbindings">
+		<antcall target="JarTrampExplGen"/>
+	</target>
+	
+	<target name="JarTrampExplGen" >
+		<jar destfile="${bundledir}/trampexplgui.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="org.tramp.expl.GuiMain" />
+				<attribute name="Created-By" value="University of Zurich, Department for Computer Science, Boris Glavic" />
+				<attribute name="Class-Path" value="
+					lib/postgresql-8.1-405.jdbc3.jar
+					lib/log4j-1.2.11.jar
+					resource/
+					" />
+			</manifest>
+		</jar>
+		<jar destfile="${windir}/trampexplgui.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="org.tramp.expl.GuiMain" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="
+					lib/postgresql-8.1-405.jdbc3.jar
+					lib/log4j-1.2.11.jar
+					resource/
+					" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="GenerateJavaDoc">
+		<javadoc access="private" 
+			author="true" 
+			classpath="/Applications/eclipse/plugins/org.junit4_4.1.0.1/junit-4.1.jar:/Applications/eclipse/plugins/org.eclipse.swt.carbon.macosx_3.2.1.v3235.jar:../DBTools/postgresql-8.0-317.jdbc3.jar::/Applications/eclipse/plugins/org.eclipse.jface_3.2.1.M20060908-1000.jar" 
+			destdir="doc" 
+			nodeprecated="false" 
+			nodeprecatedlist="false"
+			noindex="false" 
+			nonavbar="false" 
+			notree="false" 
+			packagenames="org.tramp.expl" 
+			source="1.5" 
+			sourcepath="${sourcedir}" 
+			splitindex="true" 
+			use="true" 
+			version="true">
+				<link href="file:${sesamutildir}/doc"/>
+		</javadoc>
+	</target>
+
+	<target name="GenerateXMLbindings">
+		<delete dir="${basedir}/src/org/sesam/xml/datamodel"/>
+		<delete dir="${basedir}/bin/org/sesam/xml/datamodel"/>
+		<antcall target="GenerateXMLJar" />
+		<antcall target="GenerateXMLSourceCode" />
+	</target>
+
+	<target name="GenerateXMLSourceCode">
+		<description>This task generates the java source files from the xsd schema.</description>
+		<xmlbean schema="${schema}" classgendir="${basedir}/xmlbin" srcgendir="${srcXMLDestDir}" classpathref="project.class.path.xml" javasource="1.5" />
+	</target>
+
+	<target name="GenerateXMLJar">
+		<description>This task generates a jar file containing the classes generated from the xsd schema.</description>
+		<xmlbean schema="${schema}"  debug="on" destfile="${jarXMLDestDir}" classpathref="project.class.path.xml" javasource="1.5" />
+	</target>
+
+</project>
