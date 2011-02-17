@@ -14,6 +14,7 @@
 				<xs:element name="Mappings" type="this:MappingsType" minOccurs="1" maxOccurs="1"/>
 				<xs:element name="Transformations" type="this:TransformationsType" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="ConnectionInfo" type="this:ConnectionInfoType" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Data" type="this:DataType" minOccurs="0" maxOccurs="1"/>
 			</xs:sequence>
 		</xs:complexType>
 		
@@ -169,6 +170,7 @@
 			<xs:element name="Code" type="xs:string" />
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="creates" type="xs:string"/>
 	</xs:complexType>
 	
 	<!-- ************ Connection Info Types ************************* -->
@@ -180,6 +182,38 @@
 			<xs:element name="User" type="xs:string"/>
 			<xs:element name="Password" type="xs:string"/>
 		</xs:sequence>	
+	</xs:complexType>
+	
+	<!-- ************ Data Types ************************* -->
+	
+	<xs:complexType name="DataType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="Instance" type="this:RelInstanceType" />
+			<xs:element name="InstanceFile" type="this:RelInstanceFileType" />
+		</xs:choice>
+	</xs:complexType>
+	
+	<xs:complexType name="RelInstanceType">
+		<xs:sequence>
+			<xs:element name="Row" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Value" type="xs:string"
+								 minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>	
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="RelInstanceFileType">
+		<xs:sequence>
+			<xs:element name="Path" type="xs:string" />
+			<xs:element name="FileName" type="xs:string" />
+			<xs:element name="ColumnDelim" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
 	</xs:complexType>
 	
 	<!-- ************ Helper Types **************************** -->

@@ -2,23 +2,23 @@
 <this:MappingScenario xmlns:this="org/tramp/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <Schemas>
 	<SourceSchema>
-		<Relation name="Person">
+		<Relation name="person">
 			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
-			<Attr><Name>address</Name><DataType>INT32</DataType></Attr>
+			<Attr><Name>address</Name><DataType>INT8</DataType></Attr>
 			<PrimaryKey><Attr>name</Attr></PrimaryKey>
 		</Relation>
-		<Relation name="Address">
-			<Attr><Name>id</Name><DataType>Int32</DataType></Attr>
+		<Relation name="address">
+			<Attr><Name>id</Name><DataType>INT8</DataType></Attr>
 			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
-			<PrimaryKey><Attr>Id</Attr></PrimaryKey>
+			<PrimaryKey><Attr>id</Attr></PrimaryKey>
 		</Relation>
-		<ForeignKey id="personAddr">
-			<From tableref="Person"><Attr>address</Attr></From>
-			<To tableref="Address"><Attr>id</Attr></To>
+		<ForeignKey id="person_addr">
+			<From tableref="person"><Attr>address</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
 		</ForeignKey>
 	</SourceSchema>
 	<TargetSchema>
-		<Relation name="Employee">
+		<Relation name="employee">
 			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
 			<PrimaryKey><Attr>name</Attr></PrimaryKey>
@@ -27,41 +27,41 @@
 </Schemas>
 <Correspondences>
 	<Correspondence id="c1">
-		<From tableref="Person"><Attr>name</Attr></From>
-		<To tableref="Employee"><Attr>name</Attr></To>
+		<From tableref="person"><Attr>name</Attr></From>
+		<To tableref="employee"><Attr>name</Attr></To>
 	</Correspondence>
 	<Correspondence id="c2">
-		<From tableref="Address"><Attr>city</Attr></From>
-		<To tableref="Employee"><Attr>city</Attr></To>
+		<From tableref="address"><Attr>city</Attr></From>
+		<To tableref="employee"><Attr>city</Attr></To>
 	</Correspondence>
 </Correspondences>
 <Mappings>
 	<Mapping id="M1">
 		<Foreach>
-			<Atom tableref="Person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
 		</Foreach>
 		<Exists>
-			<Atom tableref="Employee"><Var>a</Var><Var>c</Var></Atom>
+			<Atom tableref="employee"><Var>a</Var><Var>c</Var></Atom>
 		</Exists>
 	</Mapping>
 	<Mapping id="M2">
 		<Foreach>
-			<Atom tableref="Person"><Var>a</Var><Var>b</Var></Atom>
-			<Atom tableref="Address"><Var>b</Var><Var>c</Var></Atom>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="address"><Var>b</Var><Var>c</Var></Atom>
 		</Foreach>
 		<Exists>
-			<Atom tableref="Employee"><Var>a</Var><Var>c</Var></Atom>
+			<Atom tableref="employee"><Var>a</Var><Var>c</Var></Atom>
 		</Exists>
 	</Mapping>
 </Mappings>
 <Transformations>
-	<Transformation id="T1">
+	<Transformation id="T1" creates="employee">
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
-			SELECT p.name AS name, a.city AS city
-			FROM
-				person p ANNOT('M1','M2') LEFT OUTER JOIN
-				address a ANNOT('M2') ON (p.address = a.id);
+SELECT p.name AS name, a.city AS city
+FROM
+	source.person ANNOT('M1','M2') p LEFT OUTER JOIN
+	source.address ANNOT('M2') a ON (p.address = a.id)
 		</Code>
 	</Transformation>
 </Transformations>
@@ -71,4 +71,16 @@
 	<User>lordpretzel</User>
 	<Password/>
 </ConnectionInfo>
+<Data>
+	<Instance name="person">
+		<Row><Value>Peter</Value><Value>1</Value></Row>
+		<Row><Value>Heinz</Value><Value>2</Value></Row>
+		<Row><Value>Gert</Value><Value>NULL</Value></Row>
+	</Instance>
+	<Instance name="address">
+		<Row><Value>1</Value><Value>Toronto</Value></Row>
+		<Row><Value>2</Value><Value>Montreal</Value></Row>
+		<Row><Value>3</Value><Value>Quebec</Value></Row>
+	</Instance>
+</Data>
 </this:MappingScenario>
