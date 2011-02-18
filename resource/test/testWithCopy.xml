@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/tramp/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>address</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="address">
+			<Attr><Name>id</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>id</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="person_addr">
+			<From tableref="person"><Attr>address</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="employee">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="person"><Attr>name</Attr></From>
+		<To tableref="employee"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="address"><Attr>city</Attr></From>
+		<To tableref="employee"><Attr>city</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Foreach>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="employee"><Var>a</Var><Var>c</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Foreach>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="address"><Var>b</Var><Var>c</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="employee"><Var>a</Var><Var>c</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="employee">
+		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Code>
+SELECT p.name AS name, a.city AS city
+FROM
+	source.person ANNOT('M1','M2') p LEFT OUTER JOIN
+	source.address ANNOT('M2') a ON (p.address = a.id)
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>lordpretzel</User>
+	<Password/>
+</ConnectionInfo>
+<Data>
+	<InstanceFile name="person">
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/test/</Path>
+		<FileName>person.csv</FileName>
+		<ColumnDelim>|</ColumnDelim>
+	</InstanceFile>
+	<Instance name="address">
+		<Row><Value>1</Value><Value>Toronto</Value></Row>
+		<Row><Value>2</Value><Value>Montreal</Value></Row>
+		<Row><Value>3</Value><Value>Quebec</Value></Row>
+	</Instance>
+</Data>
+</this:MappingScenario>

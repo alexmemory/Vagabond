@@ -7,6 +7,9 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.tramp.expl.model.MapScenarioHolder;
 import org.tramp.xmlmodel.DataType;
+import org.tramp.xmlmodel.RelInstanceFileType;
+import org.tramp.xmlmodel.RelInstanceType;
+import org.tramp.xmlmodel.RelInstanceType.Row;
 
 public class DatabaseScenarioLoader {
 
@@ -27,30 +30,44 @@ public class DatabaseScenarioLoader {
 		String ddl;
 		
 		ddl = SchemaCodeGenerator.getInstance().
-				getSchemasCode(map.getScenario());
+				getSchemaCodeNoFKeys(map.getScenario());
+		log.debug("execute Schema DDL:\n" + ddl);
 		executeDDL(dbCon, ddl);
+		
 		if (map.hasData())
-			loadData (map.getScenario().getData());
+			loadData (dbCon, map.getScenario().getData());
+		
+		ddl = SchemaCodeGenerator.getInstance().getAllSourceForeignKeysCode
+				(map.getScenario().getSchemas().getSourceSchema(), "source");
+		log.debug("execute Foreign Key DDL:\n" + ddl);
+		executeDDL(dbCon, ddl);
 	}
 	
 	private void executeDDL(Connection dbCon, String ddl) throws SQLException {
 		Statement st;
 		
 		st = dbCon.createStatement();
-		st.addBatch(ddl);
-		st.executeBatch();
+		st.execute(ddl);
 		st.close();
 	}
 	
-	private void loadData (DataType data) {
-		for (InstanceType inst: data.getInstanceArray()) {
-			
+	private void loadData (Connection dbCon, DataType data) throws SQLException {
+		Statement st;
+		
+		st = dbCon.createStatement();
+		
+		for (RelInstanceType inst: data.getInstanceArray()) {
+			for(Row row: inst.getRowArray()) {
+				st.execute(SchemaCodeGenerator.getInstance().
+						getRowInsert("source", inst.getName(), row));
+			}
 		}
 		
-		for (InstanceFileType inst: data.getInstanceFileArray()) {
-			
+		for (RelInstanceFileType inst: data.getInstanceFileArray()) {
+			st.execute(SchemaCodeGenerator.getInstance().
+					getCopy("source", inst));
 		}
 		
+		st.close();
 	}
-	
 }

@@ -2,7 +2,11 @@ package org.tramp.expl.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Exception for errors in XML validation.
+ * 
+ * @author Boris Glavic
+ */
 public class ValidationException extends Exception {
 
 	/**

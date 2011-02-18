@@ -5,6 +5,7 @@
 
 	<property name="binarydir" location="${basedir}/bin" />
 	<property name="builddir" location="${basedir}/build" />
+	<property name="docdir" location="${basedir}/doc" />
 	<property name="librarydir" location="${basedir}/lib" />
 	<property name="resourcedir" location="${basedir}/resource" />
 	<property name="sourcedir" location="${basedir}/src" />
@@ -103,11 +104,8 @@
 	<target name="GenerateJavaDoc">
 		<javadoc access="private" 
 			author="true" 
-			classpath="/Applications/eclipse/plugins/org.junit4_4.1.0.1/junit-4.1.jar:
-			/Applications/eclipse/plugins/org.eclipse.swt.carbon.macosx_3.2.1.v3235.jar:
-			../DBTools/postgresql-8.0-317.jdbc3.jar:
-			:/Applications/eclipse/plugins/org.eclipse.jface_3.2.1.M20060908-1000.jar" 
-			destdir="doc" 
+			classpathref="libraries" 
+			destdir="${docdir}" 
 			nodeprecated="false" 
 			nodeprecatedlist="false"
 			noindex="false" 

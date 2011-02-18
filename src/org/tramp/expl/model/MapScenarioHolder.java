@@ -1,13 +1,15 @@
 package org.tramp.expl.model;
 
-import java.io.InputStream;
 import java.util.logging.Logger;
 
 import org.tramp.xmlmodel.MappingScenarioDocument;
 import org.tramp.xmlmodel.MappingScenarioDocument.MappingScenario;
 
-/*
+/**
+ * Class that functions as a wrapper around  a mapping scenario class object. 
  * 
+ * @author Boris Glavic
+ *
  */
 public class MapScenarioHolder {
 
@@ -20,17 +22,40 @@ public class MapScenarioHolder {
 		doc = null;
 	}
 	
+	/**
+	 * Create this object as a wrapper around <code>doc</code>.
+	 * 
+	 * @param doc
+	 */
+	
 	public MapScenarioHolder (MappingScenarioDocument doc) {
 		setDocument (doc);
 	}
 	
+	/**
+	 * Set the document this object is wrapping.
+	 * 
+	 * @param doc
+	 */
+	
 	public void setDocument (MappingScenarioDocument doc) {
 		this.doc = doc;
 	}
+
+	/**
+	 * 
+	 * @return The wrapped mapping scenario.
+	 */
 	
 	public MappingScenario getScenario () {
 		return doc.getMappingScenario();
 	}
+	
+	/**
+	 * Check if the wrapped scenarion has instance data.
+	 * 
+	 * @return True, if the wrapped scenario has instance data. 
+	 */
 	
 	public boolean hasData () {
 		return doc.getMappingScenario().getData() != null;
