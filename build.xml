@@ -3,14 +3,20 @@
 		
 	</description>
 
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+	  <classpath>
+	    <pathelement location="${basedir}/lib/ant-contrib.jar"/>
+	  </classpath>
+	</taskdef>
+	
 	<property name="binarydir" location="${basedir}/bin" />
 	<property name="builddir" location="${basedir}/build" />
 	<property name="docdir" location="${basedir}/doc" />
 	<property name="librarydir" location="${basedir}/lib" />
 	<property name="resourcedir" location="${basedir}/resource" />
 	<property name="sourcedir" location="${basedir}/src" />
-	<property name="bundledir" location="${builddir}/TrampExplGen.app/Contents/MacOS" />
-	<property name="windir" location="${basedir}/build/TrampExplGenWin"/>
+	<property name="macdir" location="${builddir}/macloader" />
+	<property name="windir" location="${builddir}/winloader"/>
 	<property name="schema" location="resource/xmlschema/mappingScenario.xsd" />
 	<property name="XBeansDir" location="${basedir}/xbeans" />
 	<property name="XBeansSrc" location="${XBeansDir}/src"/>
@@ -22,6 +28,18 @@
 		<fileset dir="${librarydir}"/>
 	</path>
 
+	<pathconvert property="jarClasspath" pathsep="    ">
+    	<path refid="libraries" />
+        <mapper>
+        <chainedmapper>
+          <flattenmapper/>
+          <globmapper from="*.jar" to="lib/*.jar" casesensitive="no"/>
+        </chainedmapper>
+        </mapper>
+  	</pathconvert>
+
+	<property name="fullJarClasspath" value="${jarClasspath}   resource/    lib/" />
+	
 	<path id="project.class.path.xml">
 		<pathelement path="lib/xbean.jar" />
 		<pathelement path="lib/jsr173_1.0_api.jar" />
@@ -42,11 +60,6 @@
 				<exclude name=".svn"/>
 			</fileset>
 		</copy>
-		<copy todir="${windir}/resource">
-			<fileset dir="${resourcedir}"> 
-				<exclude name=".svn"/>
-			</fileset>
-		</copy>
 	</target>
 
 	<target name="Compile" depends="CopyResources">
@@ -61,15 +74,36 @@
 		 </delete>
 		<mkdir dir="${binarydir}" />
 		<mkdir dir="${builddir}" />
+		<echo message="${jarClasspath}"/>
 	</target>
 
-	<target name="CreateApplicationBundle" depends="Jar">		
-		<mkdir dir="${bundledir}/lib"/>
-		<copy todir="${bundledir}/lib">
+	<target name="Deploy" depends="Jar">		
+		<var name="deployto" value="${macdir}" />
+		<antcall target="DeployOne" />
+		<copy todir="${macdir}" file="${resourcedir}/buildFiles/loader.sh" />
+		<var name="deployto" value="${windir}" />
+		<antcall target="DeployOne" />
+		<copy todir="${windir}" file="${resourcedir}/buildFiles/loader.bat" />
+	</target>
+	
+	<target name="DeployOne">
+		<mkdir dir="${deployto}/lib"/>
+		<copy todir="${deployto}/lib">
 			<fileset dir="${librarydir}">
 				<exclude name=".svn"/>
 			</fileset>
 		</copy>
+		<mkdir dir="${deployto}/resource"/>
+		<copy todir="${deployto}/resource">
+			<fileset dir="${resourcedir}"> 
+				<exclude name=".svn"/>
+				<exclude name="buildFiles/**"/>
+				<exclude name="test/**"/>
+				<exclude name="log4jproperties.txt"/>
+			</fileset>
+		</copy>
+		<copy todir="${deployto}/resource" 
+			file="${resourcedir}/buildFiles/log4jproperties.txt"/>
 	</target>
 	
 	<target name="Jar" depends="Compile,GenerateXMLbindings">
@@ -77,26 +111,20 @@
 	</target>
 	
 	<target name="JarTrampExplGen" >
-		<jar destfile="${bundledir}/trampexplgui.jar" basedir="${binarydir}">
+		<mkdir dir="${macdir}"/>
+		<mkdir dir="${windir}"/>
+		<jar destfile="${macdir}/loadermac.jar" basedir="${binarydir}">
 			<manifest>
-				<attribute name="Main-Class" value="org.tramp.expl.GuiMain" />
-				<attribute name="Created-By" value="University of Zurich, Department for Computer Science, Boris Glavic" />
-				<attribute name="Class-Path" value="
-					lib/postgresql-8.1-405.jdbc3.jar
-					lib/log4j-1.2.11.jar
-					resource/
-					" />
+				<attribute name="Main-Class" value="org.tramp.commandline.loader.CommandLineLoader" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
 			</manifest>
 		</jar>
-		<jar destfile="${windir}/trampexplgui.jar" basedir="${binarydir}">
+		<jar destfile="${windir}/loaderwin.jar" basedir="${binarydir}">
 			<manifest>
-				<attribute name="Main-Class" value="org.tramp.expl.GuiMain" />
+				<attribute name="Main-Class" value="org.tramp.commandline.loader.CommandLineLoader" />
 				<attribute name="Created-By" value="University of Toronto" />
-				<attribute name="Class-Path" value="
-					lib/postgresql-8.1-405.jdbc3.jar
-					lib/log4j-1.2.11.jar
-					resource/
-					" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
 			</manifest>
 		</jar>
 	</target>

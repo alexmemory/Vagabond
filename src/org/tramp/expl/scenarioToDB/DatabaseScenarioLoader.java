@@ -25,7 +25,18 @@ public class DatabaseScenarioLoader {
 		return instance;
 	}
 	
+	public void loadScenarioNoData (Connection dbCon, MapScenarioHolder map) 
+			throws SQLException {
+		loadScenario (dbCon, map, true);
+	}
+	
 	public void loadScenario (Connection dbCon, MapScenarioHolder map) 
+			throws SQLException {
+		loadScenario (dbCon, map, false);
+	}
+	
+	private void loadScenario (Connection dbCon, MapScenarioHolder map, 
+			boolean noData) 
 			throws SQLException {
 		String ddl;
 		
@@ -34,7 +45,7 @@ public class DatabaseScenarioLoader {
 		log.debug("execute Schema DDL:\n" + ddl);
 		executeDDL(dbCon, ddl);
 		
-		if (map.hasData())
+		if (map.hasData() && !noData)
 			loadData (dbCon, map.getScenario().getData());
 		
 		ddl = SchemaCodeGenerator.getInstance().getAllSourceForeignKeysCode
