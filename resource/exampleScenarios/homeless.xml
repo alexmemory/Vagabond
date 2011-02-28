@@ -29,8 +29,8 @@
 			<From tableref="tramp"><Attr>caredforby</Attr></From>
 			<To tableref="socialworker"><Attr>ssn</Attr></To>
 		</ForeignKey>
-		<ForeignKey id="sw_works_at">
-			<From tableref="socialworker"><Attr>worksat</Attr></From>
+		<ForeignKey id="sw_works_for">
+			<From tableref="socialworker"><Attr>worksfor</Attr></From>
 			<To tableref="soupkitchen"><Attr>location</Attr></To>
 		</ForeignKey>
 	</SourceSchema>
@@ -83,14 +83,14 @@
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
 SELECT t.nickname AS name, k1.city AS livesat 
-FROM tramp t, socialworker s, soupkitchen k1, soupkitchen k2 
+FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
 WHERE t.caredforby = s.ssn 
 	AND t.firstseen = k1.location 
-	AND s.worksat = k2.location 
+	AND s.worksfor = k2.location 
 UNION 
 SELECT	s.name,	k.city	AS	livesat
-FROM socialworker s, soupkitchen k 
-WHERE s.worksat = k.location
+FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
+WHERE s.worksfor = k.location
 		</Code>
 	</Transformation>
 </Transformations>

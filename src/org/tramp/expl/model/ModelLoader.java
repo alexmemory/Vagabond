@@ -42,7 +42,7 @@ public class ModelLoader {
 	/**
 	 * Load a mapping scenario from a file.
 	 * 
-	 * @param inFile The XML file to laod from.
+	 * @param inFile The XML file to load from.
 	 * @return The mapping scenario.
 	 * @throws XmlException
 	 * @throws IOException

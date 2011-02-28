@@ -16,6 +16,7 @@ import org.tramp.expl.model.ModelLoader;
 import org.tramp.expl.model.ValidationException;
 import org.tramp.expl.scenarioToDB.DatabaseScenarioLoader;
 import org.tramp.util.ConnectionManager;
+import org.tramp.util.LoggerUtil;
 
 public class CommandLineLoader {
 
@@ -53,6 +54,7 @@ public class CommandLineLoader {
 	private void parseOptions (String[] args) throws CmdLineException {
 		CmdLineParser parser;
 		
+		log.debug("Command line args are: <" + LoggerUtil.arrayToString(args) + ">");
 		parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 	}
@@ -80,16 +82,23 @@ public class CommandLineLoader {
 	public boolean execute (String[] args) {
 		try {
 			setUpLogger();
-			parseOptionsAndLoadScenario(args);
-			executeOnDB();
-		} catch (CmdLineException e) {			
-			e.printStackTrace();
-			printUsage(System.err);
-			return false;
 		} catch (Exception e) {			
 			e.printStackTrace();
 			return false;
 		}
+		
+		try {
+			parseOptionsAndLoadScenario(args);
+			executeOnDB();
+		} catch (CmdLineException e) {			
+			LoggerUtil.logException(e, log);
+			printUsage(System.err);
+			return false;
+		} catch (Exception e) {			
+			LoggerUtil.logException(e, log);
+			return false;
+		}
+
 		
 		return true;
 	}

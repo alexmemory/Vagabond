@@ -1,1 +1,1 @@
-java -jar loaderwin.jar CommandLineLoader
+java -jar loaderwin.jar

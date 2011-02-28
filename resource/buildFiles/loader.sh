@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar loadermac.jar CommandLineLoader $*
+java -jar loadermac.jar $*

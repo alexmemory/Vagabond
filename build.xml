@@ -1,13 +1,17 @@
-<project name="TrampExGen" default="" basedir=".">
+<project name="TrampExGen" default="Deploy" basedir=".">
 	<description>
 		
 	</description>
 
+	<!-- Internal Taskdefs -->
+	
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 	  <classpath>
 	    <pathelement location="${basedir}/lib/ant-contrib.jar"/>
 	  </classpath>
 	</taskdef>
+	
+	<!-- Properties -->
 	
 	<property name="binarydir" location="${basedir}/bin" />
 	<property name="builddir" location="${basedir}/build" />
@@ -24,12 +28,18 @@
 	<property name="jarXMLName" value="trampJavaModel" />
 	<property name="XBeansJar" location="lib/${jarXMLName}.jar" />
 	
+	<!-- ClassPath Setup -->
+	
 	<path id="libraries">
 		<fileset dir="${librarydir}"/>
 	</path>
 
 	<pathconvert property="jarClasspath" pathsep="    ">
-    	<path refid="libraries" />
+    	<path>
+    		<fileset dir="${librarydir}">
+    			<exclude name="ant*.jar" />
+    		</fileset>
+		</path>
         <mapper>
         <chainedmapper>
           <flattenmapper/>
