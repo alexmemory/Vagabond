@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
@@ -51,7 +52,7 @@ public class CopySourceExplanationGenerator implements
 		IMarkerSet sourceError = expl.getSourceSE();
 		
 		
-		return null;
+		return MarkerFactory.newMarkerSet();
 	}
 
 	private void retrieveCopyProvenance () 
