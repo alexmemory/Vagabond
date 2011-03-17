@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- The  -->
-<xs:schema xmlns:this="org/tramp/xmlmodel" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/tramp/xmlmodel">
+<xs:schema xmlns:this="org/vagabond/xmlmodel" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/vagabond/xmlmodel">
 	
 	<!-- ***************************************************** -->
 	<!--  -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<this:MappingScenario xmlns:this="org/tramp/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <Schemas>
 	<SourceSchema>
 		<Relation name="tramp">
@@ -82,13 +82,15 @@
 	<Transformation id="T1" creates="person">
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
-SELECT t.nickname AS name, k1.city AS livesat 
+SELECT how_pl(how_pl(how_pl(t.oid::howprov,s.oid::howprov), k1.oid::howprov), k2.oid::howprov)::text AS oid,
+	t.nickname AS name, k1.city AS livesat 
 FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
 WHERE t.caredforby = s.ssn 
 	AND t.firstseen = k1.location 
 	AND s.worksfor = k2.location 
-UNION 
-SELECT	s.name,	k.city	AS	livesat
+UNION ALL
+SELECT how_pl(s.oid::howprov, k.oid::howprov)::text AS oid,	
+	s.name,	k.city AS livesat
 FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
 WHERE s.worksfor = k.location
 		</Code>

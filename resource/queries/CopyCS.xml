@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>CopyCS</comment>
+
+<entry key="GetProv">
+SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) ${2} 
+FROM ${1}
+WHERE tid = ${3}
+</entry>
+
+</properties>

@@ -58,7 +58,7 @@
 	<Transformation id="T1" creates="employee">
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
-SELECT p.name AS name, a.city AS city
+SELECT COALESCE(p.tid::text,'') || '|' || COALESCE(a.tid::text,'') AS tid, p.name AS name, a.city AS city
 FROM
 	source.person ANNOT('M1','M2') p LEFT OUTER JOIN
 	source.address ANNOT('M2') a ON (p.address = a.id)

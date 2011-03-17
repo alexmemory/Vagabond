@@ -2,12 +2,14 @@ DROP SCHEMA IF EXISTS source CASCADE;
 CREATE SCHEMA source;
 
 CREATE TABLE source.person(
+tid INT8 NOT NULL,
 name TEXT,
 address INT8,
 PRIMARY KEY (name)
 ) WITH OIDS;
 
 CREATE TABLE source.address(
+tid INT8 NOT NULL,
 id INT8,
 city TEXT,
 PRIMARY KEY (id)

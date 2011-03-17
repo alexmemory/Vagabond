@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<this:MappingScenario xmlns:this="org/tramp/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <Schemas>
 	<SourceSchema>
 		<Relation name="person">
@@ -78,9 +78,9 @@ FROM
 		<ColumnDelim>|</ColumnDelim>
 	</InstanceFile>
 	<Instance name="address">
-		<Row><Value>1</Value><Value>Toronto</Value></Row>
-		<Row><Value>2</Value><Value>Montreal</Value></Row>
-		<Row><Value>3</Value><Value>Quebec</Value></Row>
+		<Row><Value>1</Value><Value>1</Value><Value>Toronto</Value></Row>
+		<Row><Value>2</Value><Value>2</Value><Value>Montreal</Value></Row>
+		<Row><Value>3</Value><Value>3</Value><Value>Quebec</Value></Row>
 	</Instance>
 </Data>
 </this:MappingScenario>

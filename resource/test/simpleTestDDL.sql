@@ -20,16 +20,19 @@ DROP SCHEMA IF EXISTS target CASCADE;
 CREATE SCHEMA target;
 
 CREATE VIEW target.employee AS (
-SELECT p.name AS name, a.city AS city
+SELECT COALESCE(p.tid::text,'') || '|' || COALESCE(a.tid::text,'') AS tid, p.name AS name, a.city AS city
 FROM
 	source.person ANNOT('M1','M2') p LEFT OUTER JOIN
 	source.address ANNOT('M2') a ON (p.address = a.id)
 );
 
+INSERT INTO source.person VALUES ('1','Peter','1');
+INSERT INTO source.person VALUES ('2','Heinz','2');
+INSERT INTO source.person VALUES ('3','Gert',NULL);
+
 INSERT INTO source.address VALUES ('1','1','Toronto');
 INSERT INTO source.address VALUES ('2','2','Montreal');
 INSERT INTO source.address VALUES ('3','3','Quebec');
 
-COPY source.person FROM '/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/test/person.csv' WITH CSV DELIMITER '|' NULL AS 'NULL';
 
 ALTER TABLE source.person ADD FOREIGN KEY (address) REFERENCES source.address (id);
