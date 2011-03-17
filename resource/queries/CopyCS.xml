@@ -9,4 +9,12 @@ FROM ${1}
 WHERE tid = '${2}'
 </entry>
 
+<entry key="GetSideEffect">
+SELECT *
+FROM
+(SELECT PROVENANCE * 
+FROM ${1}) AS prov
+WHERE ${2}
+</entry>
+
 </properties>

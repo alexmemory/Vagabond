@@ -29,6 +29,7 @@ FROM
 INSERT INTO source.person VALUES ('1','Peter','1');
 INSERT INTO source.person VALUES ('2','Heinz','2');
 INSERT INTO source.person VALUES ('3','Gert',NULL);
+INSERT INTO source.person VALUES ('4','Gertud','2');
 
 INSERT INTO source.address VALUES ('1','1','Toronto');
 INSERT INTO source.address VALUES ('2','2','Montreal');

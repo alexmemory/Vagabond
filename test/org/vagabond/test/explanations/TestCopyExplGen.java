@@ -19,6 +19,8 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.CopyProvExpl;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
@@ -81,10 +83,40 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testExplGen () throws Exception {
-		IAttributeValueMarker a1 = MarkerFactory.newAttrMarker("employee", "1|1", "city");
+	public void testExplGenNoSide () throws Exception {
+		IAttributeValueMarker a1 = MarkerFactory.
+				newAttrMarker("employee", "1|1", "city");
+		IMarkerSet m1 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "1"));
+		IExplanationSet eSet;
+		CopySourceError e1;
 		
-		gen.findExplanations(a1);
+		eSet = gen.findExplanations(a1);
+		e1 = (CopySourceError) eSet.getExplanations().get(0);
+		
+		assertEquals(e1.getSourceSE(), m1);
+		assertEquals(e1.explains(), a1);
+		assertEquals(e1.getSideEffects().getSize(), 0);
+	}
+	
+	@Test
+	public void testExplGenSideEffect () throws Exception {
+		IAttributeValueMarker a1 = MarkerFactory.
+				newAttrMarker("employee", "2|2", "city");
+		IMarkerSet m1 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2"));
+		IMarkerSet sideE = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "2|2"),
+				MarkerFactory.newTupleMarker("employee", "4|2"));
+		IExplanationSet eSet;
+		CopySourceError e1;
+		
+		eSet = gen.findExplanations(a1);
+		e1 = (CopySourceError) eSet.getExplanations().get(0);
+		
+		assertEquals(e1.getSourceSE(), m1);
+		assertEquals(e1.explains(), a1);
+		assertEquals(e1.getSideEffects(), sideE);
 	}
 	
 }

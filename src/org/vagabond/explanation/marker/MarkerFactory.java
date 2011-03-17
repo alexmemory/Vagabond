@@ -16,6 +16,18 @@ public class MarkerFactory {
 		return new MarkerSet();
 	}
 	
+	public static IMarkerSet newMarkerSet (ISingleMarker ... markers) {
+		 MarkerSet result;
+		 
+		 result = new MarkerSet();
+		 
+		 for (ISingleMarker marker: markers) {
+			 result.add(marker);
+		 }
+		 
+		 return result;
+	}
+	
 	public static IAttributeValueMarker newAttrMarker () {
 		return new AttrValueMarker();
 	}
@@ -43,4 +55,6 @@ public class MarkerFactory {
 			throws Exception {
 		return new TupleMarker(relId, tid);
 	}
+	
+
 }
