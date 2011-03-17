@@ -26,7 +26,7 @@ public class MarkerFactory {
 	}
 	
 	public static IAttributeValueMarker newAttrMarker 
-			(int rel, int tid, int attr) throws Exception {
+			(int rel, String tid, int attr) throws Exception {
 		return new AttrValueMarker(rel, tid, attr);
 	}
 	

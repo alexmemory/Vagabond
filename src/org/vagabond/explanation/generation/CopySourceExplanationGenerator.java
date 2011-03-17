@@ -2,8 +2,11 @@ package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -14,6 +17,8 @@ import org.vagabond.util.ConnectionManager;
 public class CopySourceExplanationGenerator implements
 		ISingleExplanationGenerator {
 
+	static Logger log = Logger.getLogger(CopySourceExplanationGenerator.class);
+	
 	private CopyProvExpl prov;
 	private IAttributeValueMarker error;
 	
@@ -29,21 +34,39 @@ public class CopySourceExplanationGenerator implements
 		
 		retrieveCopyProvenance();
 		
-		expl = new CopySourceError();
-		expl.setExplains(error);
+		expl = new CopySourceError(error);
 		expl.setSourceSE(prov.getTuplesInProv());
+		expl.setTargetSE(computeTargetSideEffects(expl));
+		
+		log.debug("Generated Explanation:\n" + expl.toString());
+		
 		result.addExplanation(expl);
+		
+		log.debug("Generated Explanation:\n" + expl.toString());
 		
 		return result;
 	}
 	
+	private IMarkerSet computeTargetSideEffects(CopySourceError expl) {
+		IMarkerSet sourceError = expl.getSourceSE();
+		
+		
+		return null;
+	}
+
 	private void retrieveCopyProvenance () 
 			throws Exception {
 		ResultSet rs;
 		CopyCSParser parser;
+		String query;
 		
-		rs = ConnectionManager.getInstance().execQuery(getQuery());
+		query = getQuery();
+		log.debug("Parameterized query for <" + error + ">:\n" + query);
+		
+		rs = ConnectionManager.getInstance().execQuery(query);
 		parser = new CopyCSParser(rs);
+		ConnectionManager.getInstance().closeRs(rs);
+		
 		this.prov = parser.getAllProv();
 	}
 
@@ -53,7 +76,7 @@ public class CopySourceExplanationGenerator implements
 		String attr = error.getAttrName();
 		
 		return QueryHolder.getQuery("CopyCS.GetProv").
-				parameterize(table, tid, attr);
+				parameterize("target." + table, tid, attr);
 	}
 	
 	

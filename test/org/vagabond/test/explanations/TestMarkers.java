@@ -46,11 +46,11 @@ public class TestMarkers extends AbstractVagabondTest {
 	public void testAttrMarkerWithSchemaResolver () throws Exception {
 		IAttributeValueMarker attr = MarkerFactory.
 				newAttrMarker("tramp","1","name");
-		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, 1, 0);
+		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, "1", 0);
 		
 		assertEquals(attr.getSize(), 1);
 		assertEquals(attr, attr2);
-		assertEquals(attr2.toString(), "(tramp,1,name)");
+		assertEquals(attr2.toString(), "(tramp(0),1,name(0))");
 	}
 	
 	@Test
@@ -69,10 +69,13 @@ public class TestMarkers extends AbstractVagabondTest {
 		IMarkerSet set3 = MarkerFactory.newMarkerSet();
 		IMarkerSet set4 = MarkerFactory.newMarkerSet();
 		IMarkerSet set5 = MarkerFactory.newMarkerSet();
+		IMarkerSet set6 = MarkerFactory.newMarkerSet();
 		
 		IAttributeValueMarker attr = MarkerFactory.
 				newAttrMarker("tramp","1","name");
-		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, 1, 0);
+		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, "1", 0);
+		IAttributeValueMarker attr3 = MarkerFactory.newAttrMarker(1, "2", 0);
+		IAttributeValueMarker attr4 = MarkerFactory.newAttrMarker(1, "2", 0);
 		
 		ITupleMarker m1 = MarkerFactory.newTupleMarker("tramp", "1");
 		ITupleMarker m2 = MarkerFactory.newTupleMarker("tramp", "1");
@@ -81,8 +84,8 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		set.add(attr);
 		set.add(attr2);
-		assertEquals(set.getNumElem(),2);
-		assertEquals(set.getSize(), 2);
+		assertEquals(set.getNumElem(),1);
+		assertEquals(set.getSize(),1);
 
 		assertFalse(set.equals(set2));
 		
@@ -98,6 +101,12 @@ public class TestMarkers extends AbstractVagabondTest {
 		set3.union(set2);
 		
 		assertEquals(set,set3);
+		
+		set6.add(attr);
+		set6.add(attr4);
+		set3.add(attr3);
+		
+		assertEquals(set3,set6);
 		
 		set4.add(m1);
 		set4.add(m3);

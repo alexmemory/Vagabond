@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import org.vagabond.explanation.generation.CopyCSParser;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
+import org.vagabond.explanation.generation.QueryHolder;
+import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
@@ -51,12 +53,14 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		
 		setSchemas("resource/test/simpleTest.xml");
 		
-		queries = new PropertyWrapper();
+		queries = new PropertyWrapper("resource/queries/CopyCS.xml");
 		queries.setProperty("copy1", 
 				"SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) " +
 				"p.name, a.city " +
 				"FROM source.person p, source.address a " +
 				"WHERE p.address = a.id AND name = 'Peter';");
+		
+		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 	}
 	
 	@Test
@@ -78,8 +82,9 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@Test
 	public void testExplGen () throws Exception {
-		ITupleMarker e1 = MarkerFactory.newTupleMarker("employee", "1|1");
-		gen.findExplanations(e1);
+		IAttributeValueMarker a1 = MarkerFactory.newAttrMarker("employee", "1|1", "city");
+		
+		gen.findExplanations(a1);
 	}
 	
 }

@@ -21,7 +21,6 @@ public class ConnectionManager {
 	private static ConnectionManager instance;
 	
 	private Connection con;
-	private Statement curSt;
 	
 	private ConnectionManager () throws ClassNotFoundException {
 		Class.forName("org.postgresql.Driver");
@@ -48,14 +47,17 @@ public class ConnectionManager {
 	}
 	
 	public void closeCon () throws SQLException {
-		closeStatement();
 		if (con != null)
 			con.close();
 	}
 	
-	public void closeStatement() throws SQLException {
-		if (curSt != null)
-			curSt.close();
+	public Statement getSt () throws SQLException {
+		return con.createStatement();
+	}
+	
+	public void closeRs (ResultSet rs) throws SQLException {
+		rs.getStatement().close();
+		rs.close();
 	}
 	
 	public ResultSet execQuery (String query) throws SQLException {
@@ -66,14 +68,7 @@ public class ConnectionManager {
 		ResultSet rs;
 		Statement st;
 		
-		if (userCon != con) {
-			st = userCon.createStatement();
-		}
-		else {
-			if (curSt == null)
-				curSt = userCon.createStatement();
-			st = curSt;
-		}
+		st = userCon.createStatement();
 		
 		rs = st.executeQuery(query);
 		

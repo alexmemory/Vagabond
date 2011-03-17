@@ -17,6 +17,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	
 	public SimpleExplanationSet () {
 		expls = new ArrayList<IBasicExplanation> ();
+		sideEffects = MarkerFactory.newMarkerSet();
 	}
 	
 	@Override
@@ -27,6 +28,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	@Override
 	public void addExplanation (IBasicExplanation expl) {
 		expls.add(expl);
+		
 		sideEffects.union(expl.getSideEffects());
 	}
 

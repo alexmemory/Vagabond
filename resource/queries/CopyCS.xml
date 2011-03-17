@@ -4,9 +4,9 @@
 <comment>CopyCS</comment>
 
 <entry key="GetProv">
-SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) ${2} 
+SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) ${3} 
 FROM ${1}
-WHERE tid = ${3}
+WHERE tid = '${2}'
 </entry>
 
 </properties>

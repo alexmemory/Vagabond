@@ -69,7 +69,8 @@ public class MarkerSet implements IMarkerSet {
 
 	@Override
 	public IMarkerSet union(IMarkerSet other) {
-		this.markers.addAll(other.getElems());
+		if (other.getElems() != null)
+			this.markers.addAll(other.getElems());
 		return this;
 	}
 

@@ -3,6 +3,7 @@ package org.vagabond.explanation.model.basic;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 
 public class CopySourceError implements IBasicExplanation {
 
@@ -13,7 +14,14 @@ public class CopySourceError implements IBasicExplanation {
 	private ISingleMarker explains;
 	
 	public CopySourceError () {
-		
+		sourceSE = MarkerFactory.newMarkerSet();
+		targetSE = MarkerFactory.newMarkerSet();
+	}
+	
+	public CopySourceError (ISingleMarker explains) {
+		this.explains = explains;
+		sourceSE = MarkerFactory.newMarkerSet();
+		targetSE = MarkerFactory.newMarkerSet();
 	}
 	
 	public CopySourceError (IMarkerSet sourceSE, IMarkerSet targetSE, 
@@ -51,6 +59,10 @@ public class CopySourceError implements IBasicExplanation {
 		this.sourceSE = sourceSE;
 	}
 
+	public IMarkerSet getSourceSE () {
+		return sourceSE;
+	}
+	
 	public void setTargetSE(IMarkerSet targetSE) {
 		this.targetSE = targetSE;
 	}
@@ -60,10 +72,12 @@ public class CopySourceError implements IBasicExplanation {
 		return sourceSE;
 	}
 	
+	
+	
 	public String toString () {
 		return "CopySourceError <" + explains.toString() + ">\n\n" +
-				"with source side-effect:\n\n" + sourceSE.toString() +
-				"and target side-effect:\n\n" + targetSE.toString();
+				"with source side-effect:\n<" + sourceSE.toString() +
+				">\n\nand target side-effect:\n<" + targetSE.toString() + ">";
 	}
 
 

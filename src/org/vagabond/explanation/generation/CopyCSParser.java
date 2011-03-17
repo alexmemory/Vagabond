@@ -52,9 +52,11 @@ public class CopyCSParser {
 				relName = ResultSetUtil.getRelFromProvName(colName);
 				relNames.add(relName);
 				tidAttrPos.add(i + 1);
+				
 			}
 		}
 		
+		log.debug("Tid attribute positions" +  tidAttrPos.toString());
 		logArray(log, colNames, "ColNames");
 		logArray(log, relNames.toArray(), "RelNames");
 		
@@ -70,10 +72,18 @@ public class CopyCSParser {
 			witList = new Vector<ITupleMarker> ();
 			for (int i = 0; i < relNames.size(); i++) {
 				tid = dbResult.getString(tidAttrPos.get(i));
-				tup = MarkerFactory.newTupleMarker(relNames.get(i), tid);
-				witList.add(tup);
-				allProv.addTupleInProv(tup);
+				log.debug("parsed tid <" + tid + ">");
+				
+				if (tid != null) {
+					tup = MarkerFactory.newTupleMarker(relNames.get(i), tid);
+					log.debug("add tuple marker " + tup);
+					witList.add(tup);
+					
+					allProv.addTupleInProv(tup);
+				}
 			}
+			
+			log.debug("created witness list " + witList);
 			allProv.addWitnessList(witList);
 		}
 	}

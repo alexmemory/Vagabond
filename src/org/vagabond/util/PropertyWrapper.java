@@ -46,7 +46,46 @@ public class PropertyWrapper extends Properties {
 		super();
 	}
 
-
+	public void addFromXMLFile (File inFile, String prefix) 
+			throws FileNotFoundException, IOException {
+		this.prefix = prefix;
+		addFromXMLFile(inFile);
+		resetPrefix();
+	}
+	
+	public void addFromXMLFile (File inFile) 
+			throws FileNotFoundException, IOException {
+		log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
+					+ prefix + ">");
+		PropertyWrapper sub = new PropertyWrapper();
+		sub.loadFromXML(new FileInputStream(inFile));
+		addAll(sub);
+	}
+	
+	public void addFromFile (File inFile, String prefix) 
+			throws FileNotFoundException, IOException {
+		this.prefix = prefix;
+		addFromFile(inFile);
+		resetPrefix();
+	}
+	
+	public void addFromFile (File inFile) 
+			throws FileNotFoundException, IOException {
+		log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
+					+ prefix + ">");
+		PropertyWrapper sub = new PropertyWrapper(inFile);
+		addAll(sub);
+	}
+	
+	public void addAll (PropertyWrapper wrap) {
+		Set<String> keys = wrap.stringPropertyNames();
+		
+		for (String key: keys) {
+			log.debug("add key <" + key + "> with value <" + wrap.getProperty(key) + ">");
+			this.setProperty(key, wrap.getProperty(key)); 
+		}
+	}
+	
 	public void resetPrefix () {
 		prefix = null;
 	}
@@ -72,6 +111,13 @@ public class PropertyWrapper extends Properties {
 		if (prefix == null)
 			return super.containsKey(key);
 		return super.containsKey(prefix + "." + ((String) key));  
+	}
+	
+	public Object setProperty (String key, String value) {
+		if (prefix == null)
+			return super.setProperty(key, value);
+		else
+			return super.setProperty(prefix + "." + key, value);
 	}
 	
 	public boolean setPropertyIfUnset (String key, String value) {
