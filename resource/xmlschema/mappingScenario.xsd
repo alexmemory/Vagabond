@@ -137,6 +137,13 @@
 	
 	<xs:complexType name="MappingType">
 		<xs:sequence>
+			<xs:element name="Uses">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Correspondence" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="Foreach" type="this:MapExprType" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="Exists" type="this:MapExprType" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>

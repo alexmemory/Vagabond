@@ -2,31 +2,38 @@ package org.vagabond.explanation.model.basic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.xmlmodel.CorrespondenceType;
 
 public class CorrespondenceError implements IBasicExplanation {
 
 	static Logger log = Logger.getLogger(CorrespondenceError.class);
 	
 	private IMarkerSet sideEffects;
-	private String correspondence;
+	private Set<CorrespondenceType> correspondences;
 	private Collection<String> mapSE;
 	private IAttributeValueMarker explains;
 
 	public CorrespondenceError () {
-		sideEffects = MarkerFactory.newMarkerSet();
-		mapSE = new ArrayList<String> ();
+		setUp();
+	}
+
+	public CorrespondenceError (ISingleMarker marker) {
+		setUp();
+		explains = (IAttributeValueMarker) marker;
 	}
 	
-	public CorrespondenceError (ISingleMarker marker) {
+	private void setUp() {
 		sideEffects = MarkerFactory.newMarkerSet();
 		mapSE = new ArrayList<String> ();
-		explains = (IAttributeValueMarker) marker;
+		correspondences = new HashSet<CorrespondenceType> ();
 	}
 	
 	@Override
@@ -51,18 +58,22 @@ public class CorrespondenceError implements IBasicExplanation {
 
 	@Override
 	public Object getExplanation() {
-		return correspondence;
+		return correspondences;
 	}
 
-	public String getCorrespondence() {
-		return correspondence;
+	public Set<CorrespondenceType> getCorrespondences() {
+		return correspondences;
 	}
 
-	public void setCorrespondence(String correspondence) {
-		this.correspondence = correspondence;
+	public void setCorrespondences (Set<CorrespondenceType> correspondence) {
+		this.correspondences = correspondence;
+	}
+	
+	public void addCorrespondence (CorrespondenceType corr) {
+		this.correspondences.add(corr);
 	}
 
-	public Collection<String> getMapSE() {
+	public Collection<String> getMapSE () {
 		return mapSE;
 	}
 

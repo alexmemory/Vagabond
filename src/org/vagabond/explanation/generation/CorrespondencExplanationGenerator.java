@@ -1,16 +1,176 @@
 package org.vagabond.explanation.generation;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.SimpleExplanationSet;
+import org.vagabond.explanation.model.basic.CorrespondenceError;
+import org.vagabond.mapping.model.MapScenarioHolder;
+import org.vagabond.util.ConnectionManager;
+import org.vagabond.xmlmodel.CorrespondenceType;
+import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.RelAtomType;
 
 public class CorrespondencExplanationGenerator implements
 		ISingleExplanationGenerator {
 
+	static Logger log = Logger.getLogger(
+			CorrespondencExplanationGenerator.class);
+	
+	private CorrespondenceError expl;
+	private IAttributeValueMarker error;
+	
+	public CorrespondencExplanationGenerator () {
+		
+	}
+	
 	@Override
 	public IExplanationSet findExplanations(ISingleMarker errorMarker)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		IExplanationSet result;
+		
+		this.error = (IAttributeValueMarker) errorMarker;
+		result = new SimpleExplanationSet();
+		expl = new CorrespondenceError(errorMarker);
+		
+		findCorrespondences();
+		computeSideEffects();
+		
+		result.addExplanation(expl);
+		
+		return result;
 	}
+
+	private void computeSideEffects() throws Exception {
+		Set<MappingType> affMaps;
+		Map<String, Set<String>> mapsPerTarget;
+		
+		affMaps = new HashSet<MappingType> ();
+		
+		for(CorrespondenceType corr: expl.getCorrespondences()) {
+			affMaps.addAll(MapScenarioHolder.getInstance()
+					.getMapsForCorr(corr));
+		}
+		
+		mapsPerTarget = partitionMapsToTarget(affMaps);
+		
+		for(String target: mapsPerTarget.keySet()) {
+			runSideEffectQuery (target, mapsPerTarget.get(target));
+		}
+	}
+	
+	private void runSideEffectQuery (String rel, Set<String> maps) throws Exception {
+		StringBuffer mapList;
+		String query;
+		IMarkerSet sideEff;
+		ResultSet rs;
+		
+		sideEff = expl.getSideEffects();
+		mapList = new StringBuffer();
+		
+		for(String mapName: maps) {
+			mapList.append("('" + mapName + "'),");
+		}
+		mapList.deleteCharAt(mapList.length() - 1);
+		
+		query = QueryHolder.getQuery("Correspondence.GetSideEffects")
+				.parameterize("target." + rel, mapList.toString());
+		
+		rs = ConnectionManager.getInstance().execQuery(query);
+
+		while(rs.next()) {
+			sideEff.add(MarkerFactory.newTupleMarker(rel, rs.getString(1)));
+		}
+		
+		ConnectionManager.getInstance().closeRs(rs);
+	}
+	
+	
+
+	private Map<String, Set<String>> partitionMapsToTarget(Set<MappingType> affMaps) {
+		Map<String,Set<String>> mapsPerTarget;
+		String targetName;
+		String mapName;
+		Set<String> maps;
+		mapsPerTarget = new HashMap<String,Set<String>> ();
+		
+		for (MappingType map: affMaps) {
+			mapName = map.getId();
+			for(RelAtomType target: map.getExists().getAtomArray()) {
+				targetName = target.getTableref();
+				if (!mapsPerTarget.containsKey(targetName))
+					mapsPerTarget.put(targetName, new HashSet<String> ());
+				mapsPerTarget.get(targetName).add(mapName);
+			}
+		}
+		
+		return mapsPerTarget;
+	}
+
+	private void findCorrespondences () throws Exception {
+		Vector<String> mappings;
+		Set<CorrespondenceType> corrCandi;
+		MappingType map;
+		
+		corrCandi = expl.getCorrespondences();
+		mappings = getMapProv(error);
+		
+		// get candidate correspondences
+		for (String mapName: mappings) {
+			map = MapScenarioHolder.getInstance().getMapping(mapName);
+			for(CorrespondenceType corr: MapScenarioHolder.getInstance()
+					.getCorrespondences(map)) {
+				if (corrMapsOnError(corr))
+					corrCandi.add(corr);
+			}
+		}
+		
+	}
+	
+	private boolean corrMapsOnError (CorrespondenceType corr) {
+		if (!corr.getTo().getTableref().equals(error.getRelName()))
+			return false;
+		for (String attrName: corr.getTo().getAttrArray()) {
+			if (attrName.equals(error.getAttrName()))
+				return true;
+		}
+		
+		return false;
+	}
+
+	private Vector<String> getMapProv(IAttributeValueMarker marker) throws SQLException, ClassNotFoundException {
+		Vector<String> mappings;
+		ResultSet rs;
+		String map;
+		String query;
+		
+		mappings = new Vector<String>();
+		query = QueryHolder.getQuery("Correspondence.GetMapProv")
+				.parameterize(marker.getRelName(), marker.getTid());
+		
+		rs = ConnectionManager.getInstance().execQuery(query);
+		while(rs.next()) {
+			map = rs.getString(1);
+			if (map != null)
+				mappings.add(map);
+		}
+		
+		ConnectionManager.getInstance().closeRs(rs);
+		
+		return mappings;
+	}
+	
+	
 
 }

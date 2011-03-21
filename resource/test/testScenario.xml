@@ -37,6 +37,9 @@
 </Correspondences>
 <Mappings>
 	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+		</Uses>
 		<Foreach>
 			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
 		</Foreach>
@@ -45,6 +48,9 @@
 		</Exists>
 	</Mapping>
 	<Mapping id="M2">
+		<Uses>
+			<Correspondence>c1</Correspondence><Correspondence>c2</Correspondence>
+		</Uses>
 		<Foreach>
 			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
 			<Atom tableref="address"><Var>b</Var><Var>c</Var></Atom>

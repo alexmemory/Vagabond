@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
@@ -136,5 +137,57 @@ public class MapScenarioHolder {
 
 	public MappingScenarioDocument getDocument() {
 		return doc;
+	}
+	
+	public MappingType getMapping (String name) throws Exception {
+		for(MappingType map: doc.getMappingScenario().getMappings()
+				.getMappingArray()) {
+			if (map.getId().equals(name))
+				return map;
+		}
+		
+		throw new Exception ("Did not find mapping with name <" + name + ">");
+	}
+	
+	public CorrespondenceType getCorr (String name) throws Exception {
+		for (CorrespondenceType corr: doc.getMappingScenario()
+				.getCorrespondences().getCorrespondenceArray()) {
+			if (corr.getId().equals(name))
+				return corr;
+		}
+		
+		throw new Exception("Did not find correspondence with name <" 
+				+ name + ">");
+	}
+	
+	public Collection<CorrespondenceType> getCorrespondences 
+			(MappingType map) throws Exception {
+		Set<CorrespondenceType> result;
+		CorrespondenceType corr;
+		
+		result = new HashSet<CorrespondenceType> ();
+		
+		for(String corrName: map.getUses().getCorrespondenceArray()) {
+			corr = getCorr(corrName);
+			result.add(corr);
+		}
+		
+		return result;
+	}
+	
+	public Collection<MappingType> getMapsForCorr (CorrespondenceType corr) {
+		Set<MappingType> maps;
+		
+		maps = new HashSet<MappingType> ();
+		
+		for(MappingType map: doc.getMappingScenario().getMappings()
+				.getMappingArray()) {
+			for (String use: map.getUses().getCorrespondenceArray()) {
+				if (use.equals(corr.getId()))
+					maps.add(map);
+			}
+		}
+		
+		return maps;
 	}
 }
