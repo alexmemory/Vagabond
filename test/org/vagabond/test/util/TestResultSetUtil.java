@@ -44,6 +44,25 @@ public class TestResultSetUtil extends AbstractVagabondTest {
 		assertTrue(ResultSetUtil.isProvAttr(names[2]));
 	}
 	
+	@Test 
+	public void testRelExtraction () {
+		String[] cols = {"tid","name","city","prov_source_person_tid",
+				"prov_source_person_name","prov_source_person_address",
+				"prov_source_address_tid","prov_source_address_id",
+				"prov_source_address_city"};
+		
+		assertArrayEquals(ResultSetUtil.getBaseRelsForProvSchema(cols).toArray(), 
+				new String[] {"person","address"});
+		
+		cols = ("city,prov_public_address_id,prov_public_address_city," +
+				"prov_public_address_street,prov_public_address_number," +
+				"prov_public_address_1_id,prov_public_address_1_city," +
+				"prov_public_address_1_street,prov_public_address_1_number").split(",");
+		
+		assertArrayEquals(ResultSetUtil.getBaseRelsForProvSchema(cols).toArray(), 
+				new String[] {"address","address_1"});
+	}
+	
 	@Test
 	public void test () throws SQLException, ClassNotFoundException {
 		String[] cols;

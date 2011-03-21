@@ -3,6 +3,7 @@ package org.vagabond.explanation.generation;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.CopyProvExpl;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.ResultSetUtil;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
@@ -101,7 +103,31 @@ public class CopySourceExplanationGenerator implements
 			ConnectionManager.getInstance().closeRs(rs);
 		}
 		
+		result.remove(MarkerFactory.newTupleMarker(
+				(IAttributeValueMarker) expl.explains()));
+		
 		return result;
+	}
+	
+	private Set<String> getNumRelForTrans (String targetRel) throws SQLException, ClassNotFoundException {
+		List<String> rels;
+		String query;
+		ResultSet rs;
+		String result;
+		
+		query = QueryHolder.getQuery("CopyCS.GetProvQueryResultAttrs")
+				.parameterize("target." + targetRel);
+		
+		rs = ConnectionManager.getInstance().execQuery(query);
+		
+		rs.next();
+		result = rs.getString(1).trim();
+		result = result.substring(1, result.length() - 1);
+		rels  = ResultSetUtil.getBaseRelsForProvSchema(result.split(","));
+		
+		ConnectionManager.getInstance().closeRs(rs);
+		
+		return new HashSet<String> (rels);
 	}
 
 	private void parseTargetSE(String rel, ResultSet rs, IMarkerSet sideEff)
@@ -113,7 +139,7 @@ public class CopySourceExplanationGenerator implements
 	}
 
 	private Map<String, Set<String>> getRelAffectedByRels 
-			(Collection<String> inputRels) {
+			(Collection<String> inputRels) throws SQLException, ClassNotFoundException {
 		String targetName;
 		Set<String> sources;
 		Map<String, Set<String>> result;
@@ -127,11 +153,11 @@ public class CopySourceExplanationGenerator implements
 					for(RelAtomType affRel: map.getExists().getAtomArray()) {
 						targetName = affRel.getTableref();
 						if (!result.containsKey(targetName)) {
-							sources = new HashSet<String> ();
+							sources = getNumRelForTrans(targetName);
 							result.put(targetName, sources);
-							for(RelAtomType oneSource: map.getForeach().getAtomArray()) {
-								sources.add(oneSource.getTableref());
-							}
+//							for(RelAtomType oneSource: map.getForeach().getAtomArray()) {
+//								sources.add(oneSource.getTableref());
+//							}
 						}
 					}
 				}
@@ -168,6 +194,7 @@ public class CopySourceExplanationGenerator implements
 			Map<String, IMarkerSet> sourceSE) {
 		StringBuffer conditions;
 		String query;
+		String unnumSource;
 //		StringBuffer provTidAttrs;
 		
 		conditions = new StringBuffer();
@@ -175,11 +202,14 @@ public class CopySourceExplanationGenerator implements
 		
 		conditions.append("(");
 		for(String source: sourceRels) {
+			unnumSource = getUnNumRelName(source);
 //			provTidAttrs.append("prov_source_" + source + "_tid,");
-			if (sourceSE.get(source) != null) {
+			if (sourceSE.get(unnumSource) != null) {
 				for(ISingleMarker sourceErr: sourceSE.get(source).getElems()) {
 					conditions.append(
-							getSideEffectEqualityCond((ITupleMarker) sourceErr, 0) + " AND ");
+							getSideEffectEqualityCond(source, 
+									(ITupleMarker) sourceErr)
+							+ " AND ");
 				}
 			}
 		}
@@ -196,12 +226,14 @@ public class CopySourceExplanationGenerator implements
 		return query;
 	}
 	
-	private String getSideEffectEqualityCond (ITupleMarker sourceErr, 
-			int relAccessNum) {
-		String relNum;
-		
-		relNum = relAccessNum == 0 ? "" : "_" + relAccessNum + "_";
-		return "prov_source_" + sourceErr.getRel() + relNum + 
+	private String getUnNumRelName(String source) {
+		if (!source.contains("_"))
+			return source;
+		return source.substring(0, source.lastIndexOf('_'));
+	}
+
+	private String getSideEffectEqualityCond (String source, ITupleMarker sourceErr) {
+		return "prov_source_" + source + 
 				"_tid IS DISTINCT FROM " + sourceErr.getTid();
 	}
 

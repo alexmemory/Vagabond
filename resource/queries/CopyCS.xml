@@ -38,5 +38,9 @@ WHERE prov.tid = sub.tid
 ORDER  BY tid
 </entry>
 
+<entry key="GetProvQueryResultAttrs">
+SELECT xpath('/Query/Select/Attr/attribute::name', 
+query_sql_to_simple_xml('SELECT PROVENANCE * FROM ${1}'))::text AS attrs;
+</entry>
 
 </properties>

@@ -56,5 +56,9 @@ public class MarkerFactory {
 		return new TupleMarker(relId, tid);
 	}
 	
+	public static ITupleMarker newTupleMarker (IAttributeValueMarker attr) throws Exception {
+		return new TupleMarker(attr.getRelName(), attr.getTid());
+	}
+	
 
 }

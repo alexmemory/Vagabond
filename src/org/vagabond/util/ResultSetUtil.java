@@ -3,6 +3,10 @@ package org.vagabond.util;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -20,6 +24,19 @@ public class ResultSetUtil {
 	
 	public static ResultSetUtil getInstance() {
 		return instance;
+	}
+	
+	public static List<String> getBaseRelsForProvSchema (String[] attrs) {
+		Set<String> rels;
+		
+		rels = new HashSet<String> ();
+		
+		for(String attr: attrs) {
+			if (isProvAttr(attr))
+				rels.add(getNumberedRelFromProvName(attr));
+		}
+		
+		return new ArrayList<String> (rels);
 	}
 	
 	public static String[] getResultColumns (ResultSet rs) throws SQLException {
@@ -70,11 +87,27 @@ public class ResultSetUtil {
 		return split[split.length - 1];
 	}
 	
+	public static String getNumberedRelFromProvName (String name) {
+		String[] split;
+		
+		split = splitProvAttrName (name);
+		if (split.length == 4)
+			return split[2];
+		else 
+			return split[2] + "_" + split[3];
+	}
+	
 	public static String getRelFromProvName (String name) {
 		String[] split;
 		
 		split = splitProvAttrName (name);
 		return split[2];
+	}
+	
+	public static String getBaseRel (String numberedRel) {
+		if (numberedRel.contains("_"))
+			return numberedRel.substring(0, numberedRel.lastIndexOf('_'));
+		return numberedRel;
 	}
 	
 	public static boolean isProvAttr (String name) {

@@ -138,4 +138,28 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 		testSingleQuery(query, result);
 	}
 	
+	@Test
+	public void testGetProvQueryResultAttrs () throws Exception {
+		String query;
+		String result;
+		
+		query = QueryHolder.getQuery("CopyCS.GetProvQueryResultAttrs")
+				.parameterize("source.person");
+		
+		result = "\n                                            attrs                                             \n" +
+		"----------------------------------------------------------------------------------------------\n" +
+		" {tid,name,address,prov_source_person_tid,prov_source_person_name,prov_source_person_address} \n";
+		
+		testSingleQuery (query, result);
+		
+		query = QueryHolder.getQuery("CopyCS.GetProvQueryResultAttrs")
+				.parameterize("target.employee");
+		
+		result = "\n                                            attrs                                             \n" +
+		"----------------------------------------------------------------------------------------------\n" +
+		"  {tid,name,city,prov_source_person_tid,prov_source_person_name,prov_source_person_address,prov_source_address_tid,prov_source_address_id,prov_source_address_city} \n";
+		
+		testSingleQuery (query, result);
+	}
+	
 }

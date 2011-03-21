@@ -147,7 +147,6 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		IMarkerSet m1 = MarkerFactory.newMarkerSet(
 				MarkerFactory.newTupleMarker("address", "2"));
 		IMarkerSet sideE = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "2|2"),
 				MarkerFactory.newTupleMarker("employee", "4|2"));
 		IExplanationSet eSet;
 		CopySourceError e1;
