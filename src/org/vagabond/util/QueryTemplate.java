@@ -15,6 +15,9 @@ public class QueryTemplate {
 	public String parameterize (String ... params) {
 		String result = queryText;
 		
+		if (params == null)
+			return result;
+		
 		for(int i = 1; i <= params.length; i++) {
 			result = result.replaceAll("\\$\\{" + i + "\\}", params[i-1]);
 		}

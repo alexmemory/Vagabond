@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
@@ -17,6 +21,7 @@ import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -27,6 +32,7 @@ import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.test.util.TestOptions;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.PropertyWrapper;
 
@@ -43,8 +49,7 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@BeforeClass
 	public static void setUp () throws SQLException, ClassNotFoundException, XmlException, IOException, ValidationException {
-		Connection con = ConnectionManager.getInstance().getConnection("localhost", 
-				"tramptest", "postgres", "");
+		Connection con = TestOptions.getInstance().getConnection();
 		
 		File mapFile = new File("resource/test/simpleTest.xml");		
 		map = ModelLoader.getInstance().load(mapFile);
@@ -61,8 +66,6 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 				"p.name, a.city " +
 				"FROM source.person p, source.address a " +
 				"WHERE p.address = a.id AND name = 'Peter';");
-		
-		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 	}
 	
 	@Test
@@ -97,6 +100,44 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		assertEquals(e1.getSourceSE(), m1);
 		assertEquals(e1.explains(), a1);
 		assertEquals(e1.getSideEffects().getSize(), 0);
+	}
+	
+	@Test
+	public void testSideEffectQueryGen () throws Exception {
+		Set<String> sourceRels;
+		Map<String, IMarkerSet> sourceErr;
+		IMarkerSet errSet, errSet2;
+		String resultQuery;
+		String query;
+		//TODO handle multiple accesses to same base rel
+		query = "SELECT prov.tid\n" +
+				"FROM\n" +
+				"(SELECT *\n" +
+				"FROM target.employee) AS prov\n" +
+				"WHERE NOT EXISTS (SELECT subprov.tid\n" +
+				"FROM (SELECT PROVENANCE * FROM target.employee) AS subprov\n" + 
+				"WHERE prov.tid = subprov.tid " +
+				"AND (prov_source_address_tid IS DISTINCT FROM 2 " +
+				"AND prov_source_address_tid IS DISTINCT FROM 3 ))";
+		errSet = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "1")
+				);
+		errSet2 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2"),
+				MarkerFactory.newTupleMarker("address", "3")
+				);
+		sourceErr = new HashMap<String, IMarkerSet> ();
+		sourceErr.put("employee", errSet);
+		sourceErr.put("address", errSet2);
+		
+		sourceRels = new HashSet<String> ();
+		sourceRels.add("address");
+		sourceRels.add("person");
+		
+		resultQuery = gen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
+		log.debug(resultQuery);
+		
+		assertEquals(query, resultQuery);
 	}
 	
 	@Test

@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -75,8 +76,8 @@ public class MarkerSet implements IMarkerSet {
 	}
 
 	@Override
-	public void add(ISingleMarker marker) {
-		markers.add(marker);
+	public boolean add(ISingleMarker marker) {
+		return markers.add(marker);
 	}
 
 	@Override
@@ -92,6 +93,66 @@ public class MarkerSet implements IMarkerSet {
 		result.append("}");
 		
 		return result.toString();
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends ISingleMarker> arg0) {
+		return markers.addAll(arg0);
+	}
+
+	@Override
+	public void clear() {
+		markers.clear();
+	}
+
+	@Override
+	public boolean contains(Object arg0) {
+		return markers.contains(arg0);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> arg0) {
+		return markers.containsAll(arg0);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return markers.isEmpty();
+	}
+
+	@Override
+	public Iterator<ISingleMarker> iterator() {
+		return markers.iterator();
+	}
+
+	@Override
+	public boolean remove(Object arg0) {
+		return markers.remove(arg0);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> arg0) {
+		return markers.removeAll(arg0);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> arg0) {
+		return markers.retainAll(arg0);
+	}
+
+	@Override
+	public int size() {
+		return markers.size();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return markers.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] arg0) {
+		return markers.toArray(arg0);
 	}
 	
 }

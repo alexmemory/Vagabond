@@ -36,9 +36,12 @@ public class PropertyWrapper extends Properties {
 		super.load(new FileReader(fileName));
 	}
 	
-	public PropertyWrapper (File inFile) throws FileNotFoundException, IOException {
+	public PropertyWrapper (File inFile, boolean xml) throws FileNotFoundException, IOException {
 		super();
-		super.load(new FileInputStream(inFile));
+		if (xml)
+			super.loadFromXML(new FileInputStream(inFile));
+		else 
+			super.load(new FileInputStream(inFile));
 	}
 
 	
@@ -73,7 +76,7 @@ public class PropertyWrapper extends Properties {
 			throws FileNotFoundException, IOException {
 		log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
 					+ prefix + ">");
-		PropertyWrapper sub = new PropertyWrapper(inFile);
+		PropertyWrapper sub = new PropertyWrapper(inFile, false);
 		addAll(sub);
 	}
 	

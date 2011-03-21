@@ -135,8 +135,6 @@ public class TestMarkers extends AbstractVagabondTest {
 	private static void setUpSchemaResolver (String fileName) throws XmlException, IOException, ValidationException {
 		MapScenarioHolder map = ModelLoader.getInstance().load(new 
 				File(fileName));
-		SchemaResolver.getInstance().setSchemas(
-				map.getScenario().getSchemas().getSourceSchema(),
-				map.getScenario().getSchemas().getTargetSchema());
+		setSchemas(fileName);
 	}
 }

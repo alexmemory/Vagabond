@@ -29,6 +29,7 @@ public class SchemaResolver {
 	public void setSchemas (SchemaType source, SchemaType target) {
 		this.sourceSchema = source;
 		this.targetSchema = target;
+		rels = new ArrayList<RelationType> ();
 		for(RelationType rel: sourceSchema.getRelationArray())
 			rels.add(rel);
 		for(RelationType rel: targetSchema.getRelationArray())
