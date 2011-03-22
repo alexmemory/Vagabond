@@ -13,6 +13,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.SimpleExplanationSet;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
@@ -41,7 +42,7 @@ public class CorrespondencExplanationGenerator implements
 		IExplanationSet result;
 		
 		this.error = (IAttributeValueMarker) errorMarker;
-		result = new SimpleExplanationSet();
+		result = ExplanationFactory.newExplanationSet();
 		expl = new CorrespondenceError(errorMarker);
 		
 		findCorrespondences();
@@ -63,11 +64,15 @@ public class CorrespondencExplanationGenerator implements
 					.getMapsForCorr(corr));
 		}
 		
+		expl.setMapSE(affMaps);
+		
 		mapsPerTarget = partitionMapsToTarget(affMaps);
 		
 		for(String target: mapsPerTarget.keySet()) {
 			runSideEffectQuery (target, mapsPerTarget.get(target));
 		}
+		
+		expl.getSideEffects().remove(expl.explains());
 	}
 	
 	private void runSideEffectQuery (String rel, Set<String> maps) throws Exception {
@@ -75,7 +80,9 @@ public class CorrespondencExplanationGenerator implements
 		String query;
 		IMarkerSet sideEff;
 		ResultSet rs;
+		String attrName;
 		
+		attrName = ((IAttributeValueMarker) expl.explains()).getAttrName();
 		sideEff = expl.getSideEffects();
 		mapList = new StringBuffer();
 		
@@ -87,11 +94,14 @@ public class CorrespondencExplanationGenerator implements
 		query = QueryHolder.getQuery("Correspondence.GetSideEffects")
 				.parameterize("target." + rel, mapList.toString());
 		
+		log.debug("Run side effect query for <" + rel + "> with query <\n" 
+				+ query + ">");
+		
 		rs = ConnectionManager.getInstance().execQuery(query);
 
-		while(rs.next()) {
-			sideEff.add(MarkerFactory.newTupleMarker(rel, rs.getString(1)));
-		}
+		while(rs.next())
+			sideEff.add(MarkerFactory.newAttrMarker(
+					rel, rs.getString(1), attrName));
 		
 		ConnectionManager.getInstance().closeRs(rs);
 	}
@@ -157,7 +167,11 @@ public class CorrespondencExplanationGenerator implements
 		
 		mappings = new Vector<String>();
 		query = QueryHolder.getQuery("Correspondence.GetMapProv")
-				.parameterize(marker.getRelName(), marker.getTid());
+				.parameterize("target." + marker.getRelName(), 
+						marker.getTid());
+		
+		log.debug("get mappings that produced <" + marker + "> with query:\n"
+				+ query + ">");
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		while(rs.next()) {

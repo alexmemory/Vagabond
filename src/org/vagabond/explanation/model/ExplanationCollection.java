@@ -17,7 +17,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	private IdMap<ISingleMarker> errorIds;
 	private Vector<Integer> numExpls;
 	private Vector<Integer> iterPos;
-	private int totalExpls = 0;
+	private int totalExpls = 1;
 	
 	public ExplanationCollection () {
 		explMap = new HashMap<ISingleMarker, IExplanationSet>();
@@ -61,7 +61,14 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 
 	@Override
 	public IExplanationSet next() {
-		return generateExplForIter(iterPos);
+		IExplanationSet set;
+		
+		set = generateExplForIter(iterPos);
+		increaseIter ();
+		
+		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
+		
+		return set; 
 	}
 	
 	private IExplanationSet generateExplForIter(Vector<Integer> iterPos) {
@@ -81,10 +88,26 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		return result;
 	}
 
-	@Override
-	public void remove() {
-		// TODO Auto-generated method stub
+	private void increaseIter () {
+		int curPos;
 		
+		for(int i = 0; i < iterPos.size(); i++) {
+			curPos = iterPos.get(i);
+			if (curPos < numExpls.get(i))
+			{
+				iterPos.set(i, curPos + 1);
+				return;
+			}
+			else {
+				iterPos.set(i, 0);
+			}
+		}
+		
+		log.debug("new iter pos is <" + iterPos + ">");
+	}
+	
+	@Override
+	public void remove() {		
 	}
 	
 	public void resetIter () {

@@ -1,43 +1,27 @@
 package org.vagabond.test.explanations;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.model.ValidationException;
-import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondDBTest;
-import org.vagabond.test.AbstractVagabondTest;
 
 public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 
-	
-	private MapScenarioHolder map;
 	private CopySourceExplanationGenerator gen;
 
-	public TestCopyExplGenQueries(String name) throws XmlException, IOException, ValidationException, SQLException {
+	public TestCopyExplGenQueries(String name) throws Exception {
 		super(name);
-		File mapFile = new File("resource/test/simpleTest.xml");		
-		map = ModelLoader.getInstance().load(mapFile);
-		
-		DatabaseScenarioLoader.getInstance().loadScenario(con, map);
+		loadToDB("resource/test/simpleTest.xml");
 		
 		gen = new CopySourceExplanationGenerator();
-		
-		AbstractVagabondTest.setSchemas("resource/test/simpleTest.xml");
 	}
 	
 	@Test

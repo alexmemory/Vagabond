@@ -11,6 +11,7 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.xmlmodel.CorrespondenceType;
+import org.vagabond.xmlmodel.MappingType;
 
 public class CorrespondenceError implements IBasicExplanation {
 
@@ -18,7 +19,7 @@ public class CorrespondenceError implements IBasicExplanation {
 	
 	private IMarkerSet sideEffects;
 	private Set<CorrespondenceType> correspondences;
-	private Collection<String> mapSE;
+	private Collection<MappingType> mapSE;
 	private IAttributeValueMarker explains;
 
 	public CorrespondenceError () {
@@ -32,7 +33,7 @@ public class CorrespondenceError implements IBasicExplanation {
 	
 	private void setUp() {
 		sideEffects = MarkerFactory.newMarkerSet();
-		mapSE = new ArrayList<String> ();
+		mapSE = new ArrayList<MappingType> ();
 		correspondences = new HashSet<CorrespondenceType> ();
 	}
 	
@@ -73,11 +74,11 @@ public class CorrespondenceError implements IBasicExplanation {
 		this.correspondences.add(corr);
 	}
 
-	public Collection<String> getMapSE () {
+	public Collection<MappingType> getMapSE () {
 		return mapSE;
 	}
 
-	public void setMapSE(Collection<String> mapSE) {
+	public void setMapSE(Collection<MappingType> mapSE) {
 		this.mapSE = mapSE;
 	}
 
@@ -89,4 +90,21 @@ public class CorrespondenceError implements IBasicExplanation {
 		this.explains = explains;
 	}
 
+	@Override
+	public String toString () {
+		StringBuffer result;
+		
+		result = new StringBuffer();
+		
+		result.append("CorrspondenceExplanation for <");
+		result.append(explains.toString());
+		result.append(">:\nIncorrect Corrspondences: <");
+		result.append(correspondences.toString());
+		result.append(">\n\nwith SideEffects:\n<");
+		result.append(sideEffects.toString());
+		result.append(">");
+		
+		return result.toString();
+	}
+	
 }

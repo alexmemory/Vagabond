@@ -1,6 +1,8 @@
 package org.vagabond.mapping.model;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,6 +41,24 @@ public class ModelLoader {
 		return instance;
 	}
 	
+	public void loadToInst (String fileName) throws Exception {
+		MapScenarioHolder.getInstance().setDocument(getDoc(
+				new FileInputStream(fileName)));
+	}
+	
+	public void loadToInst (InputStream in) throws Exception {
+		MapScenarioHolder.getInstance().setDocument(getDoc(in));
+	}
+	
+	public void loadToInst (File inFile) throws Exception {
+		MapScenarioHolder.getInstance()
+				.setDocument(getDoc(new FileInputStream(inFile)));
+	}
+	
+	public MapScenarioHolder load (String fileName) throws Exception {
+		return new MapScenarioHolder(getDoc(new FileInputStream(fileName)));
+	}
+	
 	/**
 	 * Load a mapping scenario from a file.
 	 * 
@@ -49,15 +69,9 @@ public class ModelLoader {
 	 * @throws ValidationException
 	 */
 	
-	public MapScenarioHolder load (File inFile) throws XmlException, IOException, ValidationException {
-		MappingScenarioDocument doc;
-		MapScenarioHolder holder;
-		
-		doc = MappingScenarioDocument.Factory.parse(inFile);
-		validate (doc);
-		holder = new MapScenarioHolder (doc);
-		
-		return holder;
+	public MapScenarioHolder load (File inFile) throws XmlException, 
+			IOException, ValidationException {
+		return new MapScenarioHolder(getDoc(new FileInputStream (inFile)));
 	}
 	
 	/**
@@ -70,15 +84,19 @@ public class ModelLoader {
 	 * @throws ValidationException
 	 */
 	
-	public MapScenarioHolder load (InputStream inStream) throws XmlException, IOException, ValidationException {
+	public MapScenarioHolder load (InputStream inStream) throws XmlException, 
+			IOException, ValidationException {
+		return new MapScenarioHolder(getDoc(inStream));
+	}
+	
+	private MappingScenarioDocument getDoc (InputStream in) throws XmlException,
+			IOException, ValidationException {
 		MappingScenarioDocument doc;
-		MapScenarioHolder holder;
 		
-		doc = MappingScenarioDocument.Factory.parse(inStream);
+		doc = MappingScenarioDocument.Factory.parse(in);
 		validate (doc);
-		holder = new MapScenarioHolder (doc);
 		
-		return holder;
+		return doc;
 	}
 	
 	/**

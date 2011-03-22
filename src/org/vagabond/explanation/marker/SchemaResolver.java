@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.RelationType;
 import org.vagabond.xmlmodel.SchemaType;
@@ -24,6 +25,13 @@ public class SchemaResolver {
 	
 	public static SchemaResolver getInstance () {
 		return instance;
+	}
+	
+	public void setSchemas () {
+		setSchemas(MapScenarioHolder.getInstance().getScenario().getSchemas()
+						.getSourceSchema(),
+				MapScenarioHolder.getInstance().getScenario().getSchemas()
+						.getTargetSchema());
 	}
 
 	public void setSchemas (SchemaType source, SchemaType target) {

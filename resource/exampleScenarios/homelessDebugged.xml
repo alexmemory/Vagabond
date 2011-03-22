@@ -58,6 +58,10 @@
 </Correspondences>
 <Mappings>
 	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+			<Correspondence>c3</Correspondence>
+		</Uses>
 		<Foreach>
 			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
 			<Atom tableref="socialworker"><Var>d</Var><Var>e</Var><Var>f</Var></Atom>
@@ -68,6 +72,10 @@
 		</Exists>
 	</Mapping>
 	<Mapping id="M2">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+			<Correspondence>c2</Correspondence>
+		</Uses>
 		<Foreach>
 			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
 		</Foreach>

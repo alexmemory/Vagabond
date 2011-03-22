@@ -18,6 +18,18 @@ public class ExplanationFactory {
 	public static IExplanationSet newExplanationSet () {
 		return new SimpleExplanationSet ();
 	}
+	
+	public static IExplanationSet newExplanationSet (IBasicExplanation ... elems) {
+		SimpleExplanationSet result;
+		
+		result = new SimpleExplanationSet();
+		
+		for(IBasicExplanation expl: elems) {
+			result.addExplanation(expl);
+		}
+		
+		return result;
+	}
 	 
 	public static IBasicExplanation newBasicExpl (ExplanationType type) throws Exception {
 		switch(type) {

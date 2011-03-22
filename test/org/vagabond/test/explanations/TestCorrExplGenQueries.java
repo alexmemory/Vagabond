@@ -1,21 +1,10 @@
 package org.vagabond.test.explanations;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
-import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.CorrespondencExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
-import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.model.ValidationException;
-import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondDBTest;
-import org.vagabond.test.AbstractVagabondTest;
 
 public class TestCorrExplGenQueries extends AbstractVagabondDBTest {
 
@@ -26,14 +15,9 @@ public class TestCorrExplGenQueries extends AbstractVagabondDBTest {
 	public TestCorrExplGenQueries (String name) throws Exception {
 		super(name);
 		
-		File mapFile = new File("resource/test/simpleTest.xml");		
-		MapScenarioHolder map = ModelLoader.getInstance().load(mapFile);
-		
-		DatabaseScenarioLoader.getInstance().loadScenario(con, map);
+		loadToDB("resource/test/simpleTest.xml");
 		
 		gen = new CorrespondencExplanationGenerator();
-		
-		AbstractVagabondTest.setSchemas("resource/test/simpleTest.xml");
 	}
 	
 	@Test

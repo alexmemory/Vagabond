@@ -1,7 +1,9 @@
 package org.vagabond.explanation.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -13,16 +15,20 @@ public class SimpleExplanationSet implements IExplanationSet {
 	static Logger log = Logger.getLogger(SimpleExplanationSet.class);
 	
 	private IMarkerSet sideEffects;
-	private List<IBasicExplanation> expls;
+	private Set<IBasicExplanation> expls;
 	
 	public SimpleExplanationSet () {
-		expls = new ArrayList<IBasicExplanation> ();
+		expls = new HashSet<IBasicExplanation> ();
 		sideEffects = MarkerFactory.newMarkerSet();
 	}
 	
 	@Override
 	public List<IBasicExplanation> getExplanations() {
-		return expls;
+		return new ArrayList<IBasicExplanation> (expls);
+	}
+	
+	public Set<IBasicExplanation> getExplanationsSet () {
+		return this.expls;
 	}
 
 	@Override
@@ -80,8 +86,9 @@ public class SimpleExplanationSet implements IExplanationSet {
 
 	@Override
 	public IExplanationSet union(IExplanationSet other) {
-		// TODO Auto-generated method stub
-		return null;
+		this.expls.addAll(other.getExplanationsSet());
+		this.sideEffects.union(getSideEffects());
+		return this;
 	}
 	
 }

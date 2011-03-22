@@ -1,65 +1,43 @@
 package org.vagabond.test.explanations;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-
 import org.vagabond.explanation.generation.CopyCSParser;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
-import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.CopyProvExpl;
-import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.model.ValidationException;
-import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondTest;
-import org.vagabond.test.util.TestOptions;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.PropertyWrapper;
-
-import static org.junit.Assert.*;
 
 
 public class TestCopyExplGen extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestCopyExplGen.class);
 	
-	private static MapScenarioHolder map;
 	private static CopySourceExplanationGenerator gen;
 	private static PropertyWrapper queries;
 	
 	@BeforeClass
-	public static void setUp () throws SQLException, ClassNotFoundException, XmlException, IOException, ValidationException {
-		Connection con = TestOptions.getInstance().getConnection();
-		
-		File mapFile = new File("resource/test/simpleTest.xml");		
-		map = ModelLoader.getInstance().load(mapFile);
-		
-		DatabaseScenarioLoader.getInstance().loadScenario(con, map);
+	public static void setUp () throws Exception {		
+		loadToDB("resource/test/simpleTest.xml");
 		
 		gen = new CopySourceExplanationGenerator();
-		
-		setSchemas("resource/test/simpleTest.xml");
-		
+				
 		queries = new PropertyWrapper("resource/queries/CopyCS.xml");
 		queries.setProperty("copy1", 
 				"SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) " +

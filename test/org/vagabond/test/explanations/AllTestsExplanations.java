@@ -7,8 +7,12 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 		TestMarkers.class,
+		TestQueryHolder.class,
+		TestExplSetGen.class,
 		TestCopyExplGen.class,
-		TestCopyExplGenQueries.class
+		TestCopyExplGenQueries.class,
+		TestCorrExplGen.class,
+		TestCorrExplGenQueries.class
         })
 public class AllTestsExplanations {
 

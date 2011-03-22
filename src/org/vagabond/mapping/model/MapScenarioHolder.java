@@ -5,15 +5,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import org.vagabond.xmlmodel.CorrespondenceType;
+import org.vagabond.xmlmodel.MappingScenarioDocument;
+import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
-import org.vagabond.xmlmodel.MappingScenarioDocument;
-import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 import org.vagabond.xmlmodel.TransformationType;
 
 /**

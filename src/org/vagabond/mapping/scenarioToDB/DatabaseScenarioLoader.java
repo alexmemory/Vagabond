@@ -25,6 +25,14 @@ public class DatabaseScenarioLoader {
 		return instance;
 	}
 	
+	public void loadScenario (Connection dbCon) throws SQLException {
+		loadScenario (dbCon, MapScenarioHolder.getInstance());
+	}
+	
+	public void loadScenarioNoData (Connection dbCon) throws SQLException {
+		loadScenarioNoData(dbCon, MapScenarioHolder.getInstance());
+	}
+	
 	public void loadScenarioNoData (Connection dbCon, MapScenarioHolder map) 
 			throws SQLException {
 		loadScenario (dbCon, map, true);

@@ -3,6 +3,7 @@ package org.vagabond.test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -13,9 +14,9 @@ import org.vagabond.explanation.marker.SchemaResolver;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
+import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.util.TestOptions;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.util.PropertyWrapper;
 
 public abstract class AbstractVagabondTest {
 
@@ -38,6 +39,14 @@ public abstract class AbstractVagabondTest {
 		SchemaResolver.getInstance().setSchemas(
 				holder.getScenario().getSchemas().getSourceSchema(),
 				holder.getScenario().getSchemas().getTargetSchema());
+	}
+	
+	public static void loadToDB (String fileName) throws Exception {
+		Connection con = TestOptions.getInstance().getConnection();
+		
+		ModelLoader.getInstance().loadToInst(fileName);
+		SchemaResolver.getInstance().setSchemas();
+		DatabaseScenarioLoader.getInstance().loadScenario(con);
 	}
 	
 }
