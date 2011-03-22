@@ -1,4 +1,6 @@
-package org.vagabond.test.util;
+package org.vagabond.test;
+
+import static org.vagabond.util.LoggerUtil.logException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,9 +11,7 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dbunit.database.AbstractDatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.vagabond.util.PropertyWrapper;
-import static org.vagabond.util.LoggerUtil.*;
 
 public class TestOptions extends AbstractDatabaseConnection {
 	
@@ -20,8 +20,7 @@ public class TestOptions extends AbstractDatabaseConnection {
 	private static TestOptions instance;
 	
 	private PropertyWrapper props;
-	private IDatabaseConnection iCon;
-	private Connection con;
+	private Connection con = null;
 	
 	private TestOptions () throws FileNotFoundException, IOException, ClassNotFoundException {
 		props = new PropertyWrapper(new File("resource/test/options.txt"), false);
@@ -35,7 +34,10 @@ public class TestOptions extends AbstractDatabaseConnection {
 	}
 	
 	public void close() throws SQLException {
-		
+		if (con != null) {
+			con.close();
+			con = null;
+		}
 	}
 
 	public Connection getConnection() throws SQLException {

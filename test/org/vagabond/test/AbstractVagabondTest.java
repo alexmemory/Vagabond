@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.xmlbeans.XmlException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.SchemaResolver;
@@ -15,7 +16,6 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
-import org.vagabond.test.util.TestOptions;
 import org.vagabond.util.ConnectionManager;
 
 public abstract class AbstractVagabondTest {
@@ -29,6 +29,12 @@ public abstract class AbstractVagabondTest {
 				TestOptions.getInstance().getDB(),
 				TestOptions.getInstance().getUser(), 
 				TestOptions.getInstance().getPassword());
+	}
+	
+	@AfterClass
+	public static void tearDown () throws Exception {
+		TestOptions.getInstance().close();
+		ConnectionManager.getInstance().closeCon();
 	}
 	
 	public static void setSchemas (String fileName) throws XmlException, IOException, ValidationException {

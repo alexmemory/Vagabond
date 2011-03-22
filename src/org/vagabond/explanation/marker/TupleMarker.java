@@ -28,6 +28,9 @@ public class TupleMarker implements ITupleMarker {
 		if (other == null)
 			return false;
 		
+		if (this == other)
+			return true;
+		
 		if (other instanceof ITupleMarker) {
 			ITupleMarker oMarker = (ITupleMarker) other;
 			

@@ -2,6 +2,8 @@ package org.vagabond.test.util;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,21 +12,18 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.test.TestOptions;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.ResultSetUtil;
 
 public class TestResultSetUtil extends AbstractVagabondTest {
 
 	@BeforeClass
-	public static void setUp () throws SQLException, ClassNotFoundException {
-		ConnectionManager.getInstance().getConnection("localhost", 
-				"tramptest", "postgres", "");
+	public static void setUp () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
 	}
 	
-	@AfterClass
-	public static void tearDown () throws SQLException, ClassNotFoundException {
-		ConnectionManager.getInstance().closeCon();
-	}
+	
 	
 	@Test
 	public void testProvAttrSplitters () {
@@ -64,17 +63,18 @@ public class TestResultSetUtil extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void test () throws SQLException, ClassNotFoundException {
+	public void test () throws Exception {
 		String[] cols;
 		ResultSet rs;
+		Connection con = TestOptions.getInstance().getConnection();
 		
-		rs = ConnectionManager.getInstance().execQuery(
+		rs = ConnectionManager.getInstance().execQuery(con,
 				"SELECT * FROM source.person");
 		cols = ResultSetUtil.getResultColumns(rs);
 		ConnectionManager.getInstance().closeRs(rs);
 		assertArrayEquals(cols, new String[] {"tid","name","address"});
 		
-		rs = ConnectionManager.getInstance().execQuery(
+		rs = ConnectionManager.getInstance().execQuery(con,
 				"SELECT PROVENANCE tid FROM source.person");
 		cols = ResultSetUtil.getResultColumns(rs);
 		ConnectionManager.getInstance().closeRs(rs);

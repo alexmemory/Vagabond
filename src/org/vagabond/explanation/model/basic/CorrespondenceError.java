@@ -13,6 +13,8 @@ import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 
+import static org.vagabond.util.LoggerUtil.*;
+
 public class CorrespondenceError implements IBasicExplanation {
 
 	static Logger log = Logger.getLogger(CorrespondenceError.class);
@@ -21,6 +23,8 @@ public class CorrespondenceError implements IBasicExplanation {
 	private Set<CorrespondenceType> correspondences;
 	private Collection<MappingType> mapSE;
 	private IAttributeValueMarker explains;
+
+	private int hash = -1;
 
 	public CorrespondenceError () {
 		setUp();
@@ -98,13 +102,68 @@ public class CorrespondenceError implements IBasicExplanation {
 		
 		result.append("CorrspondenceExplanation for <");
 		result.append(explains.toString());
-		result.append(">:\nIncorrect Corrspondences: <");
-		result.append(correspondences.toString());
-		result.append(">\n\nwith SideEffects:\n<");
+		result.append(">:\nIncorrect Corrspondences: ");
+		try {
+			result.append(ObjectColToStringWithMethod(correspondences, 
+					CorrespondenceType.class, "getId"));
+		} catch (Exception e) {
+			logException(e, log);
+		}
+		
+		result.append("\n\nwith target side-effects:\n<");
 		result.append(sideEffects.toString());
-		result.append(">");
+		result.append(">\n");
+		
+		result.append("\nwith map side-effects:\n");
+		try {
+			result.append(ObjectColToStringWithMethod(mapSE, 
+					MappingType.class, "getId"));
+		} catch (Exception e) {
+			logException(e, log);
+		}
 		
 		return result.toString();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		CorrespondenceError cOther;
+		
+		if (other == null)
+			return false;
+		
+		if (this == other)
+			return true;
+		
+		if (!(other instanceof CorrespondenceError))
+			return false;
+		
+		cOther = (CorrespondenceError) other;
+		
+		if (!this.explains().equals(cOther.explains()))
+			return false;
+		
+		if (!this.sideEffects.equals(cOther.getSideEffects()))
+			return false;
+		
+		if (!this.correspondences.equals(cOther.getCorrespondences()))
+			return false;
+		
+		if (!this.mapSE.equals(cOther.getMapSE()))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode () {
+		if (hash == -1) {
+			hash = explains.hashCode() * 13 
+					+ mapSE.hashCode() 
+					+ correspondences.hashCode()
+					+ sideEffects.hashCode();
+		}
+		return hash;
 	}
 	
 }

@@ -24,14 +24,13 @@ public class MarkerSet implements IMarkerSet {
 		if (other == null)
 			return false;
 		
+		if (other == this)
+			return true;
+		
 		if (other instanceof IMarkerSet) {
 			IMarkerSet oMarker = (IMarkerSet) other;
-			Iterator<ISingleMarker> iter = this.markers.iterator();
-
-			if (this.getNumElem() != oMarker.getNumElem())
-				return false;
-			while(iter.hasNext()) {
-				ISingleMarker elem = iter.next();
+			
+			for(ISingleMarker elem: markers) {
 				log.debug("check " + elem);
 				if (!oMarker.getElems().contains(elem))
 					return false;

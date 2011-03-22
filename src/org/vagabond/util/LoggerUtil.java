@@ -3,6 +3,10 @@
  */
 package org.vagabond.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 
 
@@ -83,5 +87,28 @@ public class LoggerUtil {
 		log.debug(result.toString());
 	}
 	
+	public static void logObjectColWithMethod (Logger log, Collection<?> objs,
+			Class<?> objClass, String methodName) throws  Exception {
+		log.debug(ObjectColToStringWithMethod(objs,objClass, methodName));
+	}
+	
+	public static String ObjectColToStringWithMethod (Collection<?> objs, 
+			Class<?> objClass, String methodName) throws Exception {
+		StringBuffer result = new StringBuffer();
+		Method method;
+		String callResult;
+		
+		method = objClass.getMethod(methodName);
+		
+		result.append('[');
+		for(Object elem: objs) {
+			callResult = (String) method.invoke(elem);
+			result.append(callResult);
+			result.append(',');
+		}
+		result.setCharAt(result.length() - 1, ']');
+		
+		return result.toString();
+	}
 	
 }

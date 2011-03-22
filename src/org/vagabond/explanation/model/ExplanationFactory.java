@@ -3,6 +3,9 @@ package org.vagabond.explanation.model;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.model.basic.InfluenceSourceError;
+import org.vagabond.explanation.model.basic.SuperflousMappingError;
+
 import static org.vagabond.explanation.model.basic.IBasicExplanation.*;
 
 public class ExplanationFactory {
@@ -35,6 +38,10 @@ public class ExplanationFactory {
 		switch(type) {
 		case CopySourceError:
 			return new CopySourceError();
+		case InfluenceSourceError:
+			return new InfluenceSourceError();
+		case SuperflousMappingError:
+			return new SuperflousMappingError();
 		default:
 			throw new Exception("now explanation class for type: <" 
 					+ type + ">");

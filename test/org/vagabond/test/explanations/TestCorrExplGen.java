@@ -17,7 +17,7 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondTest;
-import org.vagabond.test.util.TestOptions;
+import org.vagabond.test.TestOptions;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 

@@ -1,5 +1,6 @@
 package org.vagabond.explanation.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +19,8 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	private Vector<Integer> numExpls;
 	private Vector<Integer> iterPos;
 	private int totalExpls = 1;
+
+	private int hash = -1;
 	
 	public ExplanationCollection () {
 		explMap = new HashMap<ISingleMarker, IExplanationSet>();
@@ -52,6 +55,18 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			numExpls.add(numExpl);
 			iterPos.add(0);
 		}
+	}
+	
+	public Collection<IExplanationSet> getExplSets () {
+		return explMap.values();
+	}
+	
+	public Map<ISingleMarker, IExplanationSet> getErrorExplMap () {
+		return explMap;
+	}
+	
+	public IdMap<ISingleMarker> getErrorIdMap () {
+		return errorIds;
 	}
 
 	@Override
@@ -132,4 +147,68 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		return 0;
 	}
 	
+	@Override
+	public String toString () {
+		StringBuffer result;
+		
+		result = new StringBuffer();
+		result.append("Explanation Collection:\n\n");
+		result.append(getStats());
+		result.append("\n\n------Sets:\n");
+		
+		for(IExplanationSet set: explMap.values()) {
+			result.append(set);
+			result.append("\n------------\n");
+		}
+		
+		return result.toString();
+	}
+	
+	public String getStats () {
+		return "Stats:\n" + 
+				"\tNumber Sets: <" + explMap.size() + ">\n" +
+				"\tTotal explanations: <" + totalExpls + ">\n" +
+				"\tNumber Expls per set: <" + numExpls + ">\n";
+	}
+	
+	@Override
+	public boolean equals (Object other) {
+		ExplanationCollection oCol;
+		
+		if (other == null)
+			return false;
+		
+		if (this == other)
+			return true;
+		
+		if (!(other instanceof ExplanationCollection))
+			return false;
+		
+		oCol = (ExplanationCollection) other;
+		
+		if (this.totalExpls != oCol.totalExpls)
+			return false;
+		
+		if (this.numExpls != oCol.numExpls)
+			return false;
+		
+		if (!this.explMap.equals(oCol.explMap))
+			return false;
+		
+		if (!this.errorIds.equals(oCol.errorIds))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode () {
+		if (hash == -1) {
+			hash = totalExpls;
+			hash = hash * 13 + numExpls.hashCode();
+			hash = hash * 13 + explMap.hashCode();
+		}
+		
+		return hash;
+	}
 }

@@ -27,7 +27,7 @@ import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
-import org.vagabond.test.util.TestOptions;
+import org.vagabond.util.ConnectionManager;
 
 import static org.vagabond.util.LoggerUtil.*;
 
@@ -225,5 +225,10 @@ public abstract class AbstractVagabondDBTest extends DBTestCase  {
 		
 		ModelLoader.getInstance().loadToInst(fileName);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
+	}
+	
+	public static void closeDown () throws Exception {
+		TestOptions.getInstance().close();
+		ConnectionManager.getInstance().closeCon();
 	}
 }

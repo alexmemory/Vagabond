@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 
 public class SimpleExplanationSet implements IExplanationSet {
@@ -69,10 +70,11 @@ public class SimpleExplanationSet implements IExplanationSet {
 	public String toString () {
 		StringBuffer result = new StringBuffer();
 		
-		result.append("ExplanationSet:\n\nStats:" + getStats());
-		result.append("\nExpls:\n\n");
+		result.append("ExplanationSet:\n\nStats:\n" + getStats());
+		result.append("\nExpls:\n\n--");
 		for (IBasicExplanation expl: expls) {
 			result.append(expl.toString());
+			result.append("\n\n--");
 		}
 		
 		return result.toString();
@@ -86,9 +88,37 @@ public class SimpleExplanationSet implements IExplanationSet {
 
 	@Override
 	public IExplanationSet union(IExplanationSet other) {
+		if (other == null)
+			return this;
 		this.expls.addAll(other.getExplanationsSet());
-		this.sideEffects.union(getSideEffects());
+		this.sideEffects.union(other.getSideEffects());
 		return this;
+	}
+	
+	@Override
+	public boolean equals (Object other) {
+		SimpleExplanationSet otherSet;
+		
+		if (other == null)
+			return false;
+		
+		if (this == other)
+			return true;
+		
+		if (!(other instanceof SimpleExplanationSet))
+			return false;
+		
+		otherSet = (SimpleExplanationSet) other;
+		
+		if (expls.size() != otherSet.expls.size())
+			return false;
+		
+		for(IBasicExplanation expl: expls) {
+			if(!otherSet.getExplanations().contains(expl))
+				return false;
+		}
+		
+		return true;
 	}
 	
 }

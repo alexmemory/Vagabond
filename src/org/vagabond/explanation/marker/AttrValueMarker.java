@@ -38,6 +38,9 @@ public class AttrValueMarker implements IAttributeValueMarker {
 		if (other == null)
 			return false;
 		
+		if (this == other)
+			return true;
+		
 		if (other instanceof IAttributeValueMarker) {
 			otherAttr = (IAttributeValueMarker) other;
 			if (!otherAttr.getAttrName().equals(this.getAttrName()))

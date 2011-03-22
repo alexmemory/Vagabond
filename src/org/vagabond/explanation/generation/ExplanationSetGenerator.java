@@ -20,6 +20,8 @@ public class ExplanationSetGenerator {
 		generators = new ArrayList<ISingleExplanationGenerator> ();
 		generators.add(new CopySourceExplanationGenerator());
 		generators.add(new CorrespondencExplanationGenerator());
+		generators.add(new InfluenceSourceExplanationGenerator());
+		generators.add(new SuperfluousMappingExplanationGenerator());
 	}
 	
 	public ExplanationCollection findExplanations (IMarkerSet errors) throws Exception {

@@ -1,37 +1,35 @@
 package org.vagabond.explanation.model.basic;
 
-import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 
-public class CopySourceError implements IBasicExplanation {
+public class InfluenceSourceError implements IBasicExplanation {
 
-	static Logger log = Logger.getLogger(CopySourceError.class);
-	
 	private IMarkerSet sourceSE;
 	private IMarkerSet targetSE;
 	private ISingleMarker explains;
-
-	private int hash = -1;
 	
-	public CopySourceError () {
+	private int hash = -1;
+
+	public InfluenceSourceError () {
 		sourceSE = MarkerFactory.newMarkerSet();
 		targetSE = MarkerFactory.newMarkerSet();
 	}
 	
-	public CopySourceError (ISingleMarker explains) {
+	public InfluenceSourceError (ISingleMarker explains) {
 		this.explains = explains;
 		sourceSE = MarkerFactory.newMarkerSet();
 		targetSE = MarkerFactory.newMarkerSet();
 	}
 	
-	public CopySourceError (IMarkerSet sourceSE, IMarkerSet targetSE, 
+	public InfluenceSourceError (IMarkerSet sourceSE, IMarkerSet targetSE, 
 			ISingleMarker explains) {
 		this.sourceSE = sourceSE;
 		this.targetSE = targetSE;
 		this.explains = explains;
 	}
+
 	
 	@Override
 	public int getSideEffectSize() {
@@ -45,7 +43,7 @@ public class CopySourceError implements IBasicExplanation {
 
 	@Override
 	public ExplanationType getType() {
-		return ExplanationType.CopySourceError;
+		return ExplanationType.InfluenceSourceError;
 	}
 
 	@Override
@@ -68,15 +66,16 @@ public class CopySourceError implements IBasicExplanation {
 	public void setTargetSE(IMarkerSet targetSE) {
 		this.targetSE = targetSE;
 	}
-	
+
+
 	@Override
 	public Object getExplanation() {
 		return sourceSE;
 	}
-	
+
 	@Override
 	public String toString () {
-		return "CopySourceError <" + explains.toString() + ">\n\n" +
+		return "InfluenceSourceError <" + explains.toString() + ">\n\n" +
 				"with source side-effect:\n<" + sourceSE.toString() +
 				">\n\nand target side-effect:\n<" + targetSE.toString() + ">";
 	}
@@ -110,7 +109,7 @@ public class CopySourceError implements IBasicExplanation {
 	
 	@Override
 	public int hashCode () {
-		if (hash == -1)
+		if (hash  == -1)
 		{
 			hash = explains.hashCode();
 			hash = hash * 13 + sourceSE.hashCode();
@@ -118,5 +117,5 @@ public class CopySourceError implements IBasicExplanation {
 		}
 		return hash;
 	}
-
+	
 }

@@ -20,7 +20,7 @@ public class ConnectionManager {
 	
 	private static ConnectionManager instance;
 	
-	private Connection con;
+	private Connection con = null;
 	
 	private ConnectionManager () throws ClassNotFoundException {
 		Class.forName("org.postgresql.Driver");
@@ -47,8 +47,10 @@ public class ConnectionManager {
 	}
 	
 	public void closeCon () throws SQLException {
-		if (con != null)
+		if (con != null) {
 			con.close();
+			con = null;
+		}
 	}
 	
 	public Statement getSt () throws SQLException {

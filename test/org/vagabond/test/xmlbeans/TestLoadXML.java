@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,6 +23,7 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.mapping.scenarioToDB.SchemaCodeGenerator;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.test.TestOptions;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
@@ -31,15 +33,9 @@ public class TestLoadXML extends AbstractVagabondTest {
 	static Connection con;
 	
 	@BeforeClass 
-	public static void setUp () throws ClassNotFoundException, SQLException {
-		Class.forName("org.postgresql.Driver");
-		con = DriverManager.getConnection(
-				"jdbc:postgresql://127.0.0.1:5432/tramptest", "postgres", "");
-	}
-	
-	@AfterClass 
-	public static void tearDown () throws SQLException {
-		con.close();
+	public static void setUp () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		con = TestOptions.getInstance().getConnection();
 	}
 	
 	@Test 
