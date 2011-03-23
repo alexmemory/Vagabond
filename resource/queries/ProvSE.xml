@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>CopyCS</comment>
+
+<entry key="GetSideEffect">
+SELECT prov.tid
+FROM
+(SELECT *
+FROM ${1}) AS prov
+WHERE NOT EXISTS (SELECT subprov.tid
+FROM (SELECT PROVENANCE * FROM ${1}) AS subprov
+WHERE prov.tid = subprov.tid AND ${2})
+</entry>
+
+<entry key="GetSideEffectAlternative">
+SELECT prov.tid, ${1}
+FROM
+(SELECT PROVENANCE * 
+FROM ${2}) AS prov
+WHERE EXISTS (SELECT * FROM (SELECT PROVENANCE * FROM ${2}) AS subprov 
+WHERE prov.tid = subprov.tid AND ${3}) ORDER  BY tid
+</entry>
+
+<entry key="GetSideEffectAlternativeUnnested">
+SELECT prov.tid, ${1}
+FROM
+(SELECT PROVENANCE * 
+FROM ${2}) AS prov,
+(SELECT * FROM (SELECT PROVENANCE * FROM ${2}) AS subprov WHERE ${3}) AS sub 
+WHERE prov.tid = sub.tid 
+ORDER  BY tid
+</entry>
+
+<entry key="GetProvQueryResultAttrs">
+SELECT xpath('/Query/Select/Attr/attribute::name', 
+query_sql_to_simple_xml('SELECT PROVENANCE * FROM ${1}'))::text AS attrs;
+</entry>
+
+</properties>

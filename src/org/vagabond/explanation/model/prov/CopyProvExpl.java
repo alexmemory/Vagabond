@@ -60,5 +60,17 @@ public class CopyProvExpl {
 	
 	public Vector<ITupleMarker> getWitnessList (int i) {
 		return this.witnessLists.get(i);
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer result;
+		
+		result = new StringBuffer();
+		result.append("PROVENANCE: relnames <" + relNames + ">\n");
+		result.append("\ttuples in prov: <" + tuplesInProv + ">\n");
+		result.append("\twitness lists: <" + witnessLists + ">");
+		
+		return result.toString();
+	}
 }

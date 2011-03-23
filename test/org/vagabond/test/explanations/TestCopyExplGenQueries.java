@@ -44,7 +44,7 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 	
 	@Test
 	public void testSideEffectQuery () throws Exception {
-		String query = QueryHolder.getQuery("CopyCS.GetSideEffect")
+		String query = QueryHolder.getQuery("ProvSE.GetSideEffect")
 				.parameterize("target.employee", 
 						" subprov.prov_source_address_tid IS DISTINCT FROM 2");
 		String result =  "\ntid\n" + 
@@ -127,7 +127,7 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 		String query;
 		String result;
 		
-		query = QueryHolder.getQuery("CopyCS.GetProvQueryResultAttrs")
+		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
 				.parameterize("source.person");
 		
 		result = "\n                                            attrs                                             \n" +
@@ -136,7 +136,7 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 		
 		testSingleQuery (query, result);
 		
-		query = QueryHolder.getQuery("CopyCS.GetProvQueryResultAttrs")
+		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
 				.parameterize("target.employee");
 		
 		result = "\n                                            attrs                                             \n" +

@@ -34,7 +34,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testExplSetGenSingleEror () throws Exception {
+	public void testExplSetGenSingleError () throws Exception {
 		IMarkerSet m;
 		ExplanationCollection col;
 		CopySourceError e1;
