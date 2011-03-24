@@ -59,6 +59,9 @@ public class LoggerUtil {
 	public static String arrayToString (String[] array) {
 		StringBuilder result;
 		
+		if (array.length == 0)
+			return "";
+		
 		result = new StringBuilder();
 		
 		for (String elem: array) {

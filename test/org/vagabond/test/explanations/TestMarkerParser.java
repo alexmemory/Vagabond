@@ -35,6 +35,17 @@ public class TestMarkerParser extends AbstractVagabondTest {
 	}
 	
 	@Test
+	public void testMarkerSetFromString () throws Exception {
+		IMarkerSet expec = MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "2|2", "city"),
+				MarkerFactory.newTupleMarker("employee", "4|2")
+				);
+		String markSet = "{A(employee,2|2,city),T(employee,4|2)}";
+		
+		assertEquals(expec, MarkerParser.getInstance().parserSet(markSet));
+	}
+	
+	@Test
 	public void testLoadMarkerFile () throws Exception {
 		IMarkerSet expec = MarkerFactory.newMarkerSet(
 			MarkerFactory.newAttrMarker("employee", "2|2", "city"),

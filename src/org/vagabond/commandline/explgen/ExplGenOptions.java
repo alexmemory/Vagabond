@@ -27,7 +27,7 @@ public class ExplGenOptions {
 	private File markerFile = null;
 	
 	@Option(name="-M", usage="List of error markers")
-	private String markers;
+	private String markers = null;
 	
 	@Option(name="-loadScen", usage="Load the scenario to the database")
 	private boolean loadScen = false;

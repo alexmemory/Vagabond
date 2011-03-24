@@ -1,19 +1,21 @@
 package org.vagabond.commandline.explgen;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 import java.io.PrintStream;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.xmlbeans.XmlException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.vagabond.explanation.generation.ExplanationSetGenerator;
+import org.vagabond.explanation.generation.QueryHolder;
+import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LoggerUtil;
@@ -23,9 +25,12 @@ public class CommandLineExplGen {
 	static Logger log = Logger.getLogger(CommandLineExplGen.class);
 	
 	private ExplGenOptions options;
+	private IMarkerSet markers;
+	private ExplanationSetGenerator gen;
 	
 	public CommandLineExplGen () {
 		options = new ExplGenOptions();
+		gen = new ExplanationSetGenerator();
 	}
 	
 	public void setUpLogger () {
@@ -48,20 +53,29 @@ public class CommandLineExplGen {
 		
 		if (options.isLoadScen())
 			loadScenarioOnDB();
-		
-		loadMarkers();
-		
-		createExpls();
 	}
 	
-	private void createExpls() {
-		// TODO Auto-generated method stub
+	private void createExpls (PrintStream out) throws Exception {
+		ExplanationCollection col;
 		
+		col = gen.findExplanations(markers);
+		out.println(col);
 	}
 
-	private void loadMarkers() {
+	private IMarkerSet loadMarkers() throws Exception {
+		if (options.getMarkers() != null) 
+			markers = MarkerParser.getInstance()
+					.parserSet(options.getMarkers());
+		else if (options.getMarkerFile() != null)
+			markers = MarkerParser.getInstance()
+					.parseMarkers(new FileInputStream(options.getMarkerFile()));
+		else
+			throw new Exception("either marker file (-m) or markers (-M) have" +
+					"to be specified");
 		
+		log.debug("Markers are :<" + markers + ">");
 		
+		return markers;
 	}
 
 	private void loadScenarioOnDB() throws Exception {
@@ -73,6 +87,7 @@ public class CommandLineExplGen {
 			throws Exception {
 		ModelLoader.getInstance().loadToInst(xmlDoc);
 		SchemaResolver.getInstance().setSchemas();
+		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 		options.setDBOptions(MapScenarioHolder.getInstance().getScenario());
 	}
 	
@@ -101,7 +116,8 @@ public class CommandLineExplGen {
 		
 		try {
 			parseOptionsAndLoadScenario(args);
-			//TODO
+			loadMarkers();
+			createExpls(System.out);
 		} catch (CmdLineException e) {			
 			LoggerUtil.logException(e, log);
 			printUsage(System.err);
