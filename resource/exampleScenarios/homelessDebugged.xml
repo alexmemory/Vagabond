@@ -88,12 +88,13 @@
 	<Transformation id="T1" creates="person">
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
-SELECT t.name, k.city AS livesat 
+SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid, 
+t.name, k.city AS livesat 
 FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k 
 WHERE t.caredforby = s.ssn 
 	AND s.worksfor = k.location 
 UNION 
-SELECT	s.name,	NULL AS	livesat
+SELECT s.tid::text AS tid, s.name, NULL AS livesat
 FROM source.socialworker ANNOT('M2') s 
 		</Code>
 	</Transformation>
