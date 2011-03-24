@@ -153,5 +153,10 @@ public class MarkerSet implements IMarkerSet {
 	public <T> T[] toArray(T[] arg0) {
 		return markers.toArray(arg0);
 	}
+
+	@Override
+	public boolean contains(String relName, String tid) throws Exception {
+		return this.contains(MarkerFactory.newTupleMarker(relName, tid));
+	}
 	
 }

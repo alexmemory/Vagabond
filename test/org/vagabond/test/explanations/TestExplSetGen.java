@@ -15,6 +15,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
+import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.test.AbstractVagabondTest;
@@ -40,6 +41,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		CopySourceError e1;
 		CorrespondenceError e2;
 		SuperflousMappingError e3;
+		InfluenceSourceError e4;
 		IExplanationSet set;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
@@ -78,7 +80,10 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				MarkerFactory.newTupleMarker("employee", "1|1")
 		));
 		
-		set = ExplanationFactory.newExplanationSet(e1,e2,e3);
+		e4 = new InfluenceSourceError();
+		e4.setExplains(m.getElemList().get(0));
+		
+		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4);
 
 		col = gen.findExplanations(m);
 		log.debug(col);

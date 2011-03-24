@@ -67,7 +67,8 @@ public class SourceProvenanceSideEffectGenerator {
 		
 		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
 				.parameterize("target." + targetRel);
-		
+		log.debug("compute provenance schema for <" + targetRel 
+				+ "> with query: <" + query + ">");
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
 		rs.next();
