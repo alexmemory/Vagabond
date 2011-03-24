@@ -19,12 +19,16 @@
 	<property name="librarydir" location="${basedir}/lib" />
 	<property name="resourcedir" location="${basedir}/resource" />
 	<property name="sourcedir" location="${basedir}/src" />
-	<property name="macdir" location="${builddir}/macloader" />
-	<property name="windir" location="${builddir}/winloader"/>
-
+	<property name="loadermacdir" location="${builddir}/macloader" />
+	<property name="loaderwindir" location="${builddir}/winloader"/>
+	<property name="explmacdir" location="${builddir}/macexplgen" />
+	<property name="explwindir" location="${builddir}/winexplgen"/>
+	
 	<property name="schema" location="resource/xmlschema/mappingScenario.xsd" />
 	<property name="loaderMainClass" 
 			value="org.vagabond.commandline.loader.CommandLineLoader" />
+	<property name="explgenMainClass" 
+			value="org.vagabond.commandline.explgen.CommandLineExplGen" />
 	
 	<property name="XBeansDir" location="${basedir}/xbeans" />
 	<property name="XBeansSrc" location="${XBeansDir}/src"/>
@@ -92,12 +96,21 @@
 	</target>
 
 	<target name="Deploy" depends="Jar">		
-		<var name="deployto" value="${macdir}" />
+		<var name="deployto" value="${loadermacdir}" />
 		<antcall target="DeployOne" />
-		<copy todir="${macdir}" file="${resourcedir}/buildFiles/loader.sh" />
-		<var name="deployto" value="${windir}" />
+		<copy todir="${loadermacdir}" file="${resourcedir}/buildFiles/loader.sh" />
+		
+		<var name="deployto" value="${loaderwindir}" />
 		<antcall target="DeployOne" />
-		<copy todir="${windir}" file="${resourcedir}/buildFiles/loader.bat" />
+		<copy todir="${loaderwindir}" file="${resourcedir}/buildFiles/loader.bat" />
+		
+		<var name="deployto" value="${explmacdir}" />
+		<antcall target="DeployOne" />
+		<copy todir="${explmacdir}" file="${resourcedir}/buildFiles/expl.sh" />
+
+		<var name="deployto" value="${explwindir}" />
+		<antcall target="DeployOne" />
+		<copy todir="${explwindir}" file="${resourcedir}/buildFiles/expl.bat" />
 	</target>
 	
 	<target name="DeployOne">
@@ -121,20 +134,21 @@
 	</target>
 	
 	<target name="Jar" depends="Compile,GenerateXMLbindings">
-		<antcall target="JarTrampExplGen"/>
+		<antcall target="JarVagabondLoader"/>
+		<antcall target="JarVagabondExplGen"/>
 	</target>
 	
-	<target name="JarTrampExplGen" >
-		<mkdir dir="${macdir}"/>
-		<mkdir dir="${windir}"/>
-		<jar destfile="${macdir}/loadermac.jar" basedir="${binarydir}">
+	<target name="JarVagabondLoader" >
+		<mkdir dir="${loadermacdir}"/>
+		<mkdir dir="${loaderwindir}"/>
+		<jar destfile="${loadermacdir}/loadermac.jar" basedir="${binarydir}">
 			<manifest>
 				<attribute name="Main-Class" value="${loaderMainClass}" />
 				<attribute name="Created-By" value="University of Toronto" />
 				<attribute name="Class-Path" value="${fullJarClasspath}" />
 			</manifest>
 		</jar>
-		<jar destfile="${windir}/loaderwin.jar" basedir="${binarydir}">
+		<jar destfile="${loaderwindir}/loaderwin.jar" basedir="${binarydir}">
 			<manifest>
 				<attribute name="Main-Class" value="${loaderMainClass}" />
 				<attribute name="Created-By" value="University of Toronto" />
@@ -142,6 +156,26 @@
 			</manifest>
 		</jar>
 	</target>
+	
+	<target name="JarVagabondExplGen" >
+		<mkdir dir="${explmacdir}"/>
+		<mkdir dir="${explwindir}"/>
+		<jar destfile="${explmacdir}/explmac.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${explgenMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+		<jar destfile="${explwindir}/explwin.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${explgenMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+	</target>
+		
 
 	<target name="GenerateJavaDoc">
 		<javadoc access="private" 
