@@ -50,7 +50,7 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		assertEquals(attr.getSize(), 1);
 		assertEquals(attr, attr2);
-		assertEquals(attr2.toString(), "(tramp(0),1,name(0))");
+		assertEquals(attr2.toString(), "('tramp'(0),1,'name'(0))");
 	}
 	
 	@Test

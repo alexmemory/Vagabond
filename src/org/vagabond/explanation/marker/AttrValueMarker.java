@@ -86,9 +86,9 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	}
 	
 	public String toString () {
-		return "(" + getRelName() + "(" + relId + ")," 
-				+ getTid() + "," 
-				+ getAttrName() + "(" + attrId + "))";
+		return "('" + getRelName() + "'(" + relId + ")," 
+				+ getTid() + ",'" 
+				+ getAttrName() + "'(" + attrId + "))";
 	}
 
 	@Override
