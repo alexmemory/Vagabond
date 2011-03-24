@@ -12,14 +12,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.vagabond.explanation.generation.CopyCSParser;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
+import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
-import org.vagabond.explanation.model.prov.CopyProvExpl;
+import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.PropertyWrapper;
@@ -50,8 +50,8 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	public void testCopyProvParser () throws Exception {
 		ResultSet rs = ConnectionManager.getInstance().execQuery(
 			queries.getProperty("copy1"));
-		CopyCSParser parser = new CopyCSParser(rs);
-		CopyProvExpl expl = parser.getAllProv();
+		SourceProvParser parser = new SourceProvParser(rs);
+		ProvWLRepresentation expl = parser.getAllProv();
 		IMarkerSet mSet = MarkerFactory.newMarkerSet();
 		mSet.add(MarkerFactory.newTupleMarker("address", "1"));
 		mSet.add(MarkerFactory.newTupleMarker("person", "1"));

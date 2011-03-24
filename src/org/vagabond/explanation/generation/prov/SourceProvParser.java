@@ -1,4 +1,4 @@
-package org.vagabond.explanation.generation;
+package org.vagabond.explanation.generation.prov;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,23 +9,23 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.model.prov.CopyProvExpl;
+import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.util.ResultSetUtil;
 
 import static org.vagabond.util.LoggerUtil.*;
 
-public class CopyCSParser {
+public class SourceProvParser {
 
-	static Logger log = Logger.getLogger(CopyCSParser.class);
+	static Logger log = Logger.getLogger(SourceProvParser.class);
 	
 	private ResultSet dbResult;
-	private CopyProvExpl allProv;
+	private ProvWLRepresentation allProv;
 	private List<Integer> tidAttrPos;
 	private List<String> relNames;
 	
-	public CopyCSParser (ResultSet result) throws Exception {
+	public SourceProvParser (ResultSet result) throws Exception {
 		this.dbResult = result;
-		allProv = new CopyProvExpl();
+		allProv = new ProvWLRepresentation();
 		tidAttrPos = new ArrayList<Integer> ();
 		relNames = new ArrayList<String> ();
 		
@@ -93,7 +93,7 @@ public class CopyCSParser {
 				&& ResultSetUtil.isProvAttr(name);
 	}
 
-	public CopyProvExpl getAllProv() {
+	public ProvWLRepresentation getAllProv() {
 		return allProv;
 	}
 }

@@ -13,9 +13,9 @@ public class CopyProvExplIterator implements Iterator<Set<ITupleMarker>>{
 	private Vector<Integer> iterTupFromWL;
 	private Set<ITupleMarker> iterTupInCover;
 	private Map<ITupleMarker,Integer> firstWL;
-	private CopyProvExpl expl;
+	private ProvWLRepresentation expl;
 	
-	public CopyProvExplIterator (CopyProvExpl expl) {
+	public CopyProvExplIterator (ProvWLRepresentation expl) {
 		this.expl = expl;
 		
 		iterTupFromWL = new Vector<Integer> ();

@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 
 public class SimpleExplanationSet implements IExplanationSet {

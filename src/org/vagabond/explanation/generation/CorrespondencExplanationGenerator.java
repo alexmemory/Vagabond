@@ -15,7 +15,6 @@ import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
-import org.vagabond.explanation.model.SimpleExplanationSet;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
@@ -112,7 +111,6 @@ public class CorrespondencExplanationGenerator implements
 		Map<String,Set<String>> mapsPerTarget;
 		String targetName;
 		String mapName;
-		Set<String> maps;
 		mapsPerTarget = new HashMap<String,Set<String>> ();
 		
 		for (MappingType map: affMaps) {

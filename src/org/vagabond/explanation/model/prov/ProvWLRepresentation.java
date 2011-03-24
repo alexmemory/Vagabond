@@ -1,9 +1,7 @@
 package org.vagabond.explanation.model.prov;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -11,16 +9,16 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 
-public class CopyProvExpl {
+public class ProvWLRepresentation {
 
-	static Logger log = Logger.getLogger(CopyProvExpl.class);
+	static Logger log = Logger.getLogger(ProvWLRepresentation.class);
 	
 	private List<String> relNames;
 	private IMarkerSet tuplesInProv;
 	private Vector<Vector<ITupleMarker>> witnessLists; 
 
 	
-	public CopyProvExpl () {
+	public ProvWLRepresentation () {
 		witnessLists = new Vector<Vector<ITupleMarker>> ();
 		tuplesInProv = MarkerFactory.newMarkerSet();
 		relNames = new ArrayList<String> ();

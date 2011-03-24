@@ -21,7 +21,11 @@
 	<property name="sourcedir" location="${basedir}/src" />
 	<property name="macdir" location="${builddir}/macloader" />
 	<property name="windir" location="${builddir}/winloader"/>
+
 	<property name="schema" location="resource/xmlschema/mappingScenario.xsd" />
+	<property name="loaderMainClass" 
+			value="org.vagabond.commandline.loader.CommandLineLoader" />
+	
 	<property name="XBeansDir" location="${basedir}/xbeans" />
 	<property name="XBeansSrc" location="${XBeansDir}/src"/>
 	<property name="XBeansBin" location="${XBeansDir}/bin"/>
@@ -125,14 +129,14 @@
 		<mkdir dir="${windir}"/>
 		<jar destfile="${macdir}/loadermac.jar" basedir="${binarydir}">
 			<manifest>
-				<attribute name="Main-Class" value="org.tramp.commandline.loader.CommandLineLoader" />
+				<attribute name="Main-Class" value="${loaderMainClass}" />
 				<attribute name="Created-By" value="University of Toronto" />
 				<attribute name="Class-Path" value="${fullJarClasspath}" />
 			</manifest>
 		</jar>
 		<jar destfile="${windir}/loaderwin.jar" basedir="${binarydir}">
 			<manifest>
-				<attribute name="Main-Class" value="org.tramp.commandline.loader.CommandLineLoader" />
+				<attribute name="Main-Class" value="${loaderMainClass}" />
 				<attribute name="Created-By" value="University of Toronto" />
 				<attribute name="Class-Path" value="${fullJarClasspath}" />
 			</manifest>

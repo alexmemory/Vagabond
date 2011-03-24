@@ -1,33 +1,17 @@
 package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.prov.SourceProvParser;
+import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
-import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.ITupleMarker;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
-import org.vagabond.explanation.model.prov.CopyProvExpl;
-import org.vagabond.mapping.model.MapScenarioHolder;
+import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.util.ResultSetUtil;
-import org.vagabond.xmlmodel.MappingType;
-import org.vagabond.xmlmodel.RelAtomType;
-import org.vagabond.xmlmodel.RelationType;
 
 public class CopySourceExplanationGenerator 
 		extends SourceProvenanceSideEffectGenerator 
@@ -35,7 +19,7 @@ public class CopySourceExplanationGenerator
 
 	static Logger log = Logger.getLogger(CopySourceExplanationGenerator.class);
 	
-	private CopyProvExpl prov;
+	private ProvWLRepresentation prov;
 	protected CopySourceError expl;
 	
 	@Override
@@ -48,7 +32,7 @@ public class CopySourceExplanationGenerator
 	private IExplanationSet getExplanationSets() throws Exception {
 		IExplanationSet result = ExplanationFactory.newExplanationSet();
 		
-		retrieveCopyProvenance();
+		this.prov = retrieveCopyProvenance();
 		
 		expl = new CopySourceError(error);
 		expl.setSourceSE(prov.getTuplesInProv());
@@ -63,10 +47,10 @@ public class CopySourceExplanationGenerator
 		return result;
 	}
 	
-	private void retrieveCopyProvenance () 
+	private ProvWLRepresentation retrieveCopyProvenance () 
 			throws Exception {
 		ResultSet rs;
-		CopyCSParser parser;
+		SourceProvParser parser;
 		String query;
 		
 		query = getCopyCSQuery();
@@ -74,10 +58,10 @@ public class CopySourceExplanationGenerator
 				+ error + ">:\n" + query);
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
-		parser = new CopyCSParser(rs);
+		parser = new SourceProvParser(rs);
 		ConnectionManager.getInstance().closeRs(rs);
 		
-		this.prov = parser.getAllProv();
+		return parser.getAllProv();
 	}
 
 	

@@ -1,4 +1,4 @@
-package org.vagabond.explanation.generation;
+package org.vagabond.explanation.generation.prov;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -23,7 +24,7 @@ import org.vagabond.xmlmodel.RelAtomType;
 
 public class SourceProvenanceSideEffectGenerator {
 
-	static Logger log = Logger.getLogger(SourceProvenanceSideEffectGenerator.class);
+	public static Logger log = Logger.getLogger(SourceProvenanceSideEffectGenerator.class);
 	
 	protected IAttributeValueMarker error;
 	private IMarkerSet sourceSE;
