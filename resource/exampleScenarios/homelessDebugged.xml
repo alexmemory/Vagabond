@@ -106,17 +106,17 @@ FROM source.socialworker ANNOT('M2') s
 </ConnectionInfo>
 <Data>
 	<Instance name="tramp">
-		<Row><Value>Peter Fullbright</Value><Value>Stinky Pete</Value><Value>GreenPark</Value><Value>777</Value></Row>
-		<Row><Value>Harriot Welth</Value><Value>Cartwoman</Value><Value>Manhattan</Value><Value>123</Value></Row>
+		<Row><Value>1</Value><Value>Peter Fullbright</Value><Value>Stinky Pete</Value><Value>GreenPark</Value><Value>777</Value></Row>
+		<Row><Value>2</Value><Value>Harriot Welth</Value><Value>Cartwoman</Value><Value>Manhattan</Value><Value>123</Value></Row>
 	</Instance>
 	<Instance name="socialworker">
-		<Row><Value>123</Value><Value>Jessica Good</Value><Value>GreenPark</Value></Row>
-		<Row><Value>666</Value><Value>Laurence Knopfler</Value><Value>GreenPark</Value></Row>
-		<Row><Value>777</Value><Value>Jule Hip</Value><Value>Manhattan</Value></Row>
+		<Row><Value>1</Value><Value>123</Value><Value>Jessica Good</Value><Value>GreenPark</Value></Row>
+		<Row><Value>2</Value><Value>666</Value><Value>Laurence Knopfler</Value><Value>GreenPark</Value></Row>
+		<Row><Value>3</Value><Value>777</Value><Value>Jule Hip</Value><Value>Manhattan</Value></Row>
 	</Instance>
 	<Instance name="soupkitchen">
-		<Row><Value>GreenPark</Value><Value>Toronto</Value><Value>10.000</Value></Row>
-		<Row><Value>Manhattan</Value><Value>New York</Value><Value>5.000</Value></Row>
+		<Row><Value>1</Value><Value>GreenPark</Value><Value>Toronto</Value><Value>10.000</Value></Row>
+		<Row><Value>2</Value><Value>Manhattan</Value><Value>New York</Value><Value>5.000</Value></Row>
 	</Instance>
 </Data>
 </this:MappingScenario>
