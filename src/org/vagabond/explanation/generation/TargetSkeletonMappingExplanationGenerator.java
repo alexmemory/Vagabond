@@ -3,7 +3,7 @@ package org.vagabond.explanation.generation;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.IExplanationSet;
 
-public class TargetSkeletonExplanationGenerator implements
+public class TargetSkeletonMappingExplanationGenerator implements
 		ISingleExplanationGenerator {
 
 	@Override
