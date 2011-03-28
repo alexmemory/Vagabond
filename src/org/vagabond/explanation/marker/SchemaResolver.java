@@ -67,6 +67,10 @@ public class SchemaResolver {
 		return rel.getAttrArray()[attrId].getName();
 	}
 	
+	public String getAttrName (String relName, int attrId) throws Exception {
+		return getAttrName(getRelId(relName), attrId);
+	}
+	
 	public int getAttrId (String relName, String attrName) throws Exception {
 		return getAttrId (getRelId(relName), attrName);
 	}

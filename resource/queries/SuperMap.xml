@@ -10,9 +10,28 @@ WHERE tid = '${2}'
 </entry>
 
 <entry key="GetSideEffects">
+SELECT prov.tid
+FROM
+(SELECT *
+FROM ${1}) AS prov
+WHERE NOT EXISTS (SELECT subprov.tid
+FROM (SELECT MAPPROV * FROM ${1}) AS subprov
+WHERE prov.tid = subprov.tid AND trans_prov NOT IN (VALUES ${2}))
+</entry>
+
+<entry key="OldGetSideEffects">
 SELECT tid FROM 
 (SELECT MAPPROV * FROM ${1}) p 
 WHERE p.trans_prov IN (VALUES ${2})
 </entry>
 
+<entry key="GetSideEffectsAlternative">
+SELECT prov.tid, ${1}
+FROM
+(SELECT *
+FROM ${2}) AS prov
+WHERE NOT EXISTS (SELECT subprov.tid
+FROM (SELECT MAPPROV * FROM ${2}) AS subprov
+WHERE prov.tid = subprov.tid AND trans_prov NOT IN (VALUES ${3}))
+</entry>
 </properties>
