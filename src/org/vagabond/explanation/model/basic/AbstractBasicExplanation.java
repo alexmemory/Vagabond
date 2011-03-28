@@ -206,9 +206,10 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	private void getStringFromCol (StringBuffer buf, String message, 
 			Collection<?> coll, Class<?> clas, String methodName) {
-		buf.append("\n\n" + message + "\n");
+		buf.append("\n\n" + message);
 		try {
-			ObjectColToStringWithMethod(coll, clas, methodName);
+			buf.append(ObjectColToStringWithMethod(coll, clas, methodName));
+			buf.append('>');
 		} catch (Exception e) {
 			logException(e, log);
 		}

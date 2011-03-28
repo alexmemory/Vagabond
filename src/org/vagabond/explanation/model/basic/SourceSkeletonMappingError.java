@@ -45,6 +45,11 @@ public class SourceSkeletonMappingError extends AbstractBasicExplanation
 	}
 
 	@Override
+	public int getMappingSideEffectSize() {
+		return maps.size();
+	}
+	
+	@Override
 	public Set<MappingType> getMappingSideEffects() {
 		return maps;
 	}
