@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -23,6 +24,8 @@ import org.vagabond.xmlmodel.MappingType;
 
 public class TestExplanationCollection extends AbstractVagabondTest {
 
+	static Logger log = Logger.getLogger(TestExplanationCollection.class);
+	
 	@BeforeClass
 	public static void setUp () throws Exception {
 		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
@@ -41,7 +44,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
 		
-		
+		// copy error
 		e1 = new CopySourceError();
 		e1.setExplains(error);
 		e1.setSourceSE(MarkerFactory.newMarkerSet(
@@ -51,6 +54,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 				MarkerFactory.newTupleMarker("employee", "4|2")
 				));
 		
+		// correspondence error
 		corrs = new HashSet<CorrespondenceType> ();
 		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
 		maps = new HashSet<MappingType> ();
@@ -66,6 +70,8 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		
 		set = ExplanationFactory.newExplanationSet(e1,e2);
 		
+		
+		// *** collection
 		col = new ExplanationCollection();
 		col.addExplSet(error, set);
 		

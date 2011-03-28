@@ -178,7 +178,7 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		result.append("<" + error.toString() + ">");
 
 		if (getTargetSideEffectSize() > 0)
-			result.append("\n\nwith source side-effect:\n<" 
+			result.append("\n\nwith target side-effect:\n<" 
 					+ getTargetSideEffects().toString() + ">");
 		
 		if (getSourceSideEffectSize() > 0)

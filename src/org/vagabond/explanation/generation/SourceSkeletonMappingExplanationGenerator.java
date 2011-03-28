@@ -136,6 +136,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		}
 		mapList.deleteCharAt(mapList.length() - 1);
 		
+		//TODO why add attrs here
 		for(String attrName: attrs) {
 			attrList.append(attrName + ",");
 		}
@@ -150,9 +151,13 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
-		while(rs.next())
-			sideEff.add(MarkerFactory.newTupleMarker(
-					rel, rs.getString(1)));
+		while(rs.next()) {
+			String tid = rs.getString(1);
+			
+			for (String attr: attrs) 
+				sideEff.add(MarkerFactory.newAttrMarker(
+						rel, tid, attr));
+		}
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		

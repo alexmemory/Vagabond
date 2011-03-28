@@ -42,8 +42,8 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		m1.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		
 		exp = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "1|1"),
-				MarkerFactory.newTupleMarker("employee", "4|2")
+				MarkerFactory.newAttrMarker("employee", "1|1","city"),
+				MarkerFactory.newAttrMarker("employee", "4|2","city")
 				);
 		
 		result = gen.findExplanations(err);

@@ -22,6 +22,7 @@ public class ExplanationSetGenerator {
 		generators.add(new CorrespondencExplanationGenerator());
 		generators.add(new InfluenceSourceExplanationGenerator());
 		generators.add(new SuperfluousMappingExplanationGenerator());
+		generators.add(new SourceSkeletonMappingExplanationGenerator());
 	}
 	
 	public ExplanationCollection findExplanations (IMarkerSet errors) throws Exception {
