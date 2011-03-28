@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="employee">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>address</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="address">
+			<Attr><Name>id</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>id</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="person_addr">
+			<From tableref="person"><Attr>address</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
+		</ForeignKey>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="employee"><Attr>name</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="employee"><Attr>city</Attr></From>
+		<To tableref="address"><Attr>city</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="employee"><Var>a</Var><Var>b</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>a</Var><Var>c</Var></Atom>
+			<Atom tableref="address"><Var>c</Var><Var>b</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="person">
+		<Implements><Mapping>M1</Mapping></Implements>
+		<Code>
+SELECT e.tid AS tid, e.name AS name, 'SK1(' || e.name || ',' || e.city || ')' AS address
+FROM source.employee ANNOT('M1') e
+		</Code>
+	</Transformation>
+	<Transformation id="T2" creates="address">
+		<Implements><Mapping>M1</Mapping></Implements>
+		<Code>
+SELECT e.tid AS tid, 'SK1(' || e.name || ',' || e.city || ')' AS id, e.city AS city
+FROM source.employee ANNOT('M1') e
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>postgres</User>
+	<Password/>
+</ConnectionInfo>
+<Data>
+	<Instance name="employee">
+		<Row><Value>1</Value><Value>Peter</Value><Value>Toronto</Value></Row>
+		<Row><Value>2</Value><Value>Heinz</Value><Value>Montreal</Value></Row>
+		<Row><Value>3</Value><Value>Gert</Value><Value>Montreal</Value></Row>
+		<Row><Value>4</Value><Value>Gertrud</Value><Value>Toronto</Value></Row>
+	</Instance>
+</Data>
+</this:MappingScenario>
