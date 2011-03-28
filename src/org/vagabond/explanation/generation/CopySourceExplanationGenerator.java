@@ -36,7 +36,7 @@ public class CopySourceExplanationGenerator
 		
 		expl = new CopySourceError(error);
 		expl.setSourceSE(prov.getTuplesInProv());
-		expl.setTargetSE(computeTargetSideEffects(expl.getSourceSE()));
+		expl.setTargetSE(computeTargetSideEffects(expl.getSourceSideEffects()));
 		
 		log.debug("Generated Explanation:\n" + expl.toString());
 		

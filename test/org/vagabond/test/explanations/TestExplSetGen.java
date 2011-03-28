@@ -67,14 +67,14 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
 		e2.setCorrespondences(corrs);
 		e2.setMapSE(maps);
-		e2.setSideEffects(MarkerFactory.newMarkerSet(
+		e2.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
 				MarkerFactory.newAttrMarker("employee", "4|2", "city")
 		));
 		
 		e3 = new SuperflousMappingError();
 		e3.setExplains(m.getElemList().get(0));
-		e3.setMap(maps);
+		e3.setMapSE(maps);
 		e3.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newTupleMarker("employee", "4|2"),
 				MarkerFactory.newTupleMarker("employee", "1|1")

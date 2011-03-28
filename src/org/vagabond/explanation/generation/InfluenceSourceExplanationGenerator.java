@@ -60,7 +60,7 @@ public class InfluenceSourceExplanationGenerator
 		result.addExplanation(expl);
 		
 		
-		computeTargetSideEffects(expl.getSourceSE());
+		computeTargetSideEffects(expl.getSourceSideEffects());
 	}
 	
 	

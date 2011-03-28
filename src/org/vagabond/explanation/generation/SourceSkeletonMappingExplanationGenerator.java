@@ -118,7 +118,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 			computeSideEffects(affRel, affRels.get(affRel).mapSet, 
 					affRels.get(affRel).attrSet);
 		}
-		expl.getSideEffects().remove(MarkerFactory.newTupleMarker(error));
+		expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
 
 		result.addExplanation(expl);
 	}
@@ -127,7 +127,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		IMarkerSet result;
 		String query;
 		ResultSet rs;
-		IMarkerSet sideEff = expl.getSideEffects();
+		IMarkerSet sideEff = expl.getTargetSideEffects();
 		StringBuffer mapList = new StringBuffer();
 		StringBuffer attrList = new StringBuffer();
 		

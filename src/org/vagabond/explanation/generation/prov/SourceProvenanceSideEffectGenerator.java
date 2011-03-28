@@ -170,13 +170,13 @@ public class SourceProvenanceSideEffectGenerator {
 		return query;
 	}
 	
-	private String getUnNumRelName(String source) {
+	protected String getUnNumRelName(String source) {
 		if (!source.contains("_"))
 			return source;
 		return source.substring(0, source.lastIndexOf('_'));
 	}
 
-	private String getSideEffectEqualityCond (String source, ITupleMarker sourceErr) {
+	protected String getSideEffectEqualityCond (String source, ITupleMarker sourceErr) {
 		return "prov_source_" + source + 
 				"_tid IS DISTINCT FROM " + sourceErr.getTid();
 	}

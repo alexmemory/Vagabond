@@ -14,12 +14,12 @@ public class SimpleExplanationSet implements IExplanationSet {
 
 	static Logger log = Logger.getLogger(SimpleExplanationSet.class);
 	
-	private IMarkerSet sideEffects;
+	private IMarkerSet targetSideEffects;
 	private Set<IBasicExplanation> expls;
 	
 	public SimpleExplanationSet () {
 		expls = new HashSet<IBasicExplanation> ();
-		sideEffects = MarkerFactory.newMarkerSet();
+		targetSideEffects = MarkerFactory.newMarkerSet();
 	}
 	
 	@Override
@@ -35,7 +35,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	public void addExplanation (IBasicExplanation expl) {
 		expls.add(expl);
 		
-		sideEffects.union(expl.getSideEffects());
+		targetSideEffects.union(expl.getTargetSideEffects());
 	}
 
 	@Override
@@ -45,12 +45,12 @@ public class SimpleExplanationSet implements IExplanationSet {
 
 	@Override
 	public int getSideEffectSize() {
-		return sideEffects.getSize();
+		return targetSideEffects.getSize();
 	}
 
 	@Override
 	public IMarkerSet getSideEffects() {
-		return sideEffects;
+		return targetSideEffects;
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	
 	public String getStats () {
 		return "NumberOfExplanations: " + expls.size() + "\n" +
-				"TotalSideEffectSize: " + sideEffects.getSize() + "\n";
+				"TotalSideEffectSize: " + targetSideEffects.getSize() + "\n";
 	}
 
 
@@ -90,7 +90,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 		if (other == null)
 			return this;
 		this.expls.addAll(other.getExplanationsSet());
-		this.sideEffects.union(other.getSideEffects());
+		this.targetSideEffects.union(other.getSideEffects());
 		return this;
 	}
 	

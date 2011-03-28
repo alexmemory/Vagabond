@@ -52,7 +52,7 @@ public class SuperfluousMappingExplanationGenerator
 		affRels = new HashMap<String, Set<String>> ();
 		
 		for(MappingType map: maps) {
-			expl.addMap(map);
+			expl.addMapSE(map);
 			
 			for(RelAtomType atom: map.getExists().getAtomArray()) {
 				relName = atom.getTableref();
@@ -67,7 +67,7 @@ public class SuperfluousMappingExplanationGenerator
 		for (String affRel: affRels.keySet()) {
 			computeSideEffects(affRel, affRels.get(affRel));
 		}
-		expl.getSideEffects().remove(MarkerFactory.newTupleMarker(error));
+		expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
 
 		result.addExplanation(expl);
 	}
@@ -76,7 +76,7 @@ public class SuperfluousMappingExplanationGenerator
 		IMarkerSet result;
 		String query;
 		ResultSet rs;
-		IMarkerSet sideEff = expl.getSideEffects();
+		IMarkerSet sideEff = expl.getTargetSideEffects();
 		StringBuffer mapList;
 		
 		mapList = new StringBuffer();

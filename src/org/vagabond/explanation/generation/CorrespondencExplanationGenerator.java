@@ -58,7 +58,7 @@ public class CorrespondencExplanationGenerator implements
 		
 		affMaps = new HashSet<MappingType> ();
 		
-		for(CorrespondenceType corr: expl.getCorrespondences()) {
+		for(CorrespondenceType corr: expl.getCorrespondenceSideEffects()) {
 			affMaps.addAll(MapScenarioHolder.getInstance()
 					.getMapsForCorr(corr));
 		}
@@ -71,7 +71,7 @@ public class CorrespondencExplanationGenerator implements
 			runSideEffectQuery (target, mapsPerTarget.get(target));
 		}
 		
-		expl.getSideEffects().remove(expl.explains());
+		expl.getTargetSideEffects().remove(expl.explains());
 	}
 	
 	private void runSideEffectQuery (String rel, Set<String> maps) throws Exception {
@@ -82,7 +82,7 @@ public class CorrespondencExplanationGenerator implements
 		String attrName;
 		
 		attrName = ((IAttributeValueMarker) expl.explains()).getAttrName();
-		sideEff = expl.getSideEffects();
+		sideEff = expl.getTargetSideEffects();
 		mapList = new StringBuffer();
 		
 		for(String mapName: maps) {
@@ -131,7 +131,8 @@ public class CorrespondencExplanationGenerator implements
 		Set<CorrespondenceType> corrCandi;
 		MappingType map;
 		
-		corrCandi = expl.getCorrespondences();
+		corrCandi = (Set<CorrespondenceType>) 
+				expl.getCorrespondenceSideEffects();
 		mappings = getMapProv(error);
 		
 		// get candidate correspondences

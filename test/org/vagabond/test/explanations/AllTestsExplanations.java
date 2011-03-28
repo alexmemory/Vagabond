@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
 		TestCopyExplGen.class,
 		TestCopyExplGenQueries.class,
 		TestCorrExplGen.class,
-		TestCorrExplGenQueries.class
+		TestCorrExplGenQueries.class,
+		TestSrcSkeMapExplGen.class
         })
 public class AllTestsExplanations {
 

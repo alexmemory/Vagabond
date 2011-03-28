@@ -57,13 +57,13 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		err = (CorrespondenceError) expls.getExplanations().get(0);
 		log.debug(expls);
 		
-		assertTrue(err.getCorrespondences().contains(c2));
+		assertTrue(err.getCorrespondenceSideEffects().contains(c2));
 				
-		assertTrue(err.getSideEffects().contains(a1));
-		assertTrue(err.getSideEffects().contains(a2));
+		assertTrue(err.getTargetSideEffects().contains(a1));
+		assertTrue(err.getTargetSideEffects().contains(a2));
 		
-		assertTrue(!err.getMapSE().contains(m1));
-		assertTrue(err.getMapSE().contains(m2));
+		assertTrue(!err.getMappingSideEffects().contains(m1));
+		assertTrue(err.getMappingSideEffects().contains(m2));
 	}
 	
 }

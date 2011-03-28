@@ -13,6 +13,16 @@ FROM (SELECT PROVENANCE * FROM ${1}) AS subprov
 WHERE prov.tid = subprov.tid AND ${2})
 </entry>
 
+<entry key="GetSideEffectNotExists">
+SELECT prov.tid
+FROM
+(SELECT *
+FROM ${1}) AS prov
+WHERE NOT EXISTS (SELECT subprov.tid
+FROM (SELECT PROVENANCE * FROM ${1}) AS subprov
+WHERE prov.tid = subprov.tid AND ${2})
+</entry>
+
 <entry key="GetSideEffectAlternative">
 SELECT prov.tid, ${1}
 FROM
@@ -22,14 +32,23 @@ WHERE EXISTS (SELECT * FROM (SELECT PROVENANCE * FROM ${2}) AS subprov
 WHERE prov.tid = subprov.tid AND ${3}) ORDER  BY tid
 </entry>
 
-<entry key="GetSideEffectAlternativeUnnested">
-SELECT prov.tid, ${1}
+<entry key="GetSideEffectUnnested">
+SELECT prov.tid
 FROM
-(SELECT PROVENANCE * 
-FROM ${2}) AS prov,
-(SELECT * FROM (SELECT PROVENANCE * FROM ${2}) AS subprov WHERE ${3}) AS sub 
-WHERE prov.tid = sub.tid 
-ORDER  BY tid
+${2} AS prov
+LEFT JOIN
+(SELECT tid, 1 AS test FROM (SELECT PROVENANCE * FROM ${2}) AS subprov WHERE ${3}) AS sub 
+ON (prov.tid = sub.tid)
+WHERE test IS NULL 
+</entry>
+
+<entry key="GetSideEffectUsingAgg">
+SELECT tid
+FROM 
+(SELECT tid, ${2} AS hasSub
+FROM (SELECT PROVENANCE * FROM ${1}) p) AS sideeff
+GROUP BY tid
+HAVING bool_and(hasSub) = true;
 </entry>
 
 <entry key="GetProvQueryResultAttrs">

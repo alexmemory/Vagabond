@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
+import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -144,6 +145,42 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 		"  {tid,name,city,prov_source_person_tid,prov_source_person_name,prov_source_person_address,prov_source_address_tid,prov_source_address_id,prov_source_address_city} \n";
 		
 		testSingleQuery (query, result);
+	}
+	
+	@Test
+	public void testGetSideEffectAggQuery () throws Exception {
+		Set<String> sourceRels;
+		Map<String, IMarkerSet> sourceErr;
+		IMarkerSet errSet, errSet2;
+		String query;
+		String result;
+		AlterSourceProvenanceSideEffectGenerator altGen;
+		
+		altGen = new AlterSourceProvenanceSideEffectGenerator();
+
+		errSet = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "1")
+				);
+		errSet2 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2"),
+				MarkerFactory.newTupleMarker("address", "3")
+				);
+		sourceErr = new HashMap<String, IMarkerSet> ();
+		sourceErr.put("employee", errSet);
+		sourceErr.put("address", errSet2);
+		
+		sourceRels = new HashSet<String> ();
+		sourceRels.add("address");
+		sourceRels.add("person");
+		
+		query = altGen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
+		
+		result = "\n tid \n"+
+				"-----\n" +
+				" 2$MID$2\n" +
+				" 4$MID$2";
+		
+		testSingleQuery(query, result);
 	}
 	
 	@Test

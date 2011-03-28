@@ -1,7 +1,12 @@
 package org.vagabond.explanation.model.basic;
 
+import java.util.Collection;
+
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.xmlmodel.CorrespondenceType;
+import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.TransformationType;
 
 public interface IBasicExplanation {
 
@@ -14,9 +19,22 @@ public interface IBasicExplanation {
 		TargetSkeletonMappingError
 	}
 	
-	public int getSideEffectSize ();
-	public IMarkerSet getSideEffects ();
 	public ExplanationType getType ();
 	public ISingleMarker explains();
 	public Object getExplanation();
+	
+	public int getTargetSideEffectSize();
+	public IMarkerSet getTargetSideEffects ();
+	
+	public int getSourceSideEffectSize ();
+	public IMarkerSet getSourceSideEffects ();
+	
+	public int getMappingSideEffectSize ();
+	public Collection<MappingType> getMappingSideEffects ();
+	
+	public int getCorrSideEffectSize ();
+	public Collection<CorrespondenceType> getCorrespondenceSideEffects ();
+	
+	public int getTransformationSideEffectSize ();
+	public Collection<TransformationType> getTransformationSideEffects () ;
 }

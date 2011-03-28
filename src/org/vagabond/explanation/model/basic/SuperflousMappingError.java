@@ -11,51 +11,32 @@ import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.util.LoggerUtil;
 import org.vagabond.xmlmodel.MappingType;
 
-public class SuperflousMappingError implements IBasicExplanation {
+public class SuperflousMappingError extends AbstractBasicExplanation 
+		implements IBasicExplanation {
 
 	static Logger log = Logger.getLogger(SuperflousMappingError.class);
 	
 	private Set<MappingType> maps;
-	private IMarkerSet targetSE;
-	private ISingleMarker explains;
-	private int hash = -1;
 	
 	public SuperflousMappingError () {
-		targetSE = MarkerFactory.newMarkerSet();
+		super();
 		maps = new HashSet<MappingType> ();
 	}
 	
 	public SuperflousMappingError (IAttributeValueMarker marker) {
-		this.explains = marker;
-		targetSE = MarkerFactory.newMarkerSet();
+		super(marker);
 		maps = new HashSet<MappingType> ();
 	}
 	
 	public SuperflousMappingError (IAttributeValueMarker marker, 
 			Set<MappingType> maps) {
-		this.explains = marker;
-		targetSE = MarkerFactory.newMarkerSet();
+		super(marker);
 		this.maps = maps;
 	}
 	
 	@Override
-	public int getSideEffectSize() {
-		return targetSE.getSize();
-	}
-
-	@Override
-	public IMarkerSet getSideEffects() {
-		return targetSE;
-	}
-
-	@Override
 	public ExplanationType getType() {
 		return ExplanationType.SuperflousMappingError;
-	}
-
-	@Override
-	public ISingleMarker explains() {
-		return explains;
 	}
 
 	@Override
@@ -63,83 +44,77 @@ public class SuperflousMappingError implements IBasicExplanation {
 		return maps;
 	}
 
-	@Override
-	public String toString () {
-		try {
-			return "SuperflousMappingError for <" + explains.toString() + ">\n\n" +
-					"with mapping side-effect:\n<" 
-					+ LoggerUtil.ObjectColToStringWithMethod(
-							maps, MappingType.class, "getId")  +
-					">\n\nand target side-effect:\n<" + targetSE.toString() + ">";
-		} catch (Exception e) {
-			LoggerUtil.logException(e, log);
-		}
-		return "";
-	}
-	
-	@Override
-	public boolean equals (Object other) {
-		SuperflousMappingError err;
-		
-		if (other == null)
-			return false;
-		
-		if (this == other)
-			return true;
-		
-		if (!(other instanceof SuperflousMappingError))
-			return false;
-		
-		err = (SuperflousMappingError) other;
-		
-		if (!this.explains.equals(err.explains))
-			return false;
-		
-		if (!this.maps.equals(err.maps))//TODO
-			return false;
-		
-		if (!this.targetSE.equals(err.targetSE))
-			return false;
-		
-		return true;
-	}
-	
-	@Override
-	public int hashCode () {
-		if (hash  == -1)
-		{
-			hash = explains.hashCode();
-			hash = hash * 13 + targetSE.hashCode();
-		}
-		return hash;
-	}
+//	@Override
+//	public String toString () {
+//		try {
+//			return "SuperflousMappingError for <" + error.toString() + ">\n\n" +
+//					"with mapping side-effect:\n<" 
+//					+ LoggerUtil.ObjectColToStringWithMethod(
+//							maps, MappingType.class, "getId")  +
+//					">\n\nand target side-effect:\n<" + targetSE.toString() + ">";
+//		} catch (Exception e) {
+//			LoggerUtil.logException(e, log);
+//		}
+//		return "";
+//	}
+//	
+//	@Override
+//	public boolean equals (Object other) {
+//		SuperflousMappingError err;
+//		
+//		if (other == null)
+//			return false;
+//		
+//		if (this == other)
+//			return true;
+//		
+//		if (!(other instanceof SuperflousMappingError))
+//			return false;
+//		
+//		err = (SuperflousMappingError) other;
+//		
+//		if (!this.error.equals(err.error))
+//			return false;
+//		
+//		if (!this.maps.equals(err.maps))//TODO
+//			return false;
+//		
+//		if (!this.targetSE.equals(err.targetSE))
+//			return false;
+//		
+//		return true;
+//	}
+//	
+//	@Override
+//	public int hashCode () {
+//		if (hash  == -1)
+//		{
+//			hash = error.hashCode();
+//			hash = hash * 13 + targetSE.hashCode();
+//		}
+//		return hash;
+//	}
 
-	public Set<MappingType> getMap() {
+	@Override
+	public Set<MappingType> getMappingSideEffects() {
 		return maps;
 	}
 
-	public void setMap(Set<MappingType> maps) {
-		this.maps = maps;
+	@Override
+	public int getMappingSideEffectSize () {
+		return maps.size();
 	}
 
-	public IMarkerSet getTargetSE() {
-		return targetSE;
+	public void addMapSE(MappingType map) {
+		maps.add(map);
+	}
+	
+	public void setMapSE(Set<MappingType> maps) {
+		this.maps = maps;
 	}
 
 	public void setTargetSE(IMarkerSet targetSE) {
 		this.targetSE = targetSE;
-	}
-
-	public ISingleMarker getExplains() {
-		return explains;
-	}
-
-	public void setExplains(ISingleMarker explains) {
-		this.explains = explains;
-	}
-
-	public void addMap(MappingType map) {
-		maps.add(map);
 	}
 	
 }

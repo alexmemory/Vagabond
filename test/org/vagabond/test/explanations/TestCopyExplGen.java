@@ -75,9 +75,9 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		eSet = gen.findExplanations(a1);
 		e1 = (CopySourceError) eSet.getExplanations().get(0);
 		
-		assertEquals(e1.getSourceSE(), m1);
+		assertEquals(e1.getSourceSideEffects(), m1);
 		assertEquals(e1.explains(), a1);
-		assertEquals(e1.getSideEffects().getSize(), 0);
+		assertEquals(e1.getTargetSideEffects().getSize(), 0);
 	}
 	
 	@Test
@@ -132,9 +132,9 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		eSet = gen.findExplanations(a1);
 		e1 = (CopySourceError) eSet.getExplanations().get(0);
 		
-		assertEquals(e1.getSourceSE(), m1);
+		assertEquals(e1.getSourceSideEffects(), m1);
 		assertEquals(e1.explains(), a1);
-		assertEquals(e1.getSideEffects(), sideE);
+		assertEquals(e1.getTargetSideEffects(), sideE);
 	}
 	
 }

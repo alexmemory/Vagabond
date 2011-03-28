@@ -50,8 +50,8 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		expl = (SourceSkeletonMappingError) result.getExplanations().get(0);
 		log.debug(result);
 		
-		assertEquals(m1, expl.getMap());
-		assertEquals(exp, expl.getSideEffects());
+		assertEquals(m1, expl.getMappingSideEffects());
+		assertEquals(exp, expl.getTargetSideEffects());
 	}
 	
 }
