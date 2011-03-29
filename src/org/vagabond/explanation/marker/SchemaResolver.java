@@ -98,4 +98,8 @@ public class SchemaResolver {
 		return rel.getAttrArray().length;
 	}
 	
+	public SchemaType getTargetSchema() {
+		return targetSchema;
+	}
+	
 }
