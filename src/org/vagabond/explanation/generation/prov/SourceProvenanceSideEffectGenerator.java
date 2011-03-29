@@ -150,7 +150,7 @@ public class SourceProvenanceSideEffectGenerator {
 		for(String source: sourceRels) {
 			unnumSource = getUnNumRelName(source);
 			if (sourceSE.get(unnumSource) != null) {
-				for(ISingleMarker sourceErr: sourceSE.get(source).getElems()) {
+				for(ISingleMarker sourceErr: sourceSE.get(unnumSource).getElems()) {//CHECK ok to use unnumSource???
 					conditions.append(
 							getSideEffectEqualityCond(source, 
 									(ITupleMarker) sourceErr)

@@ -91,14 +91,14 @@
 		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
 		<Code>
 SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k1.tid::text,'') || '|' || COALESCE(k2.tid::text,'') AS tid,
-	t.nickname AS name, k1.city AS livesat 
+	t.nickname AS name, k1.city AS livesin 
 FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
 WHERE t.caredforby = s.ssn 
 	AND t.firstseen = k1.location 
 	AND s.worksfor = k2.location 
 UNION ALL
 SELECT COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
-	s.name,	k.city AS livesat
+	s.name,	k.city AS livesin
 FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
 WHERE s.worksfor = k.location
 		</Code>

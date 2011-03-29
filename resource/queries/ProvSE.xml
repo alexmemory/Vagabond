@@ -51,6 +51,18 @@ GROUP BY tid
 HAVING bool_and(hasSub) = true;
 </entry>
 
+<entry key="GetSideEffectUsingAggWithMap">
+SELECT realside.tid, trans_prov
+FROM
+(SELECT tid FROM 
+(SELECT tid, ${2} AS hasSub
+FROM (SELECT PROVENANCE * FROM ${1}) p) AS sideeff
+GROUP BY sideeff.tid
+HAVING bool_and(hasSub) = true) AS realside,
+(SELECT MAPPROV * FROM ${1}) AS mprov
+WHERE realside.tid = mprov.tid
+</entry>
+
 <entry key="GetProvQueryResultAttrs">
 SELECT xpath('/Query/Select/Attr/attribute::name', 
 query_sql_to_simple_xml('SELECT PROVENANCE * FROM ${1}'))::text AS attrs;

@@ -24,18 +24,25 @@ public class MarkerParser {
 	
 	public ISingleMarker parseMarker (String marker) throws Exception {
 		String[] split;
+		ISingleMarker result;
 		
 		switch(marker.charAt(0)) {
 		case 'A':
 			split = marker.substring(2, marker.length() - 1).split(",");
-			return MarkerFactory.newAttrMarker(split[0], split[1], split[2]);
+			result = MarkerFactory.newAttrMarker(split[0], split[1], split[2]);
+			break;
 		case 'T':
 			split = marker.substring(2, marker.length() - 1).split(",");
-			return MarkerFactory.newTupleMarker(split[0], split[1]);
+			result =  MarkerFactory.newTupleMarker(split[0], split[1]);
+			break;
 		default:
 			throw new Exception ("unknown marker type <" 
 					+ marker.charAt(0) + ">");
 		}
+		
+		log.debug("parsed marker: <" + result + ">");
+		
+		return result;
 	}
 	
 	public IMarkerSet parseMarkers (InputStream in) throws Exception {
@@ -51,6 +58,8 @@ public class MarkerParser {
 			mark = parseMarker(read.readLine());
 			result.add(mark);
 		}
+		
+		log.debug("parsed markers from input stream :<" + result + ">");
 		
 		return result;
 	}
@@ -96,6 +105,8 @@ public class MarkerParser {
 		for (String elem: elems) {
 			result.add(parseMarker(elem));
 		}
+		
+		log.debug("parsed marker set: <" + result + ">");
 		
 		return result;
 	}

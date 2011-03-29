@@ -118,7 +118,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 			computeSideEffects(affRel, affRels.get(affRel).mapSet, 
 					affRels.get(affRel).attrSet);
 		}
-		expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
+		expl.getTargetSideEffects().remove(error);
 
 		result.addExplanation(expl);
 	}
