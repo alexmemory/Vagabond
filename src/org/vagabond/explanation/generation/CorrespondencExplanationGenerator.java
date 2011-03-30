@@ -67,6 +67,9 @@ public class CorrespondencExplanationGenerator implements
 		
 		mapsPerTarget = partitionMapsToTarget(affMaps);
 		
+		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+				mapsPerTarget.keySet()));
+		
 		for(String target: mapsPerTarget.keySet()) {
 			runSideEffectQuery (target, mapsPerTarget.get(target));
 		}

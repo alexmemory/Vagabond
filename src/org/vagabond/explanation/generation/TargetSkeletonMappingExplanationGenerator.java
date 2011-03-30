@@ -122,14 +122,18 @@ public class TargetSkeletonMappingExplanationGenerator implements
 				expl.addMap(map);
 			}
 		}
-			
+		
+		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+				affRels.keySet()));
+		
 		for (String affRel: affRels.keySet()) {
 			computeSideEffects(affRel, affRels.get(affRel).mapSet, 
 					affRels.get(affRel).attrSet);
 		}
 		expl.getTargetSideEffects().remove(error);
 
-		result.addExplanation(expl);
+		if (expl.getMappingSideEffectSize() > 0)
+			result.addExplanation(expl);
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps, Set<String> attrs) throws Exception {

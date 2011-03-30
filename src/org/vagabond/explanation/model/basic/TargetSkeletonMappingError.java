@@ -1,5 +1,6 @@
 package org.vagabond.explanation.model.basic;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,29 +11,38 @@ import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.util.LoggerUtil;
 import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.TransformationType;
 
 public class TargetSkeletonMappingError extends AbstractBasicExplanation 
 		implements IBasicExplanation {
 
 	static Logger log = Logger.getLogger(TargetSkeletonMappingError.class);
 	
-	private Set<MappingType> maps;
+	private Set<MappingType> mapSE;
+	private Set<TransformationType> transSE;
 	
 	public TargetSkeletonMappingError () {
 		super();
-		maps = new HashSet<MappingType> ();
+		setUp();
 	}
 	
 	public TargetSkeletonMappingError (IAttributeValueMarker marker) {
 		super(marker);
-		maps = new HashSet<MappingType> ();
+		setUp();
 	}
 	
 	public TargetSkeletonMappingError (IAttributeValueMarker marker, 
 			Set<MappingType> maps) {
 		super(marker);
-		this.maps = maps;
+		setUp();
+		this.mapSE = maps;
 	}
+	
+	private void setUp () {
+		mapSE = new HashSet<MappingType> ();
+		transSE = new HashSet<TransformationType> ();
+	}
+	
 
 	@Override
 	public ExplanationType getType() {
@@ -41,25 +51,39 @@ public class TargetSkeletonMappingError extends AbstractBasicExplanation
 
 	@Override
 	public Object getExplanation() {
-		return maps;
+		return mapSE;
 	}
 
 	@Override
 	public int getMappingSideEffectSize() {
-		return maps.size();
+		return mapSE.size();
 	}
 	
 	@Override
 	public Set<MappingType> getMappingSideEffects() {
-		return maps;
+		return mapSE;
 	}
 
 	public void setMap(Set<MappingType> maps) {
-		this.maps = maps;
+		this.mapSE = maps;
 	}
 
 	public void addMap(MappingType map) {
-		maps.add(map);
+		mapSE.add(map);
+	}
+
+	@Override
+	public Collection<TransformationType> getTransformationSideEffects () {
+		return transSE;
+	}
+	
+	@Override
+	public int getTransformationSideEffectSize () {
+		return transSE.size();
+	}
+	
+	public void setTransSE (Collection<TransformationType> transSE) {
+		this.transSE = new HashSet<TransformationType> (transSE);
 	}
 	
 }

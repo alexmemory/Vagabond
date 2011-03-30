@@ -17,6 +17,7 @@ import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.TransformationType;
 
 public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 
@@ -36,10 +37,15 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		IExplanationSet result;
 		SourceSkeletonMappingError expl;
 		Set<MappingType> m1;
+		Set<TransformationType> t1;
 		IMarkerSet exp;
+		
 		
 		m1 = new HashSet<MappingType> ();
 		m1.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		
+		t1 = new HashSet<TransformationType> ();
+		t1.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		
 		exp = MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1","city"),
@@ -51,6 +57,7 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		log.debug(result);
 		
 		assertEquals(m1, expl.getMappingSideEffects());
+		assertEquals(t1, expl.getTransformationSideEffects());
 		assertEquals(exp, expl.getTargetSideEffects());
 	}
 	

@@ -1,17 +1,24 @@
 package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.ITupleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.xmlmodel.MappingType;
 
 public class CopySourceExplanationGenerator 
 		extends SourceProvenanceSideEffectGenerator 
@@ -31,11 +38,13 @@ public class CopySourceExplanationGenerator
 	
 	private IExplanationSet getExplanationSets() throws Exception {
 		IExplanationSet result = ExplanationFactory.newExplanationSet();
+		IMarkerSet sourceSE;
 		
-		this.prov = retrieveCopyProvenance();
+		prov = retrieveCopyProvenance();
+		sourceSE = getRealCopyFromMappings(prov.getTuplesInProv()); 
 		
 		expl = new CopySourceError(error);
-		expl.setSourceSE(prov.getTuplesInProv());
+		expl.setSourceSE(sourceSE);
 		expl.setTargetSE(computeTargetSideEffects(expl.getSourceSideEffects()));
 		
 		log.debug("Generated Explanation:\n" + expl.toString());
@@ -47,6 +56,27 @@ public class CopySourceExplanationGenerator
 		return result;
 	}
 	
+	private IMarkerSet getRealCopyFromMappings(IMarkerSet tuplesInProv) {
+		IMarkerSet result;
+		ITupleMarker tup;
+		String rel;
+		String tid;
+		int attr;
+		Map<MappingType,Set<Integer>> maps;
+		
+		result = MarkerFactory.newMarkerSet();
+		
+		for(ISingleMarker marker: tuplesInProv) {
+			tup = (ITupleMarker) marker;
+			
+			result.add(MarkerFactory.newAttrMarker(tup,attr));
+		}
+		
+		return result;
+	}
+	
+	private 
+
 	private ProvWLRepresentation retrieveCopyProvenance () 
 			throws Exception {
 		ResultSet rs;

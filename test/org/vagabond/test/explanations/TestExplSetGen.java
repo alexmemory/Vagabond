@@ -19,10 +19,12 @@ import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
+import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.TransformationType;
 
 public class TestExplSetGen extends AbstractVagabondTest {
 
@@ -45,9 +47,11 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		SuperflousMappingError e3;
 		InfluenceSourceError e4;
 		SourceSkeletonMappingError e5;
+		TargetSkeletonMappingError e6;
 		IExplanationSet set;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
+		HashSet<TransformationType> trans;
 		
 		m = MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "2|2", "city")
@@ -66,10 +70,13 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
 		maps = new HashSet<MappingType> ();
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		e2 = new CorrespondenceError();
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
 		e2.setCorrespondences(corrs);
 		e2.setMapSE(maps);
+		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
 				MarkerFactory.newAttrMarker("employee", "4|2", "city")
@@ -78,6 +85,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3 = new SuperflousMappingError();
 		e3.setExplains(m.getElemList().get(0));
 		e3.setMapSE(maps);
+		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newTupleMarker("employee", "4|2"),
 				MarkerFactory.newTupleMarker("employee", "1|1")
@@ -93,6 +101,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				MarkerFactory.newAttrMarker("employee", "4|2", "city")
 		));
 		e5.addMap(MapScenarioHolder.getInstance().getMapping("M2"));
+		e5.setTransSE(trans);
 		
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4,e5);
 
@@ -114,6 +123,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		IExplanationSet set;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
+		HashSet<TransformationType> trans;
 		
 		loadToDB("resource/exampleScenarios/homeless.xml");
 		
@@ -135,10 +145,14 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		maps = new HashSet<MappingType> ();
 		maps.add(MapScenarioHolder.getInstance().getMapping("M1"));
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
+		
 		e2 = new CorrespondenceError();
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
 		e2.setCorrespondences(corrs);
 		e2.setMapSE(maps);
+		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerParser.getInstance().parserSet(
 				"{A(person,2|1,livesin),A(person,2|1|2|1,livesin),A(person,1|3|1|2,livesin),A(person,3|2,livesin)}"));
 		
@@ -147,6 +161,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		maps = new HashSet<MappingType> ();
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e3.setMapSE(maps);
+		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerParser.getInstance().parserSet(
 				"{T(person,2|1),T(person,3|2)}"));
 		
@@ -158,6 +173,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e5.setTargetSE(MarkerParser.getInstance().parserSet(
 				"{A(person,3|2,livesin),A(person,2|1,livesin)}"));
 		e5.addMap(MapScenarioHolder.getInstance().getMapping("M2"));
+		e5.setTransSE(trans);
 		
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4,e5);
 

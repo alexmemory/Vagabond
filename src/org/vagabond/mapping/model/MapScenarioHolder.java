@@ -99,17 +99,39 @@ public class MapScenarioHolder {
 		return new ArrayList<RelationType> (result);
 	}
 	
-	public List<TransformationType> getTransCreatingRel (String relname) throws Exception {
-		RelationType rel;
+	public List<TransformationType> getTransCreatingRel (String relname) 
+			throws Exception {
 		List<TransformationType> result;
 		
 		result = new ArrayList<TransformationType> ();
 		
-		rel = getRelForName (relname, true);
 		for(TransformationType trans: doc.getMappingScenario().
 				getTransformations().getTransformationArray()) {
 			if (trans.getCreates().equals(relname))
 				result.add(trans);
+		}
+		
+		return result;
+	}
+	
+	public TransformationType getTransformation (String id) throws Exception {
+		for (TransformationType trans: 
+				doc.getMappingScenario().getTransformations()
+						.getTransformationArray()) {
+			if (trans.getId().equals(id))
+				return trans;
+		}
+		
+		throw new Exception ("no transformation for id <" + id + ">");
+	}
+	
+	public List<TransformationType> getTransForRels (Collection<String> rels) 
+			throws Exception {
+		List<TransformationType> result;
+		
+		result = new ArrayList<TransformationType> ();
+		for(String rel: rels) {
+			result.addAll(getTransCreatingRel(rel));
 		}
 		
 		return result;

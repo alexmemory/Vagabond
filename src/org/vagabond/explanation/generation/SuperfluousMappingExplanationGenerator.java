@@ -64,6 +64,9 @@ public class SuperfluousMappingExplanationGenerator
 			}
 		}
 		
+		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+				affRels.keySet()));
+		
 		for (String affRel: affRels.keySet()) {
 			computeSideEffects(affRel, affRels.get(affRel));
 		}

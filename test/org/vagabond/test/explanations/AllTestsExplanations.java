@@ -6,14 +6,19 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-		TestMarkers.class,
-		TestQueryHolder.class,
-		TestExplSetGen.class,
 		TestCopyExplGen.class,
 		TestCopyExplGenQueries.class,
 		TestCorrExplGen.class,
 		TestCorrExplGenQueries.class,
-		TestSrcSkeMapExplGen.class
+		TestExplanationCollection.class,
+		TestExplSetGen.class,
+		TestInflExplGen.class,
+		TestMarkerParser.class,
+		TestMarkers.class,
+		TestQueryHolder.class,
+		TestSrcSkeMapExplGen.class,
+		TestSuperMapExplGen.class,
+		TestTgtSkeMapExplGen.class
         })
 public class AllTestsExplanations {
 

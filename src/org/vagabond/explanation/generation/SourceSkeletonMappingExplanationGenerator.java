@@ -114,6 +114,9 @@ public class SourceSkeletonMappingExplanationGenerator implements
 			}
 		}
 		
+		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+				affRels.keySet()));
+		
 		for (String affRel: affRels.keySet()) {
 			computeSideEffects(affRel, affRels.get(affRel).mapSet, 
 					affRels.get(affRel).attrSet);

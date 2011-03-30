@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>CopyCS</comment>
+
+<entry key="GetMapDistributionForTarget">
+SELECT count(*)::float / (SELECT count(*) FROM ${1})::float AS per, 
+	count(*) AS count trans_prov 
+FROM (SELECT MAPPROV * FROM ${1}) p 
+GROUP BY trans_prov;
+</entry>
+
+<entry key="GetTransformationAllAndExists">
+SELECT bit_or(trans_prov) AS transexists, bit_and(trans_prov) AS transforall 
+FROM (SELECT TRANSPROV * FROM ${1}) p; 
+</entry>
+
+</properties>
+

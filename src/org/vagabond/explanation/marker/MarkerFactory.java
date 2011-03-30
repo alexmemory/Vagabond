@@ -42,6 +42,11 @@ public class MarkerFactory {
 		return new AttrValueMarker(rel, tid, attr);
 	}
 	
+	public static IAttributeValueMarker newAttrMarker 
+			(ITupleMarker tup, int attr) {
+		return new AttrValueMarker(tup.getRelId(), tup.getTid(), attr);
+	}
+	
 	public static ITupleMarker newTupleMarker () {
 		return new TupleMarker();
 	}
