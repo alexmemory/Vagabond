@@ -108,7 +108,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		
 		for(int i = 0; i < iterPos.size(); i++) {
 			curPos = iterPos.get(i);
-			if (curPos < numExpls.get(i))
+			if (curPos < numExpls.get(i) - 1)
 			{
 				iterPos.set(i, curPos + 1);
 				return;
