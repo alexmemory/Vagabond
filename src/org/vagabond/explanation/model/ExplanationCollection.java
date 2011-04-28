@@ -78,6 +78,8 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	public IExplanationSet next() {
 		IExplanationSet set;
 		
+		assert(hasNext());
+		
 		set = generateExplForIter(iterPos);
 		increaseIter ();
 		
@@ -111,6 +113,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			if (curPos < numExpls.get(i) - 1)
 			{
 				iterPos.set(i, curPos + 1);
+				log.debug("new iter pos is <" + iterPos + ">");
 				return;
 			}
 			else {
@@ -118,7 +121,9 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			}
 		}
 		
-		log.debug("new iter pos is <" + iterPos + ">");
+		log.debug("iterator reached end: <" + iterPos + ">");
+		for(int i = 0; i < iterPos.size(); i++)
+			iterPos.set(i, numExpls.get(i));
 	}
 	
 	@Override

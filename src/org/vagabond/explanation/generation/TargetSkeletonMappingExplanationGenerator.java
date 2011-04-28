@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -40,7 +41,7 @@ public class TargetSkeletonMappingExplanationGenerator implements
 		result = ExplanationFactory.newExplanationSet();
 		this.error = (IAttributeValueMarker) errorMarker;
 
-		getMapProv();
+		maps = ProvenanceGenerator.getInstance().getMapProv(error);
 		generateExplanation (result);
 		
 		return result;
@@ -174,28 +175,6 @@ public class TargetSkeletonMappingExplanationGenerator implements
 		ConnectionManager.getInstance().closeRs(rs);
 		
 		return result;
-	}
-
-	private void getMapProv() throws Exception {
-		String query;
-		ResultSet rs;
-		
-		maps = new HashSet<MappingType> ();
-		
-		query = QueryHolder.getQuery("SuperMap.GetMapProv")
-				.parameterize("target." + error.getRelName(), error.getTid());
-		log.debug("Compute MapProv for <" + error + "> with query:\n" + query);
-		
-		rs = ConnectionManager.getInstance().execQuery(query);
-		
-		while(rs.next()) {
-			maps.add(MapScenarioHolder.getInstance()
-					.getMapping(rs.getString(1)));
-		}
-		
-		ConnectionManager.getInstance().closeRs(rs);
-		
-		log.debug("Get mapping provenance for <" + error + "> returned <" + maps + ">");
 	}
 
 }

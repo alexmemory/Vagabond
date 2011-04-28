@@ -131,6 +131,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				MarkerFactory.newAttrMarker("person", "1|1", "livesin")
 				);
 		
+		log.debug(m);
+		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
 		e1.setSourceSE(MarkerFactory.newMarkerSet(

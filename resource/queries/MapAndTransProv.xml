@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Provenance retrieval queries</comment>
+
+<entry key="GetMapProv">
+SELECT trans_prov  
+FROM (SELECT MAPPROV * FROM ${1}) AS mprov
+WHERE tid = '${2}'
+</entry>
+
+
+
+</properties>

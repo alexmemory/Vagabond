@@ -22,14 +22,16 @@ import org.vagabond.util.ResultSetUtil;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 
-public class SourceProvenanceSideEffectGenerator {
+public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator 
+		{
 
 	public static Logger log = Logger.getLogger(SourceProvenanceSideEffectGenerator.class);
 	
 	protected IAttributeValueMarker error;
 	private IMarkerSet sourceSE;
 	
-	public IMarkerSet computeTargetSideEffects(IMarkerSet sourceSE) throws Exception {
+	public IMarkerSet computeTargetSideEffects(IMarkerSet sourceSE, 
+			IAttributeValueMarker error) throws Exception {
 		String query;
 		ResultSet rs;
 		IMarkerSet result = MarkerFactory.newMarkerSet();
@@ -37,6 +39,8 @@ public class SourceProvenanceSideEffectGenerator {
 		Map<String, IMarkerSet> partionedSE;
 		
 		this.sourceSE = sourceSE;
+		this.error = error;
+		
 		partionedSE = partitionSourceSE();
 		relsForAffTarget = getRelAffectedByRels(partionedSE.keySet());
 		

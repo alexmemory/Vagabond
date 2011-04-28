@@ -3,12 +3,6 @@
 <properties>
 <comment>CopyCS</comment>
 
-<entry key="GetMapProv">
-SELECT trans_prov  
-FROM (SELECT MAPPROV * FROM ${1}) AS mprov
-WHERE tid = '${2}'
-</entry>
-
 <entry key="GetSideEffects">
 SELECT tid FROM 
 (SELECT MAPPROV * FROM ${1}) p 

@@ -77,10 +77,11 @@ public class SourceProvParser {
 				if (tid != null) {
 					tup = MarkerFactory.newTupleMarker(relNames.get(i), tid);
 					log.debug("add tuple marker " + tup);
-					witList.add(tup);
-					
+					witList.add(tup);	
 					allProv.addTupleInProv(tup);
 				}
+				else
+					witList.add(null);
 			}
 			
 			log.debug("created witness list " + witList);

@@ -1,7 +1,6 @@
 package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -136,7 +136,7 @@ public class CorrespondencExplanationGenerator implements
 		
 		corrCandi = (Set<CorrespondenceType>) 
 				expl.getCorrespondenceSideEffects();
-		mappings = getMapProv(error);
+		mappings = ProvenanceGenerator.getInstance().getMapProvStrings(error);
 		
 		// get candidate correspondences
 		for (String mapName: mappings) {
@@ -159,34 +159,6 @@ public class CorrespondencExplanationGenerator implements
 		}
 		
 		return false;
-	}
-
-	private Vector<String> getMapProv(IAttributeValueMarker marker) throws SQLException, ClassNotFoundException {
-		Vector<String> mappings;
-		ResultSet rs;
-		String map;
-		String query;
-		
-		mappings = new Vector<String>();
-		query = QueryHolder.getQuery("Correspondence.GetMapProv")
-				.parameterize("target." + marker.getRelName(), 
-						marker.getTid());
-		
-		log.debug("get mappings that produced <" + marker + "> with query:\n"
-				+ query + ">");
-		
-		rs = ConnectionManager.getInstance().execQuery(query);
-		while(rs.next()) {
-			map = rs.getString(1);
-			if (map != null)
-				mappings.add(map);
-		}
-		
-		ConnectionManager.getInstance().closeRs(rs);
-		
-		return mappings;
-	}
-	
-	
+	}	
 
 }

@@ -23,7 +23,7 @@ public class AlterSourceProvenanceSideEffectGenerator extends SourceProvenanceSi
 		for(String source: sourceRels) {
 			unnumSource = getUnNumRelName(source);
 			if (sourceSE.get(unnumSource) != null) {
-				for(ISingleMarker sourceErr: sourceSE.get(source).getElems()) {
+				for(ISingleMarker sourceErr: sourceSE.get(unnumSource).getElems()) {
 					conditions.append(
 							getSideEffectEqualityCond(source, 
 									(ITupleMarker) sourceErr)

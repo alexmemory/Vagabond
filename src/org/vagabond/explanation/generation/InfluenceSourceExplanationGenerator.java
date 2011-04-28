@@ -2,6 +2,7 @@ package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
 
+import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -26,33 +27,13 @@ public class InfluenceSourceExplanationGenerator
 		result = ExplanationFactory.newExplanationSet();
 		
 		this.error = (IAttributeValueMarker) errorMarker;
-		prov = computePIProv();
+		prov = ProvenanceGenerator.getInstance().computePIProv(error);
 		genExplsForProv(prov);
 		
 		return result;
 	}
 
-	private ProvWLRepresentation computePIProv() throws Exception {
-		String query;
-		ResultSet rs;
-		SourceProvParser parser;
-		ProvWLRepresentation prov;
-		
-		query = QueryHolder.getQuery("InfluenceCS.GetProv")
-				.parameterize("target." + error.getRelName(), error.getTid(), 
-						error.getAttrName());
-		
-		rs = ConnectionManager.getInstance().execQuery(query);
-		
-		parser = new SourceProvParser(rs);
-		prov = parser.getAllProv();
-		
-		log.debug("compute prov for <" + error + ">:\n" + prov);
-		
-		ConnectionManager.getInstance().closeRs(rs);
-		
-		return prov;
-	}
+
 
 	private void genExplsForProv(ProvWLRepresentation prov) throws Exception {
 		//TODO
@@ -60,7 +41,7 @@ public class InfluenceSourceExplanationGenerator
 		result.addExplanation(expl);
 		
 		
-		computeTargetSideEffects(expl.getSourceSideEffects());
+		computeTargetSideEffects(expl.getSourceSideEffects(), error);
 	}
 	
 	

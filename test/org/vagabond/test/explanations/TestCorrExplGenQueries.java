@@ -20,16 +20,7 @@ public class TestCorrExplGenQueries extends AbstractVagabondDBTest {
 		gen = new CorrespondencExplanationGenerator();
 	}
 	
-	@Test
-	public void testGetMapProvQuery () throws Exception {
-		String query = QueryHolder.getQuery("Correspondence.GetMapProv")
-				.parameterize("target.employee","2|2");
-		String result =  "\ntrans_prov\n" + 
-				"-----\n" +
-				 "M2";
 
-		testSingleQuery(query, result);
-	}
 	
 	@Test
 	public void testSideEffectsQuery () throws Exception {

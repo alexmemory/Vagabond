@@ -80,43 +80,7 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		assertEquals(e1.getTargetSideEffects().getSize(), 0);
 	}
 	
-	@Test
-	public void testSideEffectQueryGen () throws Exception {
-		Set<String> sourceRels;
-		Map<String, IMarkerSet> sourceErr;
-		IMarkerSet errSet, errSet2;
-		String resultQuery;
-		String query;
-		//TODO handle multiple accesses to same base rel
-		query = "SELECT prov.tid\n" +
-				"FROM\n" +
-				"(SELECT *\n" +
-				"FROM target.employee) AS prov\n" +
-				"WHERE NOT EXISTS (SELECT subprov.tid\n" +
-				"FROM (SELECT PROVENANCE * FROM target.employee) AS subprov\n" + 
-				"WHERE prov.tid = subprov.tid " +
-				"AND (prov_source_address_tid IS DISTINCT FROM 2 " +
-				"AND prov_source_address_tid IS DISTINCT FROM 3 ))";
-		errSet = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "1")
-				);
-		errSet2 = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "2"),
-				MarkerFactory.newTupleMarker("address", "3")
-				);
-		sourceErr = new HashMap<String, IMarkerSet> ();
-		sourceErr.put("employee", errSet);
-		sourceErr.put("address", errSet2);
-		
-		sourceRels = new HashSet<String> ();
-		sourceRels.add("address");
-		sourceRels.add("person");
-		
-		resultQuery = gen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
-		log.debug(resultQuery);
-		
-		assertEquals(query, resultQuery);
-	}
+
 	
 	@Test
 	public void testExplGenSideEffect () throws Exception {

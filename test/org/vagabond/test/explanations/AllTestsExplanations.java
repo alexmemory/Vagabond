@@ -18,7 +18,9 @@ import org.junit.runners.Suite;
 		TestQueryHolder.class,
 		TestSrcSkeMapExplGen.class,
 		TestSuperMapExplGen.class,
-		TestTgtSkeMapExplGen.class
+		TestTgtSkeMapExplGen.class,
+		TestProvAndSideEffect.class,
+		TestProvAndSideEffectQueries.class
         })
 public class AllTestsExplanations {
 
