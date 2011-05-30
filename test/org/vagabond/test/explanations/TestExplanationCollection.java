@@ -40,7 +40,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		IExplanationSet resultSet;
 		IAttributeValueMarker error = 
 				MarkerFactory.newAttrMarker("employee", "2|2", "city");
-		ExplanationCollection col;
+		ExplanationCollection col, col2;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
 		
@@ -85,11 +85,57 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 			assertTrue(resultSet.getExplanationsSet().contains(e1)
 					|| resultSet.getExplanationsSet().contains(e2));
 		}
+		
+		col2 = new ExplanationCollection();
+		col2.addExplSet(error, set);
+		
+		assertEquals(col, col2);
 	}
 	
 	@Test
-	public void testMultiSetCol () {
+	public void testMultiSetCol () throws Exception {
+		CopySourceError e1;
+		CorrespondenceError e2;
+		IExplanationSet set, set2;
+		IExplanationSet resultSet;
+		IAttributeValueMarker error = 
+				MarkerFactory.newAttrMarker("employee", "2|2", "city");
+		ExplanationCollection col, col2;
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
 		
+		// copy error
+		e1 = new CopySourceError();
+		e1.setExplains(error);
+		e1.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e1.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "4|2")
+				));
+		
+		// correspondence error
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		e2 = new CorrespondenceError();
+		e2.setExplains(error);
+		e2.setCorrespondences(corrs);
+		e2.setMapSE(maps);
+		e2.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "4|2", "city")
+		));
+		
+		set = ExplanationFactory.newExplanationSet(e1);
+		set2 = ExplanationFactory.newExplanationSet(e2);
+		
+		// *** collection
+		col = ExplanationFactory.newExplanationCollection(set, set2);
+		col2 = ExplanationFactory.newExplanationCollection(set, set2);
+		
+		assertEquals(col, col2);
 	}
 	
 }

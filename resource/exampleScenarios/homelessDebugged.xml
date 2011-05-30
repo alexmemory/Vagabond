@@ -73,8 +73,8 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c1</Correspondence>
 			<Correspondence>c2</Correspondence>
+			<Correspondence>c3</Correspondence>
 		</Uses>
 		<Foreach>
 			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>

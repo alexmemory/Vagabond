@@ -64,7 +64,7 @@ public class MarkerParser {
 		return result;
 	}
 	
-	public IMarkerSet parserSet (String set) throws Exception {
+	public IMarkerSet parseSet (String set) throws Exception {
 		String elemString;
 		Vector<String> elems;
 		IMarkerSet result;
@@ -72,6 +72,11 @@ public class MarkerParser {
 		StringBuffer element;
 		
 		result = MarkerFactory.newMarkerSet();
+		
+		// handle empty set
+		if (set.matches("\\s*\\{\\s*\\}\\s*"))
+			return result;
+		
 		elemString = set.substring(1, set.length());
 		elems = new Vector<String> ();
 		

@@ -18,6 +18,21 @@ public class ExplanationFactory {
 		
 	}
 	
+	public static ExplanationCollection newExplanationCollection () {
+		return new ExplanationCollection();
+	}
+	
+	public static ExplanationCollection newExplanationCollection 
+			(IExplanationSet ... elems) {
+		ExplanationCollection result =  new ExplanationCollection();
+		
+		for(IExplanationSet set: elems) {
+			result.addExplSet(set.getExplains().iterator().next(), set);
+		}
+		
+		return result;
+	}
+	
 	public static IExplanationSet newExplanationSet () {
 		return new SimpleExplanationSet ();
 	}

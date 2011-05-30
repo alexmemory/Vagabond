@@ -42,7 +42,15 @@ public class TestMarkerParser extends AbstractVagabondTest {
 				);
 		String markSet = "{A(employee,2|2,city),T(employee,4|2)}";
 		
-		assertEquals(expec, MarkerParser.getInstance().parserSet(markSet));
+		assertEquals(expec, MarkerParser.getInstance().parseSet(markSet));
+	}
+	
+	@Test
+	public void testEmptyMarkerSet () throws Exception {
+		IMarkerSet expec = MarkerFactory.newMarkerSet();
+		String markerSet = "{}";
+		
+		assertEquals(expec, MarkerParser.getInstance().parseSet(markerSet));
 	}
 	
 	@Test

@@ -10,6 +10,7 @@ public class IdMap<Type> {
 	private SortedMap<Integer, Type> idToObj;
 	private Map<Type, Integer> ObjToId;
 	private int maxId = -1;
+	private int hash = -1;
 	
 	public IdMap () {
 		idToObj = new TreeMap<Integer, Type> ();
@@ -49,5 +50,43 @@ public class IdMap<Type> {
 	
 	public int getMaxId () {
 		return maxId;
+	}
+	
+	@Override
+	public boolean equals (Object other) {
+		if (other == null)
+			return false;
+		
+		if (this == other)
+			return false;
+		
+		if (! (other instanceof IdMap<?>))
+			return false;
+		
+		IdMap<?> oMap = (IdMap<?>) other;
+		
+		if (this.hashCode() != oMap.hashCode())
+			return false;
+		
+		if (this.maxId != oMap.maxId)
+			return false;
+		
+		if (! this.idToObj.equals(oMap.idToObj))
+			return false;
+		
+		if (! this.ObjToId.equals(oMap.ObjToId))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (hash == -1) {
+			hash = maxId;
+			hash = hash * 13 + idToObj.hashCode();
+		}
+		
+		return hash;
 	}
 }

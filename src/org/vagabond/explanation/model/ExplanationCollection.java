@@ -194,7 +194,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		if (this.totalExpls != oCol.totalExpls)
 			return false;
 		
-		if (this.numExpls != oCol.numExpls)
+		if (!this.numExpls.equals(oCol.numExpls))
 			return false;
 		
 		if (!this.explMap.equals(oCol.explMap))

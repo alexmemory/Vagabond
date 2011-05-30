@@ -65,7 +65,7 @@ public class CommandLineExplGen {
 	private IMarkerSet loadMarkers() throws Exception {
 		if (options.getMarkers() != null) 
 			markers = MarkerParser.getInstance()
-					.parserSet(options.getMarkers());
+					.parseSet(options.getMarkers());
 		else if (options.getMarkerFile() != null)
 			markers = MarkerParser.getInstance()
 					.parseMarkers(new FileInputStream(options.getMarkerFile()));

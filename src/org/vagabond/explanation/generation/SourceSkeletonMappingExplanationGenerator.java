@@ -68,6 +68,10 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		String varName = null;
 		
 		for(MappingType map: maps) {
+			// mappings with a single source atom cannot join wrong.
+			if (map.getForeach().getAtomArray().length == 1)
+				continue;
+			
 			expl.addMap(map);
 			
 			// 1st step: find the var name for the error in the target
@@ -92,6 +96,8 @@ public class SourceSkeletonMappingExplanationGenerator implements
 					}
 				}
 			}
+			
+			//TODO check that we actually have more than one source atom, otherwise there is no such explanation
 			
 			// 3rd step: find the attributes in the target that appear in the list
 			// found in the 2nd step.
@@ -124,7 +130,9 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		}
 		expl.getTargetSideEffects().remove(error);
 
-		result.addExplanation(expl);
+		// we found at least one mapping that may have joined incorrectly
+		if (expl.getMappingSideEffectSize() != 0)
+			result.addExplanation(expl);
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps, Set<String> attrs) throws Exception {

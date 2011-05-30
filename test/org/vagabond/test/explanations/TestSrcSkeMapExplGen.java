@@ -12,6 +12,8 @@ import org.vagabond.explanation.generation.SourceSkeletonMappingExplanationGener
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -32,7 +34,7 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testSrcSkeMapExplGen () throws Exception {
+	public void testSimpleTestScen () throws Exception {
 		ISingleMarker err = MarkerFactory.newAttrMarker("employee", "2|2", "city");
 		IExplanationSet result;
 		SourceSkeletonMappingError expl;
@@ -59,6 +61,20 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		assertEquals(m1, expl.getMappingSideEffects());
 		assertEquals(t1, expl.getTransformationSideEffects());
 		assertEquals(exp, expl.getTargetSideEffects());
+	}
+	
+	@Test
+	public void testHomelessDebugged () throws Exception {
+		ISingleMarker m;
+		IExplanationSet exp, result;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		m = MarkerParser.getInstance().parseMarker("A(person,1,name)");
+		exp = ExplanationFactory.newExplanationSet();
+		
+		result = gen.findExplanations(m);
+		assertEquals(exp,result);
 	}
 	
 }
