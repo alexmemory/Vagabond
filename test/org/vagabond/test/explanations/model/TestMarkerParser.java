@@ -1,4 +1,4 @@
-package org.vagabond.test.explanations;
+package org.vagabond.test.explanations.model;
 
 import static org.junit.Assert.*;
 

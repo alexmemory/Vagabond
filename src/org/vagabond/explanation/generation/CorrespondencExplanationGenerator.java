@@ -1,6 +1,7 @@
 package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -65,7 +66,8 @@ public class CorrespondencExplanationGenerator implements
 		
 		expl.setMapSE(affMaps);
 		
-		mapsPerTarget = partitionMapsToTarget(affMaps);
+		mapsPerTarget = partitionMapsToTarget(affMaps, 
+				expl.getCorrespondenceSideEffects());
 		
 		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
 				mapsPerTarget.keySet()));
@@ -110,19 +112,31 @@ public class CorrespondencExplanationGenerator implements
 	
 	
 
-	private Map<String, Set<String>> partitionMapsToTarget(Set<MappingType> affMaps) {
+	private Map<String, Set<String>> partitionMapsToTarget
+			(Set<MappingType> affMaps, Collection<CorrespondenceType> corrs) {
 		Map<String,Set<String>> mapsPerTarget;
 		String targetName;
 		String mapName;
 		mapsPerTarget = new HashMap<String,Set<String>> ();
+		Set<String> targetAffByCorr;
 		
+		
+		// find target relations affected by correspondences
+		targetAffByCorr = new HashSet<String>();
+		for (CorrespondenceType corr: corrs) {
+			targetAffByCorr.add(corr.getTo().getTableref());
+		}
+		
+		// create target rel to mappings Map
 		for (MappingType map: affMaps) {
 			mapName = map.getId();
 			for(RelAtomType target: map.getExists().getAtomArray()) {
 				targetName = target.getTableref();
-				if (!mapsPerTarget.containsKey(targetName))
-					mapsPerTarget.put(targetName, new HashSet<String> ());
-				mapsPerTarget.get(targetName).add(mapName);
+				if (targetAffByCorr.contains(targetName)) {
+					if (!mapsPerTarget.containsKey(targetName))
+						mapsPerTarget.put(targetName, new HashSet<String> ());
+					mapsPerTarget.get(targetName).add(mapName);
+				}
 			}
 		}
 		

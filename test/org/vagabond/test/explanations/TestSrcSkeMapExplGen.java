@@ -29,12 +29,13 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 	
 	@BeforeClass
 	public static void load () throws Exception {
-		loadToDB("resource/test/simpleTest.xml");
 		gen = new SourceSkeletonMappingExplanationGenerator();
 	}
 	
 	@Test
 	public void testSimpleTestScen () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		ISingleMarker err = MarkerFactory.newAttrMarker("employee", "2|2", "city");
 		IExplanationSet result;
 		SourceSkeletonMappingError expl;

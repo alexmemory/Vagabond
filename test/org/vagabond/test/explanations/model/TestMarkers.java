@@ -1,4 +1,4 @@
-package org.vagabond.test.explanations;
+package org.vagabond.test.explanations.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,6 +14,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.SchemaResolver;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
@@ -114,6 +115,15 @@ public class TestMarkers extends AbstractVagabondTest {
 		set5.add(m2);
 		
 		assertEquals(set4, set5);
+		
+		assertEquals(MarkerParser.getInstance().parseSet("{}"), 
+				MarkerParser.getInstance().parseSet("{}"));
+		
+		assertFalse(MarkerParser.getInstance().parseSet("{A(tramp,1,name)}").equals( 
+				MarkerParser.getInstance().parseSet("{}")));
+		
+		assertFalse(MarkerParser.getInstance().parseSet("{}").equals( 
+				MarkerParser.getInstance().parseSet("{A(tramp,1,name)}")));
 	}
 	
 	private void testTupSize(int relId, int size) {

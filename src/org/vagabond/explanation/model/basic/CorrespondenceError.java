@@ -22,7 +22,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 	static Logger log = Logger.getLogger(CorrespondenceError.class);
 	
 	private Set<CorrespondenceType> correspondences;
-	private Collection<MappingType> mapSE;
+	private Set<MappingType> mapSE;
 	private Set<TransformationType> transSE;
 
 	public CorrespondenceError () {
@@ -37,7 +37,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 	}
 	
 	private void setUp() {
-		mapSE = new ArrayList<MappingType> ();
+		mapSE = new HashSet<MappingType> ();
 		transSE = new HashSet<TransformationType> ();
 		correspondences = new HashSet<CorrespondenceType> ();
 	}
@@ -80,7 +80,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 		return mapSE;
 	}
 
-	public void setMapSE(Collection<MappingType> mapSE) {
+	public void setMapSE(Set<MappingType> mapSE) {
 		this.mapSE = mapSE;
 	}
 

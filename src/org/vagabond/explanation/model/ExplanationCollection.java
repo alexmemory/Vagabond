@@ -193,17 +193,27 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		
 		if (this.totalExpls != oCol.totalExpls)
 			return false;
-		
-		if (!this.numExpls.equals(oCol.numExpls))
-			return false;
-		
+				
 		if (!this.explMap.equals(oCol.explMap))
 			return false;
 		
-		if (!this.errorIds.equals(oCol.errorIds))
-			return false;
+		// ids assigned to error markers are considered instable
+		for(ISingleMarker error: explMap.keySet()) {
+			if (this.getNumExpls(error) != oCol.getNumExpls(error))
+				return false;
+		}
+		
+//		if (!this.numExpls.equals(oCol.numExpls))
+//			return false;
+//		
+//		if (!this.errorIds.equals(oCol.errorIds))
+//			return false;
 		
 		return true;
+	}
+	
+	private int getNumExpls (ISingleMarker error) {
+		return numExpls.get(errorIds.get(error));
 	}
 	
 	@Override

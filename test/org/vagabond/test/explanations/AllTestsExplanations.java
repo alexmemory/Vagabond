@@ -2,6 +2,9 @@ package org.vagabond.test.explanations;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.vagabond.test.explanations.model.TestExplanationCollection;
+import org.vagabond.test.explanations.model.TestMarkerParser;
+import org.vagabond.test.explanations.model.TestMarkers;
 
 
 @RunWith(Suite.class)
@@ -10,11 +13,8 @@ import org.junit.runners.Suite;
 		TestCopyExplGenQueries.class,
 		TestCorrExplGen.class,
 		TestCorrExplGenQueries.class,
-		TestExplanationCollection.class,
 		TestExplSetGen.class,
 		TestInflExplGen.class,
-		TestMarkerParser.class,
-		TestMarkers.class,
 		TestQueryHolder.class,
 		TestSrcSkeMapExplGen.class,
 		TestSuperMapExplGen.class,

@@ -30,13 +30,7 @@ public class MarkerSet implements IMarkerSet {
 		if (other instanceof IMarkerSet) {
 			IMarkerSet oMarker = (IMarkerSet) other;
 			
-			for(ISingleMarker elem: markers) {
-				log.debug("check " + elem);
-				if (!oMarker.getElems().contains(elem))
-					return false;
-			}
-
-			return true;
+			return markers.equals(oMarker.getElems());
 		}
 		
 		return false;

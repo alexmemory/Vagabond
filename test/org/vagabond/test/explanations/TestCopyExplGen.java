@@ -17,6 +17,8 @@ import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
@@ -34,8 +36,6 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@BeforeClass
 	public static void setUp () throws Exception {		
-		loadToDB("resource/test/simpleTest.xml");
-		
 		gen = new CopySourceExplanationGenerator();
 				
 		queries = new PropertyWrapper("resource/queries/CopyCS.xml");
@@ -48,6 +48,8 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@Test
 	public void testCopyProvParser () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		ResultSet rs = ConnectionManager.getInstance().execQuery(
 			queries.getProperty("copy1"));
 		SourceProvParser parser = new SourceProvParser(rs);
@@ -65,6 +67,8 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@Test
 	public void testExplGenNoSide () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		IAttributeValueMarker a1 = MarkerFactory.
 				newAttrMarker("employee", "1|1", "city");
 		IMarkerSet m1 = MarkerFactory.newMarkerSet(
@@ -84,6 +88,8 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	
 	@Test
 	public void testExplGenSideEffect () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		IAttributeValueMarker a1 = MarkerFactory.
 				newAttrMarker("employee", "2|2", "city");
 		IMarkerSet m1 = MarkerFactory.newMarkerSet(
@@ -99,6 +105,54 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		assertEquals(e1.getSourceSideEffects(), m1);
 		assertEquals(e1.explains(), a1);
 		assertEquals(e1.getTargetSideEffects(), sideE);
+	}
+	
+	@Test
+	public void testHomelessExplGen () throws Exception {
+		IExplanationSet result, expec;
+		CopySourceError c1;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,name)");
+		
+		c1 = new CopySourceError(error);
+		c1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{T(socialworker,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{T(person,2|1|1)}"));
+		
+		expec = ExplanationFactory.newExplanationSet(c1);
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
+	}
+	
+	@Test
+	public void testNormalizeExplGen () throws Exception {
+		IExplanationSet result, expec;
+		CopySourceError c1;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/test/targetSkeletonError.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,name)");
+		
+		c1 = new CopySourceError(error);
+		c1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{T(employee,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{T(address,1)}"));
+		
+		expec = ExplanationFactory.newExplanationSet(c1);
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
 	}
 	
 }

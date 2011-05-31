@@ -188,8 +188,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testHomelessDebugged () throws Exception
-	{
+	public void testHomelessDebugged () throws Exception {
 		IMarkerSet m;
 		ExplanationCollection col;
 		ExplanationCollection expCol;
@@ -205,9 +204,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 		
-		m = MarkerFactory.newMarkerSet(
-				MarkerFactory.newAttrMarker("person", "1", "name")
-				);
+		m = MarkerParser.getInstance().parseSet("{A(person,1,name)}");
 		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
@@ -215,7 +212,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				MarkerFactory.newTupleMarker("socialworker", "1")
 				));
 		e1.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{}"));
+				"{T(person,2|1|1)}"));
 				
 		
 		corrs = new HashSet<CorrespondenceType> ();
@@ -265,26 +262,193 @@ public class TestExplSetGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testHomelessDebuggedMultiple () throws Exception
-	{
-		IMarkerSet m;
+	public void testHomelessDebuggedMultiple () throws Exception {
+		IMarkerSet errSet;
+		IAttributeValueMarker e1, e2;
 		IExplanationSet set1, set2;
 		ExplanationCollection col, expCol;
 		
+		CopySourceError c1, c2;
+		CorrespondenceError r1, r2;
+		SuperflousMappingError sm1, sm2;
+		InfluenceSourceError i1, i2;
+		SourceSkeletonMappingError ss1;
+		
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
+		HashSet<TransformationType> trans;
+		
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 		
-		m = MarkerFactory.newMarkerSet(
-				MarkerFactory.newAttrMarker("person", "1|1", "livesin")
-				);
+		// errors
+		e1 = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,name)");
+		e2 = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,2|1|1,livesin)");
+		errSet = MarkerFactory.newMarkerSet(e1,e2);
 		
-//		set1 = ExplanationFactory.newExplanationSet(e1,e2,e3,e4);
-//		set2 = ExplanationFactory.newExplanationSet(e1,e2,e3,e4);
-//		expCol = ExplanationFactory.newExplanationCollection(set);
+		// ************** set 1	
+		c1 = new CopySourceError();
+		c1.setExplains(e1);
+		c1.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("socialworker", "1")
+				));
+		c1.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{T(person,2|1|1)}"));
+				
 		
-		col = gen.findExplanations(m);
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
+		
+		r1 = new CorrespondenceError();
+		r1.setExplains(e1);
+		r1.setCorrespondences(corrs);
+		r1.setMapSE(maps);
+		r1.setTransSE(trans);
+		r1.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{A(person,3,name),A(person,2,name)}"));
+		
+		sm1 = new SuperflousMappingError();
+		sm1.setExplains(e1);
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		sm1.setMapSE(maps);
+		sm1.setTransSE(trans);
+		sm1.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{T(person,3),T(person,2)}"));
+		
+		i1 = new InfluenceSourceError();
+		i1.setExplains(e1);
+		
+		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1,i1);
+		
+		// ****************** set 2
+
+		c2 = new CopySourceError();
+		c2.setExplains(e2);
+		c2.setSourceSE(MarkerParser.getInstance().parseSet(
+				"{T(soupkitchen,1)}"));
+		c2.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{}"));
+				
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c3"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M1"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
+		
+		r2 = new CorrespondenceError();
+		r2.setExplains(e2);
+		r2.setCorrespondences(corrs);
+		r2.setMapSE(maps);
+		r2.setTransSE(trans);
+		r2.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{A(person,1|3|2,livesin)}"));
+		
+		sm2 = new SuperflousMappingError();
+		sm2.setExplains(e2);
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M1"));
+		sm2.setMapSE(maps);
+		sm2.setTransSE(trans);
+		sm2.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{T(person,1|3|2)}"));
+		
+		i2 = new InfluenceSourceError();
+		i2.setExplains(e2);
+
+		ss1 = new SourceSkeletonMappingError();
+		ss1.setExplains(e2);
+		ss1.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{A(person,1|3|2,livesin)}"));
+		ss1.addMap(MapScenarioHolder.getInstance().getMapping("M1"));
+		ss1.setTransSE(trans);
+		
+		set2 = ExplanationFactory.newExplanationSet(c2,r2,sm2,i2,ss1);
+
+		
+		// complet collection
+		expCol = ExplanationFactory.newExplanationCollection(set1, set2);
+		
+		col = gen.findExplanations(errSet);
 		log.debug(col);
 		
-//		assertEquals(expCol, col);
+		col.resetIter();
+		
+		assertEquals(expCol, col);
+	}
+	
+	@Test
+	public void testTargetSkeletonScen () throws Exception {
+		IMarkerSet errSet;
+		IAttributeValueMarker e1;
+		IExplanationSet set1;
+		ExplanationCollection col, expCol;
+		CopySourceError c1;
+		CorrespondenceError r1;
+		SuperflousMappingError sm1;
+		InfluenceSourceError i1;
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
+		HashSet<TransformationType> trans;
+		
+		loadToDB("resource/test/targetSkeletonError.xml");
+		
+		// errors
+		e1 = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,name)");
+		errSet = MarkerFactory.newMarkerSet(e1);
+		
+		// expls
+		c1 = new CopySourceError(e1);
+		c1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{T(employee,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{T(address,1)}"));
+		
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c1"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M1"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
+		
+		r1 = new CorrespondenceError(e1);
+		r1.setCorrespondences(corrs);
+		r1.setMapSE(maps);
+		r1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{A(person,2,name),A(person,3,name),A(person,4,name)}"));
+		r1.setTransSE(trans);
+		
+		i1 = new InfluenceSourceError();
+		i1.setExplains(e1);
+		
+		sm1 = new SuperflousMappingError();
+		sm1.setExplains(e1);
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M1"));
+		sm1.setMapSE(maps);
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T2"));
+		sm1.setTransSE(trans);
+		sm1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{T(person,2),T(person,3),T(person,4)," +
+						"T(address,1),T(address,2),T(address,3),T(address,4)}"));
+		
+		// complete collection
+		set1 = ExplanationFactory.newExplanationSet(c1,r1,i1,sm1);
+		expCol = ExplanationFactory.newExplanationCollection(set1);
+		
+		col = gen.findExplanations(errSet);
+		log.debug(col);
+		
+		col.resetIter();
+		
+		assertEquals(expCol, col);		
 	}
 	
 }
