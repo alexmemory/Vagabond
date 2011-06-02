@@ -40,7 +40,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		result = ExplanationFactory.newExplanationSet();
 		this.error = (IAttributeValueMarker) errorMarker;
 
-		maps = ProvenanceGenerator.getInstance().getMapProv(error);
+		maps = ProvenanceGenerator.getInstance().computeMapProv(error);
 		generateExplanation (result);
 		
 		return result;
@@ -62,7 +62,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		
 		expl = new SourceSkeletonMappingError(error);
 		
-		String relName = error.getRelName();
+		String relName = error.getRel();
 		String attrName = error.getAttrName();
 		int errpos = SchemaResolver.getInstance().getAttrId(relName, attrName);
 		String varName = null;

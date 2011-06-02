@@ -38,7 +38,7 @@ public class SuperfluousMappingExplanationGenerator
 		result = ExplanationFactory.newExplanationSet();
 		this.error = (IAttributeValueMarker) errorMarker;
 
-		maps = ProvenanceGenerator.getInstance().getMapProv(error);
+		maps = ProvenanceGenerator.getInstance().computeMapProv(error);
 		generateExplanation (result);
 		
 		return result;

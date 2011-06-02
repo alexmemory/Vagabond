@@ -13,10 +13,7 @@ public class TestCorrExplGenQueries extends AbstractVagabondDBTest {
 	private CorrespondencExplanationGenerator gen;
 	
 	public TestCorrExplGenQueries (String name) throws Exception {
-		super(name);
-		
-		loadToDB("resource/test/simpleTest.xml");
-		
+		super(name);		
 		gen = new CorrespondencExplanationGenerator();
 	}
 	
@@ -24,6 +21,8 @@ public class TestCorrExplGenQueries extends AbstractVagabondDBTest {
 	
 	@Test
 	public void testSideEffectsQuery () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		String query = QueryHolder.getQuery("Correspondence.GetSideEffects")
 				.parameterize("target.employee", "('M1')");
 		String result = "\n tid\n" +

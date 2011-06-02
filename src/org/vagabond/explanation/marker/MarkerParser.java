@@ -26,6 +26,7 @@ public class MarkerParser {
 		String[] split;
 		ISingleMarker result;
 		
+		marker = marker.trim();
 		switch(marker.charAt(0)) {
 		case 'A':
 			split = marker.substring(2, marker.length() - 1).split(",");
@@ -64,11 +65,30 @@ public class MarkerParser {
 		return result;
 	}
 	
+	public Vector<ITupleMarker> parseWL (String wl) throws Exception {
+		String elemString;
+		Vector<ITupleMarker> result;
+		Vector<String> elems;
+		
+		result = new Vector<ITupleMarker> ();
+		
+		elemString = wl.substring(wl.indexOf('{') + 1, wl.indexOf('}') + 1);
+		elems = getElems (elemString);
+		
+		for(String elem: elems) {
+			if (elem.matches("\\s*null\\s*"))
+				result.add(null);
+			else 
+				result.add((ITupleMarker) parseMarker(elem));
+		}
+		
+		return result;
+	}
+	
 	public IMarkerSet parseSet (String set) throws Exception {
 		String elemString;
 		Vector<String> elems;
 		IMarkerSet result;
-		int bracketDepth = 0;
 		StringBuffer element;
 		
 		result = MarkerFactory.newMarkerSet();
@@ -77,8 +97,22 @@ public class MarkerParser {
 		if (set.matches("\\s*\\{\\s*\\}\\s*"))
 			return result;
 		
-		elemString = set.substring(1, set.length());
-		elems = new Vector<String> ();
+		elemString = set.substring(set.indexOf('{') + 1, set.lastIndexOf('}') + 1);
+		elems = getElems (elemString);
+		
+		for (String elem: elems) {
+			result.add(parseMarker(elem));
+		}
+		
+		log.debug("parsed marker set: <" + result + ">");
+		
+		return result;
+	}
+	
+	private Vector<String> getElems (String elemString) {
+		Vector<String> elems = new Vector<String> ();
+		StringBuffer element;
+		int bracketDepth = 0;
 		
 		element = new StringBuffer();
 		for(char c: elemString.toCharArray()) {
@@ -107,12 +141,6 @@ public class MarkerParser {
 			}
 		}
 		
-		for (String elem: elems) {
-			result.add(parseMarker(elem));
-		}
-		
-		log.debug("parsed marker set: <" + result + ">");
-		
-		return result;
+		return elems;
 	}
 }

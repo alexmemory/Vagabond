@@ -42,7 +42,9 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		this.error = error;
 		
 		partionedSE = partitionSourceSE();
+		log.debug("partioned source SE: " + partionedSE);
 		relsForAffTarget = getRelAffectedByRels(partionedSE.keySet());
+		log.debug("rels affected by source SE rels are: " + relsForAffTarget);
 		
 		for(String targetRel: relsForAffTarget.keySet()) {
 			query = getSideEffectQuery(targetRel, 
@@ -128,7 +130,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		
 		parts = new HashMap<String, IMarkerSet> ();
 		for(ISingleMarker marker: sourceSE) {
-			relName = ((ITupleMarker) marker).getRel();
+			relName = marker.getRel();
 			mSet = parts.get(relName);
 			if (mSet == null) {
 				mSet = MarkerFactory.newMarkerSet();
@@ -157,7 +159,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 				for(ISingleMarker sourceErr: sourceSE.get(unnumSource).getElems()) {//CHECK ok to use unnumSource???
 					conditions.append(
 							getSideEffectEqualityCond(source, 
-									(ITupleMarker) sourceErr)
+									 sourceErr)
 							+ " AND ");
 				}
 			}
@@ -180,7 +182,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		return source.substring(0, source.lastIndexOf('_'));
 	}
 
-	protected String getSideEffectEqualityCond (String source, ITupleMarker sourceErr) {
+	protected String getSideEffectEqualityCond (String source, ISingleMarker sourceErr) {
 		return "prov_source_" + source + 
 				"_tid IS DISTINCT FROM " + sourceErr.getTid();
 	}

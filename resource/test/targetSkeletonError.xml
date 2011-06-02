@@ -19,7 +19,7 @@
 			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
 			<PrimaryKey><Attr>id</Attr></PrimaryKey>
 		</Relation>
-		<ForeignKey id="person_addr">
+		<ForeignKey id="person_addr">	
 			<From tableref="person"><Attr>address</Attr></From>
 			<To tableref="address"><Attr>id</Attr></To>
 		</ForeignKey>

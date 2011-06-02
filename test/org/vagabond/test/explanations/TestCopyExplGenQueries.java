@@ -19,14 +19,14 @@ public class TestCopyExplGenQueries extends AbstractVagabondDBTest {
 	private CopySourceExplanationGenerator gen;
 
 	public TestCopyExplGenQueries(String name) throws Exception {
-		super(name);
-		loadToDB("resource/test/simpleTest.xml");
-		
+		super(name);		
 		gen = new CopySourceExplanationGenerator();
 	}
 	
 	@Test
 	public void testCopyCSQuery () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
+		
 		String query = QueryHolder.getQuery("CopyCS.GetProv")
 				.parameterize("target.employee","2|2","city");
 		String result = 

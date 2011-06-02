@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
 import org.apache.log4j.Logger;
+import org.vagabond.util.Pair;
 
 public class MarkerFactory {
 
@@ -47,6 +48,11 @@ public class MarkerFactory {
 		return new AttrValueMarker(tup.getRelId(), tup.getTid(), attr);
 	}
 	
+	public static IAttributeValueMarker newAttrMarker 
+		(ITupleMarker tup, String attr) throws Exception {
+		return new AttrValueMarker(tup.getRel(), tup.getTid(), attr);
+	}
+	
 	public static ITupleMarker newTupleMarker () {
 		return new TupleMarker();
 	}
@@ -62,8 +68,11 @@ public class MarkerFactory {
 	}
 	
 	public static ITupleMarker newTupleMarker (IAttributeValueMarker attr) throws Exception {
-		return new TupleMarker(attr.getRelName(), attr.getTid());
+		return new TupleMarker(attr.getRel(), attr.getTid());
 	}
 	
+	public static ITupleMarker newTupleMarker (Pair<String,String> values) throws Exception {
+		return new TupleMarker(values.getKey(), values.getValue());
+	}
 
 }

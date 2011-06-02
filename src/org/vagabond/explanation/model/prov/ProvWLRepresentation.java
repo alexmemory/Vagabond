@@ -13,10 +13,10 @@ public class ProvWLRepresentation {
 
 	static Logger log = Logger.getLogger(ProvWLRepresentation.class);
 	
-	private List<String> relNames;
-	private IMarkerSet tuplesInProv;
-	private Vector<Vector<ITupleMarker>> witnessLists; 
-
+	protected List<String> relNames;
+	protected IMarkerSet tuplesInProv;
+	protected Vector<Vector<ITupleMarker>> witnessLists; 
+	private int hash = -1;
 	
 	public ProvWLRepresentation () {
 		witnessLists = new Vector<Vector<ITupleMarker>> ();
@@ -70,5 +70,41 @@ public class ProvWLRepresentation {
 		result.append("\twitness lists: <" + witnessLists + ">");
 		
 		return result.toString();
+	}
+	
+	@Override
+	public int hashCode () {
+		if (hash == -1) {
+			hash = relNames.hashCode();
+			hash = 13 * hash + tuplesInProv.hashCode();
+			hash = 13 * hash + witnessLists.hashCode();
+		}
+			
+		return hash;
+	}
+	
+	@Override
+	public boolean equals (Object other) {
+		if (other == null)
+			return false;
+		
+		if (other == this)
+			return true;
+		
+		if (! (other instanceof ProvWLRepresentation))
+			return false;
+		
+		ProvWLRepresentation oWl = (ProvWLRepresentation) other;
+		
+		if (!this.relNames.equals(oWl.relNames))
+			return false;
+		
+		if (!this.tuplesInProv.equals(oWl.tuplesInProv))
+			return false;
+		
+		if (!this.witnessLists.equals(oWl.witnessLists))
+			return false;
+		
+		return true;
 	}
 }

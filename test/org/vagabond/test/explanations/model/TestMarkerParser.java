@@ -3,6 +3,7 @@ package org.vagabond.test.explanations.model;
 import static org.junit.Assert.*;
 
 import java.io.FileInputStream;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -13,6 +14,7 @@ import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.util.CollectionUtils;
 
 public class TestMarkerParser extends AbstractVagabondTest {
 
@@ -62,6 +64,29 @@ public class TestMarkerParser extends AbstractVagabondTest {
 		
 		assertEquals(expec,MarkerParser.getInstance().parseMarkers(
 				new FileInputStream("resource/test/markers.txt")));
+	}
+	
+	@Test
+	public void testParseVector () throws Exception {
+		Vector<ITupleMarker> result, expect;
+		
+		expect = CollectionUtils.makeVec(
+				MarkerFactory.newTupleMarker("employee", "1"),
+				MarkerFactory.newTupleMarker("employee", "2"));
+		
+		result = MarkerParser.getInstance().parseWL("  {T(employee,1)," +
+				" T(employee,2) }");
+		
+		assertEquals(expect, result);
+		
+		expect = CollectionUtils.makeVec(
+				MarkerFactory.newTupleMarker("employee", "1"),
+				null);
+		
+		result = MarkerParser.getInstance().parseWL("  {T(employee,1)," +
+				" null }");
+		
+		assertEquals(expect, result);
 	}
 	
 }

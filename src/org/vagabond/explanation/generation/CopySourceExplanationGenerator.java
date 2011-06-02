@@ -44,7 +44,7 @@ public class CopySourceExplanationGenerator
 		IMarkerSet sourceSE;
 		IMarkerSet targetSE;
 		
-		prov = ProvenanceGenerator.getInstance().getCopyProvenance(error);
+		prov = ProvenanceGenerator.getInstance().computeCopyProvenance(error);
 //		sourceSE = getRealCopyFromMappings(prov.getTuplesInProv()); 
 		sourceSE = prov.getTuplesInProv();
 		targetSE = SideEffectGenerator.getInstance()

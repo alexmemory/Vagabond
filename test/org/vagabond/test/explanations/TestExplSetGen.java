@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -33,11 +34,9 @@ public class TestExplSetGen extends AbstractVagabondTest {
 	private ExplanationSetGenerator gen;
 	
 	public TestExplSetGen () throws Exception {
-		loadToDB("resource/test/simpleTest.xml");
-		
 		gen = new ExplanationSetGenerator();
 	}
-	
+		
 	@Test
 	public void testSimpleTestSingleError () throws Exception {
 		IMarkerSet m;
@@ -51,6 +50,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
 		HashSet<TransformationType> trans;
+	
+		loadToDB("resource/test/simpleTest.xml");
 		
 		m = MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "2|2", "city")
@@ -92,6 +93,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e4 = new InfluenceSourceError();
 		e4.setExplains(m.getElemList().get(0));
+		e4.setSourceSE(MarkerParser.getInstance().parseSet("{A(person,2,address)}"));
 		
 		e5 = new SourceSkeletonMappingError();
 		e5.setExplains(m.getElemList().get(0));
@@ -157,7 +159,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e2.setMapSE(maps);
 		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{A(person,2|1,livesin),A(person,2|1|2|1,livesin),A(person,1|3|1|2,livesin),A(person,3|2,livesin)}"));
+				"{A(person,2|1,livesin),A(person,2|1|2|1,livesin)," +
+				"A(person,1|3|1|2,livesin),A(person,3|2,livesin)}"));
 		
 		e3 = new SuperflousMappingError();
 		e3.setExplains(m.getElemList().get(0));
@@ -170,6 +173,10 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e4 = new InfluenceSourceError();
 		e4.setExplains(m.getElemList().get(0));
+		e4.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(socialworker,1,worksfor)}"));
+		e4.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{T(person,2|1|2|1)}"));
 		
 		e5 = new SourceSkeletonMappingError();
 		e5.setExplains(m.getElemList().get(0));
@@ -195,8 +202,6 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		CopySourceError e1;
 		CorrespondenceError e2;
 		SuperflousMappingError e3;
-		InfluenceSourceError e4;
-		SourceSkeletonMappingError e5;
 		IExplanationSet set;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
@@ -239,8 +244,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setTargetSE(MarkerParser.getInstance().parseSet(
 				"{T(person,3),T(person,2)}"));
 		
-		e4 = new InfluenceSourceError();
-		e4.setExplains(m.getElemList().get(0));
+//		e4 = new InfluenceSourceError();
+//		e4.setExplains(m.getElemList().get(0));
 		
 //		e5 = new SourceSkeletonMappingError();
 //		e5.setExplains(m.getElemList().get(0));
@@ -249,7 +254,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 //		e5.addMap(MapScenarioHolder.getInstance().getMapping("M2"));
 //		e5.setTransSE(trans);
 
-		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4);
+		set = ExplanationFactory.newExplanationSet(e1,e2,e3);
 		expCol = ExplanationFactory.newExplanationCollection(set);
 		
 		col = gen.findExplanations(m);
@@ -271,7 +276,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		CopySourceError c1, c2;
 		CorrespondenceError r1, r2;
 		SuperflousMappingError sm1, sm2;
-		InfluenceSourceError i1, i2;
+		InfluenceSourceError  i2a,i2b,i2c;
 		SourceSkeletonMappingError ss1;
 		
 		HashSet<CorrespondenceType> corrs;
@@ -321,10 +326,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		sm1.setTargetSE(MarkerParser.getInstance().parseSet(
 				"{T(person,3),T(person,2)}"));
 		
-		i1 = new InfluenceSourceError();
-		i1.setExplains(e1);
-		
-		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1,i1);
+		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1);
 		
 		// ****************** set 2
 
@@ -359,8 +361,21 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		sm2.setTargetSE(MarkerParser.getInstance().parseSet(
 				"{T(person,1|3|2)}"));
 		
-		i2 = new InfluenceSourceError();
-		i2.setExplains(e2);
+		i2a = new InfluenceSourceError(e2);
+		i2a.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(tramp,2,caredforby)}"));
+		i2a.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		
+		i2b = new InfluenceSourceError(e2);
+		i2b.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(socialworker,1,worksfor)}"));
+		i2b.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,1)}"));
+
+		i2c = new InfluenceSourceError(e2);
+		i2c.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(socialworker,1,ssn)}"));
+		i2c.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,1)}"));
+		
 
 		ss1 = new SourceSkeletonMappingError();
 		ss1.setExplains(e2);
@@ -369,7 +384,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		ss1.addMap(MapScenarioHolder.getInstance().getMapping("M1"));
 		ss1.setTransSE(trans);
 		
-		set2 = ExplanationFactory.newExplanationSet(c2,r2,sm2,i2,ss1);
+		set2 = ExplanationFactory.newExplanationSet(c2,r2,sm2,i2a,i2b,i2c,ss1);
 
 		
 		// complet collection
@@ -392,7 +407,6 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		CopySourceError c1;
 		CorrespondenceError r1;
 		SuperflousMappingError sm1;
-		InfluenceSourceError i1;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
 		HashSet<TransformationType> trans;
@@ -425,8 +439,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				.parseSet("{A(person,2,name),A(person,3,name),A(person,4,name)}"));
 		r1.setTransSE(trans);
 		
-		i1 = new InfluenceSourceError();
-		i1.setExplains(e1);
+//		i1 = new InfluenceSourceError();
+//		i1.setExplains(e1);
 		
 		sm1 = new SuperflousMappingError();
 		sm1.setExplains(e1);
@@ -440,7 +454,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 						"T(address,1),T(address,2),T(address,3),T(address,4)}"));
 		
 		// complete collection
-		set1 = ExplanationFactory.newExplanationSet(c1,r1,i1,sm1);
+		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1);
 		expCol = ExplanationFactory.newExplanationCollection(set1);
 		
 		col = gen.findExplanations(errSet);

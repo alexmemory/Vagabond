@@ -45,7 +45,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 			otherAttr = (IAttributeValueMarker) other;
 			if (!otherAttr.getAttrName().equals(this.getAttrName()))
 				return false;
-			if (!otherAttr.getRelName().equals(this.getRelName()))
+			if (!otherAttr.getRel().equals(this.getRel()))
 				return false;
 			if (!otherAttr.getTid().equals(this.getTid()))
 				return false;
@@ -71,7 +71,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	}
 
 	@Override
-	public String getRelName() {
+	public String getRel() {
 		return SchemaResolver.getInstance().getRelName(relId);
 	}
 
@@ -84,9 +84,13 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	public String getAttrName() {
 		return SchemaResolver.getInstance().getAttrName(relId, attrId);
 	}
+
+	public int getAttrId () {
+		return attrId;
+	}
 	
 	public String toString () {
-		return "('" + getRelName() + "'(" + relId + ")," 
+		return "('" + getRel() + "'(" + relId + ")," 
 				+ getTid() + ",'" 
 				+ getAttrName() + "'(" + attrId + "))";
 	}

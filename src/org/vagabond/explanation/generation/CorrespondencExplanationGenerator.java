@@ -150,7 +150,7 @@ public class CorrespondencExplanationGenerator implements
 		
 		corrCandi = (Set<CorrespondenceType>) 
 				expl.getCorrespondenceSideEffects();
-		mappings = ProvenanceGenerator.getInstance().getMapProvStrings(error);
+		mappings = ProvenanceGenerator.getInstance().computeMapProvAsStrings(error);
 		
 		// get candidate correspondences
 		for (String mapName: mappings) {
@@ -165,7 +165,7 @@ public class CorrespondencExplanationGenerator implements
 	}
 	
 	private boolean corrMapsOnError (CorrespondenceType corr) {
-		if (!corr.getTo().getTableref().equals(error.getRelName()))
+		if (!corr.getTo().getTableref().equals(error.getRel()))
 			return false;
 		for (String attrName: corr.getTo().getAttrArray()) {
 			if (attrName.equals(error.getAttrName()))

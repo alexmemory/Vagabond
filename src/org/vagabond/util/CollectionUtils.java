@@ -1,0 +1,76 @@
+package org.vagabond.util;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+
+public class CollectionUtils {
+
+	static Logger log = Logger.getLogger(CollectionUtils.class);
+	
+	public static <T> Set<T> unionSets (Collection<Set<T>> sets) {
+		Set<T> result = new HashSet<T>();
+		
+		for(Set<T> set: sets)
+			result.addAll(set);
+		
+		return result;
+	}
+	
+	public static <T> Set<T> unionSets (Set<T> ... elems) {
+		Set<T> result = new HashSet<T>();
+		
+		for(Set<T> set: elems)
+			result.addAll(set);
+		
+		return result;
+	}
+	
+	public static <T> Set<T> makeSet (T ... elems) {
+		Set<T> result;
+		
+		result = new HashSet<T> (elems.length);
+		
+		for(T elem: elems)
+			result.add(elem);
+		
+		return result;
+	}
+	
+	public static <T> Vector<T> makeVec (T ... elems) {
+		return new Vector<T> (Arrays.asList(elems)); 
+	}
+	
+	public static <T> Vector<T> makeVecFromArray (T[] array) {
+		return new Vector<T> (Arrays.asList(array));
+	}
+	
+	public static <T> List<T> makeList (T ... elems) {
+		return Arrays.asList(elems);
+	}
+	
+	public static <T> int linearSearch (T[] array, T elem) {
+		for(int i = 0; i < array.length; i++) {
+			if (array[i].equals(elem))
+				return i;
+		}
+		
+		return -1;
+	}
+	
+	public static <T> Stack<T> makeStack (Collection<T> col) {
+		Stack<T> result;
+		
+		result = new Stack<T> ();
+		for(T elem: col)
+			result.push(elem);
+		
+		return result;
+	}
+}

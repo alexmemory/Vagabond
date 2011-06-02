@@ -26,7 +26,7 @@ public class AlterSourceProvenanceSideEffectGenerator extends SourceProvenanceSi
 				for(ISingleMarker sourceErr: sourceSE.get(unnumSource).getElems()) {
 					conditions.append(
 							getSideEffectEqualityCond(source, 
-									(ITupleMarker) sourceErr)
+									 sourceErr)
 							+ " OR ");
 				}
 			}
@@ -44,7 +44,7 @@ public class AlterSourceProvenanceSideEffectGenerator extends SourceProvenanceSi
 	}
 
 	@Override
-	protected String getSideEffectEqualityCond (String source, ITupleMarker sourceErr) {
+	protected String getSideEffectEqualityCond (String source, ISingleMarker sourceErr) {
 		return "prov_source_" + source + 
 				"_tid = " + sourceErr.getTid();
 	}
