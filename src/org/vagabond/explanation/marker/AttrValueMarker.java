@@ -31,6 +31,12 @@ public class AttrValueMarker implements IAttributeValueMarker {
 		this.tid = tid;
 	}
 	
+	public AttrValueMarker (String relName, String tid, int attrId) throws Exception {
+		this.relId = SchemaResolver.getInstance().getRelId(relName);
+		this.attrId = attrId;
+		this.tid = tid;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		IAttributeValueMarker otherAttr;
@@ -74,6 +80,11 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	public String getRel() {
 		return SchemaResolver.getInstance().getRelName(relId);
 	}
+	
+	@Override
+	public int getRelId() {
+		return relId;
+	}
 
 	@Override
 	public String getTid() {
@@ -85,6 +96,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 		return SchemaResolver.getInstance().getAttrName(relId, attrId);
 	}
 
+	@Override
 	public int getAttrId () {
 		return attrId;
 	}

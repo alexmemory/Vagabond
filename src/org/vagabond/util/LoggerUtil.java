@@ -105,11 +105,12 @@ public class LoggerUtil {
 		
 		result.append('[');
 		for(Object elem: objs) {
+			if (result.length() != 1)
+				result.append(',');
 			callResult = (String) method.invoke(elem);
 			result.append(callResult);
-			result.append(',');
 		}
-		result.setCharAt(result.length() - 1, ']');
+		result.append(']');
 		
 		return result.toString();
 	}

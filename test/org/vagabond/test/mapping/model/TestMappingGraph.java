@@ -65,4 +65,32 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		assertEquals(CollectionUtils.makeSet(), result);
 	}
 	
+	@Test
+	public void testAttrMapping () throws Exception {
+		MappingGraph g; 
+		int[][][] result, expect = {
+				{{0},{}},
+				{{},{1}}
+				};
+		
+		
+		g = MapScenarioHolder.getInstance().getGraphForMapping("M2");
+		result = g.getAtomPosToTargetPosMap(0);
+		
+		log.debug(result);
+		
+		assertEquals(expect.length, result.length);
+		for(int i = 0; i < result.length; i++) {
+			assertEquals(expect[i].length, result[i].length);
+			for(int j = 0; j < result[i].length; j++) {
+				if (expect[i][j] != null) {
+					assertEquals(expect[i][j].length, result[i][j].length);
+					for(int k = 0 ; k < result[i][j].length; k++) {
+						assertEquals(expect[i][j][k], result[i][j][k]);
+					}
+				}
+			}
+		}
+	}
+	
 }

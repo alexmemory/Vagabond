@@ -9,17 +9,22 @@ import org.junit.Test;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
+import org.vagabond.explanation.generation.prov.AttrGranularitySourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.generation.prov.SideEffectGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.test.AbstractVagabondDBTest;
+import org.vagabond.test.TestOptions;
+import org.vagabond.util.ConnectionManager;
 
 public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 
 	private SideEffectGenerator gen;
 	private SourceProvenanceSideEffectGenerator standSEGen;
 	private AlterSourceProvenanceSideEffectGenerator alterGen;
+	private AttrGranularitySourceProvenanceSideEffectGenerator attrGen;
 	
 	public TestProvAndSideEffectQueries(String name) throws Exception {
 		super(name);
@@ -28,6 +33,7 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		gen = SideEffectGenerator.getInstance();
 		standSEGen = new SourceProvenanceSideEffectGenerator();
 		alterGen = new AlterSourceProvenanceSideEffectGenerator();
+		attrGen = new AttrGranularitySourceProvenanceSideEffectGenerator();
 	}
 	
 	@Test
@@ -153,9 +159,6 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		IMarkerSet errSet, errSet2;
 		String query;
 		String result;
-		AlterSourceProvenanceSideEffectGenerator altGen;
-		
-		altGen = new AlterSourceProvenanceSideEffectGenerator();
 
 		errSet = MarkerFactory.newMarkerSet(
 				MarkerFactory.newTupleMarker("employee", "1")
@@ -172,7 +175,7 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		sourceRels.add("address");
 		sourceRels.add("person");
 		
-		query = altGen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
+		query = alterGen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
 		
 		result = "\n tid \n"+
 				"-----\n" +
@@ -187,7 +190,7 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		String query;
 		String result;
 		
-		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
+		query = QueryHolder.getQuery("MetaQ.GetProvQueryResultAttrs")
 				.parameterize("source.person");
 		
 		result = "\n                                            attrs                                             \n" +
@@ -196,7 +199,7 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		
 		testSingleQuery (query, result);
 		
-		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
+		query = QueryHolder.getQuery("MetaQ.GetProvQueryResultAttrs")
 				.parameterize("target.employee");
 		
 		result = "\n                                            attrs                                             \n" +
@@ -211,7 +214,7 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		String query;
 		String result;
 		
-		query = QueryHolder.getQuery("ProvSE.GetMapsForBaseRelAccess")
+		query = QueryHolder.getQuery("MetaQ.GetMapsForBaseRelAccess")
 				.parameterize("target.employee");
 		
 		result = "\n xslt_process \n"+
@@ -229,6 +232,72 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 				"-----\n" +
 				 "M2";
 
+		testSingleQuery(query, result);
+	}
+	
+	@Test
+	public void testAttrGenSideEffectQuery () throws Exception {
+		Set<String> sourceRels;
+		Map<String, IMarkerSet> sourceErr;
+		IMarkerSet errSet, errSet2;
+		String query;
+		String result;
+
+		ConnectionManager.getInstance().getConnection(
+				TestOptions.getInstance().getHost(),
+				TestOptions.getInstance().getDB(),
+				TestOptions.getInstance().getUser(), 
+				TestOptions.getInstance().getPassword());
+		
+		errSet = MarkerParser.getInstance().parseSet("{T(employee,1)}");
+		errSet2 = MarkerParser.getInstance().parseSet("{T(address,2),T(address,3)}");
+		sourceErr = new HashMap<String, IMarkerSet> ();
+		sourceErr.put("employee", errSet);
+		sourceErr.put("address", errSet2);
+		
+		sourceRels = new HashSet<String> ();
+		sourceRels.add("address");
+		sourceRels.add("person");
+		
+		query = attrGen.getSideEffectQuery("employee", sourceRels, sourceErr).trim();
+		
+		result = "\n tid | prov_source_person_tid | prov_source_address_tid \n" +
+			"-----+------------------------+-------------------------\n" +
+			" 2$MID$2 |                      2 |                       2\n" +
+			" 4$MID$2 |                      4 |                       2";
+		
+		testSingleQuery(query, result);
+	}
+	
+	@Test
+	public void testGetSideEffectAndMapQuery () throws Exception {
+		String query = QueryHolder
+				.getQuery("ProvSE.GetSideEffectUsingAggWithMap")
+				.parameterize("target.employee",
+						"(prov_source_address_tid = 2 " +
+						"OR prov_source_address_tid = 3 )");
+		String result = "\n tid | trans_prov\n" + 
+						"-----+------------\n" +
+						" 2$MID$2 | M2\n" +
+						" 4$MID$2 | M2";
+		
+		
+		testSingleQuery(query, result);
+	}
+	
+	@Test
+	public void testGetSideEffectAndProvQuery () throws Exception {
+		String query = QueryHolder
+				.getQuery("ProvSE.GetSideEffectUsingAggPlusCompleteProv")
+				.parameterize("target.employee",
+						"(prov_source_address_tid = 2 " +
+						"OR prov_source_address_tid = 3 )",
+						"prov.prov_source_person_tid, prov.prov_source_address_tid");
+		String result = "\n tid | prov_source_person_tid | prov_source_address_tid \n" +
+					"-----+------------------------+-------------------------\n" +
+					" 2$MID$2 |                      2 |                       2\n" +
+					" 4$MID$2 |                      4 |                       2";
+		
 		testSingleQuery(query, result);
 	}
 	

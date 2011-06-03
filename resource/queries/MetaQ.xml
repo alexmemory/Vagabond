@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Metaquerying templates</comment>
+
+<entry key="GetProvQueryResultAttrs">
+SELECT xpath('/Query/Select/Attr/attribute::name', 
+query_sql_to_simple_xml('SELECT PROVENANCE * FROM ${1}'))::text AS attrs;
+</entry>
+
+<entry key="GetMapsForBaseRelAccess">
+SELECT xslt_process(
+query_sql_to_simple_xml('SELECT PROVENANCE * FROM ${1}'::text)::text,
+'&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;
+&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+&lt;xsl:output method=&quot;text&quot;/&gt;
+&lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;xsl:for-each select=&quot;//Annotation[local-name(..) != ''Annotation'']&quot;&gt;
+    	&lt;xsl:value-of select=&quot;.//Relation/text()&quot;/&gt;
+	&lt;xsl:value-of select=&quot;'':''&quot;/&gt;
+    	&lt;xsl:for-each select=&quot;./descendant-or-self::Annotation&quot;&gt;
+      	    &lt;xsl:value-of select=&quot;./attribute::value&quot;/&gt;
+	&lt;xsl:if test=&quot;position( ) != last( )&quot;&gt;&lt;xsl:value-of select=&quot;'',''&quot;/&gt;&lt;/xsl:if&gt;
+	&lt;/xsl:for-each&gt;
+&lt;xsl:if test=&quot;position( ) != last( )&quot;&gt;&lt;xsl:value-of select=&quot;''|''&quot;/&gt;&lt;/xsl:if&gt;
+    &lt;/xsl:for-each&gt;
+&lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;');
+</entry>
+
+
+
+</properties>

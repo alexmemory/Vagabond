@@ -14,7 +14,7 @@ public class SideEffectGenerator {
 	static {
 		instance = new SideEffectGenerator();
 		// set default implementation
-		instance.genImpl = new AlterSourceProvenanceSideEffectGenerator();
+		instance.genImpl = new AttrGranularitySourceProvenanceSideEffectGenerator();
 	}
 	
 	private SideEffectGenerator () {

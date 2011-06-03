@@ -1,5 +1,9 @@
 package org.vagabond.explanation.model.prov;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -14,12 +18,14 @@ public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 	static Logger log = Logger.getLogger(MapAndWLProvRepresentation.class);
 	
 	private Vector<MappingType> mapProv;
+	private Map<MappingType, Vector<Integer>> mapToWlPos;
+	private Set<MappingType> allMaps;
 	private int hash = -1;
 	
 	public MapAndWLProvRepresentation () {
 		super();
 		
-		mapProv = new Vector<MappingType> ();
+		init();
 	}
 	
 	public MapAndWLProvRepresentation (ProvWLRepresentation prov) {
@@ -27,7 +33,13 @@ public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 		this.tuplesInProv = prov.tuplesInProv;
 		this.witnessLists = prov.witnessLists;
 		
+		init();
+	}
+	
+	private void init () {
 		mapProv = new Vector<MappingType> ();
+		mapToWlPos = new HashMap<MappingType, Vector<Integer>> ();
+		allMaps = new HashSet<MappingType> ();
 	}
 	
 
@@ -37,10 +49,12 @@ public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 
 	public void setMapProv(Vector<MappingType> mapProv) {
 		this.mapProv = mapProv;
+		allMaps = new HashSet<MappingType> (mapProv);
 	}
 
 	public void addMapProv(MappingType map) {
 		mapProv.add(map);
+		allMaps.add(map);
 	}
 	
 	public Pair<Vector<ITupleMarker>, MappingType> getProvAndMap (int i) {
@@ -60,6 +74,30 @@ public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 		return result;
 	}
 	
+	public Map<MappingType, Vector<Integer>> getMapToWlPos() {
+		return mapToWlPos;
+	}
+
+	public void setMapToWlPos(Map<MappingType, Vector<Integer>> mapToWlPos) {
+		this.mapToWlPos = mapToWlPos;
+	}
+	
+	public void addMapToWlPos(MappingType map, Vector<Integer> pos) {
+		mapToWlPos.put(map, pos);
+	}
+	
+	public Vector<Integer> getMapToWlPosPositions (MappingType map) {
+		return mapToWlPos.get(map);
+	}
+
+	public Set<MappingType> getAllMaps() {
+		return allMaps;
+	}
+
+	public void setAllMaps(Set<MappingType> allMaps) {
+		this.allMaps = allMaps;
+	}
+
 	@Override
 	public String toString () {
 		String result;

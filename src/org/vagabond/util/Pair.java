@@ -68,14 +68,26 @@ public class Pair<K,V> {
 		return "[" + key.toString() + "," + value.toString() + "]";
 	}
 	
-	public static <T,K> Collection<T> pairColToValueCol 
-			(Collection<Pair<K,T>> pairCol) {
-		Collection<T> result;
+	public static <K,V> Collection<V> pairColToValueCol 
+			(Collection<Pair<K,V>> pairCol) {
+		Collection<V> result;
 		
-		result = new Vector<T>();
+		result = new Vector<V>();
 		
-		for(Pair<?,T> pair: pairCol)
+		for(Pair<K,V> pair: pairCol)
 			result.add(pair.getValue());
+		
+		return result;
+	}
+	
+	public static <K,V> Vector<K> pairVecToKeyVec (Vector<Pair<K,V>> pairVec) {
+		Vector<K> result;
+		
+		result = new Vector<K> ();
+		
+		for(Pair<K,V> pair: pairVec) {
+			result.add(pair.getKey());
+		}
 		
 		return result;
 	}

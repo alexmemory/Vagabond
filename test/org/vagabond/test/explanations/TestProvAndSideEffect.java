@@ -13,10 +13,13 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.generation.QueryHolder;
+import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
+import org.vagabond.explanation.generation.prov.AttrGranularitySourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
@@ -32,6 +35,8 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 	
 	private static ProvenanceGenerator pGen;
 	private static SourceProvenanceSideEffectGenerator seGen;
+	private static AlterSourceProvenanceSideEffectGenerator altGen;
+	private static AttrGranularitySourceProvenanceSideEffectGenerator attrGen;
 	
 	@BeforeClass
 	public static void setUp () throws Exception {	
@@ -40,6 +45,8 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		
 		pGen = ProvenanceGenerator.getInstance();
 		seGen = new SourceProvenanceSideEffectGenerator();
+		altGen = new AlterSourceProvenanceSideEffectGenerator();
+		attrGen = new AttrGranularitySourceProvenanceSideEffectGenerator();
 	}
 	
 	@Test
@@ -151,5 +158,98 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		
 		assertEquals(expect, result);
 	}
+
+	@Test
+	public void testAlterSourceSideEffectQueryGen() throws Exception {
+		Set<String> sourceRels;
+		Map<String, IMarkerSet> sourceErr;
+		IMarkerSet errSet, errSet2;
+		String resultQuery;
+		String query;
+
+		query = "SELECT tid\n" +
+				"FROM \n" +
+				"(SELECT tid, (prov_source_address_tid = 2 OR prov_source_address_tid = 3 ) AS hasSub\n" +
+				"FROM (SELECT PROVENANCE * FROM target.employee) p) AS sideeff\n" +
+				"GROUP BY tid\n" +
+				"HAVING bool_and(hasSub) = true;";
+		errSet = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "1")
+				);
+		errSet2 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2"),
+				MarkerFactory.newTupleMarker("address", "3")
+				);
+		sourceErr = new HashMap<String, IMarkerSet> ();
+		sourceErr.put("employee", errSet);
+		sourceErr.put("address", errSet2);
+		
+		sourceRels = new HashSet<String> ();
+		sourceRels.add("address");
+		sourceRels.add("person");
+		
+		resultQuery = altGen.getSideEffectQuery
+				("employee", sourceRels, sourceErr).trim();
+		log.debug(resultQuery);
+		
+		assertEquals(query, resultQuery);
+	}
 	
+	@Test
+	public void testAttrGranSideEffectsQueryGen () throws Exception {
+		Set<String> sourceRels;
+		Map<String, IMarkerSet> sourceErr;
+		IMarkerSet errSet, errSet2;
+		String resultQuery;
+		String query;
+
+		query = "SELECT realside.tid, prov_source_person_tid,prov_source_address_tid\n" +
+				"FROM\n" +
+				"(SELECT tid FROM \n" +
+				"(SELECT tid, (prov_source_address_tid = 2 OR prov_source_address_tid = 3 ) AS hasSub\n" +
+				"FROM (SELECT PROVENANCE * FROM target.employee) p) AS sideeff\n" +
+				"GROUP BY sideeff.tid\n" +
+				"HAVING bool_and(hasSub) = true) AS realside,\n" +
+				"(SELECT PROVENANCE * FROM target.employee) AS prov\n" +
+				"WHERE realside.tid = prov.tid\n" +
+				"ORDER BY realside.tid";
+		errSet = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("employee", "1")
+				);
+		errSet2 = MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2"),
+				MarkerFactory.newTupleMarker("address", "3")
+				);
+		sourceErr = new HashMap<String, IMarkerSet> ();
+		sourceErr.put("employee", errSet);
+		sourceErr.put("address", errSet2);
+		
+		sourceRels = new HashSet<String> ();
+		sourceRels.add("address");
+		sourceRels.add("person");
+		
+		resultQuery = attrGen.getSideEffectQuery
+				("employee", sourceRels, sourceErr).trim();
+		log.debug(resultQuery);
+		
+		assertEquals(query, resultQuery);		
+	}
+	
+	@Test
+	public void testAttrGranSideEffects () throws Exception {
+		IAttributeValueMarker error;
+		IMarkerSet sourceSE, targetSE, targetExpect;
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(employee,2|2,city)");
+		sourceSE = MarkerParser.getInstance().parseSet(
+				"{A(address,2,city)}");
+		targetExpect = MarkerParser.getInstance().parseSet(
+				"{A(employee,4|2,city)}"); 
+		
+		targetSE = attrGen.computeTargetSideEffects(sourceSE, error);
+		log.debug("targetSE is:\n" + targetSE);
+		
+		assertEquals(targetExpect, targetSE);
+	}
 }

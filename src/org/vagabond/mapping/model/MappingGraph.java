@@ -183,6 +183,54 @@ public class MappingGraph {
 		return joinAttrs;
 	}
 
+	public int[][][] getAtomPosToTargetPosMap (String targetRel) 
+			throws Exception {
+		for(MappingGraphRel node: existsNodes) {
+			if (node.relName.equals(targetRel))
+				return getAtomPosToTargetPosMap(node.pos);
+		}
+		
+		throw new Exception ("Mapping does not map to relation <" 
+				+ targetRel + ">");
+	}
+	
+	public int[][][] getAtomPosToTargetPosMap (int existsPos) {
+		int[][][] result = new int[foreachNodes.size()][][];
+		MappingGraphRel node;
+		
+		for(int i = 0; i < result.length; i++) {
+			node = foreachNodes.get(i);
+			result[i] = new int[node.vars.size()][];
+			
+			for(int j = 0; j < node.vars.size(); j++) {
+				String var = node.vars.get(j);
+				Set<MappingGraphRel> existsNodes;
+				existsNodes = getExistsAtomsForVar(var);
+				
+				for(MappingGraphRel exists: existsNodes) {
+					if (exists.pos == existsPos) {
+						Vector<Integer> varPositions = new Vector<Integer>();
+						
+						for(int k = 0; k < exists.vars.size(); k++) {
+							if (exists.vars.get(k).equals(var))
+								varPositions.add(k);
+						}
+						
+						result[i][j] = new int[varPositions.size()];
+						for(int k = 0; k < result[i][j].length; k++) {
+							result[i][j][k] = varPositions.get(k);
+						}
+					}
+				}
+				
+				if (result[i][j] == null)
+					result[i][j] = new int[0];
+			}
+		}
+		
+		return result;
+	}
+	
 	@Override
 	public String toString () {
 		StringBuffer result;

@@ -2,8 +2,10 @@ package org.vagabond.mapping.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -28,7 +30,7 @@ public class MapScenarioHolder {
 	private static MapScenarioHolder instance = new MapScenarioHolder();
 	
 	private MappingScenarioDocument doc; 
-	
+	private Map<MappingType, MappingGraph> graphsForMaps;
 	
 	public static MapScenarioHolder getInstance() {
 		return instance;
@@ -36,6 +38,7 @@ public class MapScenarioHolder {
 	
 	public MapScenarioHolder () {
 		doc = null;
+		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
 	}
 	
 	/**
@@ -168,6 +171,14 @@ public class MapScenarioHolder {
 		}
 		
 		throw new Exception ("Did not find mapping with name <" + name + ">");
+	}
+	
+	public MappingGraph getGraphForMapping (MappingType map) throws Exception {
+		if (!graphsForMaps.containsKey(map)) {
+			graphsForMaps.put(map,  new MappingGraph(map));
+		}
+		
+		return graphsForMaps.get(map);
 	}
 	
 	public MappingGraph getGraphForMapping (String name) throws Exception {

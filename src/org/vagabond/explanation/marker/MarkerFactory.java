@@ -39,6 +39,11 @@ public class MarkerFactory {
 	}
 	
 	public static IAttributeValueMarker newAttrMarker 
+			(String relName, String tid, int attrId) throws Exception {
+		return new AttrValueMarker(relName, tid, attrId);
+	}
+	
+	public static IAttributeValueMarker newAttrMarker 
 			(int rel, String tid, int attr) throws Exception {
 		return new AttrValueMarker(rel, tid, attr);
 	}

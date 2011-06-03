@@ -39,6 +39,19 @@ public class ResultSetUtil {
 		return new ArrayList<String> (rels);
 	}
 	
+	public static Vector<String> getProvTidAttrsForProvSchema (String[] attrs) {
+		Vector<String> result;
+		
+		result = new Vector<String> ();
+		
+		for(String att: attrs) {
+			if (isProvAttr(att) && att.matches(".*_tid$"))
+				result.add(att);
+		}
+		
+		return result;
+	}
+	
 	public static String[] getResultColumns (ResultSet rs) throws SQLException {
 		String[] result;
 		int colCount;
@@ -95,6 +108,13 @@ public class ResultSetUtil {
 			return split[2];
 		else 
 			return split[2] + "_" + split[3];
+	}
+	
+	public static String getUnnumRelFromRel (String name) {
+		String[] split;
+		
+		split = splitProvAttrName (name);
+		return split[0];
 	}
 	
 	public static String getRelFromProvName (String name) {

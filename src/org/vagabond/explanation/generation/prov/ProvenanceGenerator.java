@@ -19,6 +19,7 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.Pair;
+import org.vagabond.util.ResultSetUtil;
 import org.vagabond.xmlmodel.MappingType;
 
 public class ProvenanceGenerator {
@@ -141,7 +142,7 @@ public class ProvenanceGenerator {
 		
 		result = new Vector<Pair<String,Set<MappingType>>>();
 		
-		query = QueryHolder.getQuery("ProvSE.GetMapsForBaseRelAccess")
+		query = QueryHolder.getQuery("MetaQ.GetMapsForBaseRelAccess")
 				.parameterize("target." + targetRel);
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
@@ -175,6 +176,29 @@ public class ProvenanceGenerator {
 		return result;
 	}
 	
+	public String[] getProvSchemaForTarget (String targetRel) throws Exception {
+		String query;
+		String resultStr;
+		ResultSet rs;
+		
+		
+		query = QueryHolder.getQuery("MetaQ.GetProvQueryResultAttrs")
+				.parameterize("target." + targetRel);
+		
+		log.debug("compute provenance schema for <" + targetRel 
+				+ "> with query: <" + query + ">");
+		
+		rs = ConnectionManager.getInstance().execQuery(query);
+		
+		rs.next();
+		resultStr = rs.getString(1).trim();
+		resultStr = resultStr.substring(1, resultStr.length() - 1);
+		
+		ConnectionManager.getInstance().closeRs(rs);
+
+		return resultStr.split(",");
+	}
+	
 	public MapAndWLProvRepresentation computePIAndMapProv 
 			(IAttributeValueMarker error) throws Exception {
 		MapAndWLProvRepresentation result;
@@ -184,7 +208,7 @@ public class ProvenanceGenerator {
 		
 		result = new MapAndWLProvRepresentation(computePIProv(error));
 		relMapMap = getBaseRelAccessToMapping(error.getRel());
-		maps = Pair.<Set<MappingType>,String>
+		maps = Pair.<String,Set<MappingType>>
 				pairColToValueCol(relMapMap);
 		allMaps = CollectionUtils.<MappingType>unionSets(maps);
 		
@@ -195,11 +219,11 @@ public class ProvenanceGenerator {
 		return result;
 	}
 	
-	private MappingType computMapProvFromWL (Vector<ITupleMarker> wl, 
+	public MappingType computMapProvFromWL (Vector<ITupleMarker> wl, 
 			Vector<Pair<String, Set<MappingType>>> relMapMap,
 			Set<MappingType> allMaps) {
 		ITupleMarker tid;
-		Set<MappingType> mapset = allMaps;
+		Set<MappingType> mapset = new HashSet<MappingType> (allMaps);
 		
 		for(int i =0; i < wl.size(); i++) {
 			tid = wl.get(i);

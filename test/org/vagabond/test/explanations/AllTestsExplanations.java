@@ -20,7 +20,8 @@ import org.vagabond.test.explanations.model.TestMarkers;
 		TestSuperMapExplGen.class,
 		TestTgtSkeMapExplGen.class,
 		TestProvAndSideEffect.class,
-		TestProvAndSideEffectQueries.class
+		TestProvAndSideEffectQueries.class,
+		TestProvParsers.class
         })
 public class AllTestsExplanations {
 

@@ -25,10 +25,11 @@ import org.vagabond.xmlmodel.RelAtomType;
 public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator 
 		{
 
-	public static Logger log = Logger.getLogger(SourceProvenanceSideEffectGenerator.class);
+	public static Logger log = Logger.getLogger(
+			SourceProvenanceSideEffectGenerator.class);
 	
 	protected IAttributeValueMarker error;
-	private IMarkerSet sourceSE;
+	protected IMarkerSet sourceSE;
 	
 	public IMarkerSet computeTargetSideEffects(IMarkerSet sourceSE, 
 			IAttributeValueMarker error) throws Exception {
@@ -59,35 +60,21 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 			ConnectionManager.getInstance().closeRs(rs);
 		}
 		
-		result.remove(MarkerFactory.newTupleMarker(
-				(IAttributeValueMarker) error));
+		result.remove(error);
 		
 		return result;
 	}
 	
-	private Set<String> getNumRelForTrans (String targetRel) throws SQLException, ClassNotFoundException {
+	private Set<String> getNumRelForTrans (String targetRel) throws Exception {
 		List<String> rels;
-		String query;
-		ResultSet rs;
-		String result;
 		
-		query = QueryHolder.getQuery("ProvSE.GetProvQueryResultAttrs")
-				.parameterize("target." + targetRel);
-		log.debug("compute provenance schema for <" + targetRel 
-				+ "> with query: <" + query + ">");
-		rs = ConnectionManager.getInstance().execQuery(query);
-		
-		rs.next();
-		result = rs.getString(1).trim();
-		result = result.substring(1, result.length() - 1);
-		rels  = ResultSetUtil.getBaseRelsForProvSchema(result.split(","));
-		
-		ConnectionManager.getInstance().closeRs(rs);
+		rels  = ResultSetUtil.getBaseRelsForProvSchema(ProvenanceGenerator
+				.getInstance().getProvSchemaForTarget(targetRel));
 		
 		return new HashSet<String> (rels);
 	}
 
-	private void parseTargetSE(String rel, ResultSet rs, IMarkerSet sideEff)
+	protected void parseTargetSE(String rel, ResultSet rs, IMarkerSet sideEff)
 			throws Exception {
 		while(rs.next()) {
 			sideEff.add(MarkerFactory.newTupleMarker(rel, 
@@ -95,8 +82,8 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		}
 	}
 
-	private Map<String, Set<String>> getRelAffectedByRels 
-			(Collection<String> inputRels) throws SQLException, ClassNotFoundException {
+	protected Map<String, Set<String>> getRelAffectedByRels 
+			(Collection<String> inputRels) throws Exception {
 		String targetName;
 		Set<String> sources;
 		Map<String, Set<String>> result;
@@ -123,7 +110,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		return result;
 	}
 	
-	private Map<String, IMarkerSet> partitionSourceSE () {
+	protected Map<String, IMarkerSet> partitionSourceSE () {
 		Map<String, IMarkerSet> parts;
 		IMarkerSet mSet;
 		String relName;
@@ -145,7 +132,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 	}
 
 	public String getSideEffectQuery (String relName, Set<String> sourceRels, 
-			Map<String, IMarkerSet> sourceSE) {
+			Map<String, IMarkerSet> sourceSE) throws Exception {
 		StringBuffer conditions;
 		String query;
 		String unnumSource;
@@ -156,7 +143,8 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		for(String source: sourceRels) {
 			unnumSource = getUnNumRelName(source);
 			if (sourceSE.get(unnumSource) != null) {
-				for(ISingleMarker sourceErr: sourceSE.get(unnumSource).getElems()) {//CHECK ok to use unnumSource???
+				for(ISingleMarker sourceErr
+						: sourceSE.get(unnumSource).getElems()) {//CHECK ok to use unnumSource???
 					conditions.append(
 							getSideEffectEqualityCond(source, 
 									 sourceErr)
