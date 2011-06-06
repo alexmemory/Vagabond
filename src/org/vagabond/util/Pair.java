@@ -80,6 +80,18 @@ public class Pair<K,V> {
 		return result;
 	}
 	
+	public static <K,V> Vector<V> pairVecToValueVec (Vector<Pair<K,V>> pairVec) {
+		Vector<V> result;
+		
+		result = new Vector<V> ();
+		
+		for(Pair<K,V> pair: pairVec) {
+			result.add(pair.getValue());
+		}
+		
+		return result;
+	}
+	
 	public static <K,V> Vector<K> pairVecToKeyVec (Vector<Pair<K,V>> pairVec) {
 		Vector<K> result;
 		

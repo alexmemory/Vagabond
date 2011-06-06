@@ -72,7 +72,7 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		IAttributeValueMarker a1 = MarkerFactory.
 				newAttrMarker("employee", "1|1", "city");
 		IMarkerSet m1 = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "1"));
+				MarkerFactory.newAttrMarker("address", "1","city"));
 		IExplanationSet eSet;
 		CopySourceError e1;
 		
@@ -93,9 +93,9 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		IAttributeValueMarker a1 = MarkerFactory.
 				newAttrMarker("employee", "2|2", "city");
 		IMarkerSet m1 = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "2"));
+				MarkerFactory.newAttrMarker("address", "2","city"));
 		IMarkerSet sideE = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "4|2"));
+				MarkerFactory.newAttrMarker("employee", "4|2","city"));
 		IExplanationSet eSet;
 		CopySourceError e1;
 		
@@ -108,7 +108,7 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testHomelessExplGen () throws Exception {
+	public void testHomelessDebuggedExplGenName () throws Exception {
 		IExplanationSet result, expec;
 		CopySourceError c1;
 		IAttributeValueMarker error;
@@ -120,9 +120,33 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		
 		c1 = new CopySourceError(error);
 		c1.setSourceSE(MarkerParser.getInstance()
-				.parseSet("{T(socialworker,1)}"));
+				.parseSet("{A(socialworker,1,name)}"));
 		c1.setTargetSE(MarkerParser.getInstance()
-				.parseSet("{T(person,2|1|1)}"));
+				.parseSet("{}"));
+		
+		expec = ExplanationFactory.newExplanationSet(c1);
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
+	}
+	
+	@Test
+	public void testHomelessDebuggedExplGenLivesIn () throws Exception {
+		IExplanationSet result, expec;
+		CopySourceError c1;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,2|1|1,livesin)");
+		
+		c1 = new CopySourceError(error);
+		c1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(soupkitchen,1,city)}"));
+		c1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{}"));
 		
 		expec = ExplanationFactory.newExplanationSet(c1);
 		
@@ -144,9 +168,9 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		
 		c1 = new CopySourceError(error);
 		c1.setSourceSE(MarkerParser.getInstance()
-				.parseSet("{T(employee,1)}"));
+				.parseSet("{A(employee,1,name)}"));
 		c1.setTargetSE(MarkerParser.getInstance()
-				.parseSet("{T(address,1)}"));
+				.parseSet("{}"));
 		
 		expec = ExplanationFactory.newExplanationSet(c1);
 		

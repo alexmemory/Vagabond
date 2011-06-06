@@ -8,7 +8,8 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 
-public class AlterSourceProvenanceSideEffectGenerator extends SourceProvenanceSideEffectGenerator {
+public class AlterSourceProvenanceSideEffectGenerator 
+		extends SourceProvenanceSideEffectGenerator {
 
 	@Override
 	public String getSideEffectQuery (String relName, Set<String> sourceRels, 

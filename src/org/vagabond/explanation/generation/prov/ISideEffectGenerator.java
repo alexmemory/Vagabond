@@ -7,5 +7,6 @@ public interface ISideEffectGenerator {
 
 	public IMarkerSet computeTargetSideEffects (IMarkerSet sourceSE, 
 			IAttributeValueMarker error) throws Exception;
+	public void reset ();
 	
 }

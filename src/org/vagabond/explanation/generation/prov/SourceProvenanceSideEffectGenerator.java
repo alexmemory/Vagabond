@@ -31,6 +31,12 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 	protected IAttributeValueMarker error;
 	protected IMarkerSet sourceSE;
 	
+	@Override
+	public void reset () {
+		
+	}
+	
+	@Override
 	public IMarkerSet computeTargetSideEffects(IMarkerSet sourceSE, 
 			IAttributeValueMarker error) throws Exception {
 		String query;

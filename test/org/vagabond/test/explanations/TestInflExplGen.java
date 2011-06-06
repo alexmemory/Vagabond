@@ -62,13 +62,13 @@ public class TestInflExplGen extends AbstractVagabondTest {
 		expl2 = new InfluenceSourceError(err);
 		expl2.setSourceSE(MarkerParser.getInstance()
 				.parseSet("{A(socialworker,3,worksfor)}"));
-		expl2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		expl2.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,1|3|2,name)}"));
 //		expl2.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,3)}"));
 
 		expl3 = new InfluenceSourceError(err);
 		expl3.setSourceSE(MarkerParser.getInstance()
 				.parseSet("{A(socialworker,3,ssn)}"));
-		expl3.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		expl3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,1|3|2,name)}"));
 //		expl3.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,3)}"));
 		
 		expect = ExplanationFactory.newExplanationSet(expl1, expl2, expl3);

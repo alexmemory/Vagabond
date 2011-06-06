@@ -2,7 +2,6 @@ package org.vagabond.mapping.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -11,6 +10,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.Pair;
+import org.vagabond.util.UniqueStack;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 
@@ -119,12 +119,30 @@ public class MappingGraph {
 		varToNodesMap = new HashMap<String, Set<MappingGraphRel>> ();
 	}
 	
+	public Set<MappingGraphRel> getForeachAtomsForVarWithoutRoot (String var, 
+			MappingGraphRel root) {
+		Set<MappingGraphRel> result;
+		
+		result = getForeachAtomsForVar(var);
+		result.remove(root);
+		
+		return result;
+	}
+	
 	public Set<MappingGraphRel> getForeachAtomsForVar (String var) {
 		return getAtoms (true, var);
 	}
 	
 	public Set<MappingGraphRel> getExistsAtomsForVar (String var) {
 		return getAtoms (false, var);
+	}
+	
+	public MappingGraphRel getExistsForRelName (String name) {
+		for(MappingGraphRel node: existsNodes) {
+			if (node.relName.equals(name))
+				return node;
+		}
+		return null;
 	}
 	
 	private Set<MappingGraphRel> getAtoms (boolean foreach, String var) {
@@ -182,6 +200,33 @@ public class MappingGraph {
 		
 		return joinAttrs;
 	}
+	
+	public int[][] getAtomPosForTargetPos (String targetRel, int pos) {
+		String varName;
+		MappingGraphRel existsNode;
+		int[][] result;
+		Vector<Integer> attrs;
+		
+		result = new int[foreachNodes.size()][];
+		existsNode = getExistsForRelName(targetRel);
+		
+		varName = existsNode.vars.get(pos);
+		
+		for(int i = 0; i < foreachNodes.size(); i++) {
+			MappingGraphRel node =  foreachNodes.get(i);
+			attrs = new Vector<Integer>();
+			for(int j = 0; j < node.vars.size(); j++) {
+				if (node.vars.get(j).equals(varName))
+					attrs.add(j);
+			}
+			
+			result[i] = new int[attrs.size()];
+			for(int j = 0; j < attrs.size(); j++)
+				result[i][j] = attrs.get(j);
+		}
+		
+		return result;
+	}
 
 	public int[][][] getAtomPosToTargetPosMap (String targetRel) 
 			throws Exception {
@@ -197,6 +242,7 @@ public class MappingGraph {
 	public int[][][] getAtomPosToTargetPosMap (int existsPos) {
 		int[][][] result = new int[foreachNodes.size()][][];
 		MappingGraphRel node;
+		MappingGraphRel exists = existsNodes.get(existsPos);
 		
 		for(int i = 0; i < result.length; i++) {
 			node = foreachNodes.get(i);
@@ -204,27 +250,67 @@ public class MappingGraph {
 			
 			for(int j = 0; j < node.vars.size(); j++) {
 				String var = node.vars.get(j);
-				Set<MappingGraphRel> existsNodes;
-				existsNodes = getExistsAtomsForVar(var);
+				Set<String> joinedVars;
+				Vector<Integer> varPositions = new Vector<Integer>();
 				
-				for(MappingGraphRel exists: existsNodes) {
-					if (exists.pos == existsPos) {
-						Vector<Integer> varPositions = new Vector<Integer>();
-						
-						for(int k = 0; k < exists.vars.size(); k++) {
-							if (exists.vars.get(k).equals(var))
-								varPositions.add(k);
-						}
-						
-						result[i][j] = new int[varPositions.size()];
-						for(int k = 0; k < result[i][j].length; k++) {
-							result[i][j][k] = varPositions.get(k);
-						}
+				// get vars influenced by joining incorrectly
+				joinedVars = getVarsReachableThroughJoin(var, node);
+			
+				// add directly copied and indirectly influenced positions
+				for(int k = 0; k < exists.vars.size(); k++) {
+					String existsVar = exists.vars.get(k);
+					if (existsVar.equals(var) 
+							|| joinedVars.contains(existsVar))
+						varPositions.add(k);
+				}
+
+				// copy var positions
+				result[i][j] = new int[varPositions.size()];
+				for(int k = 0; k < result[i][j].length; k++) {
+					result[i][j][k] = varPositions.get(k);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public Set<String> getVarsReachableThroughJoin (String joinVar, MappingGraphRel node) {
+		UniqueStack<MappingGraphRel> todo;
+		Set<String> result;
+		MappingGraphRel curNode;
+		Set<MappingGraphRel> done;
+		
+		result = new HashSet<String> ();
+		todo = new UniqueStack<MappingGraphRel>();
+		done = new HashSet<MappingGraphRel> ();
+		
+		if (node.vars.contains(joinVar)) {
+			todo.addAll(getForeachAtomsForVarWithoutRoot(joinVar,node));
+			done.add(node);
+			
+			// join var joins with at least one other atom, find other join vars
+			// of node and trace them too
+			if (!todo.empty()) {
+				for(String var: node.vars) {
+					if (getForeachAtomsForVar(var).size() > 1)
+						todo.addAll(getForeachAtomsForVarWithoutRoot(var, node));
+				}
+			}
+		}
+		
+		while(!todo.empty()) {
+			curNode = todo.pop();
+			done.add(curNode);
+			
+			for(String var: curNode.getVars()) {
+				if (!var.equals(joinVar)) {
+					result.add(var);
+					for(MappingGraphRel toNode: getForeachAtomsForVar(var)) {
+						if (!done.contains(toNode))
+							todo.push(toNode);
 					}
 				}
-				
-				if (result[i][j] == null)
-					result[i][j] = new int[0];
 			}
 		}
 		

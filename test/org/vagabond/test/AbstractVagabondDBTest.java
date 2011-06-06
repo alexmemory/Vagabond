@@ -29,6 +29,7 @@ import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.GlobalResetter;
 
 import static org.vagabond.util.LoggerUtil.*;
 
@@ -224,6 +225,7 @@ public abstract class AbstractVagabondDBTest extends DBTestCase  {
 	public static void loadToDB (String fileName) throws Exception {
 		Connection con = TestOptions.getInstance().getConnection();
 		
+		GlobalResetter.getInstance().reset();
 		ModelLoader.getInstance().loadToInst(fileName);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
 		SchemaResolver.getInstance().setSchemas();

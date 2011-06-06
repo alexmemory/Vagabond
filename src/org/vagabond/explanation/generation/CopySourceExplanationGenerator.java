@@ -2,6 +2,7 @@ package org.vagabond.explanation.generation;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -19,7 +20,9 @@ import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
+import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
+import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.xmlmodel.MappingType;
 
@@ -29,7 +32,7 @@ public class CopySourceExplanationGenerator
 	static Logger log = Logger.getLogger(CopySourceExplanationGenerator.class);
 	
 	private IAttributeValueMarker error;
-	private ProvWLRepresentation prov;
+	private MapAndWLProvRepresentation prov;
 	protected CopySourceError expl;
 	
 	@Override
@@ -44,9 +47,8 @@ public class CopySourceExplanationGenerator
 		IMarkerSet sourceSE;
 		IMarkerSet targetSE;
 		
-		prov = ProvenanceGenerator.getInstance().computeCopyProvenance(error);
-//		sourceSE = getRealCopyFromMappings(prov.getTuplesInProv()); 
-		sourceSE = prov.getTuplesInProv();
+		prov = ProvenanceGenerator.getInstance().computePIAndMapProv(error);
+		sourceSE = getRealCopyFromMappings(); 
 		targetSE = SideEffectGenerator.getInstance()
 				.computeTargetSideEffects(sourceSE, error);
 		
@@ -63,24 +65,38 @@ public class CopySourceExplanationGenerator
 		return result;
 	}
 	
-	private IMarkerSet getRealCopyFromMappings() {
+	private IMarkerSet getRealCopyFromMappings() throws Exception {
 		IMarkerSet result;
-		ITupleMarker witness;
-		Vector<Set<Integer>> attrForBaseRel;
+		Map<String,int[][]> wlCopyAttrForMap;
+		Vector<ITupleMarker> wl;
+		MappingType m;
 		
 		result = MarkerFactory.newMarkerSet();
-		attrForBaseRel = getCopyCSAttrsForBaseRels();
+		wlCopyAttrForMap = getCopyCSAttrsForBaseRels();
 		
 		/* for each tid in each witness list: Determine from the
 		 * mappings from which attributes values are copied to the error
 		 * and add IAttributeValueMarkers for each of them.
 		 */
-		for(Vector<ITupleMarker> wl: prov.getWitnessLists()) {
-			for(int i = 0; i < wl.size(); i++) {
-				witness = wl.get(i);
-				if (witness != null) {
-					for (int attr: attrForBaseRel.get(i)) {
-						result.add(MarkerFactory.newAttrMarker(witness, attr));
+		for(int i = 0; i < prov.getWitnessLists().size(); i++) {
+			wl = prov.getWitnessList(i);
+			m = prov.getMapProv().get(i);
+			
+			log.debug("WL: <" + wl + "> and map <" + m + ">");
+			
+			for(int j = 0; j < wl.size(); j++) {
+				ITupleMarker wlElem = wl.get(j);
+				
+				if (wlElem != null) {
+					int atomPos = prov.getMapToWlPosPositions(m).indexOf(j);
+					int[] sourceAttrs = wlCopyAttrForMap.get(m.getId())[atomPos];
+					
+					for (int attr: sourceAttrs) {
+						IAttributeValueMarker newMarker;
+						
+						newMarker = MarkerFactory.newAttrMarker(wlElem, attr);
+						log.debug("added marker: " + newMarker);
+						result.add(newMarker);
 					}
 				}
 			}
@@ -89,12 +105,17 @@ public class CopySourceExplanationGenerator
 		return result;
 	}
 	
-	private Vector<Set<Integer>> getCopyCSAttrsForBaseRels () {
-		Map<MappingType,Set<Integer>> maps;
-		Vector<Set<Integer>> result;
-		result = new Vector<Set<Integer>>();
+	private Map<String,int[][]> getCopyCSAttrsForBaseRels () throws Exception {
+		Map<String,int[][]> result;
+		result = new HashMap<String,int[][]> ();
 		
+		for(MappingType map: prov.getAllMaps()) {
+			result.put(map.getId(), MapScenarioHolder.getInstance()
+					.getGraphForMapping(map)
+					.getAtomPosForTargetPos(error.getRel(), error.getAttrId()));
+		}
 		
+		log.debug("created mapping to atom vars affected by target attr mapping.");
 		
 		return result;
 	}

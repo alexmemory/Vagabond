@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.vagabond.util.GlobalResetter;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
@@ -49,6 +50,7 @@ public class MapScenarioHolder {
 	
 	public MapScenarioHolder (MappingScenarioDocument doc) {
 		setDocument (doc);
+		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
 	}
 	
 	/**
@@ -59,6 +61,7 @@ public class MapScenarioHolder {
 	
 	public void setDocument (MappingScenarioDocument doc) {
 		this.doc = doc;
+		GlobalResetter.getInstance().reset();
 	}
 
 	/**
@@ -68,6 +71,10 @@ public class MapScenarioHolder {
 	
 	public MappingScenario getScenario () {
 		return doc.getMappingScenario();
+	}
+	
+	public void reset () {
+		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
 	}
 	
 	/**

@@ -32,12 +32,18 @@ public class ProvenanceGenerator {
 		instance = new ProvenanceGenerator();
 	}
 	
+	private Map<String,Vector<Pair<String,Set<MappingType>>>> targetToRelMapMap;
+	
 	private ProvenanceGenerator () {
-		
+		targetToRelMapMap = new HashMap<String,Vector<Pair<String,Set<MappingType>>>> ();
 	}
 	
 	public static ProvenanceGenerator getInstance() {
 		return instance;
+	}
+	
+	public void reset () {
+		targetToRelMapMap = new HashMap<String,Vector<Pair<String,Set<MappingType>>>> ();
 	}
 	
 	public Vector<String> computeMapProvAsStrings (IAttributeValueMarker error) 
@@ -54,9 +60,8 @@ public class ProvenanceGenerator {
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
-		while(rs.next()) {
+		while(rs.next())
 			maps.add(rs.getString(1));
-		}
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
@@ -133,12 +138,25 @@ public class ProvenanceGenerator {
 		return prov;
 	}
 	
+	public Vector<Set<MappingType>> getWlPosToMapping (String targetRel) 
+			throws Exception {
+		return Pair.pairVecToValueVec(getBaseRelAccessToMapping(targetRel));
+	}
+	
+	public Vector<String> getWlPosToBaseRelName (String targetRel) 
+			throws Exception {
+		return Pair.pairVecToKeyVec(getBaseRelAccessToMapping(targetRel));
+	}
+	
 	public Vector<Pair<String,Set<MappingType>>> getBaseRelAccessToMapping 
 			(String targetRel) throws Exception {
 		Vector<Pair<String,Set<MappingType>>> result;
 		String query;
 		String parse;
 		ResultSet rs;
+		
+		if (targetToRelMapMap.containsKey(targetRel))
+			return targetToRelMapMap.get(targetRel); 
 		
 		result = new Vector<Pair<String,Set<MappingType>>>();
 		
@@ -173,6 +191,7 @@ public class ProvenanceGenerator {
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
+		targetToRelMapMap.put(targetRel, result);
 		return result;
 	}
 	
@@ -202,25 +221,32 @@ public class ProvenanceGenerator {
 	public MapAndWLProvRepresentation computePIAndMapProv 
 			(IAttributeValueMarker error) throws Exception {
 		MapAndWLProvRepresentation result;
-		Vector<Pair<String, Set<MappingType>>> relMapMap;
+		Vector<Set<MappingType>> relMapMap;
+		Map<MappingType, Vector<Integer>> mapPos;
 		Set<MappingType> allMaps;
-		Collection<Set<MappingType>> maps;
 		
 		result = new MapAndWLProvRepresentation(computePIProv(error));
-		relMapMap = getBaseRelAccessToMapping(error.getRel());
-		maps = Pair.<String,Set<MappingType>>
-				pairColToValueCol(relMapMap);
-		allMaps = CollectionUtils.<MappingType>unionSets(maps);
+		relMapMap = getWlPosToMapping(error.getRel());
+		allMaps = CollectionUtils.<MappingType>unionSets(relMapMap);
 		
-		for(Vector<ITupleMarker> wl: result.getWitnessLists()) {
+		for(Vector<ITupleMarker> wl: result.getWitnessLists())
 			result.addMapProv(computMapProvFromWL(wl, relMapMap, allMaps));
+			
+		mapPos = new HashMap<MappingType, Vector<Integer>> ();
+		for(int i = 0; i < relMapMap.size(); i++) {
+			for(MappingType map: relMapMap.get(i)) {
+				if (!mapPos.containsKey(map))
+					mapPos.put(map, new Vector<Integer>());
+				mapPos.get(map).add(i);
+			}
 		}
+		result.setMapToWlPos(mapPos);
 		
 		return result;
 	}
 	
 	public MappingType computMapProvFromWL (Vector<ITupleMarker> wl, 
-			Vector<Pair<String, Set<MappingType>>> relMapMap,
+			Vector<Set<MappingType>> relMapMap,
 			Set<MappingType> allMaps) {
 		ITupleMarker tid;
 		Set<MappingType> mapset = new HashSet<MappingType> (allMaps);
@@ -229,9 +255,9 @@ public class ProvenanceGenerator {
 			tid = wl.get(i);
 			
 			if(tid != null)
-				mapset.retainAll(relMapMap.get(i).getValue());
+				mapset.retainAll(relMapMap.get(i));
 			else
-				mapset.removeAll(relMapMap.get(i).getValue());
+				mapset.removeAll(relMapMap.get(i));
 		}
 		
 		assert(mapset.size() == 1);

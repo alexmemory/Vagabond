@@ -34,6 +34,10 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 	public AttrGranularitySourceProvenanceSideEffectGenerator () {
 		super();
 		
+		reset();
+	}
+	
+	public void reset () {
 		mapSourceToTarget = new HashMap<Pair<String,String>, int[][][]>();
 		sourceSEtidToAttrs = new HashMap<String,Map<String,Vector<Integer>>>();
 	}

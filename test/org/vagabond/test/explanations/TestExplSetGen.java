@@ -59,12 +59,11 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
-		e1.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "2")
-				));
-		e1.setTargetSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "4|2")
-				));
+		e1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(address,2,city)}"));
+		e1.setTargetSE(MarkerParser.getInstance()
+				.parseSet("{A(employee,4|2,city)}"));
+				
 		
 		corrs = new HashSet<CorrespondenceType> ();
 		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
@@ -138,12 +137,12 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
-		e1.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("soupkitchen", "1")
-				));
+		e1.setSourceSE(MarkerParser.getInstance()
+				.parseSet("{A(soupkitchen,1,city)}"));
+		
 		e1.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,2|1),T(person,2|1|2|1),T(person,1|3|1|2)}"));
-				
+				"{A(person,2|1,livesin),A(person,1|3|1|2,livesin)}"));
+				//T(person,2|1|2|1),
 		
 		corrs = new HashSet<CorrespondenceType> ();
 		corrs.add(MapScenarioHolder.getInstance().getCorr("c3"));
@@ -176,7 +175,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e4.setSourceSE(MarkerParser.getInstance()
 				.parseSet("{A(socialworker,1,worksfor)}"));
 		e4.setTargetSE(MarkerParser.getInstance()
-				.parseSet("{T(person,2|1|2|1)}"));
+				.parseSet("{A(person,2|1|2|1,livesin),A(person,2|1|2|1,name)}"));
 		
 		e5 = new SourceSkeletonMappingError();
 		e5.setExplains(m.getElemList().get(0));
@@ -213,11 +212,10 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
-		e1.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("socialworker", "1")
-				));
+		e1.setSourceSE(MarkerParser.getInstance().parseSet(
+				"{A(socialworker,1,name)}"));
 		e1.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,2|1|1)}"));
+				"{}"));
 				
 		
 		corrs = new HashSet<CorrespondenceType> ();
@@ -243,16 +241,6 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerParser.getInstance().parseSet(
 				"{T(person,3),T(person,2)}"));
-		
-//		e4 = new InfluenceSourceError();
-//		e4.setExplains(m.getElemList().get(0));
-		
-//		e5 = new SourceSkeletonMappingError();
-//		e5.setExplains(m.getElemList().get(0));
-//		e5.setTargetSE(MarkerParser.getInstance().parseSet(
-//				"{A(person,3|2,livesin),A(person,2|1,livesin)}"));
-//		e5.addMap(MapScenarioHolder.getInstance().getMapping("M2"));
-//		e5.setTransSE(trans);
 
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3);
 		expCol = ExplanationFactory.newExplanationCollection(set);
@@ -295,11 +283,10 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		// ************** set 1	
 		c1 = new CopySourceError();
 		c1.setExplains(e1);
-		c1.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("socialworker", "1")
-				));
+		c1.setSourceSE(MarkerParser.getInstance().parseSet(
+				"{A(socialworker,1,name)}"));
 		c1.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,2|1|1)}"));
+				"{}"));
 				
 		
 		corrs = new HashSet<CorrespondenceType> ();
@@ -333,7 +320,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		c2 = new CopySourceError();
 		c2.setExplains(e2);
 		c2.setSourceSE(MarkerParser.getInstance().parseSet(
-				"{T(soupkitchen,1)}"));
+				"{A(soupkitchen,1,city)}"));
 		c2.setTargetSE(MarkerParser.getInstance().parseSet(
 				"{}"));
 				
@@ -369,12 +356,12 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		i2b = new InfluenceSourceError(e2);
 		i2b.setSourceSE(MarkerParser.getInstance()
 				.parseSet("{A(socialworker,1,worksfor)}"));
-		i2b.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,1)}"));
+		i2b.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,2|1|1,name)}"));
 
 		i2c = new InfluenceSourceError(e2);
 		i2c.setSourceSE(MarkerParser.getInstance()
 				.parseSet("{A(socialworker,1,ssn)}"));
-		i2c.setTargetSE(MarkerParser.getInstance().parseSet("{T(person,1)}"));
+		i2c.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,2|1|1,name)}"));
 		
 
 		ss1 = new SourceSkeletonMappingError();
@@ -421,9 +408,9 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		// expls
 		c1 = new CopySourceError(e1);
 		c1.setSourceSE(MarkerParser.getInstance()
-				.parseSet("{T(employee,1)}"));
+				.parseSet("{A(employee,1,name)}"));
 		c1.setTargetSE(MarkerParser.getInstance()
-				.parseSet("{T(address,1)}"));
+				.parseSet("{}"));
 		
 		corrs = new HashSet<CorrespondenceType> ();
 		corrs.add(MapScenarioHolder.getInstance().getCorr("c1"));

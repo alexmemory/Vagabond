@@ -35,6 +35,10 @@ public class SideEffectGenerator {
 		return genImpl.computeTargetSideEffects(sourceSE, error);
 	}
 	
+	public void reset () {
+		genImpl.reset();
+	}
+	
 	
 	
 }

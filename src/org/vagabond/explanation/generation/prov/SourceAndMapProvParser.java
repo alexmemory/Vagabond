@@ -23,7 +23,7 @@ public class SourceAndMapProvParser {
 	
 	private ResultSet dbResult;
 	private Vector<Pair<String,MapAndWLProvRepresentation>> allProv;
-	private Vector<Pair<String, Set<MappingType>>> relMapMap;
+	private Vector<Set<MappingType>> relMapMap;
 	private List<String> baseRels;
 	private Vector<String> unnumRels;
 	
@@ -31,8 +31,9 @@ public class SourceAndMapProvParser {
 		this.dbResult = result;
 		allProv = new Vector<Pair<String, MapAndWLProvRepresentation>>();
 		relMapMap = ProvenanceGenerator.getInstance()
-				.getBaseRelAccessToMapping(targetRel);
-		baseRels = Pair.pairVecToKeyVec(relMapMap);
+				.getWlPosToMapping(targetRel);
+		baseRels = ProvenanceGenerator.getInstance()
+				.getWlPosToBaseRelName(targetRel);
 		
 		unnumRels = new Vector<String> ();
 		for(int i = 0; i < baseRels.size(); i++)
@@ -81,20 +82,15 @@ public class SourceAndMapProvParser {
 	}
 
 	private void createMapProv (String targetRel) throws Exception {
-		Vector<Pair<String, Set<MappingType>>> relMapMap;
 		MapAndWLProvRepresentation prov;
-		Collection<Set<MappingType>> maps;
 		Set<MappingType> allMaps;
 		Map<MappingType, Vector<Integer>> mapPos;
-		
-		relMapMap = ProvenanceGenerator.getInstance()
-				.getBaseRelAccessToMapping(targetRel);
-		maps = Pair.<String,Set<MappingType>>pairColToValueCol(relMapMap);
-		allMaps = CollectionUtils.<MappingType>unionSets(maps);	
+	
+		allMaps = CollectionUtils.<MappingType>unionSets(relMapMap);	
 		
 		mapPos = new HashMap<MappingType, Vector<Integer>> ();
 		for(int i = 0; i < relMapMap.size(); i++) {
-			for(MappingType map: relMapMap.get(i).getValue()) {
+			for(MappingType map: relMapMap.get(i)) {
 				if (!mapPos.containsKey(map))
 					mapPos.put(map, new Vector<Integer>());
 				mapPos.get(map).add(i);

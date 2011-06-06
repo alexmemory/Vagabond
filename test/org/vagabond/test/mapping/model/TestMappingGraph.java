@@ -69,16 +69,86 @@ public class TestMappingGraph extends AbstractVagabondTest {
 	public void testAttrMapping () throws Exception {
 		MappingGraph g; 
 		int[][][] result, expect = {
-				{{0},{}},
-				{{},{1}}
+				{{0},{1}},
+				{{0},{1}}
 				};
 		
 		
 		g = MapScenarioHolder.getInstance().getGraphForMapping("M2");
 		result = g.getAtomPosToTargetPosMap(0);
 		
-		log.debug(result);
+		logArray(result);
 		
+		compare3DArray (expect, result);
+	}
+	
+	@Test
+	public void testAttrMappingHomeless () throws Exception {
+		MappingGraph g; 
+		int[][][] result, expect = {
+				{{0},{},{},{1}},
+				{{0,1},{},{0,1}},
+				{{0},{1},{}}
+				};
+		
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		g = MapScenarioHolder.getInstance().getGraphForMapping("M1");
+		result = g.getAtomPosToTargetPosMap(0);
+		
+		logArray(result);
+		
+		compare3DArray (expect, result);
+	}
+	
+	@Test
+	public void testGetAtomPosForTargetVar () throws Exception {
+		MappingGraph g;
+		int[][] result, expect = {
+				{},
+				{1}
+		};
+
+		g = MapScenarioHolder.getInstance().getGraphForMapping("M2");
+		result = g.getAtomPosForTargetPos("employee", 1);
+
+		compare2DArray (expect, result);
+	}
+	
+	private void logArray (int[][][] array) {
+		StringBuffer result;
+		
+		result = new StringBuffer ();
+		result.append('\n');
+		for(int i = 0; i < array.length; i++) {
+			result.append("Atom " + i);
+			for(int j = 0; j < array[i].length; j++) {
+				result.append("\t Var " + j + ": [");
+				if (array[i][j] != null) {
+					for(int k = 0 ; k < array[i][j].length; k++) {
+						if (k != 0)
+							result.append(',');
+						result.append(array[i][j][k] + "");
+					}
+				}
+				result.append("]\n");
+			}
+		}
+		
+		log.debug(result.toString());
+	}
+	
+	private void compare2DArray (int[][] expect, int[][] result) {
+		assertEquals(expect.length, result.length);
+		for(int i = 0; i < result.length; i++) {
+			assertEquals(expect[i].length, result[i].length);
+			for(int j = 0; j < result[i].length; j++) {
+				assertEquals(expect[i][j], result[i][j]);
+			}
+		}
+	}
+	
+	private void compare3DArray (int[][][] expect, int[][][] result) {
 		assertEquals(expect.length, result.length);
 		for(int i = 0; i < result.length; i++) {
 			assertEquals(expect[i].length, result[i].length);
@@ -92,5 +162,4 @@ public class TestMappingGraph extends AbstractVagabondTest {
 			}
 		}
 	}
-	
 }
