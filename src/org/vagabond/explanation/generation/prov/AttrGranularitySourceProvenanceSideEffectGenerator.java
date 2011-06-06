@@ -39,7 +39,6 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 	
 	public void reset () {
 		mapSourceToTarget = new HashMap<Pair<String,String>, int[][][]>();
-		sourceSEtidToAttrs = new HashMap<String,Map<String,Vector<Integer>>>();
 	}
 	
 	@Override
@@ -51,6 +50,7 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 		Map<String, Set<String>> relsForAffTarget;
 		Map<String, IMarkerSet> partionedSE;
 		
+		sourceSEtidToAttrs = new HashMap<String,Map<String,Vector<Integer>>>();
 		this.sourceSE = sourceSE;
 		this.error = error;
 		

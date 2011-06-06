@@ -189,7 +189,7 @@ public class MapScenarioHolder {
 	}
 	
 	public MappingGraph getGraphForMapping (String name) throws Exception {
-		return new  MappingGraph(getMapping(name));
+		return getGraphForMapping(getMapping(name));
 	}
 	
 	public CorrespondenceType getCorr (String name) throws Exception {
