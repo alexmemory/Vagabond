@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="lib/dbunit.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/ujmp-complete-0.2.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
