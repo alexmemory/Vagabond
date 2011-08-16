@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -25,7 +25,7 @@ import org.vagabond.xmlmodel.RelAtomType;
 public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator 
 		{
 
-	public static Logger log = Logger.getLogger(
+	public static Logger log = LogProviderHolder.getInstance().getLogger(
 			SourceProvenanceSideEffectGenerator.class);
 	
 	protected IAttributeValueMarker error;

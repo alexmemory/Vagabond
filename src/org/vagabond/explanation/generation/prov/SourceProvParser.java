@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
@@ -16,7 +16,7 @@ import static org.vagabond.util.LoggerUtil.*;
 
 public class SourceProvParser {
 
-	static Logger log = Logger.getLogger(SourceProvParser.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SourceProvParser.class);
 	
 	private ResultSet dbResult;
 	private ProvWLRepresentation allProv;

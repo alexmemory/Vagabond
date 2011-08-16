@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class MarkerSet implements IMarkerSet {
 
-	static Logger log = Logger.getLogger(MarkerSet.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerSet.class);
 	
 	private Set<ISingleMarker> markers;
 	

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -16,7 +16,7 @@ import org.vagabond.xmlmodel.TransformationType;
 public class SourceSkeletonMappingError extends AbstractBasicExplanation 
 		implements IBasicExplanation {
 
-	static Logger log = Logger.getLogger(SourceSkeletonMappingError.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SourceSkeletonMappingError.class);
 	
 	private Set<MappingType> mapSE;
 	private Set<TransformationType> transSE;

@@ -7,9 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.vagabond.util.GlobalResetter;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
@@ -26,7 +27,7 @@ import org.vagabond.xmlmodel.TransformationType;
  */
 public class MapScenarioHolder {
 
-	static Logger log = Logger.getLogger(MapScenarioHolder.class.getName());
+	static Logger log = LogProviderHolder.getInstance().getLogger(MapScenarioHolder.class.getName());
 	
 	private static MapScenarioHolder instance = new MapScenarioHolder();
 	

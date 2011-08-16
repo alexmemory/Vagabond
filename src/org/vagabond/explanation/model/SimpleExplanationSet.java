@@ -5,14 +5,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 
 public class SimpleExplanationSet implements IExplanationSet {
 
-	static Logger log = Logger.getLogger(SimpleExplanationSet.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SimpleExplanationSet.class);
 	
 	private IMarkerSet targetSideEffects;
 	private Set<IBasicExplanation> expls;

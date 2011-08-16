@@ -9,16 +9,17 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class PropertyWrapper extends Properties {
 
-	static Logger log = Logger.getLogger(PropertyWrapper.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(PropertyWrapper.class);
 	
 	/**
 	 * 
@@ -49,6 +50,18 @@ public class PropertyWrapper extends Properties {
 		super();
 	}
 
+	public void addFromXMLStream (InputStream in, String prefix) throws InvalidPropertiesFormatException, IOException {
+		this.prefix = prefix;
+		addFromXMLStream(in);
+		resetPrefix();
+	}
+	
+	public void addFromXMLStream (InputStream in) throws InvalidPropertiesFormatException, IOException {
+		PropertyWrapper sub = new PropertyWrapper ();
+		sub.loadFromXML(in);
+		addAll(sub);
+	}
+	
 	public void addFromXMLFile (File inFile, String prefix) 
 			throws FileNotFoundException, IOException {
 		this.prefix = prefix;

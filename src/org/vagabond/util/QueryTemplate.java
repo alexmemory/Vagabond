@@ -1,10 +1,10 @@
 package org.vagabond.util;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class QueryTemplate {
 
-	static Logger log = Logger.getLogger(QueryTemplate.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(QueryTemplate.class);
 	
 	private String queryText;
 	

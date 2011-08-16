@@ -1,10 +1,10 @@
 package org.vagabond.explanation.marker;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class TupleMarker implements ITupleMarker {
 
-	static Logger log = Logger.getLogger(TupleMarker.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(TupleMarker.class);
 	
 	private int relId;
 	private String tid;

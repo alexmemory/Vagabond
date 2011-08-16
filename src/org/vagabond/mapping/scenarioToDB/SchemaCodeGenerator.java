@@ -1,6 +1,6 @@
 package org.vagabond.mapping.scenarioToDB;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.AttrListType;
 import org.vagabond.xmlmodel.ForeignKeyType;
@@ -23,7 +23,7 @@ import org.vagabond.xmlmodel.TransformationsType;
 
 public class SchemaCodeGenerator {
 
-	static Logger log = Logger.getLogger(SchemaCodeGenerator.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SchemaCodeGenerator.class);
 	
 	private static SchemaCodeGenerator instance;
 	

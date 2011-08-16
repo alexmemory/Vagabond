@@ -5,13 +5,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.util.ConnectionManager;
 
 public class StatsQueryExecutor {
 
-	static Logger log = Logger.getLogger(StatsQueryExecutor.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(StatsQueryExecutor.class);
 	
 	private static StatsQueryExecutor instance = new StatsQueryExecutor();
 	

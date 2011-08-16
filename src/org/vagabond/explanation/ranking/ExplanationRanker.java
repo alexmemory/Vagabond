@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
 
 public class ExplanationRanker {
-	static Logger log = Logger.getLogger(ExplanationCollection.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationCollection.class);
 	
 	private ExplanationCollection explCollection;
 	private List<IExplanationSet> sortedExpls;

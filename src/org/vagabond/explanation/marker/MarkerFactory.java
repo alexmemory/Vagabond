@@ -1,11 +1,11 @@
 package org.vagabond.explanation.marker;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 
 public class MarkerFactory {
 
-	static Logger log = Logger.getLogger(MarkerFactory.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerFactory.class);
 	
 	private static MarkerFactory instance = new MarkerFactory();
 	

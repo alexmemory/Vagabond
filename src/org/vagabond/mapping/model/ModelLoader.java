@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
@@ -24,7 +24,7 @@ import org.vagabond.xmlmodel.MappingScenarioDocument;
  */
 public class ModelLoader {
 
-	static Logger log = Logger.getLogger(ModelLoader.class.getName());
+	static Logger log = LogProviderHolder.getInstance().getLogger(ModelLoader.class.getName());
 	
 	private static ModelLoader instance = new ModelLoader();
 	

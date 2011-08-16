@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SideEffectGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvParser;
@@ -24,12 +24,13 @@ import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.MappingType;
 
 public class CopySourceExplanationGenerator  
 		implements ISingleExplanationGenerator {
 
-	static Logger log = Logger.getLogger(CopySourceExplanationGenerator.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(CopySourceExplanationGenerator.class);
 	
 	private IAttributeValueMarker error;
 	private MapAndWLProvRepresentation prov;

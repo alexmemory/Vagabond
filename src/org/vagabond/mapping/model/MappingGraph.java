@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.Pair;
 import org.vagabond.util.UniqueStack;
@@ -63,7 +63,7 @@ public class MappingGraph {
 		}
 	}
 
-	static Logger log = Logger.getLogger(MappingGraph.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(MappingGraph.class);
 	
 	private Vector<MappingGraphRel> foreachNodes;
 	private Vector<MappingGraphRel> existsNodes;

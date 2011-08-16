@@ -138,6 +138,16 @@
 		<antcall target="JarVagabondExplGen"/>
 	</target>
 	
+	<target name="JarForGui" depends="Compile,GenerateXMLbindings">
+		<jar destfile="${basedir}/../VivienVagabond/lib/loadermac.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${loaderMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+	</target>
+	
 	<target name="JarVagabondLoader" >
 		<mkdir dir="${loadermacdir}"/>
 		<mkdir dir="${loaderwindir}"/>

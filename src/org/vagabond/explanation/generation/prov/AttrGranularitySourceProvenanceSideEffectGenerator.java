@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -25,7 +25,7 @@ import org.vagabond.xmlmodel.MappingType;
 public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 		SourceProvenanceSideEffectGenerator {
 
-	static Logger log = Logger.getLogger(
+	static Logger log = LogProviderHolder.getInstance().getLogger(
 			AttrGranularitySourceProvenanceSideEffectGenerator.class);
 	
 	private Map<Pair<String,String>, int[][][]> mapSourceToTarget;

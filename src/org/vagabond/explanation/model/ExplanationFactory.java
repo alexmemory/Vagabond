@@ -1,6 +1,6 @@
 package org.vagabond.explanation.model;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
@@ -10,7 +10,7 @@ import static org.vagabond.explanation.model.basic.IBasicExplanation.*;
 
 public class ExplanationFactory {
 
-	static Logger log = Logger.getLogger(ExplanationFactory.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationFactory.class);
 	
 	private static ExplanationFactory instance = new ExplanationFactory();
 	

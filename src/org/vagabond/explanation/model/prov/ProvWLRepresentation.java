@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 
 public class ProvWLRepresentation {
 
-	static Logger log = Logger.getLogger(ProvWLRepresentation.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ProvWLRepresentation.class);
 	
 	protected List<String> relNames;
 	protected IMarkerSet tuplesInProv;

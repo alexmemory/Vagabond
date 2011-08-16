@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.xmlmodel.DataType;
 import org.vagabond.xmlmodel.RelInstanceFileType;
@@ -13,7 +13,7 @@ import org.vagabond.xmlmodel.RelInstanceType.Row;
 
 public class DatabaseScenarioLoader {
 
-	static Logger log = Logger.getLogger(DatabaseScenarioLoader.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(DatabaseScenarioLoader.class);
 	
 	private static DatabaseScenarioLoader instance = new DatabaseScenarioLoader ();
 	

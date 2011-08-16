@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -19,6 +19,7 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
@@ -26,7 +27,7 @@ import org.vagabond.xmlmodel.RelAtomType;
 public class CorrespondencExplanationGenerator implements
 		ISingleExplanationGenerator {
 
-	static Logger log = Logger.getLogger(
+	static Logger log = LogProviderHolder.getInstance().getLogger(
 			CorrespondencExplanationGenerator.class);
 	
 	private CorrespondenceError expl;

@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 public class ResultSetUtil {
 
-	static Logger log = Logger.getLogger(ResultSetUtil.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ResultSetUtil.class.getName());
 	
 	private static ResultSetUtil instance = new ResultSetUtil();
 	

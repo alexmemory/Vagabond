@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
@@ -24,7 +24,7 @@ import org.vagabond.xmlmodel.MappingType;
 
 public class ProvenanceGenerator {
 
-	static Logger log = Logger.getLogger(ProvenanceGenerator.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ProvenanceGenerator.class);
 	
 	private static ProvenanceGenerator instance;
 	

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -19,7 +19,7 @@ import static org.vagabond.util.LoggerUtil.*;
 public class CorrespondenceError extends AbstractBasicExplanation 
 		implements IBasicExplanation {
 
-	static Logger log = Logger.getLogger(CorrespondenceError.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(CorrespondenceError.class);
 	
 	private Set<CorrespondenceType> correspondences;
 	private Set<MappingType> mapSE;

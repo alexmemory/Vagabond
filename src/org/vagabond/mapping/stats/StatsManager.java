@@ -2,14 +2,14 @@ package org.vagabond.mapping.stats;
 
 import java.sql.Connection;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
 public class StatsManager {
 
-	static Logger log = Logger.getLogger(StatsManager.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(StatsManager.class);
 	
 	private static StatsManager instance = new StatsManager();;
 	

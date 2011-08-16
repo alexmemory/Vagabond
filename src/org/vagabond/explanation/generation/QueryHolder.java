@@ -4,14 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URL;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.PropertyWrapper;
 import org.vagabond.util.QueryTemplate;
 
 public class QueryHolder {
 
-	static Logger log = Logger.getLogger(QueryHolder.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(QueryHolder.class);
 	
 	private static QueryHolder instance = new QueryHolder();
 	
@@ -52,6 +55,14 @@ public class QueryHolder {
 		}
 	}
 
+	public void loadFromURLs (Map<String,URL> urlMap) throws InvalidPropertiesFormatException, IOException {
+		queries = new PropertyWrapper();
+		
+		for(String key: urlMap.keySet()) {
+			queries.addFromXMLStream(urlMap.get(key).openStream(), key);
+		}
+	}
+	
 	public PropertyWrapper getQueries() {
 		return queries;
 	}

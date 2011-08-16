@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 /**
  * Singleton for conveniently creating database connections.
@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class ConnectionManager {
 
-	static Logger log = Logger.getLogger(ConnectionManager.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ConnectionManager.class);
 	
 	private static ConnectionManager instance;
 	

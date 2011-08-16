@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class CollectionUtils {
 
-	static Logger log = Logger.getLogger(CollectionUtils.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(CollectionUtils.class);
 	
 	public static <T> Set<T> unionSets (Collection<Set<T>> sets) {
 		Set<T> result = new HashSet<T>();

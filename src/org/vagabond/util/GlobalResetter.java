@@ -1,6 +1,6 @@
 package org.vagabond.util;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SideEffectGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
@@ -16,7 +16,7 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 
 public class GlobalResetter {
 
-	static Logger log = Logger.getLogger(GlobalResetter.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(GlobalResetter.class);
 	
 	private static GlobalResetter instance;
 	

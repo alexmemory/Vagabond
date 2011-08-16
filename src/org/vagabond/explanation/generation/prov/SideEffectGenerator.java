@@ -1,12 +1,12 @@
 package org.vagabond.explanation.generation.prov;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 
 public class SideEffectGenerator {
 
-	static Logger log = Logger.getLogger(SideEffectGenerator.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SideEffectGenerator.class);
 	
 	private static SideEffectGenerator instance;
 	private ISideEffectGenerator genImpl;

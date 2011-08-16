@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.util.Pair;
 import org.vagabond.xmlmodel.MappingType;
@@ -15,7 +15,7 @@ import static org.vagabond.util.LoggerUtil.logException;
 
 public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 
-	static Logger log = Logger.getLogger(MapAndWLProvRepresentation.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(MapAndWLProvRepresentation.class);
 	
 	private Vector<MappingType> mapProv;
 	private Map<MappingType, Vector<Integer>> mapToWlPos;

@@ -2,11 +2,11 @@ package org.vagabond.explanation.marker;
 
 import javax.xml.validation.Schema;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 
 public class AttrValueMarker implements IAttributeValueMarker {
 
-	static Logger log = Logger.getLogger(AttrValueMarker.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(AttrValueMarker.class);
 	
 	private int hash = 0;
 	private int relId;

@@ -3,7 +3,7 @@ package org.vagabond.explanation.generation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.ExplanationCollection;
@@ -12,7 +12,7 @@ import org.vagabond.explanation.model.IExplanationSet;
 
 public class ExplanationSetGenerator {
 
-	static Logger log = Logger.getLogger(ExplanationSetGenerator.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationSetGenerator.class);
 	
 	private List<ISingleExplanationGenerator> generators;
 	

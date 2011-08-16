@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.util.IdMap;
 
 public class ExplanationCollection implements Iterator<IExplanationSet> {
 
-	static Logger log = Logger.getLogger(ExplanationCollection.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationCollection.class);
 	
 	private Map<ISingleMarker, IExplanationSet> explMap;
 	private IdMap<ISingleMarker> errorIds;
