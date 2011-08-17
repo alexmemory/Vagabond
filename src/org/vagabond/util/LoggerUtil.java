@@ -56,6 +56,21 @@ public class LoggerUtil {
 		return stackString.toString();
 	}
 	
+	public static String stringColToString (Collection<String> strings) {
+		StringBuilder result;
+		
+		if (strings.isEmpty())
+			return "";
+		
+		result = new StringBuilder();
+		
+		for(String elem: strings)
+			result.append("'" + elem + "',");
+		result.deleteCharAt(result.length() - 1);
+		
+		return result.toString();
+	}
+	
 	public static String arrayToString (String[] array) {
 		StringBuilder result;
 		
