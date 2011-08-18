@@ -19,6 +19,15 @@ public class UniqueStack<T> extends java.util.Stack<T> {
 	Vector<T> stack;
 	
 	public UniqueStack () {
+		init();
+	}
+	
+	public UniqueStack (Collection<? extends T> newEl) {
+		init();
+		this.addAll(newEl);
+	}
+	
+	private void init () {
 		elemSet = new HashSet<T> ();
 		stack = new Vector<T> ();
 	}

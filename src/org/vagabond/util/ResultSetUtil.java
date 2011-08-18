@@ -39,6 +39,19 @@ public class ResultSetUtil {
 		return new ArrayList<String> (rels);
 	}
 	
+	public static List<String> getUniqueBaseRelsForProvSchema (String[] attrs) {
+		Set<String> rels;
+		
+		rels = new HashSet<String> ();
+		
+		for(String attr: attrs) {
+			if (isProvAttr(attr))
+				rels.add(getUnnumRelFromRel(getNumberedRelFromProvName(attr)));
+		}
+		
+		return new ArrayList<String> (rels);
+	}
+	
 	public static Vector<String> getProvTidAttrsForProvSchema (String[] attrs) {
 		Vector<String> result;
 		

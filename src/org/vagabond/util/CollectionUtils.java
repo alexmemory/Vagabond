@@ -73,4 +73,13 @@ public class CollectionUtils {
 		
 		return result;
 	}
+	
+	public static <T> boolean search (T[] array, T element) {
+		for(T test: array) {
+			if (test.equals(element))
+				return true;
+		}
+		
+		return false;
+	}
 }

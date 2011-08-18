@@ -7,8 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.mapping.stats.StatsQueryExecutor;
+import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.GlobalResetter;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
@@ -33,6 +36,8 @@ public class MapScenarioHolder {
 	
 	private MappingScenarioDocument doc; 
 	private Map<MappingType, MappingGraph> graphsForMaps;
+	private Map<TransformationType, RelationType[]> transToSource;
+	private Map<TransformationType, RelationType> transToTarget;
 	
 	public static MapScenarioHolder getInstance() {
 		return instance;
@@ -40,7 +45,7 @@ public class MapScenarioHolder {
 	
 	public MapScenarioHolder () {
 		doc = null;
-		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
+		init();
 	}
 	
 	/**
@@ -51,7 +56,13 @@ public class MapScenarioHolder {
 	
 	public MapScenarioHolder (MappingScenarioDocument doc) {
 		setDocument (doc);
+		init();
+	}
+	
+	private void init() {
 		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
+		transToSource = new HashMap<TransformationType, RelationType[]> ();
+		transToTarget = new HashMap<TransformationType, RelationType> ();
 	}
 	
 	/**
@@ -148,15 +159,57 @@ public class MapScenarioHolder {
 		return result;
 	}
 	
+	public TransformationType[] getTransForMap (MappingType m) {
+		String id = m.getId();
+		List<TransformationType> result;
+		
+		result = new ArrayList<TransformationType> ();
+		
+		for(TransformationType t: doc.getMappingScenario().getTransformations()
+				.getTransformationArray()) {
+			if (CollectionUtils.search(t.getImplements().getMappingArray(), id))
+				result.add(t);
+		}
+		
+		return result.toArray(new TransformationType[] {});
+	}
+	
+	public RelationType getRelCreateByTrans (TransformationType t) throws Exception {
+		if (!transToTarget.containsKey(t)) {
+			String relId = t.getCreates();
+			transToTarget.put(t, getRelForName(relId, true));
+		}
+		return transToTarget.get(t);
+	}
+	
+	public RelationType[] getRelsAccessedByTrans (TransformationType t) throws Exception {		
+		if (!transToSource.containsKey(t)) {
+			List<String> relNames;
+			RelationType [] rels;
+			int i = 0;
+			
+			relNames = StatsQueryExecutor.getInstance().
+					getRelsAccessedByTransformation(t.getCreates());
+			rels = new RelationType[relNames.size()];
+			for(String relName: relNames) {
+				rels[i++] = getRelForName(relName, false);
+			}
+			
+			transToSource.put(t, rels);
+		}
+		
+		return transToSource.get(t);
+	}
+	
 	public RelationType getRelForName (String relname, boolean target) throws Exception {
 		RelationType[] rels;
 		
 		if (target)
 			rels = doc.getMappingScenario().getSchemas().
-					getSourceSchema().getRelationArray();
+					getTargetSchema().getRelationArray();
 		else
 			rels = doc.getMappingScenario().getSchemas().
-					getTargetSchema().getRelationArray();
+					getSourceSchema().getRelationArray();
 		
 		for (RelationType rel: rels) {
 			if (rel.getName().equals(relname))

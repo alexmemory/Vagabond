@@ -15,5 +15,8 @@ SELECT bit_or(trans_prov) AS transexists, bit_and(trans_prov) AS transforall
 FROM (SELECT TRANSPROV * FROM ${1}) p; 
 </entry>
 
+<entry key="GetBaseRelsForTarget">
+</entry>
+
 </properties>
 

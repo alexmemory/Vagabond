@@ -71,8 +71,9 @@ public class LoggerUtil {
 		return result.toString();
 	}
 	
-	public static String arrayToString (String[] array) {
+	public static String arrayToString (String[] array, String delim, boolean quotes) {
 		StringBuilder result;
+		String quot = quotes ? "'" : "";
 		
 		if (array.length == 0)
 			return "";
@@ -80,11 +81,15 @@ public class LoggerUtil {
 		result = new StringBuilder();
 		
 		for (String elem: array) {
-			result.append("'" + elem + "',");
+			result.append(quot + elem + quot + delim);
 		}
 		result.deleteCharAt(result.length() - 1);
 		
 		return result.toString();
+	}
+	
+	public static String arrayToString (String[] array) {
+		return arrayToString(array, ",", true);
 	}
 	
 	public static void logArray (Logger log, Object[] array) {
