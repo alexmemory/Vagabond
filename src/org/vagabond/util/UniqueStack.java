@@ -1,9 +1,11 @@
 package org.vagabond.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -77,5 +79,16 @@ public class UniqueStack<T> extends java.util.Stack<T> {
 			push(iter.next());
 		
 		return newElems.size() != 0;
+	}
+	
+	public List<T> toList () {
+		List<T> result;
+		
+		result = new ArrayList<T> ();
+		
+		for(T elem: stack)
+			result.add(elem);
+		
+		return result;
 	}
 }

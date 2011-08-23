@@ -1,7 +1,10 @@
 package org.vagabond.mapping.model;
 
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -160,6 +163,23 @@ public class MappingGraph {
 	
 	public Set<String> getAllVars () {
 		return varToNodesMap.keySet();
+	}
+	
+	public List<String> getVarsOrdered () {
+		UniqueStack<String> result;
+		
+		result = new UniqueStack<String> ();
+		
+		for(MappingGraphRel foreach: foreachNodes) {
+			for(String var: foreach.vars)
+				result.push(var);
+		}
+		for(MappingGraphRel exists: existsNodes) {
+			for(String var: exists.vars)
+				result.push(var);
+		}
+		
+		return result.toList();
 	}
 	
 	public Set<Pair<Integer,String>> getJoinVarsAndAtoms (String var) {

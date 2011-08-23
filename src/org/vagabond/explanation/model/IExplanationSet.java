@@ -1,12 +1,13 @@
 package org.vagabond.explanation.model;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 
-public interface IExplanationSet {
+public interface IExplanationSet extends Set<IBasicExplanation> {
 
 	public List<IBasicExplanation> getExplanations();
 	public Set<IBasicExplanation> getExplanationsSet();
@@ -14,6 +15,6 @@ public interface IExplanationSet {
 	public int getSideEffectSize();
 	public IMarkerSet getSideEffects();
 	public IMarkerSet getExplains();
-	public void addExplanation(IBasicExplanation expl);
+	public boolean addExplanation(IBasicExplanation expl);
 	public IExplanationSet union (IExplanationSet other);
 }

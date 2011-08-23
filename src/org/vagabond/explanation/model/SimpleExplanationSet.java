@@ -1,7 +1,9 @@
 package org.vagabond.explanation.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -32,10 +34,9 @@ public class SimpleExplanationSet implements IExplanationSet {
 	}
 
 	@Override
-	public void addExplanation (IBasicExplanation expl) {
-		expls.add(expl);
-		
+	public boolean addExplanation (IBasicExplanation expl) {
 		targetSideEffects.union(expl.getTargetSideEffects());
+		return expls.add(expl);
 	}
 
 	@Override
@@ -119,5 +120,72 @@ public class SimpleExplanationSet implements IExplanationSet {
 		
 		return true;
 	}
+
+	@Override
+	public boolean add(IBasicExplanation e) {
+		return addExplanation(e);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends IBasicExplanation> c) {
+		return expls.addAll(c);
+	}
+
+	@Override
+	public void clear() {
+		expls.clear();
+		targetSideEffects.clear();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return expls.contains(o);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return expls.containsAll(c);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return expls.isEmpty();
+	}
+
+	@Override
+	public Iterator<IBasicExplanation> iterator() {
+		return expls.iterator();
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return expls.remove(o);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return expls.removeAll(c);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return expls.retainAll(c);
+	}
+
+	@Override
+	public int size() {
+		return expls.size();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return expls.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return expls.toArray(a);
+	}
+
 	
 }
