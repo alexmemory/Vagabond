@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -77,6 +79,13 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			result.append(" and max " + max);
 			
 			return result.toString();
+		}
+		
+		@Override
+		public boolean equals (Object o) {
+			if (o == null || !(o instanceof RankedListElement))
+				return false;
+			return RankedListComparator.comp.compare(this, (RankedListElement) o) == 0;
 		}
 	}
 	
@@ -165,7 +174,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	private int iterDone = -1;
 	private int numSets = -1;
 	private int numErrors = -1;
-	private List<RankedListElement> sortedSets;
+	private RankedListElement lastDoneElem;
+	private RankedListElement curIterElem;
+	private TreeSet<RankedListElement> sortedSets;
 	private List<OneErrorExplSet> errorExpl;
 	private List<ISingleMarker> errors;
 	private ExplanationCollection col;
@@ -175,7 +186,7 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	private boolean rankingDone = false;
 	
 	public SideEffectExplanationRanker () {
-		sortedSets = new ArrayList<RankedListElement> ();
+		sortedSets = new TreeSet<RankedListElement> (RankedListComparator.comp);
 		errorExpl = new ArrayList<OneErrorExplSet> ();
 		errors = new ArrayList<ISingleMarker> ();
 	}
@@ -227,7 +238,7 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		for(int i = 0; i < errorExpl.get(0).size(); i++) {
 			sortedSets.add(new RankedListElement(numErrors, i));
 		}
-		
+
 		init = true;
 	}
 
@@ -238,9 +249,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 			// skip ranked, complete elements
 			if (iterDone == -1)
-				curCand = sortedSets.get(0);
+				curCand = sortedSets.first();
 			else
-				curCand = sortedSets.get(iterDone);
+				curCand = sortedSets.higher(lastDoneElem);
 			
 			// current best candidate is not complete, expand it
 			if (!curCand.isDone())
@@ -253,15 +264,17 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 				RankedListElement inclCand = curCand;
 				
 				// find first incomplete set if exists
-				while(inclCand.isDone() && curPos != sortedSets.size())
-					inclCand = sortedSets.get(curPos++);
+				while(curPos != sortedSets.size() && inclCand.isDone()) {
+					inclCand = sortedSets.higher(inclCand);
+					curPos++;
+				}
 				
 				// everything complete -> we are done with ranking
-				if (inclCand.isDone()) {
+				if (inclCand == null) {
 					rankingDone = true;
 					numSets = sortedSets.size();			
 					iterDone = sortedSets.size() - 1;
-					
+					lastDoneElem = sortedSets.last();
 					// requested non existing set?
 					if (iterDone < upTo)
 						throw new NoSuchElementException("trying to access beyond last " +
@@ -269,7 +282,8 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 					return;
 				}
 				
-				iterDone = curPos - 2;
+				lastDoneElem = sortedSets.lower(inclCand);
+				iterDone = curPos - 1;
 				
 				// expand the best incomplete element
 				expandAndInsert(inclCand);
@@ -287,40 +301,47 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	private void expandAndInsert(RankedListElement curExp) {
 		sortedSets.remove(curExp);
 		for(int i = 0; i < errorExpl.get(curExp.countSet).size(); i++)
-			insertElem(new RankedListElement (curExp, i));
+			sortedSets.add(new RankedListElement (curExp, i));
+			//insertElem(new RankedListElement (curExp, i));
 	}
 	
 	private void insertElem (RankedListElement newElem) {
 		int insertPos;
 		
-		insertPos = Collections.binarySearch(sortedSets, 
-				 newElem, RankedListComparator.comp);
-		log.debug("binary search result " + insertPos);
-		
-		insertPos = -insertPos - 1;
-		
-		log.debug("insert " + newElem.toString() + " at pos " + insertPos);
-		sortedSets.add(insertPos, newElem);
+//		insertPos = Collections.binarySearch(sortedSets, 
+//				 newElem, RankedListComparator.comp);
+//		log.debug("binary search result " + insertPos);
+//		
+//		insertPos = -insertPos - 1;
+//		
+//		log.debug("insert " + newElem.toString() + " at pos " + insertPos);
+//		sortedSets.add(insertPos, newElem);
 	}
 
 	@Override
 	public IExplanationSet next() {
-		if (iterPos < iterDone)
-			return getSetForRankedListElem (++iterPos);
 		if (iterPos >= numSets)
 			throw new NoSuchElementException("only " + numSets + " elements");
-		generateUpTo(++iterPos);
-		return getSetForRankedListElem (iterPos);
+		
+		iterPos++;
+		if (iterPos > iterDone)
+			generateUpTo(iterPos);			
+
+		if (curIterElem == null)
+			curIterElem = sortedSets.first();
+		else
+			curIterElem = sortedSets.higher(curIterElem);
+		
+		return getSetForRankedListElem (curIterElem);
 	}
 
-	private IExplanationSet getSetForRankedListElem (int pos) {
+	private IExplanationSet getSetForRankedListElem (RankedListElement elem) {
 		IExplanationSet result = ExplanationFactory.newExplanationSet();		
-		RankedListElement elem = sortedSets.get(pos);
 		
 		for(int i = 0; i < elem.countSet; i++)
 			result.add(errorExpl.get(i).get(elem.elem[i]));
 		
-		log.debug("set for iter pos " + pos + " is \n"  + result.toString());
+		log.debug("set for iter is \n"  + result.toString());
 		
 		return result;
 	}
