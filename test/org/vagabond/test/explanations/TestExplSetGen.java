@@ -1,11 +1,10 @@
 package org.vagabond.test.explanations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -20,7 +19,6 @@ import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
-import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.xmlmodel.CorrespondenceType;

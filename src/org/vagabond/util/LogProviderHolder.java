@@ -1,6 +1,6 @@
 package org.vagabond.util;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 
 public class LogProviderHolder implements LogProvider {
 
@@ -28,7 +28,7 @@ public class LogProviderHolder implements LogProvider {
 	}
 
 	@Override
-	public Logger getLogger(Class clazz) {
+	public Logger getLogger(Class<?> clazz) {
 		if (provider == null)
 			return Logger.getLogger(clazz);
 

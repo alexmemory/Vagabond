@@ -1,17 +1,12 @@
 package org.vagabond.explanation.generation;
 
-import java.sql.ResultSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SideEffectGenerator;
-import org.vagabond.explanation.generation.prov.SourceProvParser;
-import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -21,9 +16,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
-import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.MappingType;
 

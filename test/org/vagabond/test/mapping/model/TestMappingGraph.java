@@ -1,21 +1,15 @@
 package org.vagabond.test.mapping.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
-import org.vagabond.explanation.marker.IAttributeValueMarker;
-import org.vagabond.explanation.marker.ITupleMarker;
-import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.MappingGraph;
 import org.vagabond.mapping.model.MappingGraph.MappingGraphRel;
-import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.Pair;

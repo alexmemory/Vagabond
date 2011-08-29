@@ -5,9 +5,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.util.LogProviderHolder;
 
 public class ExplanationRanker {
 	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationCollection.class);
@@ -30,7 +31,7 @@ public class ExplanationRanker {
 		while (iterExplCollection.hasNext()) {
 			sortedExpls.add(iterExplCollection.next());
 		}
-		Collections.sort(sortedExpls, new IExplanationSetComparator());
+		Collections.sort(sortedExpls, new ExplanationSetComparator());
 	}
 	
 

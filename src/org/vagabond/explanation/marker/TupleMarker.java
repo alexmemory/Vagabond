@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 
 public class TupleMarker implements ITupleMarker {
 
@@ -76,6 +77,14 @@ public class TupleMarker implements ITupleMarker {
 		return "('" + getRel() + "'(" + getRelId() + "),'" + tid + "')"; 
 	}
 
+	public String toUserString () {
+		return "relation: " + getRel() + " tuple: " + getTid();
+	}
+	
+	public String toUserStringNoRel () {
+		return "tuple: " + getTid(); 
+	}
+	
 	@Override
 	public int hashCode () {
 		return relId + tid.charAt(0);

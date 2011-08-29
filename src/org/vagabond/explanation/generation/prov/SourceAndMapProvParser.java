@@ -1,18 +1,18 @@
 package org.vagabond.explanation.generation.prov;
 
 import java.sql.ResultSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
 import org.vagabond.util.CollectionUtils;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 import org.vagabond.util.ResultSetUtil;
 import org.vagabond.xmlmodel.MappingType;

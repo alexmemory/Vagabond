@@ -7,10 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.util.LogProviderHolder;
 
 public class SimpleExplanationSet implements IExplanationSet {
 
@@ -18,6 +19,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	
 	private IMarkerSet targetSideEffects;
 	private Set<IBasicExplanation> expls;
+	private ArrayList<IBasicExplanation> sorted = null;
 	
 	public SimpleExplanationSet () {
 		expls = new HashSet<IBasicExplanation> ();
@@ -26,7 +28,9 @@ public class SimpleExplanationSet implements IExplanationSet {
 	
 	@Override
 	public List<IBasicExplanation> getExplanations() {
-		return new ArrayList<IBasicExplanation> (expls);
+		if (sorted == null)
+			sorted = new ArrayList<IBasicExplanation> (expls);
+		return sorted;
 	}
 	
 	public Set<IBasicExplanation> getExplanationsSet () {

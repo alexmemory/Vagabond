@@ -19,7 +19,6 @@ import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;

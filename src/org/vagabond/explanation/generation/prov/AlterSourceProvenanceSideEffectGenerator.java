@@ -6,7 +6,6 @@ import java.util.Set;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.ITupleMarker;
 
 public class AlterSourceProvenanceSideEffectGenerator 
 		extends SourceProvenanceSideEffectGenerator {

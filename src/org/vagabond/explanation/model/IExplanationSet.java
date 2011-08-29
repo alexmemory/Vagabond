@@ -1,6 +1,5 @@
 package org.vagabond.explanation.model;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 

@@ -1,17 +1,19 @@
 package org.vagabond.explanation.model.prov;
 
+import static org.vagabond.util.LoggerUtil.ObjectColToStringWithMethod;
+import static org.vagabond.util.LoggerUtil.logException;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ITupleMarker;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 import org.vagabond.xmlmodel.MappingType;
-import static org.vagabond.util.LoggerUtil.ObjectColToStringWithMethod;
-import static org.vagabond.util.LoggerUtil.logException;
 
 public class MapAndWLProvRepresentation extends ProvWLRepresentation {
 

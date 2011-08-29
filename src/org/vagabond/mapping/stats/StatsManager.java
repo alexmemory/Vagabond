@@ -2,10 +2,10 @@ package org.vagabond.mapping.stats;
 
 import java.sql.Connection;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
+import org.vagabond.util.LogProviderHolder;
 
 public class StatsManager {
 

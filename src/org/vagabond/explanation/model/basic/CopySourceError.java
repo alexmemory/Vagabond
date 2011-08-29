@@ -1,10 +1,10 @@
 package org.vagabond.explanation.model.basic;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
-import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.util.LogProviderHolder;
 
 public class CopySourceError extends AbstractBasicExplanation implements IBasicExplanation {
 

@@ -7,5 +7,7 @@ public interface ISingleMarker {
 	public int getRelId();
 	public boolean isSubsumed (ISingleMarker other);
 	public int getSize ();
+	public String toUserString();
+	public String toUserStringNoRel();
 	
 }

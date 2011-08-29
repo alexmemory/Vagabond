@@ -4,12 +4,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
-import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.util.LoggerUtil;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.TransformationType;
 

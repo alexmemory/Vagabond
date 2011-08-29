@@ -1,9 +1,7 @@
 package org.vagabond.test.explanations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,10 +16,7 @@ import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.test.AbstractVagabondTest;
-import org.vagabond.test.TestOptions;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.TransformationType;

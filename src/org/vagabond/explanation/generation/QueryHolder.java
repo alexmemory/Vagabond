@@ -8,7 +8,8 @@ import java.net.URL;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.PropertyWrapper;
 import org.vagabond.util.QueryTemplate;
 

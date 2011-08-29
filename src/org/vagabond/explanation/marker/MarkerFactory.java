@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 
 public class MarkerFactory {

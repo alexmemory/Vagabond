@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.generation.prov.AttrGranularitySourceProvenanceSideEffectGenerator;

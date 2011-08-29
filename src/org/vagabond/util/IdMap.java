@@ -1,16 +1,20 @@
 package org.vagabond.util;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class IdMap<Type> {
+public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 
 	private SortedMap<Integer, Type> idToObj;
 	private Map<Type, Integer> ObjToId;
 	private int maxId = -1;
 	private int hash = -1;
+	private int iter = -1;
 	
 	public IdMap () {
 		idToObj = new TreeMap<Integer, Type> ();
@@ -32,15 +36,19 @@ public class IdMap<Type> {
 		return idToObj.containsKey(id);
 	}
 	
-	public boolean containsValue (Type value) {
+	public boolean containsVal (Type value) {
 		return ObjToId.get(value) != null;
+	}
+	
+	public int size() {
+		return idToObj.keySet().size();
 	}
 	
 	public Type get (int id) {
 		return idToObj.get(id);
 	}
 	
-	public int get (Type value) {
+	public int getId (Type value) {
 		return ObjToId.get(value);
 	}
 	
@@ -88,5 +96,95 @@ public class IdMap<Type> {
 		}
 		
 		return hash;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return iter < maxId;
+	}
+
+	@Override
+	public Type next() {
+		return idToObj.get(++iter);
+	}
+	
+	public void resetIter () {
+		iter = -1;
+	}
+
+	@Override
+	public void remove() {
+		//TODO nothing
+	}
+
+	@Override
+	public void clear() {
+		idToObj.clear();
+		ObjToId.clear();
+		maxId = -1;
+	}
+
+	@Override
+	public boolean containsKey(Object key) {
+		return idToObj.containsKey(key);
+	}
+
+	@Override
+	public boolean containsValue(Object value) {
+		return ObjToId.containsKey(value);
+	}
+
+	@Override
+	public Set<java.util.Map.Entry<Integer, Type>> entrySet() {
+		return idToObj.entrySet();
+	}
+
+	@Override
+	public Type get(Object key) {
+		return idToObj.get(key);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return idToObj.isEmpty();
+	}
+
+	@Override
+	public Set<Integer> keySet() {
+		return idToObj.keySet();
+	}
+
+	@Override
+	public Type put(Integer key, Type value) {
+		ObjToId.put(value, key);
+		return idToObj.put(key, value);
+	}
+
+	@Override
+	public void putAll(Map<? extends Integer, ? extends Type> m) {
+		for(Integer i: m.keySet()) {
+			Type val = m.get(i);
+			idToObj.put(i, val);
+			ObjToId.put(val, i);
+			maxId = (maxId > i) ? maxId: i;
+		}
+	}
+
+	@Override
+	public Type remove(Object key) {
+		Type val;
+		
+		val = idToObj.get(key);
+		if (val != null) {
+			ObjToId.remove(val);
+			idToObj.remove(key);
+		}
+	
+		return val;
+	}
+
+	@Override
+	public Collection<Type> values() {
+		return ObjToId.keySet();
 	}
 }

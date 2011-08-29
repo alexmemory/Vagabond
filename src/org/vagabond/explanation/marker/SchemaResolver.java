@@ -3,8 +3,9 @@ package org.vagabond.explanation.marker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.mapping.model.MapScenarioHolder;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.RelationType;
 import org.vagabond.xmlmodel.SchemaType;

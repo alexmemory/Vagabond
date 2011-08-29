@@ -2,18 +2,16 @@ package org.vagabond.mapping.stats;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
-import org.vagabond.util.ResultSetUtil;
-import org.vagabond.util.UniqueStack;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.xmlmodel.RelationType;
+import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.ResultSetUtil;
 
 public class StatsQueryExecutor {
 
@@ -38,6 +36,7 @@ public class StatsQueryExecutor {
 		query = QueryHolder.getQuery("Stats.GetMapDistributionForTarget")
 				.parameterize("target." + target);
 		rs = ConnectionManager.getInstance().execQuery(query);
+		rs.next();
 		
 		return result;
 	}

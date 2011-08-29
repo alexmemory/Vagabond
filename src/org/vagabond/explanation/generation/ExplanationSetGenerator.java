@@ -3,12 +3,14 @@ package org.vagabond.explanation.generation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.ranking.DummyRanker;
+import org.vagabond.util.LogProviderHolder;
 
 public class ExplanationSetGenerator {
 
@@ -34,6 +36,8 @@ public class ExplanationSetGenerator {
 			explsForOne = findExplanations(error);
 			result.addExplSet(error, explsForOne);
 		}
+		
+		result.createRanker (new DummyRanker());
 		
 		return result;
 	}

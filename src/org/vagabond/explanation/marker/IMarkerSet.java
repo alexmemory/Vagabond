@@ -12,4 +12,5 @@ public interface IMarkerSet extends Set<ISingleMarker> {
 	public IMarkerSet union (IMarkerSet other);
 	public boolean add (ISingleMarker marker);
 	public boolean contains (String relName, String tid) throws Exception;
+	public String toUserString();
 }

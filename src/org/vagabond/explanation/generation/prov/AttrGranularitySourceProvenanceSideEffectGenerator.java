@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -18,6 +18,7 @@ import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.MappingGraph;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 import org.vagabond.util.ResultSetUtil;
 import org.vagabond.xmlmodel.MappingType;

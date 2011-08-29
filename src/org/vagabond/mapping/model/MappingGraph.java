@@ -1,7 +1,6 @@
 package org.vagabond.mapping.model;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,8 +9,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.util.CollectionUtils;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 import org.vagabond.util.UniqueStack;
 import org.vagabond.xmlmodel.MappingType;

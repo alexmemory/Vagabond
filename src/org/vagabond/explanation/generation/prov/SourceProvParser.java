@@ -1,18 +1,19 @@
 package org.vagabond.explanation.generation.prov;
 
+import static org.vagabond.util.LoggerUtil.logArray;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.prov.ProvWLRepresentation;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.ResultSetUtil;
-
-import static org.vagabond.util.LoggerUtil.*;
 
 public class SourceProvParser {
 

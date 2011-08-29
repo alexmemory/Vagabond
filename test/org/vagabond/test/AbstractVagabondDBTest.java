@@ -1,13 +1,12 @@
 package org.vagabond.test;
 
+import static org.vagabond.util.LoggerUtil.logException;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.InvalidPropertiesFormatException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -30,8 +29,6 @@ import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.GlobalResetter;
-
-import static org.vagabond.util.LoggerUtil.*;
 
 public abstract class AbstractVagabondDBTest extends DBTestCase  {
 

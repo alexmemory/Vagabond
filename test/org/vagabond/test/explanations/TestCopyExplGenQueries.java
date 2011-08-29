@@ -1,17 +1,8 @@
 package org.vagabond.test.explanations;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Test;
 import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
-import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
-import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.test.AbstractVagabondDBTest;
 
 public class TestCopyExplGenQueries extends AbstractVagabondDBTest {

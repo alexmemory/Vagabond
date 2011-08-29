@@ -1,6 +1,5 @@
 package org.vagabond.explanation.generation;
 
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,10 +8,9 @@ import java.util.Vector;
 
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;
 import org.vagabond.explanation.generation.prov.SideEffectGenerator;
-import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.generation.prov.SourceProvenanceSideEffectGenerator;
-import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.AttrValueMarker;
+import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
@@ -21,10 +19,8 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
-import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.mapping.model.MappingGraph;
 import org.vagabond.util.CollectionUtils;
-import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.Pair;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;

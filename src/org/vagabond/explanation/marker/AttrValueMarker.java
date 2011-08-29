@@ -1,8 +1,7 @@
 package org.vagabond.explanation.marker;
 
-import javax.xml.validation.Schema;
-
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 
 public class AttrValueMarker implements IAttributeValueMarker {
 
@@ -117,6 +116,16 @@ public class AttrValueMarker implements IAttributeValueMarker {
 			this.relId = SchemaResolver.getInstance().getRelId(relName);
 			this.attrId = SchemaResolver.getInstance().getAttrId(this.relId, attrName);
 			this.tid = tid;
+	}
+
+	@Override
+	public String toUserString() {
+		return "relation: " + getRel() + " tuple: " + getTid() + " attribute: " + getAttrName();
+	}
+
+	@Override
+	public String toUserStringNoRel() {
+		return " tuple: " + getTid() + " attribute: " + getAttrName();
 	}
 	
 	

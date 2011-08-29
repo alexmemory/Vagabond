@@ -6,9 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.ranking.DummyRanker;
+import org.vagabond.explanation.ranking.IExplanationRanker;
 import org.vagabond.util.IdMap;
+import org.vagabond.util.LogProviderHolder;
 
 public class ExplanationCollection implements Iterator<IExplanationSet> {
 
@@ -17,8 +21,8 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	private Map<ISingleMarker, IExplanationSet> explMap;
 	private IdMap<ISingleMarker> errorIds;
 	private Vector<Integer> numExpls;
-	private Vector<Integer> iterPos;
 	private int totalExpls = 1;
+	private IExplanationRanker ranker = null;
 
 	private int hash = -1;
 	
@@ -26,7 +30,6 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		explMap = new HashMap<ISingleMarker, IExplanationSet>();
 		errorIds = new IdMap<ISingleMarker>();
 		numExpls = new Vector<Integer>();
-		iterPos = new Vector<Integer>();
 	}
 	
 	public Vector<Integer> getDimensions () {
@@ -43,7 +46,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		
 		if (explMap.containsKey(marker)) {
 			totalExpls /= explMap.get(marker).getSize();
-			id = errorIds.get(marker);
+			id = errorIds.getId(marker);
 			numExpl = numExpls.get(id) + numExpl;
 			numExpls.set(id, numExpl);
 			totalExpls *= numExpl;
@@ -53,8 +56,20 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			errorIds.put(marker);
 			totalExpls *= numExpl;
 			numExpls.add(numExpl);
-			iterPos.add(0);
 		}
+	}
+	
+	public void createRanker (IExplanationRanker ranker) {
+		this.ranker = ranker;
+		ranker.initialize(this);
+	}
+	
+	public void confirmExplanation (IBasicExplanation expl) {
+		ranker.confirmExplanation(expl);
+	}
+	
+	public int getNumErrors () {
+		return errorIds.getSize();
 	}
 	
 	public Collection<IExplanationSet> getExplSets () {
@@ -71,86 +86,19 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 
 	@Override
 	public boolean hasNext() {
-		return compareVec (iterPos, numExpls) < 0;
-	}
-
-	@Override
-	public IExplanationSet next() {
-		IExplanationSet set;
-		
-		assert(hasNext());
-		
-		set = generateExplForIter(iterPos);
-		increaseIter ();
-		
-		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
-		
-		return set; 
-	}
-	
-	private IExplanationSet generateExplForIter(Vector<Integer> iterPos) {
-		IExplanationSet result;
-		ISingleMarker marker;
-		IExplanationSet curSet;
-		int iterVal;
-		
-		result = ExplanationFactory.newExplanationSet();
-		for(int i = 0; i < iterPos.size(); i++) {
-			iterVal = iterPos.get(i);
-			marker = errorIds.get(i);
-			curSet = explMap.get(marker);
-			result.addExplanation(curSet.getExplanations().get(iterVal));
-		}
-		
-		return result;
-	}
-
-	private void increaseIter () {
-		int curPos;
-		
-		for(int i = 0; i < iterPos.size(); i++) {
-			curPos = iterPos.get(i);
-			if (curPos < numExpls.get(i) - 1)
-			{
-				iterPos.set(i, curPos + 1);
-				log.debug("new iter pos is <" + iterPos + ">");
-				return;
-			}
-			else {
-				iterPos.set(i, 0);
-			}
-		}
-		
-		log.debug("iterator reached end: <" + iterPos + ">");
-		for(int i = 0; i < iterPos.size(); i++)
-			iterPos.set(i, numExpls.get(i));
+		return ranker.hasNext();
 	}
 	
 	@Override
-	public void remove() {		
+	public void remove() {	
+		ranker.remove();
 	}
 	
 	public void resetIter () {
-		for(int i = 0; i < iterPos.size(); i++) {
-			iterPos.set(i, 0);
-		}
+		ranker.resetIter();
 	}
 	
-	private int compareVec (Vector<Integer> left, Vector<Integer> right) {
-		if (left.size() < right.size())
-			return 1;
-		if (right.size() < left.size())
-			return -1;
-		
-		for(int i = 0; i < left.size(); i++) {
-			if (left.get(i) < right.get(i))
-				return -1;
-			if (left.get(i) > right.get(i))
-				return 1;
-		}
-		
-		return 0;
-	}
+
 	
 	@Override
 	public String toString () {
@@ -213,7 +161,11 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	}
 	
 	private int getNumExpls (ISingleMarker error) {
-		return numExpls.get(errorIds.get(error));
+		return numExpls.get(errorIds.getId(error));
+	}
+	
+	public Vector<Integer> getNumExpls () {
+		return numExpls;
 	}
 	
 	@Override
@@ -225,5 +177,10 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		}
 		
 		return hash;
+	}
+
+	@Override
+	public IExplanationSet next() {
+		return ranker.next();
 	}
 }

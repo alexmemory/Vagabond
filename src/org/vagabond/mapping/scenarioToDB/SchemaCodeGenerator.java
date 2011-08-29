@@ -1,6 +1,7 @@
 package org.vagabond.mapping.scenarioToDB;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.AttrListType;
 import org.vagabond.xmlmodel.ForeignKeyType;

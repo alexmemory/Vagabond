@@ -1,8 +1,9 @@
 package org.vagabond.explanation.generation.prov;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.util.LogProviderHolder;
 
 public class SideEffectGenerator {
 

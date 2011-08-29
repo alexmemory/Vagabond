@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
+import org.vagabond.util.LogProviderHolder;
 
 public class MarkerSet implements IMarkerSet {
 
@@ -84,6 +86,24 @@ public class MarkerSet implements IMarkerSet {
 		result.deleteCharAt(result.length() - 1);
 		
 		result.append("}");
+		
+		return result.toString();
+	}
+	
+	public String toUserString () {
+		StringBuffer result = new StringBuffer();
+		
+		Map<String,IMarkerSet> markerPerRel = MarkerSetUtil.partitionOnRelation(this);
+		
+		for(String rel: markerPerRel.keySet()) {
+			result.append(" relation " + rel + " (");
+			for(ISingleMarker marker: markerPerRel.get(rel)) {
+				result.append(marker.toUserStringNoRel());
+				result.append(", ");
+			}
+			result.delete(result.length() - 2, result.length());
+			result.append(')');
+		}
 		
 		return result.toString();
 	}

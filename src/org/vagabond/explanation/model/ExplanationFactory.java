@@ -1,12 +1,12 @@
 package org.vagabond.explanation.model;
 
-import org.apache.log4j.Logger; import org.vagabond.util.LogProviderHolder;
+import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
-
-import static org.vagabond.explanation.model.basic.IBasicExplanation.*;
+import org.vagabond.util.LogProviderHolder;
 
 public class ExplanationFactory {
 
