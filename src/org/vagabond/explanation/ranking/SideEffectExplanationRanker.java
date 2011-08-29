@@ -320,10 +320,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public IExplanationSet next() {
-		if (iterPos >= numSets)
+		if (++iterPos >= numSets)
 			throw new NoSuchElementException("only " + numSets + " elements");
 		
-		iterPos++;
 		if (iterPos > iterDone)
 			generateUpTo(iterPos);			
 
@@ -367,9 +366,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public boolean hasNext() {
-		return iterPos < numSets;
+		return iterPos < numSets - 1;
 	}
-
+	
 	@Override
 	public boolean ready() {
 		return init;
@@ -389,6 +388,12 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	@Override
 	public void resetIter() {
 		iterPos = -1;
+		curIterElem = null;
+	}
+
+	@Override
+	public int getIterPos() {
+		return iterPos + 1;
 	}
 
 }

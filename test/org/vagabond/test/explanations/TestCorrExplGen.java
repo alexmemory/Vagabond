@@ -13,6 +13,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -74,6 +75,23 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		assertEquals(maps, err.getMappingSideEffects());
 
 		assertEquals(expect, err);
+	}
+	
+	@Test
+	public void testNullValueExplGen () throws Exception {
+		IExplanationSet result, expec;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,livesin)");
+		
+		expec = ExplanationFactory.newExplanationSet();
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
 	}
 	
 	@Test

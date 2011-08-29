@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.generation.SourceSkeletonMappingExplanationGenerator;
+import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
@@ -76,6 +77,23 @@ public class TestSrcSkeMapExplGen extends AbstractVagabondTest {
 		
 		result = gen.findExplanations(m);
 		assertEquals(exp,result);
+	}
+	
+	@Test
+	public void testNullValueExplGen () throws Exception {
+		IExplanationSet result, expec;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,livesin)");
+		
+		expec = ExplanationFactory.newExplanationSet();
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
 	}
 	
 }

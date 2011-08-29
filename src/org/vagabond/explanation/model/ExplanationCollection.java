@@ -98,6 +98,9 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		ranker.resetIter();
 	}
 	
+	public int getIterPos () {
+		return ranker.getIterPos();
+	}
 
 	
 	@Override

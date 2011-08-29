@@ -47,6 +47,10 @@ public class CorrespondencExplanationGenerator implements
 		expl = new CorrespondenceError(errorMarker);
 		
 		findCorrespondences();
+		// did not find correspondence?
+		if (expl.getCorrSideEffectSize() == 0)
+			return result;
+		
 		computeSideEffects();
 		
 		result.addExplanation(expl);
@@ -162,6 +166,8 @@ public class CorrespondencExplanationGenerator implements
 					corrCandi.add(corr);
 			}
 		}
+		
+		log.debug("Correpsondence candidates are " + corrCandi.toString());
 		
 	}
 	

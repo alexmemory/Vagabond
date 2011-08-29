@@ -42,7 +42,11 @@ public class CopySourceExplanationGenerator
 		IMarkerSet targetSE;
 		
 		prov = ProvenanceGenerator.getInstance().computePIAndMapProv(error);
-		sourceSE = getRealCopyFromMappings(); 
+		sourceSE = getRealCopyFromMappings();
+		
+		if (sourceSE.getSize() == 0)
+			return result;
+		
 		targetSE = SideEffectGenerator.getInstance()
 				.computeTargetSideEffects(sourceSE, error);
 		

@@ -14,6 +14,7 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -29,12 +30,13 @@ public class TestTgtSkeMapExplGen extends AbstractVagabondTest {
 	
 	@BeforeClass
 	public static void load () throws Exception {
-		loadToDB("resource/test/targetSkeletonError.xml");
 		gen = new TargetSkeletonMappingExplanationGenerator();
 	}
 	
 	@Test
 	public void testTgtSkeMapExplGen () throws Exception {
+		loadToDB("resource/test/targetSkeletonError.xml");
+		
 		ISingleMarker err = MarkerFactory.newAttrMarker("person", "2", "address");
 		IExplanationSet result;
 		TargetSkeletonMappingError expl, expect;
@@ -66,6 +68,23 @@ public class TestTgtSkeMapExplGen extends AbstractVagabondTest {
 		assertEquals(m1, expl.getMappingSideEffects());
 		assertEquals(exp, expl.getTargetSideEffects());
 		assertEquals(expl, expect);
+	}
+	
+	@Test
+	public void testNullValueExplGen () throws Exception {
+		IExplanationSet result, expec;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,livesin)");
+		
+		expec = ExplanationFactory.newExplanationSet();
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
 	}
 	
 }

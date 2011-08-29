@@ -78,4 +78,21 @@ public class TestInflExplGen extends AbstractVagabondTest {
 		
 		assertEquals(expect,result);
 	}
+	
+	@Test
+	public void testNullValueExplGen () throws Exception {
+		IExplanationSet result, expec;
+		IAttributeValueMarker error;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		error = (IAttributeValueMarker) MarkerParser.getInstance()
+				.parseMarker("A(person,1,livesin)");
+		
+		expec = ExplanationFactory.newExplanationSet();
+		
+		result = gen.findExplanations(error);
+		
+		assertEquals(expec, result);
+	}
 }

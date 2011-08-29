@@ -1,9 +1,11 @@
 package org.vagabond.test.explanations.model;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -325,14 +327,121 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col.createRanker(new SideEffectExplanationRanker());
 		col.resetIter();
 		
+		assertEquals (0, col.getIterPos());
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.next());
+		assertEquals (1, col.getIterPos());
 		assertEquals ("0,0",ExplanationFactory.newExplanationSet(e11,e21),
 				col.next());
+		assertEquals (2, col.getIterPos());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(e12,e22),
 				col.next());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(e11,e22),
 				col.next());		
+	}
+	
+	@Test
+	public void testResetAndAdvanceOverBorders () throws Exception {
+		CopySourceError e11, e12, e22;
+		CorrespondenceError e21;
+		IExplanationSet set1, set2;
+		IAttributeValueMarker error1, error2; 
+				
+		ExplanationCollection col;
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
+		
+		error1 = MarkerFactory.newAttrMarker("employee", "8|8", "city");
+		error2 = MarkerFactory.newAttrMarker("employee", "9|9", "city");
+		
+		// copy error
+		e11 = new CopySourceError();
+		e11.setExplains(error1);
+		e11.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e11.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "4|2", "city")
+				));
+	
+		e12 = new CopySourceError();
+		e12.setExplains(error1);
+		e12.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e12.setTargetSE(MarkerFactory.newMarkerSet(
+				));
+		
+		// first set
+		set1 = ExplanationFactory.newExplanationSet(e11, e12);
+		
+		///////////////////////////////////////////////////////////////////////
+		
+		// correspondence error
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		e21 = new CorrespondenceError();
+		e21.setExplains(error2);
+		e21.setCorrespondences(corrs);
+		e21.setMapSE(maps);
+		e21.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "7|2", "city")
+		));
+	
+		e22 = new CopySourceError();
+		e22.setExplains(error2);
+		e22.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e22.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|6", "city"),
+				MarkerFactory.newAttrMarker("employee", "1|5", "city"),
+				MarkerFactory.newAttrMarker("employee", "1|4", "city"),
+				MarkerFactory.newAttrMarker("employee", "f|4", "city")
+				));
+		
+		// set 2
+		set2 = ExplanationFactory.newExplanationSet(e21,e22);
+		
+		/* ensure order in sets */
+		set1.getExplanations();
+		set2.getExplanations();
+		
+		// *** collection
+		col = ExplanationFactory.newExplanationCollection(set1, set2);
+		
+		/* create Dummy Ranker */
+		col.createRanker(new SideEffectExplanationRanker());
+		col.resetIter();
+		
+		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
+				col.next());
+		assertEquals (1, col.getIterPos());
+		col.resetIter();
+		assertEquals (0, col.getIterPos());
+		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
+				col.next());
+		assertEquals (1, col.getIterPos());
+		assertEquals ("0,0",ExplanationFactory.newExplanationSet(e11,e21),
+				col.next());
+		assertEquals (2, col.getIterPos());
+		assertEquals ("1,1",ExplanationFactory.newExplanationSet(e12,e22),
+				col.next());
+		assertTrue(col.hasNext());
+		assertEquals ("0,1",ExplanationFactory.newExplanationSet(e11,e22),
+				col.next());
+		assertFalse(col.hasNext());
+		
+		try {
+			col.next();
+			assertTrue(false);
+		} catch (NoSuchElementException e) {
+			
+		}
+		
 	}
 	
 }

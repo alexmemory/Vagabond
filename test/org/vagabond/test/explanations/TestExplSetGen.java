@@ -384,6 +384,51 @@ public class TestExplSetGen extends AbstractVagabondTest {
 	}
 	
 	@Test
+	public void testGenForNullValue () throws Exception {
+		IMarkerSet m;
+		ExplanationCollection col;
+		ExplanationCollection expCol;
+		SuperflousMappingError e3;
+		IExplanationSet set;
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
+		HashSet<TransformationType> trans;
+		
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		
+		m = MarkerParser.getInstance().parseSet("{A(person,1,livesin)}");
+		
+				
+		
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		trans = new HashSet<TransformationType> ();
+		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
+				
+		e3 = new SuperflousMappingError();
+		e3.setExplains(m.getElemList().get(0));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		e3.setMapSE(maps);
+		e3.setTransSE(trans);
+		e3.setTargetSE(MarkerParser.getInstance().parseSet(
+				"{T(person,3),T(person,2)}"));
+
+		set = ExplanationFactory.newExplanationSet(e3);
+		expCol = ExplanationFactory.newExplanationCollection(set);
+		
+		col = gen.findExplanations(m);
+		log.debug(col);
+		
+		col.resetIter();
+		assertEquals(set, col.getExplSets().iterator().next());
+		
+		assertEquals(expCol, col);
+	}
+	
+	@Test
 	public void testTargetSkeletonScen () throws Exception {
 		IMarkerSet errSet;
 		IAttributeValueMarker e1;

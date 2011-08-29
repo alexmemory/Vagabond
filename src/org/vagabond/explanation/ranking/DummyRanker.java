@@ -24,6 +24,7 @@ public class DummyRanker implements IExplanationRanker {
 	private boolean[] fixedPos;
 	private boolean init = false;
 	private int numExplSets = 1;
+	private int curIterPos = -1;
 	private IExplanationSet fixed = new SimpleExplanationSet();
 	
 	public DummyRanker () {
@@ -126,7 +127,8 @@ public class DummyRanker implements IExplanationRanker {
 			if (curPos < numExpls.get(i) - 1)
 			{
 				iterPos.set(i, curPos + 1);
-				log.debug("new iter pos is <" + iterPos + ">");
+				curIterPos++;
+				log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);
 				return;
 			}
 			else {
@@ -171,6 +173,11 @@ public class DummyRanker implements IExplanationRanker {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public int getIterPos() {
+		return curIterPos + 1;
 	}
 
 	
