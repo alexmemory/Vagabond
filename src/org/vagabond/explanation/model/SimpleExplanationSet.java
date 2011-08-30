@@ -2,6 +2,8 @@ package org.vagabond.explanation.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.util.LogProviderHolder;
 
@@ -20,16 +23,29 @@ public class SimpleExplanationSet implements IExplanationSet {
 	private IMarkerSet targetSideEffects;
 	private Set<IBasicExplanation> expls;
 	private ArrayList<IBasicExplanation> sorted = null;
+	private Comparator<IBasicExplanation> comp = null;
 	
+	public SimpleExplanationSet (Comparator<IBasicExplanation> comp) {
+		init();
+		this.comp = comp;
+	}
+
 	public SimpleExplanationSet () {
+		init();
+	}
+	
+	private void init() {
 		expls = new HashSet<IBasicExplanation> ();
 		targetSideEffects = MarkerFactory.newMarkerSet();
 	}
+	
+	
 	
 	@Override
 	public List<IBasicExplanation> getExplanations() {
 		if (sorted == null)
 			sorted = new ArrayList<IBasicExplanation> (expls);
+		Collections.sort(sorted, ExplanationComparators.fullSideEffComp);
 		return sorted;
 	}
 	
@@ -128,6 +144,15 @@ public class SimpleExplanationSet implements IExplanationSet {
 	@Override
 	public boolean add(IBasicExplanation e) {
 		return addExplanation(e);
+	}
+	
+	public boolean addUnique(IBasicExplanation e) {
+		for(IBasicExplanation expl: expls) {
+			if (comp.compare(e, expl) == 0)
+				return false;
+		}
+		
+		return add(e);
 	}
 
 	@Override

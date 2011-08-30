@@ -1,5 +1,7 @@
 package org.vagabond.explanation.model;
 
+import java.util.Comparator;
+
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
@@ -35,6 +37,23 @@ public class ExplanationFactory {
 	
 	public static IExplanationSet newExplanationSet () {
 		return new SimpleExplanationSet ();
+	}
+	
+	public static IExplanationSet newExplanationSet (Comparator<IBasicExplanation> comp) {
+		return new SimpleExplanationSet(comp);
+	}
+	
+	public static IExplanationSet newExplanationSet (Comparator<IBasicExplanation> comp,
+			IBasicExplanation ... elems) {
+		SimpleExplanationSet result;
+		
+		result = new SimpleExplanationSet(comp);
+		
+		for(IBasicExplanation expl: elems) {
+			result.addUnique(expl);
+		}
+		
+		return result;
 	}
 	
 	public static IExplanationSet newExplanationSet (IBasicExplanation ... elems) {

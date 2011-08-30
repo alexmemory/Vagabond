@@ -21,6 +21,10 @@ public class LoggerUtil {
 		log.error(getCompleteTrace(e));
 	}
 	
+	public static void logException (Exception e, Logger log, String message) {
+		log.error(message + "\n\n" + getCompleteTrace(e));
+	}
+	
 	public static void logDebugException (Exception e, Logger log) {
 		log.debug(getCompleteTrace(e));
 	}
@@ -93,6 +97,21 @@ public class LoggerUtil {
 	
 	public static void logArray (Logger log, Object[] array) {
 		logArray(log, array, null);
+	}
+	
+	public static void logArray (Logger log, int[] array, String message) {
+		StringBuffer result = new StringBuffer();
+		
+		if (message != null)
+			result.append(message + ":\n");
+		
+		for (int o : array) {
+			result.append(o + ",");
+		}
+		
+		result.deleteCharAt(result.length() - 1);
+		
+		log.debug(result.toString());
 	}
 		
 	public static void logArray (Logger log, Object[] array, String message) {

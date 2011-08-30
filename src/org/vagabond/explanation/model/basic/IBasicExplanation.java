@@ -26,6 +26,13 @@ public interface IBasicExplanation {
 	public int getTargetSideEffectSize();
 	public IMarkerSet getTargetSideEffects ();
 	
+	public int getRealTargetSideEffectSize();
+	public IMarkerSet getRealTargetSideEffects();
+	public void setRealTargetSideEffects(IMarkerSet set);
+	
+	public IMarkerSet getRealExplains();
+	public void setRealExplains(IMarkerSet set);
+	
 	public int getSourceSideEffectSize ();
 	public IMarkerSet getSourceSideEffects ();
 	

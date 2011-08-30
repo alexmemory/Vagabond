@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -17,10 +18,11 @@ import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.SimpleExplanationSet;
-import org.vagabond.explanation.model.basic.BasicExplanationSideEffectComparator;
+import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.util.IdMap;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.LoggerUtil;
 
 public class SideEffectExplanationRanker implements IExplanationRanker {
 
@@ -34,15 +36,32 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		public int max;
 		public int realSE = 0;
 		public int countSet;
+		public int firstUnset;
 		
 		public RankedListElement (int maxSize, int ... elems) {
 			elem = new int[maxSize];
 			countSet = elems.length;
-			for(int i = 0; i < elems.length; i++)
-				elem[i] = elems[i];
+			
+			// initialize unset elements with -1
 			for(int i = elems.length; i < maxSize; i++)
 				elem[i] = -1;
 			
+			// set elements and implied elements
+			for(int i = 0; i < elems.length; i++) {
+				int newElem =  elems[i];
+				elem[i] = newElem;
+				for(int j = 0; j < explainsMatrix[i][newElem].length; j++) {
+					int pos = explainsMatrix[i][newElem][j];
+					
+					if (this.elem[pos] == -1) {
+						this.elem[pos] = -2;
+						countSet++;
+					}
+				}
+			}
+			
+			updateFirstUnset();
+							
 			computeSideEffectSize(this);
 		}
 		
@@ -52,13 +71,35 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			this.max = prefix.max;
 			this.countSet = prefix.countSet;
 			this.realSE = prefix.realSE;
-			elem[countSet++] = newElem;
+			this.firstUnset = prefix.firstUnset;
+			this.elem[prefix.firstUnset] = newElem;
+			countSet++;
+			
+			// set implied explanations and new element
+			for(int i = 0; i < explainsMatrix[prefix.firstUnset][newElem].length; i++) {
+				int pos = explainsMatrix[prefix.firstUnset][newElem][i];
+				if (this.elem[pos] == -1) {
+					this.elem[pos] = -2;
+					countSet++;
+				}
+			}
+			
+				
 			
 			// adapt the side effect size
+			updateFirstUnset();
 			computeSideEffectSize(this);
 			
 			log.debug("extended set " + prefix.toString() + " to " 
 					+ toString());
+		}
+		
+		private void updateFirstUnset () {
+			for(int i = 0; i < elem.length; i++)
+				if (elem[i] == -1) {
+					firstUnset = i;
+					return;
+				}
 		}
 		
 		public boolean isDone () {
@@ -86,6 +127,33 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			if (o == null || !(o instanceof RankedListElement))
 				return false;
 			return RankedListComparator.comp.compare(this, (RankedListElement) o) == 0;
+		}
+
+		public boolean extensionWithoutOverlap() {
+			for(int i = 0; i < explainsMatrix[firstUnset].length; i++) {
+				boolean hasOverlap = false;
+				int[] overlap = explainsMatrix[firstUnset][i];
+				
+				for(int j: overlap)
+					if (j < firstUnset)
+						hasOverlap = true;
+				if (!hasOverlap)
+					return true;
+			}
+			return false;
+		}
+		
+		public boolean lastAdditionHasOverlap () {
+			for(int i = elem.length - 1; i > 0; i--) {
+				if (elem[i] > -1) {
+					for(int j = 0; j < explainsMatrix[i][elem[i]].length;j++) {
+						if (explainsMatrix[i][elem[i]][j] < i)
+							return true;
+					}
+					return false;
+				}
+			}
+			return false;
 		}
 	}
 	
@@ -120,8 +188,18 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			this.error = error;
 			List<IBasicExplanation> expList;
 			
+			// remove errors from side effects and add them to explains
+			for(IBasicExplanation e: explSet) {
+				e.setRealTargetSideEffects(e.getTargetSideEffects().cloneSet()
+						.diff(errors));
+				e.getRealExplains().union(
+						e.getTargetSideEffects().cloneSet().intersect(errors));
+			}
+			
 			expList = explSet.getExplanations();
-			Collections.sort(expList, BasicExplanationSideEffectComparator.comp);
+			
+			// sort on intersected side effects
+			Collections.sort(expList, ExplanationComparators.realEffComp);
 			for(IBasicExplanation e: expList)
 				put(e);
 			minSE = expList.get(0).getTargetSideEffectSize();
@@ -151,6 +229,18 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		public void setError(ISingleMarker error) {
 			this.error = error;
 		}
+		
+		public String toString () {
+			StringBuilder result = new StringBuilder();
+			
+			result.append("ONE ERROR EXPL for <");
+			result.append(error);
+			result.append(" subsuming expls \n");
+			result.append(this.idToObj.values().toString());
+			result.append("\nwith min " + minSE + " and max " + maxSE);
+			
+			return result.toString();
+		}
 			
 	}
 	
@@ -178,7 +268,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	private RankedListElement curIterElem;
 	private TreeSet<RankedListElement> sortedSets;
 	private List<OneErrorExplSet> errorExpl;
-	private List<ISingleMarker> errors;
+	private IMarkerSet errors;
+	private List<ISingleMarker> errorList;
+	private int[][][] explainsMatrix;
 	private ExplanationCollection col;
 	private int[] combinedMin;
 	private int[] combinedMax;
@@ -188,7 +280,8 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	public SideEffectExplanationRanker () {
 		sortedSets = new TreeSet<RankedListElement> (RankedListComparator.comp);
 		errorExpl = new ArrayList<OneErrorExplSet> ();
-		errors = new ArrayList<ISingleMarker> ();
+		errors = MarkerFactory.newMarkerSet();
+		errorList = new ArrayList<ISingleMarker> ();
 	}
 	
 	/**
@@ -198,8 +291,17 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	
 	@Override
 	public void initialize(ExplanationCollection coll) {
+		int j;
+		
 		numSets = 1;
 		this.col = coll;
+		
+		explainsMatrix = new int[col.getErrorExplMap().keySet().size()][][];
+		
+		// create set of errors
+		for(ISingleMarker m: col.getErrorExplMap().keySet()) {
+			errors.add(m);
+		}
 		
 		// create data structures for the expl sets for each error
 		for(ISingleMarker m: col.getErrorExplMap().keySet()) {
@@ -208,12 +310,17 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			errorExpl.add(newOne);
 			numSets *= newOne.size();
 		}
+		
 		// sort on min-max span to improve pruning
 		Collections.sort(errorExpl, OneErrorExplSetComparator.comp);
+		for(OneErrorExplSet newOne: errorExpl)
+			errorList.add(newOne.error);
 		
-		// add errors in sort order
+		// remove errors from side-effect to guarantee correct ranking
+		j = 0;
 		for(OneErrorExplSet newOne: errorExpl) {
-			errors.add(newOne.error);
+			generateExplainsMatrix(newOne,j);
+			j++;
 		}
 		
 		numErrors = errors.size();
@@ -224,10 +331,8 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		
 		for(int i = 0; i < combinedMin.length; i++) {
 			OneErrorExplSet one = errorExpl.get(numErrors - i - 1);
-			combinedMin[numErrors - i - 1] = Math.max(one.minSE 
-					,(i != 0 ? combinedMin[numErrors - i] : 0));
-			combinedMax[numErrors - i - 1] = one.maxSE 
-					+ (i != 0 ? combinedMax[numErrors - i] : 0);
+			combinedMin[numErrors - i - 1] = one.minSE;
+			combinedMax[numErrors - i - 1] = one.maxSE; 
 		}
 		
 		for(int i = 0; i < numErrors; i++) {
@@ -242,6 +347,38 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		init = true;
 	}
 
+	private void generateExplainsMatrix (OneErrorExplSet expl, int pos) {
+		List<Integer> overlaps;
+		IBasicExplanation e;
+		IMarkerSet overlap;
+		
+		explainsMatrix[pos] = new int[expl.size()][];
+		
+		for(int i = 0; i < expl.size(); i++) {
+			overlaps = new ArrayList<Integer> ();
+			e = expl.get(i);
+	
+			// get other errors that are covered
+			overlap = errors.cloneSet().intersect(e.getTargetSideEffects());
+			for(ISingleMarker error: overlap) {
+				int errorPos = getPosForError(error);
+				if (errorPos != pos)
+					overlaps.add(errorPos);
+			}
+			Collections.sort(overlaps);
+			explainsMatrix[pos][i] = new int [overlaps.size()];
+			for(int j = 0; j < overlaps.size(); j++)
+				explainsMatrix[pos][i][j] = overlaps.get(j);
+			
+			LoggerUtil.logArray(log, explainsMatrix[pos][i], 
+					"[" + pos + "," + i + "] is ");
+		}
+	}
+	
+	private int getPosForError (ISingleMarker error) {
+		return errorList.indexOf(error);
+	}
+	
 	private void generateUpTo(int upTo) {
 		
 		while(iterDone <= upTo) {
@@ -299,23 +436,16 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	 */
 	
 	private void expandAndInsert(RankedListElement curExp) {
-		sortedSets.remove(curExp);
-		for(int i = 0; i < errorExpl.get(curExp.countSet).size(); i++)
-			sortedSets.add(new RankedListElement (curExp, i));
-			//insertElem(new RankedListElement (curExp, i));
-	}
-	
-	private void insertElem (RankedListElement newElem) {
-		int insertPos;
+		boolean disOverlap;
 		
-//		insertPos = Collections.binarySearch(sortedSets, 
-//				 newElem, RankedListComparator.comp);
-//		log.debug("binary search result " + insertPos);
-//		
-//		insertPos = -insertPos - 1;
-//		
-//		log.debug("insert " + newElem.toString() + " at pos " + insertPos);
-//		sortedSets.add(insertPos, newElem);
+		sortedSets.remove(curExp);
+		disOverlap = curExp.extensionWithoutOverlap();
+		
+		for(int i = 0; i < errorExpl.get(curExp.firstUnset).size(); i++) {
+			RankedListElement newOne = new RankedListElement (curExp, i);
+			if (!disOverlap || !newOne.lastAdditionHasOverlap())
+				sortedSets.add(newOne);
+		}
 	}
 
 	@Override
@@ -335,10 +465,12 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	}
 
 	private IExplanationSet getSetForRankedListElem (RankedListElement elem) {
-		IExplanationSet result = ExplanationFactory.newExplanationSet();		
+		IExplanationSet result = ExplanationFactory.newExplanationSet(
+				ExplanationComparators.sameElemComp);		
 		
-		for(int i = 0; i < elem.countSet; i++)
-			result.add(errorExpl.get(i).get(elem.elem[i]));
+		for(int i = 0; i < elem.elem.length; i++)
+			if (elem.elem[i] > -1)
+				result.addUnique(errorExpl.get(i).get(elem.elem[i]));
 		
 		log.debug("set for iter is \n"  + result.toString());
 		
@@ -348,15 +480,26 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	private void computeSideEffectSize (RankedListElement elem) {
 		IMarkerSet sideEff = MarkerFactory.newMarkerSet();
 		
-		for(int i = 0; i <  elem.countSet; i++)
-			sideEff.union(errorExpl.get(i).get(elem.elem[i]).getTargetSideEffects());
-		
+		elem.min = 0;
+		elem.max = 0;
+		for(int i = 0; i <  elem.elem.length; i++) {
+			if (elem.elem[i] > -1)
+				sideEff.union(errorExpl.get(i).get(elem.elem[i]).getTargetSideEffects());
+			else if (elem.elem[i] != -2){
+				elem.min = Math.max(combinedMin[i], elem.min);
+				elem.max += combinedMax[i];
+			}
+		}
+			
 		elem.realSE = sideEff.getSize();
-		elem.min = Math.max(elem.realSE 
-				, ((elem.countSet != elem.elem.length) 
-						? combinedMin[elem.countSet] : 0));
-		elem.max = elem.realSE + ((elem.countSet != elem.elem.length) 
-				? combinedMax[elem.countSet] : 0);
+		if (elem.isDone()) {
+			elem.min = elem.realSE;
+			elem.max = elem.realSE;
+		}
+		else {
+			elem.min = Math.max(elem.realSE, elem.min);
+			elem.max = elem.realSE + elem.max;
+		}
 	}
 	
 	@Override
@@ -394,6 +537,27 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 	@Override
 	public int getIterPos() {
 		return iterPos + 1;
+	}
+
+	@Override
+	public IExplanationSet previous() {
+		if (--iterPos < 0)
+			throw new NoSuchElementException("try to get element before first");
+		
+		curIterElem = sortedSets.lower(curIterElem);
+		
+		return getSetForRankedListElem (curIterElem);
+	}
+
+	@Override
+	public boolean hasPrevious() {
+		return iterPos > 0;
+	}
+
+	@Override
+	public int getNumberPrefetched() {
+		log.debug("ITER DONE " + (iterDone + 1) + " incomplete " + (sortedSets.size() - iterDone - 1));
+		return iterDone + 1;
 	}
 
 }

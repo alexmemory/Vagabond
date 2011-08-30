@@ -27,6 +27,8 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	protected IAttributeValueMarker error;
 	protected IMarkerSet targetSE;
+	protected IMarkerSet realTargetSE;
+	protected IMarkerSet realExplains;
 	private int hash = -1;
 	
 	static {
@@ -38,11 +40,15 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	public AbstractBasicExplanation () {
 		targetSE = MarkerFactory.newMarkerSet();
+		realTargetSE = MarkerFactory.newMarkerSet();
+		realExplains = MarkerFactory.newMarkerSet();
 	}
 	
 	public AbstractBasicExplanation (ISingleMarker error) {
 		targetSE = MarkerFactory.newMarkerSet();
+		realTargetSE = MarkerFactory.newMarkerSet();
 		this.error = (IAttributeValueMarker) error;
+		realExplains = MarkerFactory.newMarkerSet(error);
 	}
 	
 	
@@ -217,4 +223,23 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		
 	}
 
+	public int getRealTargetSideEffectSize() {
+		return realTargetSE.size();
+	}
+	
+	public IMarkerSet getRealTargetSideEffects() {
+		return realTargetSE;
+	}
+	
+	public void setRealTargetSideEffects(IMarkerSet set) {
+		this.realTargetSE = set;
+	}
+	
+	public IMarkerSet getRealExplains() {
+		return this.realExplains;
+	}
+	
+	public void setRealExplains(IMarkerSet set) {
+		this.realExplains = set;
+	}
 }

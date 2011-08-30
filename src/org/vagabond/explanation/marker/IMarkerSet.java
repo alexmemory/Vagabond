@@ -10,7 +10,10 @@ public interface IMarkerSet extends Set<ISingleMarker> {
 	public Set<ISingleMarker> getElems();
 	public List<ISingleMarker> getElemList();
 	public IMarkerSet union (IMarkerSet other);
+	public IMarkerSet intersect (IMarkerSet other);
+	public IMarkerSet diff (IMarkerSet other);
 	public boolean add (ISingleMarker marker);
 	public boolean contains (String relName, String tid) throws Exception;
 	public String toUserString();
+	public IMarkerSet cloneSet ();
 }

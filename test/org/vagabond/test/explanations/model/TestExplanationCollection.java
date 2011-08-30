@@ -18,6 +18,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
+import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.explanation.ranking.SideEffectExplanationRanker;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -304,7 +305,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		e22 = new CopySourceError();
 		e22.setExplains(error2);
 		e22.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "3")
+				MarkerFactory.newTupleMarker("address", "4")
 				));
 		e22.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|6", "city"),
@@ -394,7 +395,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		e22 = new CopySourceError();
 		e22.setExplains(error2);
 		e22.setSourceSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("address", "3")
+				MarkerFactory.newTupleMarker("address", "5")
 				));
 		e22.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|6", "city"),
@@ -424,6 +425,10 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		assertEquals (0, col.getIterPos());
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.next());
+		col.next();
+		assertEquals (2, col.getIterPos());
+		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
+				col.previous());
 		assertEquals (1, col.getIterPos());
 		assertEquals ("0,0",ExplanationFactory.newExplanationSet(e11,e21),
 				col.next());
@@ -442,6 +447,225 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 			
 		}
 		
+		try {
+			col.resetIter();
+			col.previous();
+			assertTrue(false);
+		} catch (NoSuchElementException e) {
+			
+		}
+		
+	}
+
+	@Test
+	public void testUnqiueness () throws Exception {
+		CopySourceError e11, e12, e22;
+		CorrespondenceError e21, e13;
+		IExplanationSet set1, set2;
+		IAttributeValueMarker error1, error2; 
+				
+		ExplanationCollection col;
+		HashSet<CorrespondenceType> corrs;
+		HashSet<MappingType> maps;
+		
+		error1 = MarkerFactory.newAttrMarker("employee", "8|8", "city");
+		error2 = MarkerFactory.newAttrMarker("employee", "9|9", "city");
+		
+		// copy error
+		e11 = new CopySourceError();
+		e11.setExplains(error1);
+		e11.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e11.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "4|2", "city")
+				));
+	
+//		e12 = new CopySourceError();
+//		e12.setExplains(error1);
+//		e12.setSourceSE(MarkerFactory.newMarkerSet(
+//				MarkerFactory.newTupleMarker("address", "3")
+//				));
+//		e12.setTargetSE(MarkerFactory.newMarkerSet(
+//				error2
+//				));
+		
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		e13 = new CorrespondenceError();
+		e13.setExplains(error1);
+		e13.setCorrespondences(corrs);
+		e13.setMapSE(maps);
+		e13.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "7|2", "city"),
+				error2
+		));
+		
+		// first set
+		set1 = ExplanationFactory.newExplanationSet(e11, e13);
+		
+		///////////////////////////////////////////////////////////////////////
+		
+		// correspondence error
+		corrs = new HashSet<CorrespondenceType> ();
+		corrs.add(MapScenarioHolder.getInstance().getCorr("c2"));
+		maps = new HashSet<MappingType> ();
+		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
+		e21 = new CorrespondenceError();
+		e21.setExplains(error2);
+		e21.setCorrespondences(corrs);
+		e21.setMapSE(maps);
+		e21.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "7|2", "city"),
+				error1
+		));
+	
+		e22 = new CopySourceError();
+		e22.setExplains(error2);
+		e22.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e22.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "1|6", "city"),
+				MarkerFactory.newAttrMarker("employee", "1|5", "city"),
+				MarkerFactory.newAttrMarker("employee", "1|4", "city"),
+				MarkerFactory.newAttrMarker("employee", "f|4", "city")
+				));
+		
+		// set 2
+		set2 = ExplanationFactory.newExplanationSet(e21,e22);
+		
+		/* ensure order in sets */
+		set1.getExplanations();
+		set2.getExplanations();
+		
+		// *** collection
+		col = ExplanationFactory.newExplanationCollection(set1, set2);
+		
+		/* create Dummy Ranker */
+		col.createRanker(new SideEffectExplanationRanker());
+		col.resetIter();
+		
+		assertEquals (0, col.getIterPos());
+		assertTrue ("e13", ExplanationComparators.sameElemComp.compare(col.next().iterator().next(),
+				e13) == 0);
+		assertEquals (1, col.getIterPos());
+		assertEquals ("e11,e22",ExplanationFactory.newExplanationSet(e11,e22),
+				col.next());
+		assertFalse(col.hasNext()); 
 	}
 	
+	@Test
+	public void testMeanOverlap () throws Exception {
+		CopySourceError e11, e12, e21, e22, e23, e31;
+		IExplanationSet set1, set2, set3;
+		IAttributeValueMarker error1, error2, error3; 
+				
+		ExplanationCollection col;
+		
+		error1 = MarkerFactory.newAttrMarker("employee", "1", "city");
+		error2 = MarkerFactory.newAttrMarker("employee", "2", "city");
+		error3 = MarkerFactory.newAttrMarker("employee", "3", "city");
+		
+		// copy error
+		e11 = new CopySourceError();
+		e11.setExplains(error1);
+		e11.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "1")
+				));
+		e11.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E1a", "city"),
+				MarkerFactory.newAttrMarker("employee", "E1b", "city"),
+				error2
+				));
+	
+		e12 = new CopySourceError();
+		e12.setExplains(error1);
+		e12.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e12.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E2", "city"),
+				error2
+				));
+		
+		// first set
+		set1 = ExplanationFactory.newExplanationSet(e11, e12);
+		
+		///////////////////////////////////////////////////////////////////////
+		
+		e21 = new CopySourceError();
+		e21.setExplains(error2);
+		e21.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "1")
+				));
+		e21.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E1a", "city"),
+				MarkerFactory.newAttrMarker("employee", "E1b", "city"),
+				error1
+				));
+	
+		e22 = new CopySourceError();
+		e22.setExplains(error2);
+		e22.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e22.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E2", "city"),
+				error1
+				));
+		
+		e23 = new CopySourceError();
+		e23.setExplains(error2);
+		e23.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e23.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E3", "city"),
+				error3
+				));
+		
+		// set 2
+		set2 = ExplanationFactory.newExplanationSet(e21,e22,e23);
+
+		
+		e31 = new CopySourceError();
+		e31.setExplains(error3);
+		e31.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e31.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E3", "city"),
+				error2
+				));
+		
+		set3 = ExplanationFactory.newExplanationSet(e31);
+		
+		/* ensure order in sets */
+		set1.getExplanations();
+		set2.getExplanations();
+		set3.getExplanations();
+		
+		// *** collection
+		col = ExplanationFactory.newExplanationCollection(set1, set2, set3);
+		
+		/* create Dummy Ranker */
+		col.createRanker(new SideEffectExplanationRanker());
+		col.resetIter();
+		
+		assertEquals (0, col.getIterPos());
+		assertTrue ("e12,e31", ExplanationComparators.setSameElemComp.compare(
+				ExplanationFactory.newExplanationSet(e12,e31), 
+				col.next()) == 0);
+		assertEquals (1, col.getIterPos());
+		assertTrue (col.hasNext());
+		assertTrue ("e11,e31", ExplanationComparators.setSameElemComp.compare(
+				ExplanationFactory.newExplanationSet(e11,e31), 
+				col.next()) == 0);
+		assertFalse(col.hasNext()); 
+	}
 }

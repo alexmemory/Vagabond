@@ -15,5 +15,6 @@ public interface IExplanationSet extends Set<IBasicExplanation> {
 	public IMarkerSet getSideEffects();
 	public IMarkerSet getExplains();
 	public boolean addExplanation(IBasicExplanation expl);
+	public boolean addUnique(IBasicExplanation e);
 	public IExplanationSet union (IExplanationSet other);
 }

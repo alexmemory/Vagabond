@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 
-	private SortedMap<Integer, Type> idToObj;
-	private Map<Type, Integer> ObjToId;
+	protected SortedMap<Integer, Type> idToObj;
+	protected Map<Type, Integer> ObjToId;
 	private int maxId = -1;
 	private int hash = -1;
 	private int iter = -1;

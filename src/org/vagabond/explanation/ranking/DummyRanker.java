@@ -113,6 +113,30 @@ public class DummyRanker implements IExplanationRanker {
 		return numExplSets;
 	}
 
+	private void decreaseIter () {
+		int curPos;
+		Vector<Integer> numExpls;
+		
+		numExpls = coll.getNumExpls();
+		
+		for(int i = 0; i < iterPos.size(); i++) {
+			if (fixedPos[i])
+				continue;
+			
+			curPos = iterPos.get(i);
+			if (curPos > 0)
+			{
+				iterPos.set(i, curPos - 1);
+				curIterPos++;
+				log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);
+				return;
+			}
+			else {
+				iterPos.set(i, numExpls.get(i) - 1);
+			}
+		}
+	}
+	
 	private void increaseIter () {
 		int curPos;
 		Vector<Integer> numExpls;
@@ -178,6 +202,30 @@ public class DummyRanker implements IExplanationRanker {
 	@Override
 	public int getIterPos() {
 		return curIterPos + 1;
+	}
+
+	@Override
+	public IExplanationSet previous() {
+		IExplanationSet set;
+		
+		assert(hasPrevious());
+		
+		decreaseIter ();
+		set = generateExplForIter(iterPos);
+		
+		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
+		
+		return set;
+	}
+
+	@Override
+	public boolean hasPrevious() {
+		return curIterPos > 0;
+	}
+
+	@Override
+	public int getNumberPrefetched() {
+		return 0;
 	}
 
 	

@@ -37,7 +37,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	}
 	
 	public int getNumCombinations() {
-		return totalExpls;
+		return ranker.getNumberOfExplSets();
 	}
 	
 	public void addExplSet (ISingleMarker marker, IExplanationSet expls) {
@@ -102,6 +102,13 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		return ranker.getIterPos();
 	}
 
+	public boolean hasPrevious() {
+		return ranker.hasPrevious();
+	}
+	
+	public IExplanationSet previous() {
+		return ranker.previous();
+	}
 	
 	@Override
 	public String toString () {
@@ -185,5 +192,9 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	@Override
 	public IExplanationSet next() {
 		return ranker.next();
+	}
+	
+	public int getNumPrefetched () {
+		return ranker.getNumberPrefetched();
 	}
 }

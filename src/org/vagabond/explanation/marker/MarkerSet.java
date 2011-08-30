@@ -172,5 +172,29 @@ public class MarkerSet implements IMarkerSet {
 	public boolean contains(String relName, String tid) throws Exception {
 		return this.contains(MarkerFactory.newTupleMarker(relName, tid));
 	}
+
+	@Override
+	public IMarkerSet intersect(IMarkerSet other) {
+		retainAll(other);
+		return this;
+	}
+	
+	
+
+	@Override
+	public IMarkerSet cloneSet() {
+		MarkerSet clone = new MarkerSet();
+		
+		for(ISingleMarker m: this.markers)
+			clone.add(m);
+		
+		return clone;
+	}
+
+	@Override
+	public IMarkerSet diff(IMarkerSet other) {
+		this.removeAll(other);
+		return this;
+	}
 	
 }

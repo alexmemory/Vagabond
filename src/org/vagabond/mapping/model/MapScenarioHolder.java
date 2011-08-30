@@ -248,7 +248,7 @@ public class MapScenarioHolder {
 	public CorrespondenceType getCorr (String name) throws Exception {
 		for (CorrespondenceType corr: doc.getMappingScenario()
 				.getCorrespondences().getCorrespondenceArray()) {
-			if (corr.getId().equals(name))
+			if (corr.getId().toUpperCase().equals(name))
 				return corr;
 		}
 		

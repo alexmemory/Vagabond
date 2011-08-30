@@ -17,6 +17,9 @@ public interface IExplanationRanker extends Iterator<IExplanationSet> {
 	public void confirmExplanation (IBasicExplanation correctExpl);
 	
 	public int getIterPos();
+	public IExplanationSet previous();
+	public boolean hasPrevious();
 	public int getNumberOfExplSets ();
+	public int getNumberPrefetched ();
 	public void resetIter();
 }
