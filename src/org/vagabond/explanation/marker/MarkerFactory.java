@@ -1,5 +1,7 @@
 package org.vagabond.explanation.marker;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
@@ -28,6 +30,17 @@ public class MarkerFactory {
 		 }
 		 
 		 return result;
+	}
+	
+	public static IMarkerSet newMarkerSet (Collection<ISingleMarker> markers) {
+		MarkerSet result;
+		
+		result = new MarkerSet();
+		
+		for (ISingleMarker marker: markers)
+			result.add(marker);
+		
+		return result;
 	}
 	
 	public static IAttributeValueMarker newAttrMarker () {

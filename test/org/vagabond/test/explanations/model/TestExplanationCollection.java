@@ -220,23 +220,35 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col.createRanker(new DummyRanker());
 		
 		col.resetIter();
-		
+		assertEquals(4, col.getNumCombinations());
+		assertEquals(0, col.getIterPos());
 		assertEquals ("0,0", ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(0)),
 				col.next());
+		assertEquals(1, col.getIterPos());
 		assertEquals ("1,0",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(0)),
 				col.next());
+		assertEquals(2, col.getIterPos());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.next());
+		assertEquals(3, col.getIterPos());
+		assertTrue(col.hasNext());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(1)),
 				col.next());
+		assertFalse(col.hasNext());
+		assertEquals(4,col.getIterPos());
+		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
+				set1.getExplanations().get(0), 
+				set2.getExplanations().get(1)),
+				col.previous());
+		assertEquals(3,col.getIterPos());
 		
 		col.confirmExplanation(set2.getExplanations().get(1));
 		col.resetIter();
@@ -245,10 +257,17 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.next());
+		assertEquals(1, col.getIterPos());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(1)),
 				col.next());
+		assertEquals(2, col.getIterPos());
+		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
+				set1.getExplanations().get(0), 
+				set2.getExplanations().get(1)),
+				col.previous());
+		assertEquals(1, col.getIterPos());
 	}
 	
 	@Test

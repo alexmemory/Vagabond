@@ -3,10 +3,13 @@ package org.vagabond.explanation.ranking;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -33,7 +36,7 @@ public class DummyRanker implements IExplanationRanker {
 	
 	@Override
 	public boolean hasNext() {
-		return compareVec (iterPos, coll.getNumExpls()) < 0;
+		return curIterPos < numExplSets - 1;
 	}
 
 	@Override
@@ -42,10 +45,12 @@ public class DummyRanker implements IExplanationRanker {
 		
 		assert(hasNext());
 		
-		set = generateExplForIter(iterPos);
+		log.debug("cur iter pos = " + iterPos.toString());
+
 		increaseIter ();
+		set = generateExplForIter(iterPos);
 		
-		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
+//		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
 		
 		return set;
 	}
@@ -57,6 +62,9 @@ public class DummyRanker implements IExplanationRanker {
 
 	@Override
 	public void initialize(ExplanationCollection coll) {
+		List<IBasicExplanation> expList;
+		IMarkerSet errors;
+		
 		this.coll = coll;
 		int numErrors = coll.getNumErrors();
 		
@@ -65,8 +73,23 @@ public class DummyRanker implements IExplanationRanker {
 			iterPos.add(0);
 			numExplSets *= coll.getDimensions().get(i);
 		}
+		iterPos.set(0, -1);
 		fixedPos = new boolean[numErrors];
 		Arrays.fill(fixedPos, false);
+		
+		errors = MarkerFactory.newMarkerSet(coll.getErrorExplMap().keySet());
+		for(ISingleMarker error: errors) {
+			IExplanationSet explSet = coll.getErrorExplMap().get(error);
+			// remove errors from side effects and add them to explains
+			for(IBasicExplanation e: explSet) {
+				e.setRealTargetSideEffects(e.getTargetSideEffects().cloneSet()
+						.diff(errors));
+				e.getRealExplains().union(
+						e.getTargetSideEffects().cloneSet().intersect(errors));
+			}
+		
+			expList = explSet.getExplanations();
+		}
 		
 		init = true;
 	}
@@ -102,6 +125,8 @@ public class DummyRanker implements IExplanationRanker {
 			if (!fixedPos[i])
 				iterPos.set(i, 0);
 		}
+		iterPos.set(0, -1);
+		curIterPos = -1; 
 	}
 
 	@Override
@@ -127,7 +152,7 @@ public class DummyRanker implements IExplanationRanker {
 			if (curPos > 0)
 			{
 				iterPos.set(i, curPos - 1);
-				curIterPos++;
+				curIterPos--;
 				log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);
 				return;
 			}
@@ -135,6 +160,11 @@ public class DummyRanker implements IExplanationRanker {
 				iterPos.set(i, numExpls.get(i) - 1);
 			}
 		}
+		
+		for(int i = 0; i < iterPos.size(); i++)
+			if (!fixedPos[i])
+				iterPos.set(i, 0);
+		curIterPos--;
 	}
 	
 	private void increaseIter () {
@@ -160,9 +190,12 @@ public class DummyRanker implements IExplanationRanker {
 			}
 		}
 		
-		log.debug("iterator reached end: <" + iterPos + ">");
 		for(int i = 0; i < iterPos.size(); i++)
-			iterPos.set(i, numExpls.get(i));
+			if (!fixedPos[i])
+				iterPos.set(i, numExpls.get(i) -1);
+		
+		curIterPos++;
+		log.debug("iterator reached end: <" + iterPos + "> : " + curIterPos);
 	}
 		
 	private int compareVec (Vector<Integer> left, Vector<Integer> right) {
@@ -172,9 +205,9 @@ public class DummyRanker implements IExplanationRanker {
 			return -1;
 		
 		for(int i = 0; i < left.size(); i++) {
-			if (left.get(i) < right.get(i))
+			if (left.get(i) < right.get(i) - 1)
 				return -1;
-			if (left.get(i) > right.get(i))
+			if (left.get(i) > right.get(i) - 1)
 				return 1;
 		}
 		
@@ -211,6 +244,7 @@ public class DummyRanker implements IExplanationRanker {
 		assert(hasPrevious());
 		
 		decreaseIter ();
+		log.debug("cur iter pos = " + iterPos.toString());
 		set = generateExplForIter(iterPos);
 		
 		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
