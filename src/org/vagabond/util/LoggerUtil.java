@@ -6,7 +6,9 @@ package org.vagabond.util;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 
 /**
@@ -22,11 +24,13 @@ public class LoggerUtil {
 	}
 	
 	public static void logException (Exception e, Logger log, String message) {
+		if (log.isEnabledFor(Level.ERROR))
 		log.error(message + "\n\n" + getCompleteTrace(e));
 	}
 	
 	public static void logDebugException (Exception e, Logger log) {
-		log.debug(getCompleteTrace(e));
+		if (log.isDebugEnabled())
+			log.debug(getCompleteTrace(e));
 	}
 	
 	public static String getCompleteTrace (Exception e) {
@@ -102,6 +106,9 @@ public class LoggerUtil {
 	public static void logArray (Logger log, int[] array, String message) {
 		StringBuffer result = new StringBuffer();
 		
+		if (!log.isDebugEnabled())
+			return;
+		
 		if (message != null)
 			result.append(message + ":\n");
 		
@@ -115,7 +122,12 @@ public class LoggerUtil {
 	}
 		
 	public static void logArray (Logger log, Object[] array, String message) {
-		StringBuffer result = new StringBuffer();
+		StringBuffer result;
+		
+		if (!log.isDebugEnabled())
+			return;
+		
+		result = new StringBuffer();
 		
 		if (message != null)
 			result.append(message + ":\n");

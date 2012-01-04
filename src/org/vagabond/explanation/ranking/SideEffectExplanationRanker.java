@@ -90,8 +90,10 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			updateFirstUnset();
 			computeSideEffectSize(this);
 			
-			log.debug("extended set " + prefix.toString() + " to " 
-					+ toString());
+			if (log.isDebugEnabled()) {
+				log.debug("extended set " + prefix.toString() + " to " 
+						+ toString());
+			}
 		}
 		
 		private void updateFirstUnset () {
@@ -335,8 +337,10 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			combinedMax[numErrors - i - 1] = one.maxSE; 
 		}
 		
-		for(int i = 0; i < numErrors; i++) {
-			log.debug("min " + combinedMin[i] + " max " + combinedMax[i]);
+		if (log.isDebugEnabled()) {
+			for(int i = 0; i < numErrors; i++) {
+				log.debug("min " + combinedMin[i] + " max " + combinedMax[i]);
+			}
 		}
 		
 		// initialize the sorted list with one expl, explanations
@@ -472,7 +476,8 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			if (elem.elem[i] > -1)
 				result.addUnique(errorExpl.get(i).get(elem.elem[i]));
 		
-		log.debug("set for iter is \n"  + result.toString());
+		if (log.isDebugEnabled())
+			log.debug("set for iter is \n"  + result.toString());
 		
 		return result;
 	}
@@ -556,7 +561,9 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public int getNumberPrefetched() {
-		log.debug("ITER DONE " + (iterDone + 1) + " incomplete " + (sortedSets.size() - iterDone - 1));
+		if (log.isDebugEnabled())
+			log.debug("ITER DONE " + (iterDone + 1) + " incomplete " 
+					+ (sortedSets.size() - iterDone - 1));
 		return iterDone + 1;
 	}
 
