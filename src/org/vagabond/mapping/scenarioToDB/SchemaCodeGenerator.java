@@ -1,5 +1,7 @@
 package org.vagabond.mapping.scenarioToDB;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
@@ -44,9 +46,10 @@ public class SchemaCodeGenerator {
 	 * 
 	 * @param map
 	 * @return DDL script as a String.
+	 * @throws Exception 
 	 */
 	
-	public String getSchemaPlusInstanceCode (MappingScenario map) {
+	public String getSchemaPlusInstanceCode (MappingScenario map) throws Exception {
 		StringBuffer result = new StringBuffer ();
 		
 		getSchemasCode(map, result, false);
@@ -356,9 +359,10 @@ public class SchemaCodeGenerator {
 	 * 
 	 * @param map the mapping scenario.
 	 * @return DDL code as a String.
+	 * @throws Exception 
 	 */
 	
-	public String getInstanceCode (MappingScenario map) {
+	public String getInstanceCode (MappingScenario map) throws Exception {
 		return getInstanceCode(map, null);
 	}
 	
@@ -368,9 +372,10 @@ public class SchemaCodeGenerator {
 	 * @param map the mapping scenario.
 	 * @param schemaName The name of the source schema.
 	 * @return DDL code as a String
+	 * @throws Exception 
 	 */
 	
-	public String getInstanceCode (MappingScenario map, String schemaName) {
+	public String getInstanceCode (MappingScenario map, String schemaName) throws Exception {
 		StringBuffer result = new StringBuffer();
 		
 		schemaName = getSchemaString(schemaName);
@@ -385,9 +390,10 @@ public class SchemaCodeGenerator {
 	 * @param map The mapping scenario.
 	 * @param schemaName The name of the source schema.	 
 	 * @param result StringBuffer to hold the code.
+	 * @throws Exception 
 	 */
 	
-	private void getInstanceCode (MappingScenario map, String schemaName, StringBuffer result) {
+	private void getInstanceCode (MappingScenario map, String schemaName, StringBuffer result) throws Exception {
 		schemaName = getSchemaString(schemaName);
 	
 		for (RelInstanceType inst: map.getData().getInstanceArray()) {
@@ -464,9 +470,10 @@ public class SchemaCodeGenerator {
 	 * @param schemaName The name of the schema.
 	 * @param inst The CSV file to load from.
 	 * @return Code as a String.
+	 * @throws Exception 
 	 */
 	
-	public String getCopy (String schemaName, RelInstanceFileType inst) {
+	public String getCopy (String schemaName, RelInstanceFileType inst) throws Exception {
 		StringBuffer result;
 		
 		result = new StringBuffer();
@@ -486,7 +493,7 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getCopy (String schemaName, 
-			RelInstanceFileType inst, StringBuffer result) {
+			RelInstanceFileType inst, StringBuffer result) throws Exception {
 		String delim;
 		String path;
 		
@@ -495,8 +502,19 @@ public class SchemaCodeGenerator {
 		if (!path.endsWith("/"))
 			path += "/";
 		path += inst.getFileName();
+		
+		path = getAbsolutePath(path);
+		
 		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
 				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+	}
+	
+	private String getAbsolutePath (String pathString) throws Exception {
+		File path;
+		
+		path = new File(pathString);
+		
+		return path.getAbsolutePath();
 	}
 }
 

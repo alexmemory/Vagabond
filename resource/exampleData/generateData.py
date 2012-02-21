@@ -56,8 +56,8 @@ def generateSoupKitchen(attributes, maxInt=100000, numTuples=100000, delimiter='
     for the foreign keys from table tramp and socialworker.'''
     data = []
     locations = []
-    for i in range(numTuples):
-        line = ''
+    for tid in range(numTuples):
+        line = str(tid) + ','
         i = 0 # index for locations
         for attr in attributes:
             attrValue = ''
@@ -65,6 +65,7 @@ def generateSoupKitchen(attributes, maxInt=100000, numTuples=100000, delimiter='
                 attrLength = int(attr[8:-1])
                 attrValue = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(random.randint(1,attrLength)))
                 if i == 0:
+                    attrValue += str(tid) # primary key
                     locations.append(attrValue)
             elif attr.startswith('int'):
                 attrValue = random.randint(1, maxInt)
@@ -82,8 +83,8 @@ def generateSocialWorker(attributes, locations, maxStrLength=10, maxInt=100000, 
     for the foreign keys from table tramp.'''
     data = []
     ssns = []
-    for i in range(numTuples):
-        line = ''
+    for tid in range(numTuples):
+        line = str(tid) + ','
         i = 0 # index for ssn's
         for attr in attributes:
             attrValue = ''
@@ -96,6 +97,7 @@ def generateSocialWorker(attributes, locations, maxStrLength=10, maxInt=100000, 
             elif attr.startswith('int'):
                 attrValue = random.randint(1, maxInt)
                 if i == 0:
+                    attrValue = attrValue * (10 ** len(str(tid))) + tid # add tid to the end to make it unique
                     ssns.append(attrValue)
             else:
                 raise exception('datatype not supported: %s' % a)
@@ -109,8 +111,8 @@ def generateSocialWorker(attributes, locations, maxStrLength=10, maxInt=100000, 
 def generateTramp(attributes, locations, ssnList, maxStrLength=10, maxInt=100000, numTuples=100000, delimiter=','):
     '''This method needs only to return the data'''
     data = []
-    for i in range(numTuples):
-        line = ''
+    for tid in range(numTuples):
+        line = str(tid) + ','
         i = 0 # index for ssn's
         for attr in attributes:
             attrValue = ''
@@ -120,6 +122,8 @@ def generateTramp(attributes, locations, ssnList, maxStrLength=10, maxInt=100000
                 else: # Not the attribute for locations
                     attrLength = int(attr[8:-1])
                     attrValue = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(random.randint(1,attrLength)))
+                    if i == 0: # primary key
+                        attrValue += str(tid)
             elif attr.startswith('int'):
                 if i == 3: # ssn
                     attrValue = ssnList[random.randint(0, len(ssnList)-1)]

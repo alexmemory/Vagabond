@@ -26,27 +26,27 @@ public class DatabaseScenarioLoader {
 		return instance;
 	}
 	
-	public void loadScenario (Connection dbCon) throws SQLException {
+	public void loadScenario (Connection dbCon) throws Exception {
 		loadScenario (dbCon, MapScenarioHolder.getInstance());
 	}
 	
-	public void loadScenarioNoData (Connection dbCon) throws SQLException {
+	public void loadScenarioNoData (Connection dbCon) throws Exception {
 		loadScenarioNoData(dbCon, MapScenarioHolder.getInstance());
 	}
 	
 	public void loadScenarioNoData (Connection dbCon, MapScenarioHolder map) 
-			throws SQLException {
+			throws Exception {
 		loadScenario (dbCon, map, true);
 	}
 	
 	public void loadScenario (Connection dbCon, MapScenarioHolder map) 
-			throws SQLException {
+			throws Exception {
 		loadScenario (dbCon, map, false);
 	}
 	
 	private void loadScenario (Connection dbCon, MapScenarioHolder map, 
 			boolean noData) 
-			throws SQLException {
+			throws Exception {
 		String ddl;
 		
 		ddl = SchemaCodeGenerator.getInstance().
@@ -71,7 +71,7 @@ public class DatabaseScenarioLoader {
 		st.close();
 	}
 	
-	private void loadData (Connection dbCon, DataType data) throws SQLException {
+	private void loadData (Connection dbCon, DataType data) throws Exception {
 		Statement st;
 		
 		st = dbCon.createStatement();

@@ -46,7 +46,7 @@ public class CommandLineLoader {
 	}
 	
 	private void loadScenario (File xmlDoc) 
-			throws XmlException, IOException, ValidationException {
+			throws Exception {
 		map = ModelLoader.getInstance().load(xmlDoc);
 		options.setDBOptions(map.getScenario());
 	}
@@ -59,7 +59,7 @@ public class CommandLineLoader {
 		parser.parseArgument(args);
 	}
 	
-	public void executeOnDB () throws SQLException, ClassNotFoundException {
+	public void executeOnDB () throws Exception {
 		Connection dbCon;
 		
 		dbCon = ConnectionManager.getInstance().getConnection(
