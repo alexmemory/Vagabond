@@ -58,7 +58,7 @@ public class TestCopyCSBatch {
 
 	private static String getQuery(String tids) throws FileNotFoundException,
 			IOException {
-		QueryHolder.getInstance().loadFromDir(new File ("resource/exampleTests"));
+		QueryHolder.getInstance().loadFromDir(new File ("examples"));
 		String query = QueryHolder.getQuery("TestCopyCSBatch.GetProv")
 						.parameterize("target.person",tids,"livesin");
 		return query;

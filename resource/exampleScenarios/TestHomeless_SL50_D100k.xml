@@ -106,7 +106,7 @@ WHERE s.worksfor = k.location
 </Transformations>
 <ConnectionInfo>
 	<Host>localhost</Host>
-	<DB>test</DB>
+	<DB>tramptest</DB>
 	<User>jiang</User>
 	<Password/>
 </ConnectionInfo>
