@@ -55,7 +55,7 @@ def generateErrMarkers(errPercentage=10):
     data = []
     tidList = getTidList()
     errTidList = random.sample(tidList, len(tidList)*errPercentage/100)
-    maxBitValue = 3 # 4 bits: 1111
+    maxBitValue = 3 # 2 bits: 11
     maxDigits = int(math.sqrt(maxBitValue+1))
     for errTid in errTidList:
         attrValue = random.randint(1, maxBitValue)
