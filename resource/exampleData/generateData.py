@@ -45,12 +45,14 @@ def generateTables(tables):
         tableData = generateTramp(locations = locs, ssnList = ssns, attributes = tables.get('tramp'))
         writeToFile(tableData, 'tramp.csv')
         
+
 def writeToFile(lineList, fileName):
     outFile = file(fileName, 'w')
     lineList = map(lambda(x): str(x)+'\n', lineList)
     outFile.writelines(lineList)
     outFile.close()
     
+
 def generateSoupKitchen(attributes, maxInt=100000, numTuples=100000, delimiter=','):
     '''This method needs to return both the data it generates and the list of values for locations
     for the foreign keys from table tramp and socialworker.'''
