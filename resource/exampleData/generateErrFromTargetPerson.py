@@ -30,7 +30,7 @@ class Usage(Exception):
     
 def generateTables():
     tableData = generateErrMarkers()
-    writeToFile(tableData, 'errMarkers.csv')
+    writeToFile(tableData, '../../build/macloader/resource/exampleData/errMarkers.csv')
         
 
 def writeToFile(lineList, fileName):
@@ -61,7 +61,7 @@ def generateErrMarkers(errPercentage=10):
         attrValue = random.randint(1, maxBitValue)
         errMarker = bin(attrValue)[2:]
         if len(errMarker) < maxDigits:
-            errMarker = '0'*(maxDigits-len(errMarker))+errMarker
+            errMarker = '0'*(maxDigits-len(errMarker))+errMarker # padding
         data.append('person,'+errTid+','+errMarker)
     return data
     

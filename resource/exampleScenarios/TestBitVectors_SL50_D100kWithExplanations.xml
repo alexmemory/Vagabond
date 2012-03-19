@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!--  This scenario has a tree structure for source
+             U
+        |----+----|
+        S1        S2
+    |---+---|  |---+---|
+    R1      R2 R3      R4
+    
+ R1(A1, B1), R2(A2, B1), S1(B1, C)
+ R3(A3, B2), R4(A4, B2), S2(B2, C)
+ U(C, D)
+ 
+ Target is T(A, B, C, D):
+ ( ( (R1 join S1) union all (R2 join S1) ) join U )
+              union all
+ ( ( (R3 join S2) union all (R4 join S2) ) join U )
+ 
+ or:
+ ( ( (R1 union all R2) join S1 )
+  union all
+ ( (R3 union all R4) join S2 ) )
+  join U
+ -->
+<Schemas>
+	<SourceSchema>
+		<Relation name="R1">
+			<Attr><Name>A1</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>B1</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>A1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="R2">
+			<Attr><Name>A2</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>B1</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>A2</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="S1">
+			<Attr><Name>B1</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>C</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>B1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="R3">
+			<Attr><Name>A3</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>B2</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>A3</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="R4">
+			<Attr><Name>A4</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>B2</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>A4</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="S2">
+			<Attr><Name>B2</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>C</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>B2</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="U">
+			<Attr><Name>C</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>D</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>C</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="r1">
+			<From tableref="R1"><Attr>B1</Attr></From>
+			<To tableref="S1"><Attr>B1</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="r2">
+			<From tableref="R2"><Attr>B1</Attr></From>
+			<To tableref="S1"><Attr>B1</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="s1">
+			<From tableref="S1"><Attr>C</Attr></From>
+			<To tableref="U"><Attr>C</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="r3">
+			<From tableref="R3"><Attr>B2</Attr></From>
+			<To tableref="S2"><Attr>B2</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="r4">
+			<From tableref="R4"><Attr>B2</Attr></From>
+			<To tableref="S2"><Attr>B2</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="s2">
+			<From tableref="S2"><Attr>C</Attr></From>
+			<To tableref="U"><Attr>C</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="T">
+			<Attr><Name>A</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>B</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>C</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>D</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>C</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="R1"><Attr>A1</Attr></From>
+		<To tableref="T"><Attr>A</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="R2"><Attr>A2</Attr></From>
+		<To tableref="T"><Attr>A</Attr></To>
+	</Correspondence>
+	<Correspondence id="c3">
+		<From tableref="R3"><Attr>A3</Attr></From>
+		<To tableref="T"><Attr>A</Attr></To>
+	</Correspondence>
+	<Correspondence id="c4">
+		<From tableref="R4"><Attr>A4</Attr></From>
+		<To tableref="T"><Attr>A</Attr></To>
+	</Correspondence>
+	<Correspondence id="c5">
+		<From tableref="R1"><Attr>B1</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c6">
+		<From tableref="R2"><Attr>B1</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c7">
+		<From tableref="R3"><Attr>B2</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c8">
+		<From tableref="R4"><Attr>B2</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c9">
+		<From tableref="S1"><Attr>B1</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c10">
+		<From tableref="S2"><Attr>B2</Attr></From>
+		<To tableref="T"><Attr>B</Attr></To>
+	</Correspondence>
+	<Correspondence id="c11">
+		<From tableref="S1"><Attr>C</Attr></From>
+		<To tableref="T"><Attr>C</Attr></To>
+	</Correspondence>
+	<Correspondence id="c12">
+		<From tableref="S2"><Attr>C</Attr></From>
+		<To tableref="T"><Attr>C</Attr></To>
+	</Correspondence>
+	<Correspondence id="c13">
+		<From tableref="U"><Attr>C</Attr></From>
+		<To tableref="T"><Attr>C</Attr></To>
+	</Correspondence>
+	<Correspondence id="c14">
+		<From tableref="U"><Attr>D</Attr></From>
+		<To tableref="T"><Attr>D</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+			<Correspondence>c5</Correspondence>
+			<Correspondence>c9</Correspondence>
+			<Correspondence>c11</Correspondence>
+			<Correspondence>c13</Correspondence>
+			<Correspondence>c14</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="R1"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="S1"><Var>b</Var><Var>i</Var></Atom>
+			<Atom tableref="U"><Var>i</Var><Var>m</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="T"><Var>a</Var><Var>b</Var><Var>i</Var><Var>m</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Uses>
+			<Correspondence>c2</Correspondence>
+			<Correspondence>c6</Correspondence>
+			<Correspondence>c9</Correspondence>
+			<Correspondence>c11</Correspondence>
+			<Correspondence>c13</Correspondence>
+			<Correspondence>c14</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="R2"><Var>c</Var><Var>d</Var></Atom>
+			<Atom tableref="S1"><Var>d</Var><Var>j</Var></Atom>
+			<Atom tableref="U"><Var>j</Var><Var>n</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="T"><Var>c</Var><Var>d</Var><Var>j</Var><Var>n</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M3">
+		<Uses>
+			<Correspondence>c3</Correspondence>
+			<Correspondence>c7</Correspondence>
+			<Correspondence>c10</Correspondence>
+			<Correspondence>c12</Correspondence>
+			<Correspondence>c13</Correspondence>
+			<Correspondence>c14</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="R3"><Var>e</Var><Var>f</Var></Atom>
+			<Atom tableref="S2"><Var>f</Var><Var>k</Var></Atom>
+			<Atom tableref="U"><Var>k</Var><Var>o</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="T"><Var>e</Var><Var>f</Var><Var>k</Var><Var>o</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M4">
+		<Uses>
+			<Correspondence>c4</Correspondence>
+			<Correspondence>c8</Correspondence>
+			<Correspondence>c10</Correspondence>
+			<Correspondence>c12</Correspondence>
+			<Correspondence>c13</Correspondence>
+			<Correspondence>c14</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="R4"><Var>g</Var><Var>h</Var></Atom>
+			<Atom tableref="S2"><Var>h</Var><Var>l</Var></Atom>
+			<Atom tableref="U"><Var>l</Var><Var>p</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="T"><Var>g</Var><Var>h</Var><Var>l</Var><Var>p</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="T">
+		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping><Mapping>M3</Mapping><Mapping>M4</Mapping></Implements>
+		<Code>
+SELECT tid_ || '|' || 'U_' || COALESCE(U.tid::text,'') as tid,
+    a, b, U.c as c, U.D as d
+FROM (SELECT 'R1_' || COALESCE(R1.tid::text,'') || '|' || 'S1_' || COALESCE(S1.tid::text,'') AS tid_,
+          R1.a1 AS a, S1.b1 AS b
+      FROM source.R1 AS R1, source.S1 AS S1
+      WHERE R1.b1 = S1.b1
+          UNION ALL
+      SELECT 'R2_' || COALESCE(R2.tid::text,'') || '|' || 'S1_' || COALESCE(S1.tid::text,'') AS tid_,
+          R2.a2 AS a, S1.b1 AS b
+      FROM source.R2 AS R2, source.S1 AS S1
+      WHERE R2.b1 = S1.b1) AS _S1, source.U AS U
+UNION ALL
+SELECT tid_ || '|' || 'U_' || COALESCE(U.tid::text,'') as tid,
+    a, b, U.c as c, U.D as d
+FROM (SELECT 'R3_' || COALESCE(R3.tid::text,'') || '|' || 'S2_' || COALESCE(S2.tid::text,'') AS tid_,
+          R3.a3 AS a, S2.b2 AS b
+      FROM source.R3 AS R3, source.S2 AS S2
+      WHERE R3.b2 = S2.b2
+          UNION ALL
+      SELECT 'R4_' || COALESCE(R4.tid::text,'') || '|' || 'S2_' || COALESCE(S2.tid::text,'') AS tid_,
+          R4.a4 AS a, S2.b2 AS b
+      FROM source.R4 AS R4, source.S2 AS S2
+      WHERE R4.b2 = S2.b2) AS _S2, source.U AS U
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>jiang</User>
+	<Password/>
+</ConnectionInfo>
+<Data>
+	<InstanceFile name="R1">
+		<Path>resource/exampleData</Path>
+		<FileName>R1.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="R2">
+		<Path>resource/exampleData</Path>
+		<FileName>R2.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="S1">
+		<Path>resource/exampleData</Path>
+		<FileName>S1.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="R3">
+		<Path>resource/exampleData</Path>
+		<FileName>R3.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="R4">
+		<Path>resource/exampleData</Path>
+		<FileName>R4.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="S2">
+		<Path>resource/exampleData</Path>
+		<FileName>S2.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="U">
+		<Path>resource/exampleData</Path>
+		<FileName>U.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+</Data>
+</this:MappingScenario>

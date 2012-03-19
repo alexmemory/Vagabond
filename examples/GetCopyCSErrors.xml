@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>GetCopyCSErrors</comment>
+
+<entry key="GetProv">
+EXPLAIN ANALYZE (
+SELECT 
+    errors.rel,
+    errors.tid,
+    errors.att,
+    prov_source_tramp_tid ,
+    prov_source_soupkitchen_tid ,
+    prov_source_socialworker_tid ,
+    prov_source_socialworker_1_tid
+FROM 
+    (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid,name 
+    FROM target.person) AS prov,
+    (SELECT * FROM errm WHERE att &amp; 'B10'::varbit != 'B00'::varbit) AS errors
+WHERE errors.tid = prov.tid
+UNION ALL
+SELECT 
+    errors.rel,
+    errors.tid,
+    errors.att,
+    prov_source_tramp_tid ,
+    prov_source_soupkitchen_tid ,
+    prov_source_socialworker_tid ,
+    prov_source_socialworker_1_tid
+FROM 
+    (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid,livesin 
+    FROM target.person) AS prov,
+    (SELECT * FROM errm WHERE att &amp; 'B01'::varbit != 'B00'::varbit) AS errors
+WHERE errors.tid = prov.tid  
+)
+</entry>
+
+
+
+</properties>

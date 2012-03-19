@@ -35,14 +35,14 @@ class Schema:
     def getTables(self):
         return self.tables
     
-def generateTables(tables):
-        tableData, locs = generateSoupKitchen(attributes = tables.get('soupkitchen'))
+def generateTables(tables, maxInteger=100000, cardinality=100000):
+        tableData, locs = generateSoupKitchen(attributes = tables.get('soupkitchen'), maxInt = maxInteger, numTuples = cardinality)
         writeToFile(tableData, 'soupkitchen.csv')
 
-        tableData, ssns = generateSocialWorker(locations = locs, attributes = tables.get('socialworker'))
+        tableData, ssns = generateSocialWorker(locations = locs, attributes = tables.get('socialworker'), maxInt = maxInteger, numTuples = cardinality)
         writeToFile(tableData, 'socialworker.csv')
 
-        tableData = generateTramp(locations = locs, ssnList = ssns, attributes = tables.get('tramp'))
+        tableData = generateTramp(locations = locs, ssnList = ssns, attributes = tables.get('tramp'), maxInt = maxInteger, numTuples = cardinality)
         writeToFile(tableData, 'tramp.csv')
         
 
@@ -142,11 +142,12 @@ def generateTramp(attributes, locations, ssnList, maxStrLength=10, maxInt=100000
 
 
 def main(argv=None):
+    cardinality = 100000
     if argv is None:
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], "ho:v", ["help", "output="])
+            opts, args = getopt.getopt(argv[1:], "hoc:v", ["help", "output=", "cardinality="])
         except getopt.error, msg:
             raise Usage(msg)
     
@@ -158,9 +159,11 @@ def main(argv=None):
                 raise Usage(help_message)
             if option in ("-o", "--output"):
                 output = value
+            if option in ("-c", "--cardinality"):
+                cardinality = int(value)
                 
         schema = Schema()
-        generateTables(schema.getTables())
+        generateTables(schema.getTables(), cardinality = cardinality)
     
     except Usage, err:
         print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
