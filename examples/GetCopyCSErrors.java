@@ -17,72 +17,10 @@ import org.vagabond.util.ResultSetUtil;
 
 public class GetCopyCSErrors {
 
-	static {
-		PropertyConfigurator.configure("resource/test/testLog4jproperties.txt");
-	}
-	
 	public static void main(String args[]) throws Exception {
-
-		// String numMarkers = args[0];
-		int ROUNDS = 5;
-		Connection con = TestOptions.getInstance().getConnection();
 		
-		String query = getQuery();
-		ArrayList<Double> results = runQueryWithRounds(ROUNDS, con, query);
+		GatherStats4Query.gatherStats("GetCopyCSErrors");
 
-		con.close();
-		
-		double finalAverage = getAverage(ROUNDS, results);
-		double finalMedian = getMedian(ROUNDS, results);
-		// System.out.println("Number of error markers: " + numMarkers);
-		System.out.println("Running rounds: "+ ROUNDS);
-		System.out.println("Average time spent: " + finalAverage);
-		System.out.println("Median time spent: " + finalMedian);
-	}
-
-	private static String getQuery() throws FileNotFoundException,
-			IOException {
-		QueryHolder.getInstance().loadFromDir(new File ("examples"));
-		String query = QueryHolder.getQuery("GetCopyCSErrors.GetProv").parameterize();
-		return query;
-	}
-
-	private static ArrayList<Double> runQueryWithRounds(int ROUNDS, 
-			Connection con, String query) throws SQLException,
-			ClassNotFoundException {
-		ArrayList<Double> results = new ArrayList<Double>();
-		Pattern pattern = Pattern.compile("Total runtime: (\\d+.\\d+) ms");
-		ResultSet rs = null;
-		String queryResults;
-		for (int round=0; round<ROUNDS; round++) {
-			rs = ConnectionManager.getInstance().execQuery(con,query);
-			while (rs.next()) {
-				queryResults = rs.getString(1);
-				Matcher m = pattern.matcher(queryResults);
-				if (m.find()) {
-					double result = Double.valueOf(m.group(1));
-					// System.out.println(result);
-					results.add(result);
-				}
-			}
-		}
-		ConnectionManager.getInstance().closeRs(rs);
-		return results;
-	}
-
-	private static double getAverage(int ROUNDS,
-			ArrayList<Double> results) {
-		double sumResult = 0.0;
-		for (int round=0; round<ROUNDS; round++) {
-			sumResult += results.get(round);
-		}
-		return sumResult/ROUNDS;
-	}
-	
-	private static double getMedian(int ROUNDS,
-			ArrayList<Double> results) {
-		Collections.sort(results);
-		return results.get((ROUNDS-1)/2);
 	}
 
 }
