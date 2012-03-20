@@ -6,6 +6,29 @@
 <entry key="GetProv">
 CREATE OR REPLACE VIEW csr AS (
 SELECT 
+    rel,
+    tid,
+    att,
+
+    prov_source_tramp_tid ,
+    NULL::varbit AS prov_source_tramp_att,
+
+    prov_source_soupkitchen_tid ,
+    CASE WHEN prov_source_soupkitchen_tid IS NOT NULL 
+    THEN 'B010'::varbit
+    ELSE NULL
+    END  AS prov_source_soupkitchen_att,
+
+    prov_source_socialworker_tid ,
+    NULL::varbit AS prov_source_socialworker_att,
+
+    prov_source_socialworker_1_tid,
+    CASE WHEN prov_source_socialworker_1_tid IS NOT NULL 
+    THEN 'B100'::varbit
+    ELSE NULL::varbit
+    END AS prov_source_socialworker_1_att
+FROM (
+SELECT 
     errors.rel,
     errors.tid,
     errors.att,
@@ -31,7 +54,8 @@ FROM
     (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid,livesin 
     FROM target.person) AS prov,
     (SELECT * FROM errm WHERE att &amp; 'B01'::varbit != 'B00'::varbit) AS errors
-WHERE errors.tid = prov.tid  
+WHERE errors.tid = prov.tid
+) pp
 )
 </entry>
 

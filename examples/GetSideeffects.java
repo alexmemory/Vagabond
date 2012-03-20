@@ -26,10 +26,15 @@ public class GetSideeffects {
 	private static void generateView4CS() throws Exception {
 		Connection con = TestOptions.getInstance().getConnection();
 		
-		String query = GatherStats4Query.getQuery("CreateCSErrorsView");
-		GatherStats4Query.runDDLQuery(con, query);
-
-		con.close();
+		try {
+			GatherStats4Query.runDDLQuery(con, "drop view if exists csr");
+			String query = GatherStats4Query.getQuery("CreateCSErrorsView");
+			GatherStats4Query.runDDLQuery(con, query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// con.close();
+		}
 
 	}
 

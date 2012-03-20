@@ -44,6 +44,7 @@ def load2DB(conn, fullPath):
         cur.execute("drop table if exists errm")
         cur.execute("create table errm (rel text, tid text, att bit varying(2))")
         cur.execute("copy errm from '"+fullPath+"' delimiter ','")
+        cur.execute("VACUUM FULL ANALYZE")
         conn.commit()
     except:
         print('errors in loading to the table')
