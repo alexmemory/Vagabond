@@ -77,4 +77,13 @@ public class ConnectionManager {
 		return rs;
 	}
 	
+	public void execUpdate (Connection userCon, String query) throws SQLException {
+		Statement st;
+		
+		st = userCon.createStatement();
+		
+		st.executeUpdate(query);
+		
+	}
+	
 }

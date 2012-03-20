@@ -36,15 +36,19 @@ public class GatherStats4Query {
 		double finalMedian = getMedian(ROUNDS, results);
 		// System.out.println("Number of error markers: " + numMarkers);
 		System.out.println("Running rounds: "+ ROUNDS);
-		System.out.println("Average time spent: " + finalAverage);
-		System.out.println("Median time spent: " + finalMedian);
+		System.out.println("Average time spent: " + finalAverage + " ms");
+		System.out.println("Median time spent: " + finalMedian + " ms");
 	}
 
-	private static String getQuery(String xmlQuery) throws FileNotFoundException,
+	public static String getQuery(String xmlQuery) throws FileNotFoundException,
 			IOException {
 		QueryHolder.getInstance().loadFromDir(new File ("examples"));
 		String query = QueryHolder.getQuery(xmlQuery+".GetProv").parameterize();
 		return query;
+	}
+	
+	public static void runDDLQuery(Connection con, String query) throws SQLException, ClassNotFoundException {
+		ConnectionManager.getInstance().execUpdate(con, query);
 	}
 
 	private static ArrayList<Double> runQueryWithRounds(int ROUNDS, 

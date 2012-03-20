@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>GetCopyCSErrors</comment>
+
+<entry key="GetProv">
+EXPLAIN ANALYZE (
+SELECT DISTINCT * FROM (
+SELECT
+      csr.rel AS rel,
+      csr.tid AS tid,
+      csr.att AS att,
+      'person' AS se_rel,
+      prov.tid AS se_tid,
+      'B10'::varbit AS se_att
+FROM 
+      (SELECT tid, 
+              prov_source_tramp_tid ,
+              CASE WHEN prov_source_tramp_tid IS NOT NULL 
+              THEN 'B1000'::varbit
+              ELSE NULL::varbit
+              END AS prov_source_tramp_att,
+
+              prov_source_soupkitchen_tid ,
+              NULL AS prov_source_soupkitchen_att,
+
+              prov_source_socialworker_tid ,
+              NULL AS prov_source_socialworker_att,
+
+              prov_source_socialworker_1_tid,
+              CASE WHEN prov_source_socialworker_1_tid IS NOT NULL 
+              THEN 'B010'::varbit
+              ELSE NULL
+              END AS prov_source_socialworker_1_att
+       FROM
+              (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid, name 
+              FROM target.person) AS psub) AS prov,
+      csr
+WHERE (csr.prov_source_tramp_tid = prov.prov_source_tramp_tid AND 
+       csr.prov_source_tramp_att |        prov.prov_source_tramp_att != 'B0000'::varbit) 
+      OR
+      (csr.prov_source_socialworker_1_tid = prov.prov_source_socialworker_1_tid AND
+      csr.prov_source_socialworker_1_att | prov.prov_source_socialworker_1_att != 'B000'::varbit) 
+      AND (csr.tid != prov.tid OR csr.att &amp; 'B10'::varbit = 'B00'::varbit)
+UNION ALL
+SELECT
+      csr.rel AS rel,
+      csr.tid AS tid,
+      csr.att AS att,
+      'person' AS se_rel,
+      prov.tid AS se_tid,
+      'B01'::varbit AS se_att
+FROM 
+      (SELECT tid, 
+              prov_source_tramp_tid ,
+              NULL::varbit AS prov_source_tramp_att,
+
+              prov_source_soupkitchen_tid ,
+              CASE WHEN prov_source_soupkitchen_tid IS NOT NULL 
+              THEN 'B010'::varbit
+              ELSE NULL::varbit
+              END AS prov_source_soupkitchen_att,
+
+              prov_source_socialworker_tid ,
+              NULL::varbit AS prov_source_socialworker_att,
+
+              prov_source_socialworker_1_tid,
+              NULL AS prov_source_socialworker_1_att
+       FROM
+              (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid, livesin
+              FROM target.person) AS psub) AS prov,
+      csr
+WHERE (csr.prov_source_soupkitchen_tid = prov.prov_source_soupkitchen_tid AND 
+       csr.prov_source_soupkitchen_att |        prov.prov_source_soupkitchen_att != 'B0000'::varbit) 
+      AND (csr.tid != prov.tid OR csr.att &amp; 'B01'::varbit = 'B00'::varbit)) AS se)
+</entry>
+
+
+
+</properties>
