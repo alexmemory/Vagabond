@@ -21,16 +21,15 @@ public class GatherStats4Query {
 		PropertyConfigurator.configure("resource/test/testLog4jproperties.txt");
 	}
 	
-	public static void gatherStats(String xmlQuery) throws Exception {
+	public static void gatherStats(String xmlQuery, Connection con) throws Exception {
 
 		// String numMarkers = args[0];
 		int ROUNDS = 5;
-		Connection con = TestOptions.getInstance().getConnection();
 		
 		String query = getQuery(xmlQuery);
 		ArrayList<Double> results = runQueryWithRounds(ROUNDS, con, query);
 
-		con.close();
+		// con.close();
 		
 		double finalAverage = getAverage(ROUNDS, results);
 		double finalMedian = getMedian(ROUNDS, results);

@@ -33,8 +33,7 @@ FROM
               ELSE NULL
               END AS prov_source_socialworker_1_att
        FROM
-              (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid, name 
-              FROM target.person) AS psub) AS prov,
+              prov_name,
       csr
 WHERE (csr.prov_source_tramp_tid = prov.prov_source_tramp_tid AND 
        csr.prov_source_tramp_att |        prov.prov_source_tramp_att != 'B0000'::varbit) 
@@ -67,8 +66,7 @@ FROM
               prov_source_socialworker_1_tid,
               NULL AS prov_source_socialworker_1_att
        FROM
-              (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid, livesin
-              FROM target.person) AS psub) AS prov,
+              prov_livesin,
       csr
 WHERE (csr.prov_source_soupkitchen_tid = prov.prov_source_soupkitchen_tid AND 
        csr.prov_source_soupkitchen_att |        prov.prov_source_soupkitchen_att != 'B0000'::varbit) 

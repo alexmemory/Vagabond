@@ -37,10 +37,9 @@ SELECT
     prov_source_socialworker_tid ,
     prov_source_socialworker_1_tid
 FROM 
-    (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid,name 
-    FROM target.person) AS prov,
+    prov_name,
     (SELECT * FROM errm WHERE att &amp; 'B10'::varbit != 'B00'::varbit) AS errors
-WHERE errors.tid = prov.tid
+WHERE errors.tid = prov_name.tid
 UNION ALL
 SELECT 
     errors.rel,
@@ -51,10 +50,9 @@ SELECT
     prov_source_socialworker_tid ,
     prov_source_socialworker_1_tid
 FROM 
-    (SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid,livesin 
-    FROM target.person) AS prov,
+    prov_livesin,
     (SELECT * FROM errm WHERE att &amp; 'B01'::varbit != 'B00'::varbit) AS errors
-WHERE errors.tid = prov.tid
+WHERE errors.tid = prov_livesin.tid
 ) pp
 )
 </entry>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>GetCopyCSErrors</comment>
+
+<entry key="GetProv">
+CREATE OR REPLACE VIEW prov_livesin AS 
+    SELECT PROVENANCE ON CONTRIBUTION (COPY PARTIAL TRANSITIVE) tid, livesin 
+    FROM target.person
+</entry>
+
+
+
+</properties>

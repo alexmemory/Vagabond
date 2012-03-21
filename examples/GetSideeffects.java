@@ -17,15 +17,23 @@ import org.vagabond.util.ResultSetUtil;
 
 public class GetSideeffects {
 
-	public static void main(String args[]) throws Exception {
-		generateView4CS();
-		GatherStats4Query.gatherStats("GetSideeffects");
+	private static Connection con;
 
+	public static void main(String args[]) throws Exception {
+		Connection con = TestOptions.getInstance().getConnection();
+		
+		try {
+			generateView4CS();
+			GatherStats4Query.gatherStats("GetSideeffects", con);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			con.close();
+		}
+		
 	}
 	
 	private static void generateView4CS() throws Exception {
-		Connection con = TestOptions.getInstance().getConnection();
-		
 		try {
 			GatherStats4Query.runDDLQuery(con, "drop view if exists csr");
 			String query = GatherStats4Query.getQuery("CreateCSErrorsView");
@@ -33,7 +41,6 @@ public class GetSideeffects {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			// con.close();
 		}
 
 	}
