@@ -20,11 +20,21 @@ public class GetSideeffects {
 	private static Connection con;
 
 	public static void main(String args[]) throws Exception {
-		Connection con = TestOptions.getInstance().getConnection();
-		
 		try {
+			con = TestOptions.getInstance().getConnection();
+			
+			RelWrapper.createViews(con);
 			generateView4CS();
-			GatherStats4Query.gatherStats("GetSideeffects", con);
+			GatherStats4Query.gatherStats(con, "GetSideeffects");
+			cleanupView4CS();		// csr depends on prov_name & prov_livesin
+			RelWrapper.cleanupViews(con);
+			
+			RelWrapper.materializeProvs(con);
+			generateView4CS();
+			GatherStats4Query.gatherStats(con, "GetSideeffects");
+			cleanupView4CS();
+			RelWrapper.cleanupTables(con);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -35,14 +45,18 @@ public class GetSideeffects {
 	
 	private static void generateView4CS() throws Exception {
 		try {
-			GatherStats4Query.runDDLQuery(con, "drop view if exists csr");
+			RelWrapper.executeDDL(con, "drop view if exists csr");
 			String query = GatherStats4Query.getQuery("CreateCSErrorsView");
-			GatherStats4Query.runDDLQuery(con, query);
+			RelWrapper.executeDDL(con, query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 		}
 
+	}
+	
+	private static void cleanupView4CS() throws Exception {
+		RelWrapper.executeDDL(con, "drop view if exists csr");
 	}
 
 

@@ -21,7 +21,7 @@ public class GatherStats4Query {
 		PropertyConfigurator.configure("resource/test/testLog4jproperties.txt");
 	}
 	
-	public static void gatherStats(String xmlQuery, Connection con) throws Exception {
+	public static void gatherStats(Connection con, String xmlQuery) throws Exception {
 
 		// String numMarkers = args[0];
 		int ROUNDS = 5;
