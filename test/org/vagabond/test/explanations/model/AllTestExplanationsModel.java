@@ -9,7 +9,9 @@ import org.junit.runners.Suite;
 		TestBasicAndExplanationSets.class,
 		TestExplanationCollection.class,
 		TestMarkerParser.class,
-		TestMarkers.class
+		TestMarkers.class,
+		TestErrorPartitionGraph.class,
+		TestScenarioDictionary.class
         })
 public class AllTestExplanationsModel {
 

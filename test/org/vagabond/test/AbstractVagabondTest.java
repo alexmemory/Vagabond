@@ -11,7 +11,7 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.vagabond.explanation.generation.QueryHolder;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
@@ -42,16 +42,18 @@ public abstract class AbstractVagabondTest {
 		
 		holder = ModelLoader.getInstance().load(new File(fileName));
 		MapScenarioHolder.getInstance().setDocument(holder.getDocument());
-		SchemaResolver.getInstance().setSchemas(
+		ScenarioDictionary.getInstance().setSchemas(
 				holder.getScenario().getSchemas().getSourceSchema(),
 				holder.getScenario().getSchemas().getTargetSchema());
+		ScenarioDictionary.getInstance().setMappings(
+				holder.getScenario().getMappings());
 	}
 	
 	public static void loadToDB (String fileName) throws Exception {
 		Connection con = TestOptions.getInstance().getConnection();
 		
 		ModelLoader.getInstance().loadToInst(fileName);
-		SchemaResolver.getInstance().setSchemas();
+		ScenarioDictionary.getInstance().initFromScenario();
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
 	}
 	

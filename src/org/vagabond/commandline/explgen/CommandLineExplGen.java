@@ -12,7 +12,7 @@ import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
@@ -86,7 +86,7 @@ public class CommandLineExplGen {
 	private void loadScenario (File xmlDoc) 
 			throws Exception {
 		ModelLoader.getInstance().loadToInst(xmlDoc);
-		SchemaResolver.getInstance().setSchemas();
+		ScenarioDictionary.getInstance().initFromScenario();
 		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 		options.setDBOptions(MapScenarioHolder.getInstance().getScenario());
 	}

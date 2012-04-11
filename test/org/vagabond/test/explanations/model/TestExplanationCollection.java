@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -34,7 +34,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 	@BeforeClass
 	public static void setUp () throws Exception {
 		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-		SchemaResolver.getInstance().setSchemas();
+		ScenarioDictionary.getInstance().initFromScenario();
 	}
 	
 	@Test

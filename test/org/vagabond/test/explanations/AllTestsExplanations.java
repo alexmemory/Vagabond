@@ -2,6 +2,7 @@ package org.vagabond.test.explanations;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.vagabond.test.explanations.model.AllTestExplanationsModel;
 
 
 @RunWith(Suite.class)
@@ -18,7 +19,8 @@ import org.junit.runners.Suite;
 		TestTgtSkeMapExplGen.class,
 		TestProvAndSideEffect.class,
 		TestProvAndSideEffectQueries.class,
-		TestProvParsers.class
+		TestProvParsers.class,
+		AllTestExplanationsModel.class
         })
 public class AllTestsExplanations {
 

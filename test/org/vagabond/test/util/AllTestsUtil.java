@@ -7,7 +7,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 		TestResultSetUtil.class,
-		TestQueryTemplate.class
+		TestQueryTemplate.class,
+		TestBitMatrixAndBitset.class
         })
 public class AllTestsUtil {
 }

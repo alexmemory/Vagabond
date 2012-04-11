@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -26,7 +26,7 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 	public static void setUp () throws Exception {
 		ModelLoader.getInstance().loadToInst(
 				"resource/exampleScenarios/homelessDebugged.xml");
-		SchemaResolver.getInstance().setSchemas();
+		ScenarioDictionary.getInstance().initFromScenario();
 	}
 	
 	@Test

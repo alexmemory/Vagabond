@@ -13,7 +13,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
@@ -64,7 +64,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		
 		String relName = error.getRel();
 		String attrName = error.getAttrName();
-		int errpos = SchemaResolver.getInstance().getAttrId(relName, attrName);
+		int errpos = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
 		String varName = null;
 		
 		for(MappingType map: maps) {
@@ -112,7 +112,7 @@ public class SourceSkeletonMappingExplanationGenerator implements
 						}
 						relAttrMapSet = affRels.get(targetRelName);
 						relAttrMapSet.mapSet.add(map.getId());
-						String targetAttrName = SchemaResolver.getInstance()
+						String targetAttrName = ScenarioDictionary.getInstance()
 												.getAttrName(targetRelName, vpos);
 						relAttrMapSet.attrSet.add(targetAttrName);
 					}

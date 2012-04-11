@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.mapping.stats.StatsQueryExecutor;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.GlobalResetter;
@@ -37,6 +38,7 @@ public class MapScenarioHolder {
 	private Map<MappingType, MappingGraph> graphsForMaps;
 	private Map<TransformationType, RelationType[]> transToSource;
 	private Map<TransformationType, RelationType> transToTarget;
+	private ErrorPartitionGraph scenGraph;
 	
 	public static MapScenarioHolder getInstance() {
 		return instance;
@@ -287,4 +289,14 @@ public class MapScenarioHolder {
 		
 		return maps;
 	}
+
+	public ErrorPartitionGraph getScenGraph() {
+		return scenGraph;
+	}
+
+	public void setScenGraph(ErrorPartitionGraph scenGraph) {
+		this.scenGraph = scenGraph;
+	}
+	
+	
 }

@@ -25,13 +25,13 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	}
 	
 	public AttrValueMarker (String relName, String tid, String attrName) throws Exception {
-		this.relId = SchemaResolver.getInstance().getRelId(relName);
-		this.attrId = SchemaResolver.getInstance().getAttrId(this.relId, attrName);
+		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
+		this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
 		this.tid = tid;
 	}
 	
 	public AttrValueMarker (String relName, String tid, int attrId) throws Exception {
-		this.relId = SchemaResolver.getInstance().getRelId(relName);
+		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 		this.attrId = attrId;
 		this.tid = tid;
 	}
@@ -77,7 +77,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	@Override
 	public String getRel() {
-		return SchemaResolver.getInstance().getRelName(relId);
+		return ScenarioDictionary.getInstance().getRelName(relId);
 	}
 	
 	@Override
@@ -92,7 +92,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	@Override
 	public String getAttrName() {
-		return SchemaResolver.getInstance().getAttrName(relId, attrId);
+		return ScenarioDictionary.getInstance().getAttrName(relId, attrId);
 	}
 
 	@Override
@@ -113,8 +113,8 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	@Override
 	public void setValues(String relName, String tid, String attrName) throws Exception {
-			this.relId = SchemaResolver.getInstance().getRelId(relName);
-			this.attrId = SchemaResolver.getInstance().getAttrId(this.relId, attrName);
+			this.relId = ScenarioDictionary.getInstance().getRelId(relName);
+			this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
 			this.tid = tid;
 	}
 

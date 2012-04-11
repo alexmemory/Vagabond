@@ -15,7 +15,7 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
@@ -25,7 +25,7 @@ public class TestMarkers extends AbstractVagabondTest {
 
 	@Before
 	public void setUp () throws XmlException, IOException, ValidationException {
-		setUpSchemaResolver ("resource/exampleScenarios/homeless.xml");
+		setSchemas("resource/exampleScenarios/homeless.xml");
 	}
 	
 	@Test
@@ -127,24 +127,19 @@ public class TestMarkers extends AbstractVagabondTest {
 	}
 	
 	private void testTupSize(int relId, int size) {
-		assertEquals(SchemaResolver.getInstance().getTupleSize(relId), size);
+		assertEquals(ScenarioDictionary.getInstance().getTupleSize(relId), size);
 	}
 	
 	private void testAttrIdPair (int relId, String relName, int attrId, 
 			String attrName) throws Exception {
-		assertEquals(SchemaResolver.getInstance().getRelName(relId), relName);
-		assertEquals(SchemaResolver.getInstance().getAttrId(relId, attrName), attrId);
-		assertEquals(SchemaResolver.getInstance().getAttrName(relId, attrId), attrName);
+		assertEquals(ScenarioDictionary.getInstance().getRelName(relId), relName);
+		assertEquals(ScenarioDictionary.getInstance().getAttrId(relId, attrName), attrId);
+		assertEquals(ScenarioDictionary.getInstance().getAttrName(relId, attrId), attrName);
 	}
 	
 	private void testRelIdPair (int id, String name) throws Exception {
-		assertEquals(SchemaResolver.getInstance().getRelName(id), name);
-		assertEquals(SchemaResolver.getInstance().getRelId(name), id);
+		assertEquals(ScenarioDictionary.getInstance().getRelName(id), name);
+		assertEquals(ScenarioDictionary.getInstance().getRelId(name), id);
 	}
 	
-	private static void setUpSchemaResolver (String fileName) throws XmlException, IOException, ValidationException {
-		MapScenarioHolder map = ModelLoader.getInstance().load(new 
-				File(fileName));
-		setSchemas(fileName);
-	}
 }

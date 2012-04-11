@@ -28,8 +28,7 @@ public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 	}
 	
 	public void put (Type value) {
-		maxId++;
-		put(maxId, value);
+		put(++maxId, value);
 	}
 	
 	public boolean containsKey (int id) {

@@ -14,7 +14,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
@@ -66,14 +66,14 @@ public class TargetSkeletonMappingExplanationGenerator implements
 		
 		String relName = error.getRel();
 		String attrName = error.getAttrName();
-		int errpos = SchemaResolver.getInstance().getAttrId(relName, attrName);
+		int errpos = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
 		String varName = null;
 		
 		for(MappingType map: maps) {
 			// Verify that attrName is in the "From" attribute of a foreign key.
 			boolean isIn = false;
 			ForeignKeyType[] fksInTarget = 
-				SchemaResolver.getInstance().getTargetSchema().getForeignKeyArray();
+				ScenarioDictionary.getInstance().getTargetSchema().getForeignKeyArray();
 			Set<String> attrArr = new HashSet<String>();
 			for (ForeignKeyType fk: fksInTarget) {
 				List<String> allAttrList = Arrays.asList(fk.getFrom().getAttrArray());
@@ -95,7 +95,7 @@ public class TargetSkeletonMappingExplanationGenerator implements
 					// Now check if this combination of "From" and "To" attribute names
 					// appear in this mapping.
 					int fromPos = errpos;
-					int toPos = SchemaResolver.getInstance().getAttrId(toRelName, toAttrName);
+					int toPos = ScenarioDictionary.getInstance().getAttrId(toRelName, toAttrName);
 					RelAtomType[] targetRels = map.getExists().getAtomArray();
 					for (RelAtomType targetRel: targetRels) {
 						if (targetRel.getTableref().equals(fromRelName)) {

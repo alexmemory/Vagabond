@@ -20,7 +20,7 @@ public class TupleMarker implements ITupleMarker {
 	}
 	
 	public TupleMarker (String rel, String tid) throws Exception {
-		this.relId = SchemaResolver.getInstance().getRelId(rel);
+		this.relId = ScenarioDictionary.getInstance().getRelId(rel);
 		this.tid = tid;
 	}
 	
@@ -54,7 +54,7 @@ public class TupleMarker implements ITupleMarker {
 
 	@Override
 	public int getSize() {
-		return SchemaResolver.getInstance().getTupleSize(relId);
+		return ScenarioDictionary.getInstance().getTupleSize(relId);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class TupleMarker implements ITupleMarker {
 
 	@Override
 	public String getRel() {
-		return SchemaResolver.getInstance().getRelName(relId);
+		return ScenarioDictionary.getInstance().getRelName(relId);
 	}
 
 	@Override

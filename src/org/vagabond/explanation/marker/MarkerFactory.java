@@ -1,8 +1,10 @@
 package org.vagabond.explanation.marker;
 
 import java.util.Collection;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.Pair;
 
@@ -94,4 +96,34 @@ public class MarkerFactory {
 		return new TupleMarker(values.getKey(), values.getValue());
 	}
 
+	public static MarkerSummary newMarkerSummary (IMarkerSet set) {
+		MarkerSummary result;
+		
+		result = new MarkerSummary();
+		
+		for (ISingleMarker marker: set) {
+			result.addAll(newSchemaMarker(marker));
+		}
+		
+		return result;
+	}
+	
+	public static Collection<ISchemaMarker> newSchemaMarker (ISingleMarker marker) {
+		Vector<ISchemaMarker> result;
+		int numAttr;
+		int relId = marker.getRelId();
+		
+		
+		if (marker instanceof IAttributeValueMarker) {
+			int attrId = ((IAttributeValueMarker) marker).getAttrId();
+			return CollectionUtils.makeSet((ISchemaMarker) new AttrMarker(relId, attrId));
+		}
+		
+		numAttr = ScenarioDictionary.getInstance().getTupleSize(relId);
+		result = new Vector<ISchemaMarker> ();
+		for (int i = 0; i < numAttr; i++)
+			result.add(new AttrMarker(relId, i));
+		
+		return result;
+	}
 }

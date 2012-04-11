@@ -482,6 +482,7 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		return result;
 	}
 
+	//TODO memoize unioned side effects?
 	private void computeSideEffectSize (RankedListElement elem) {
 		IMarkerSet sideEff = MarkerFactory.newMarkerSet();
 		

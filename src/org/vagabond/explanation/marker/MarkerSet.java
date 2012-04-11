@@ -16,6 +16,7 @@ public class MarkerSet implements IMarkerSet {
 	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerSet.class);
 	
 	private Set<ISingleMarker> markers;
+	private MarkerSummary sum;
 	
 	public MarkerSet () {
 		markers = new HashSet<ISingleMarker> ();
@@ -179,8 +180,6 @@ public class MarkerSet implements IMarkerSet {
 		return this;
 	}
 	
-	
-
 	@Override
 	public IMarkerSet cloneSet() {
 		MarkerSet clone = new MarkerSet();
@@ -195,6 +194,11 @@ public class MarkerSet implements IMarkerSet {
 	public IMarkerSet diff(IMarkerSet other) {
 		this.removeAll(other);
 		return this;
+	}
+
+	@Override
+	public MarkerSummary getSummary() {
+		return MarkerFactory.newMarkerSummary(this); //TODO add caching?
 	}
 	
 }

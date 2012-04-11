@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.vagabond.explanation.generation.QueryHolder;
-import org.vagabond.explanation.marker.SchemaResolver;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
@@ -225,7 +225,7 @@ public abstract class AbstractVagabondDBTest extends DBTestCase  {
 		GlobalResetter.getInstance().reset();
 		ModelLoader.getInstance().loadToInst(fileName);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
-		SchemaResolver.getInstance().setSchemas();
+		ScenarioDictionary.getInstance().initFromScenario();
 	}
 	
 	public static void closeDown () throws Exception {

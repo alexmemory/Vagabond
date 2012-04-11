@@ -59,7 +59,7 @@ public class TestLoadXML extends AbstractVagabondTest {
 	}
 	
 	@Test 
-	public void genLoadScript () throws XmlException, IOException {
+	public void genLoadScript () throws Exception {
 		String script;
 		
 		MappingScenario mapScen = loadAnXml("resource/test/testScenario.xml");
@@ -79,7 +79,7 @@ public class TestLoadXML extends AbstractVagabondTest {
 	}
 	
 	@Test 
-	public void testExecuteLoad () throws SQLException, XmlException, IOException {
+	public void testExecuteLoad () throws Exception {
 		MappingScenarioDocument mapDoc = MappingScenarioDocument.Factory.
 				parse(new File("resource/test/testScenario.xml"));
 		DatabaseScenarioLoader.getInstance().loadScenario(con, new MapScenarioHolder(mapDoc));

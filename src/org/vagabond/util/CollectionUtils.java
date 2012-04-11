@@ -1,8 +1,10 @@
 package org.vagabond.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -82,4 +84,40 @@ public class CollectionUtils {
 		
 		return false;
 	}
+	
+
+	
+	public static <T> List<T> filter (List<T> in, int[] positions) {
+		List<T> result;
+		
+		result = new ArrayList<T> ();
+		
+		for(int i: positions)
+			result.add(in.get(i));
+		
+		return result;
+	}
+	
+	public static <T> List<T> filter (IdMap<T> in, int[] positions) {
+		List<T> result;
+		
+		result = new ArrayList<T> ();
+		
+		for(int i: positions)
+			result.add(in.get(i));
+		
+		return result;
+	}
+	
+	public static <T> List<T> filter (IdMap<T> in, Iterator<Integer> pos) {
+		List<T> result;
+		
+		result = new ArrayList<T> ();
+		
+		while(pos.hasNext())
+			result.add(in.get(pos.next()));
+		
+		return result;
+	}
+
 }

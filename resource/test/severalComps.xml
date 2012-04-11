@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="r">
+			<Attr><Name>r1</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>r2</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>r1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="s">
+			<Attr><Name>s1</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>s2</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>s1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="t">
+			<Attr><Name>t1</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>t2</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>t1</Attr></PrimaryKey>
+		</Relation>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="u">
+			<Attr><Name>u1</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>u1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="v">
+			<Attr><Name>v1</Name><DataType>INT8</DataType></Attr>
+			<PrimaryKey><Attr>v1</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="r"><Attr>r1</Attr></From>
+		<To tableref="u"><Attr>u1</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="t"><Attr>t1</Attr></From>
+		<To tableref="v"><Attr>v1</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="r"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="s"><Var>b</Var><Var>c</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="u"><Var>a</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Uses>
+			<Correspondence>c2</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="t"><Var>a</Var><Var>b</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="v"><Var>a</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="u">
+		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Code>
+SELECT r.tid AS tid, r.r1 AS u1, NULL AS u2
+FROM r ANNOT('M1') JOIN s ANNOT('M1') ON r.r2 = s.s1
+UNION 
+SELECT t.tid AS tid, NULL AS u1, t.t1 AS u2
+FROM t ANNOT('M2')
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>lordpretzel</User>
+	<Password/>
+</ConnectionInfo>
+<Data>
+	<Instance name="r">
+		<Row><Value>1</Value><Value>1</Value></Row>
+		<Row><Value>2</Value><Value>1</Value></Row>
+		<Row><Value>3</Value><Value>2</Value></Row>
+	</Instance>
+	<Instance name="s">
+		<Row><Value>1</Value><Value>5</Value></Row>
+	</Instance>
+	<Instance name="t">
+		<Row><Value>4</Value><Value>1</Value></Row>
+		<Row><Value>5</Value><Value>1</Value></Row>
+	</Instance>
+</Data>
+</this:MappingScenario>
