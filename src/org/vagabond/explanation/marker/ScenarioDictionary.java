@@ -102,11 +102,24 @@ public class ScenarioDictionary {
 		throw new Exception ("Did not find relation <" + relName + ">");
 	}
 	
-	public String getAttrName (int relId, int attrId) {
+	public boolean validateRelId (int relId) {
+		return relId >= 0 && relId < rels.size();
+	}
+	
+	public boolean validateAttrId (int relId, int attrId) {
 		RelationType rel;
 		
+		if (!validateRelId(relId) || attrId < 0)
+			return false;
 		rel = rels.get(relId);
-		return rel.getAttrArray()[attrId].getName();
+		
+		return attrId < rel.getAttrArray().length;
+	}
+	
+	public String getAttrName (int relId, int attrId) {
+		assert(validateRelId(relId) && validateAttrId(relId, attrId));
+		
+		return rels.get(relId).getAttrArray()[attrId].getName();
 	}
 	
 	public String getAttrName (String relName, int attrId) throws Exception {

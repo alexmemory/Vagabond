@@ -46,6 +46,23 @@ public class MarkerParser {
 		return result;
 	}
 	
+	public ISchemaMarker parseSchemaMarker (String marker) throws Exception {
+		String[] split;
+		ISchemaMarker result;
+		
+		if (marker.charAt(0) != 'S') {
+			throw new Exception ("unknown marker type <" 
+					+ marker.charAt(0) + ">");
+		}
+		
+		split = marker.substring(2, marker.length() - 1).split(",");
+		result = new AttrMarker(split[0], split[1]);
+		
+		log.debug("parsed marker: <" + result + ">");
+		
+		return result;
+	}
+	
 	public IMarkerSet parseMarkers (InputStream in) throws Exception {
 		IMarkerSet result;
 		BufferedReader read;
@@ -85,11 +102,33 @@ public class MarkerParser {
 		return result;
 	}
 	
+	public MarkerSummary parseMarkerSummary (String set) throws Exception {
+		String elemString;
+		Vector<String> elems;
+		MarkerSummary result;
+		
+		result = MarkerFactory.newMarkerSummary();
+		
+		// handle empty set
+		if (set.matches("\\s*\\{\\s*\\}\\s*"))
+			return result;
+		
+		elemString = set.substring(set.indexOf('{') + 1, set.lastIndexOf('}') + 1);
+		elems = getElems (elemString);
+		
+		for (String elem: elems) {
+			result.add(parseSchemaMarker(elem));
+		}
+		
+		log.debug("parsed marker summary: <" + result + ">");
+		
+		return result;
+	}
+	
 	public IMarkerSet parseSet (String set) throws Exception {
 		String elemString;
 		Vector<String> elems;
 		IMarkerSet result;
-		StringBuffer element;
 		
 		result = MarkerFactory.newMarkerSet();
 		

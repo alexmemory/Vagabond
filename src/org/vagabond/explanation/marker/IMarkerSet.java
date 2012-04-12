@@ -17,4 +17,5 @@ public interface IMarkerSet extends Set<ISingleMarker> {
 	public String toUserString();
 	public IMarkerSet cloneSet ();
 	public MarkerSummary getSummary ();
+	public IMarkerSet subset (MarkerSummary sum);
 }

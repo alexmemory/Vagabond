@@ -10,9 +10,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.CollectionUtils;
 
@@ -87,6 +89,27 @@ public class TestMarkerParser extends AbstractVagabondTest {
 				" null }");
 		
 		assertEquals(expect, result);
+	}
+	
+	@Test
+	public void testParseSchemaMarker () throws Exception {
+		ISchemaMarker m = MarkerFactory.newSchemaMarker(2,1);
+		ISchemaMarker ex = MarkerParser.getInstance().parseSchemaMarker("S(employee,city)");
+		
+		assertEquals(ex, m);
+	}
+	
+	@Test
+	public void testMarkerSummary () throws Exception {
+		MarkerSummary ex = MarkerFactory.newMarkerSummary();
+		ex.add(MarkerParser.getInstance().parseSchemaMarker("S(employee,city)"));
+		ex.add(MarkerParser.getInstance().parseSchemaMarker("S(employee,name)"));
+		
+		MarkerSummary s = MarkerParser.getInstance()
+				.parseMarkerSummary("{S(employee,name),S(employee,city)}");
+		
+		assertEquals(ex,s);
+				
 	}
 	
 }

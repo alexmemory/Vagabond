@@ -1,11 +1,14 @@
 package org.vagabond.explanation.marker;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.postgresql.ssl.MakeSSL;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.Pair;
 
 public class MarkerFactory {
@@ -13,6 +16,12 @@ public class MarkerFactory {
 	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerFactory.class);
 	
 	private static MarkerFactory instance = new MarkerFactory();
+	
+	private static ArrayList<ArrayList<ISchemaMarker>> schemaMConsts;
+	
+	static {
+		schemaMConsts = new ArrayList<ArrayList<ISchemaMarker>> ();
+	}
 	
 	private MarkerFactory () {
 		
@@ -96,6 +105,56 @@ public class MarkerFactory {
 		return new TupleMarker(values.getKey(), values.getValue());
 	}
 
+	public static ISchemaMarker newSchemaMarker (int relId, int attrId) {
+		ArrayList<ISchemaMarker> attrs;
+		ISchemaMarker result;
+		
+		assert(ScenarioDictionary.getInstance().validateAttrId(relId, attrId));
+		
+		attrs = relId < schemaMConsts.size() ? schemaMConsts.get(relId) : null;
+		if (attrs == null) {
+			attrs = new ArrayList<ISchemaMarker> ();
+			CollectionUtils.addToList(schemaMConsts, attrs, relId);
+		}
+		
+		result = attrId < attrs.size() ? attrs.get(attrId) : null;
+		if (result == null) {
+			try {
+				result = new AttrMarker(relId, attrId);
+			} catch (Exception e) {
+				LoggerUtil.logException(e, log);
+				result = null;
+			}
+			CollectionUtils.addToList(attrs, result, attrId);
+		}
+		
+		return result; 
+	}
+	
+	public static ISchemaMarker newSchemaMarker (String relName, String attrName) throws Exception {
+		int relId = ScenarioDictionary.getInstance().getRelId(relName);
+		int attrId = ScenarioDictionary.getInstance().getAttrId(relId, attrName);
+		
+		return newSchemaMarker(relId, attrId);
+	}
+	
+	public static ISchemaMarker newSchemaMarker (IAttributeValueMarker attr) {
+		return newSchemaMarker(attr.getRelId(), attr.getAttrId());
+	}
+	
+	public static MarkerSummary newMarkerSummary () {
+		return new MarkerSummary();
+	}
+	
+	public static MarkerSummary newMarkerSummary (ISchemaMarker ... m) {
+		MarkerSummary result = new MarkerSummary();
+		
+		for(ISchemaMarker mark: m)
+			result.add(mark);
+		
+		return result;
+	}
+	
 	public static MarkerSummary newMarkerSummary (IMarkerSet set) {
 		MarkerSummary result;
 		
@@ -115,14 +174,13 @@ public class MarkerFactory {
 		
 		
 		if (marker instanceof IAttributeValueMarker) {
-			int attrId = ((IAttributeValueMarker) marker).getAttrId();
-			return CollectionUtils.makeSet((ISchemaMarker) new AttrMarker(relId, attrId));
+			return CollectionUtils.makeSet(newSchemaMarker((IAttributeValueMarker) marker));
 		}
 		
 		numAttr = ScenarioDictionary.getInstance().getTupleSize(relId);
 		result = new Vector<ISchemaMarker> ();
 		for (int i = 0; i < numAttr; i++)
-			result.add(new AttrMarker(relId, i));
+			result.add(newSchemaMarker(relId, i));
 		
 		return result;
 	}

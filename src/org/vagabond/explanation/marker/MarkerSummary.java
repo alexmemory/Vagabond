@@ -8,10 +8,14 @@ import java.util.Set;
 
 public class MarkerSummary implements Set<ISchemaMarker> {
 
-	public Set<ISchemaMarker> schemaMarkers;
+	protected Set<ISchemaMarker> schemaMarkers;
 	
 	public MarkerSummary () {
 		schemaMarkers = new HashSet<ISchemaMarker> ();
+	}
+	
+	public boolean hasAttr (ISingleMarker attr) {
+		return schemaMarkers.containsAll(MarkerFactory.newSchemaMarker(attr));
 	}
 	
 	public boolean add (ISchemaMarker newMarker) {
@@ -81,5 +85,21 @@ public class MarkerSummary implements Set<ISchemaMarker> {
 	@Override
 	public String toString () {
 		return schemaMarkers.toString();
+	}
+	
+	@Override
+	public boolean equals (Object other) {
+		if (other == null)
+			return false;
+		
+		if (other == this)
+			return true;
+		
+		if (other instanceof MarkerSummary) {
+			MarkerSummary s = (MarkerSummary) other;
+			return schemaMarkers.equals(s.schemaMarkers);
+		}
+		
+		return false;
 	}
 }

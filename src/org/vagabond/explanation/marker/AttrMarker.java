@@ -1,7 +1,13 @@
 package org.vagabond.explanation.marker;
 
+import org.apache.log4j.Logger;
+import org.vagabond.explanation.marker.ScenarioDictionary;
+import org.vagabond.util.LoggerUtil;
+
 public class AttrMarker implements ISchemaMarker {
 
+	static Logger log = Logger.getLogger(AttrMarker.class);
+	
 	private int relId;
 	private int attrId;
 	private int hash = -1;
@@ -17,9 +23,11 @@ public class AttrMarker implements ISchemaMarker {
 		attrId = ScenarioDictionary.getInstance().getAttrId(relId, attrName);
 	}
 	
-	public AttrMarker (int relId, int attrId) {
+	public AttrMarker (int relId, int attrId) throws Exception {
 		this.relId = relId;
 		this.attrId = attrId;
+		if (!ScenarioDictionary.getInstance().validateAttrId(relId, attrId))
+			throw new Exception ("Invalid relId <" + relId + "> or attrId <" + attrId + ">");
 	}
 	
 	@Override
@@ -35,7 +43,12 @@ public class AttrMarker implements ISchemaMarker {
 	}
 	
 	public String getAttrName() {
-		return ScenarioDictionary.getInstance().getAttrName(relId, attrId);
+		try {
+			return ScenarioDictionary.getInstance().getAttrName(relId, attrId);
+		} catch (Exception e) { // should never be executed anyways
+			LoggerUtil.logException(e, log);
+			return null;
+		}
 	}
 	
 	

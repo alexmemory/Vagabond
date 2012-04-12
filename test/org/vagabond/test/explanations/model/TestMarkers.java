@@ -6,20 +6,26 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Vector;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
+import org.vagabond.explanation.marker.AttrMarker;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.util.CollectionUtils;
 
 public class TestMarkers extends AbstractVagabondTest {
 
@@ -124,6 +130,42 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		assertFalse(MarkerParser.getInstance().parseSet("{}").equals( 
 				MarkerParser.getInstance().parseSet("{A(tramp,1,name)}")));
+	}
+	
+	@Test
+	public void testSchemaMarker () throws Exception {
+		AttrMarker a1 = (AttrMarker) MarkerFactory.newSchemaMarker(0, 0);
+		AttrMarker a2 = (AttrMarker) MarkerFactory.newSchemaMarker(MarkerFactory.newAttrMarker(0, "1", 0));
+		Vector<ISchemaMarker> as = (Vector<ISchemaMarker>) MarkerFactory.newSchemaMarker(MarkerFactory.newTupleMarker(0, "1"));
+		Vector<ISchemaMarker> as2 = CollectionUtils.makeVec(a1, 
+				MarkerFactory.newSchemaMarker(0,1),
+				MarkerFactory.newSchemaMarker(0,2),
+				MarkerFactory.newSchemaMarker(0,3)
+				); 
+		
+		assertEquals(a1,a2);
+		assertTrue(a1 == a2);
+		
+		assertTrue(as.contains(a1));
+		assertEquals(as2, as);
+	}
+	
+	@Test
+	public void testMarkerSummary () throws Exception {
+		IAttributeValueMarker attr = MarkerFactory.newAttrMarker(0,"1",0);
+		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, "1", 1);
+		IAttributeValueMarker attr3 = MarkerFactory.newAttrMarker(1, "2", 0);
+		IAttributeValueMarker attr4 = MarkerFactory.newAttrMarker(1, "3", 0);
+		IMarkerSet set = MarkerFactory.newMarkerSet(attr,attr2,attr3,attr4);
+		
+		MarkerSummary sum = MarkerFactory.newMarkerSummary(set);
+		MarkerSummary exSum = MarkerFactory.newMarkerSummary(
+				MarkerFactory.newSchemaMarker(0,0),
+				MarkerFactory.newSchemaMarker(0,1),
+				MarkerFactory.newSchemaMarker(1,0)
+				);
+		
+		assertEquals (sum, exSum);
 	}
 	
 	private void testTupSize(int relId, int size) {

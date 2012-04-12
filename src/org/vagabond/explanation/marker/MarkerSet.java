@@ -68,6 +68,7 @@ public class MarkerSet implements IMarkerSet {
 	public IMarkerSet union(IMarkerSet other) {
 		if (other.getElems() != null)
 			this.markers.addAll(other.getElems());
+		sum = null;
 		return this;
 	}
 
@@ -111,12 +112,14 @@ public class MarkerSet implements IMarkerSet {
 
 	@Override
 	public boolean addAll(Collection<? extends ISingleMarker> arg0) {
+		sum = null;
 		return markers.addAll(arg0);
 	}
 
 	@Override
 	public void clear() {
 		markers.clear();
+		sum = null;
 	}
 
 	@Override
@@ -141,11 +144,13 @@ public class MarkerSet implements IMarkerSet {
 
 	@Override
 	public boolean remove(Object arg0) {
+		sum = null;
 		return markers.remove(arg0);
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
+		sum = null;
 		return markers.removeAll(arg0);
 	}
 
@@ -187,6 +192,9 @@ public class MarkerSet implements IMarkerSet {
 		for(ISingleMarker m: this.markers)
 			clone.add(m);
 		
+		if (sum != null)
+			clone.sum = sum;
+		
 		return clone;
 	}
 
@@ -195,10 +203,26 @@ public class MarkerSet implements IMarkerSet {
 		this.removeAll(other);
 		return this;
 	}
+	
+	@Override
+	public IMarkerSet subset (MarkerSummary sum) {
+		IMarkerSet cloneSet;
+		
+		cloneSet = this.cloneSet();
+		
+		for(ISingleMarker m: markers) {
+			if (!sum.hasAttr(m))
+				cloneSet.remove(m);
+		}
+		
+		return cloneSet;
+	}
 
 	@Override
 	public MarkerSummary getSummary() {
-		return MarkerFactory.newMarkerSummary(this); //TODO add caching?
+		if (sum == null)
+			this.sum = MarkerFactory.newMarkerSummary(this); //TODO check methods 
+		return sum;
 	}
 	
 }

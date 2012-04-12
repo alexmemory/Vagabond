@@ -120,4 +120,11 @@ public class CollectionUtils {
 		return result;
 	}
 
+	public static <T> void addToList (List<T> list, T newElem, int pos) {
+		while(list.size() <= pos) {
+			list.add(null);
+		}
+		list.set(pos, newElem);
+	}
+	
 }
