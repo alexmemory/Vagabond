@@ -2,6 +2,7 @@ package org.vagabond.test.explanations;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
@@ -11,6 +12,8 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.marker.PartitionedMarkerSet;
+import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -493,6 +496,49 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col.resetIter();
 		
 		assertEquals(expCol, col);		
+	}
+	
+	@Test
+	public void testSeveralComps () throws Exception {
+		loadToDB("resource/test/severalComps.xml");
+		
+		IAttributeValueMarker a1 = MarkerFactory.newAttrMarker("v", "1", "v1"); 
+		
+		IMarkerSet m = MarkerFactory.newMarkerSet(a1); 
+		
+		// elements
+		CorrespondenceType c2 = MapScenarioHolder.getInstance().getCorr("c2");
+		
+		MappingType m2 = MapScenarioHolder.getInstance().getMapping("M2");
+		
+		TransformationType t2 = MapScenarioHolder.getInstance().getTransformation("T2");
+		
+		// expl
+		CopySourceError e1 = new CopySourceError(a1);
+		e1.setSourceSE(MarkerParser.getInstance().parseSet("{A(t,1,t1)}"));
+		
+		CorrespondenceError e2 = new CorrespondenceError(a1);
+		e2.addCorrespondence(c2);
+		e2.setMapSE(Collections.singleton(m2));
+		e2.setTransSE(Collections.singleton(t2));
+		e2.setTargetSE(MarkerParser.getInstance().parseSet("{A(v,2,v1)}"));
+		
+		SuperflousMappingError e3 = new SuperflousMappingError(a1);
+		e3.setMapSE(Collections.singleton(m2));
+		e3.setTransSE(Collections.singleton(t2));
+		e3.setTargetSE(MarkerParser.getInstance().parseSet("{T(v,2)}"));
+		
+		IExplanationSet expl = ExplanationFactory.newExplanationSet(e1, e2, e3);
+		
+		ExplanationCollection ex = new ExplanationCollection();
+		ex.addExplSet(a1, expl);
+		
+		// create
+		ExplanationCollection col1 = gen.findExplanations(MarkerFactory.newMarkerSet(a1));
+		
+		log.debug(col1);
+		
+		assertEquals(ex, col1);
 	}
 	
 }

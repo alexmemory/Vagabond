@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 		TestMarkerParser.class,
 		TestMarkers.class,
 		TestErrorPartitionGraph.class,
-		TestScenarioDictionary.class
+		TestScenarioDictionary.class,
+		TestErrorPartitioning.class
         })
 public class AllTestExplanationsModel {
 

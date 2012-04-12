@@ -9,7 +9,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
-import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.explanation.ranking.IExplanationRanker;
 import org.vagabond.util.IdMap;
 import org.vagabond.util.LogProviderHolder;

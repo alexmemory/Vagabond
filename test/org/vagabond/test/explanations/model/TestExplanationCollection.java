@@ -1,9 +1,6 @@
 package org.vagabond.test.explanations.model;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 
@@ -478,7 +475,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 
 	@Test
 	public void testUnqiueness () throws Exception {
-		CopySourceError e11, e12, e22;
+		CopySourceError e11, e22;
 		CorrespondenceError e21, e13;
 		IExplanationSet set1, set2;
 		IAttributeValueMarker error1, error2; 

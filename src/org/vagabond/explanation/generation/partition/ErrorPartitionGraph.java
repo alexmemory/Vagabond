@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -188,10 +189,35 @@ public class ErrorPartitionGraph {
 		}
 	}
 	
-	public ErrorPartitionGraph getInducedSubGraph (MarkerSummary summary) {
-		ErrorPartitionGraph newGraph;
+	public List<MarkerSummary> paritionAttrs (MarkerSummary summary) throws Exception {
+		List<MarkerSummary> result = new ArrayList<MarkerSummary> ();
 		
-		return null; //TODO newGraph;
+		getComponents();
+		for(int i = 0; i < components.getRows(); i++) {
+			result.add(new MarkerSummary());
+		}
+		
+		for(ISchemaMarker m: summary)
+			result.get(getPartitionForAttr(m)).add(m);
+		
+		while(result.contains(null))
+			result.remove(null);
+		
+		return result;
+	}
+	
+	private int getComponent (int node) throws Exception {
+		getComponents();
+		return components.firstOneInCol(node);
+	}
+	
+	public int getPartitionForAttr (ISchemaMarker m) throws Exception {
+		int node = nodeIndex[m.getRelId() + sourceOffset][m.getAttrId()];
+		return getComponent(node);
+	}
+	
+	public ErrorNode getNode (ISchemaMarker m) {
+		return nodes.get(nodeIndex[m.getRelId() + sourceOffset][m.getAttrId()]);
 	}
 	
 	public List<ErrorNode> getNodesForComponents (ErrorNode node) {

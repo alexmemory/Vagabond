@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -13,6 +14,9 @@ import org.junit.Test;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph.ErrorGraphNodeType;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph.ErrorNode;
+import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.BitMatrix;
 import org.vagabond.util.CollectionUtils;
@@ -181,6 +185,23 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		
 		assertEquals(2, g.getNumComponents());
 		assertEquals(nodes, compNodes);
+	}
+	
+	@Test
+	public void testParitioning () throws Exception {
+		ErrorPartitionGraph g;
+		
+		setSchemas("resource/test/severalComps.xml");
+		g = new ErrorPartitionGraph();
+		
+		MarkerSummary ex1 = MarkerParser.getInstance().parseMarkerSummary("{S(u,u1)}");
+		MarkerSummary ex2 = MarkerParser.getInstance().parseMarkerSummary("{S(v,v1)}");
+		
+		g.getComponents();
+		List<MarkerSummary> sum = g.paritionAttrs(MarkerParser.getInstance().parseMarkerSummary("{S(u,u1),S(v,v1)}"));
+		
+		assertTrue(sum.contains(ex1));
+		assertTrue(sum.contains(ex2));
 	}
 	
 }

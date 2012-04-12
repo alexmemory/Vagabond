@@ -62,7 +62,6 @@ public class DummyRanker implements IExplanationRanker {
 
 	@Override
 	public void initialize(ExplanationCollection coll) {
-		List<IBasicExplanation> expList;
 		IMarkerSet errors;
 		
 		this.coll = coll;
@@ -88,7 +87,7 @@ public class DummyRanker implements IExplanationRanker {
 						e.getTargetSideEffects().cloneSet().intersect(errors));
 			}
 		
-			expList = explSet.getExplanations();
+//			explSet.getExplanations();
 		}
 		
 		init = true;
@@ -198,6 +197,7 @@ public class DummyRanker implements IExplanationRanker {
 		log.debug("iterator reached end: <" + iterPos + "> : " + curIterPos);
 	}
 		
+	@SuppressWarnings("unused")
 	private int compareVec (Vector<Integer> left, Vector<Integer> right) {
 		if (left.size() < right.size())
 			return 1;

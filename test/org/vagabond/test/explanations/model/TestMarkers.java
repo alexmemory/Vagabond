@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.xmlbeans.XmlException;
@@ -20,12 +18,12 @@ import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.MarkerSummary;
+import org.vagabond.explanation.marker.PartitionedMarkerSet;
 import org.vagabond.explanation.marker.ScenarioDictionary;
-import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.CollectionUtils;
+import org.vagabond.util.Pair;
 
 public class TestMarkers extends AbstractVagabondTest {
 
@@ -166,6 +164,71 @@ public class TestMarkers extends AbstractVagabondTest {
 				);
 		
 		assertEquals (sum, exSum);
+		assertEquals (sum, set.getSummary());
+	}
+	
+	@Test
+	public void testMarkerSetSubset () throws Exception {
+		IAttributeValueMarker attr = MarkerFactory.newAttrMarker(0,"1",0);
+		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, "1", 1);
+		IAttributeValueMarker attr3 = MarkerFactory.newAttrMarker(1, "2", 0);
+		IAttributeValueMarker attr4 = MarkerFactory.newAttrMarker(1, "3", 0);
+		IMarkerSet set = MarkerFactory.newMarkerSet(attr,attr2,attr3,attr4); 
+				
+		MarkerSummary sum = MarkerFactory.newMarkerSummary(
+				MarkerFactory.newSchemaMarker(0,0),
+				MarkerFactory.newSchemaMarker(1,0)
+				);
+		
+		IMarkerSet subset = set.subset(sum);
+		IMarkerSet exSubset = MarkerFactory.newMarkerSet(attr,attr3,attr4);
+		
+		assertEquals(subset, exSubset);
+	}
+
+	@Test
+	public void testPartitionedMarkerSet () throws Exception {
+		IAttributeValueMarker attr = MarkerFactory.newAttrMarker(0,"1",0);
+		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(0, "1", 1);
+		IAttributeValueMarker attr3 = MarkerFactory.newAttrMarker(1, "2", 0);
+		IAttributeValueMarker attr4 = MarkerFactory.newAttrMarker(1, "3", 0);
+		IMarkerSet set = MarkerFactory.newMarkerSet(attr,attr2,attr3,attr4); 
+				
+		MarkerSummary sum1 = MarkerFactory.newMarkerSummary(
+				MarkerFactory.newSchemaMarker(0,0),
+				MarkerFactory.newSchemaMarker(1,0)
+				);
+		
+		MarkerSummary sum2 = MarkerFactory.newMarkerSummary(
+				MarkerFactory.newSchemaMarker(0,1)
+				);
+		
+		IMarkerSet sub1 = set.subset(sum1);
+		IMarkerSet sub2 = set.subset(sum2);
+		
+		PartitionedMarkerSet m = new PartitionedMarkerSet();
+		
+		m.addPartition(sub1, sum1);
+		m.addPartition(sub2, sum2);
+		
+		assertEquals(2, m.getNumParts());
+		
+		assertEquals(sum1, m.getAttrPartition(0));
+		assertEquals(sum2, m.getAttrPartition(1));
+		
+		assertEquals(sub1, m.getPartition(0));
+		assertEquals(sub2, m.getPartition(1));
+		
+		assertEquals(sum1, m.getAttrPartition(MarkerFactory.newSchemaMarker(0, 0)));
+		assertEquals(sum1, m.getAttrPartition(MarkerFactory.newSchemaMarker(1, 0)));
+		assertEquals(sum2, m.getAttrPartition(MarkerFactory.newSchemaMarker(0, 1)));
+
+		assertEquals(sub1, m.getMarkerPartition(MarkerFactory.newSchemaMarker(0, 0)));
+		assertEquals(sub1, m.getMarkerPartition(MarkerFactory.newSchemaMarker(1, 0)));
+		assertEquals(sub2, m.getMarkerPartition(MarkerFactory.newSchemaMarker(0, 1)));
+		
+		assertEquals(new Pair<IMarkerSet, MarkerSummary> (sub1, sum1), m.getPartAndSum(0));
+		assertEquals(new Pair<IMarkerSet, MarkerSummary> (sub2, sum2), m.getPartAndSum(1));
 	}
 	
 	private void testTupSize(int relId, int size) {
