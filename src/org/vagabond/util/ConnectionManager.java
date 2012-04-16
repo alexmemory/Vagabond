@@ -77,6 +77,10 @@ public class ConnectionManager {
 		return rs;
 	}
 	
+	public void execUpdate(String query) throws SQLException {
+		execUpdate(con, query);
+	}
+	
 	public void execUpdate (Connection userCon, String query) throws SQLException {
 		Statement st;
 		

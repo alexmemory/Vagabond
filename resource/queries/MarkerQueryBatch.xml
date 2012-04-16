@@ -5,7 +5,7 @@
 
 <entry key="GetQuery">
 SELECT *
-FROM (${1}) AS e
+FROM ${1} AS e
 WHERE ${2}
 </entry>
 

@@ -91,4 +91,36 @@ public class TestMarkerQueryBatch extends AbstractVagabondTest {
 		
 	}
 	
+	@Test
+	public void testMarkerQueryBatchSetLivesinMaterializedView () throws Exception {
+		String query = 
+			"CREATE TABLE errm AS " +
+			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
+			"FROM target.person " +
+			"WHERE person.livesin IS NULL " + 
+			"UNION " + 
+			"SELECT 'person'::text AS rel, person.tid, B'01'::bit varying AS att " + 
+			"FROM target.person " + 
+			"WHERE person.livesin IS NOT NULL";
+		
+		ConnectionManager.getInstance().execUpdate(query);
+		
+		String relName = "errm";
+		String predicate = "att & 'B01'::varbit != 'B00'::varbit";
+		
+		mq = new MarkerQueryBatch(relName, predicate);
+		ISingleMarker m1 = new AttrValueMarker("person", "1|3|2", "livesin");
+		ISingleMarker m3 = new AttrValueMarker("person", "2|1|1", "livesin");
+		ISingleMarker m5 = new AttrValueMarker("person", "3|3|2", "livesin");
+		markers.add(m1);
+		markers.add(m3);
+		markers.add(m5);
+		
+		assert(mq.equals(markers));
+		
+		query = "DROP TABLE errm";
+		ConnectionManager.getInstance().execUpdate(query);
+		
+	}
+	
 }

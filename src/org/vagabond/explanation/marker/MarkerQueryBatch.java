@@ -23,6 +23,10 @@ public class MarkerQueryBatch extends MarkerSet {
 	public MarkerQueryBatch(String relName, String predicate) throws Exception {
 		ResultSet rs;
 		
+		if (relName.toUpperCase().startsWith("SELECT")) {
+			relName = "(" + relName + ")";
+		}
+		
 		query = QueryHolder.getQuery("MarkerQueryBatch.GetQuery")
 				.parameterize(relName, predicate);
 		log.debug("Compute markers for query:\n" + query);
