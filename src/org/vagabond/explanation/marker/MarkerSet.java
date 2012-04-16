@@ -15,7 +15,7 @@ public class MarkerSet implements IMarkerSet {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerSet.class);
 	
-	private Set<ISingleMarker> markers;
+	protected Set<ISingleMarker> markers;
 	private MarkerSummary sum;
 	
 	public MarkerSet () {

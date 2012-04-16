@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>MarkerQueryBatch</comment>
+
+<entry key="GetQuery">
+SELECT *
+FROM (${1}) AS e
+WHERE ${2}
+</entry>
+
+
+
+</properties>
