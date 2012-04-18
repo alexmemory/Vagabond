@@ -35,6 +35,10 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		return numExpls;
 	}
 	
+	public IExplanationRanker getRanker () {
+		return this.ranker;
+	}
+	
 	public int getNumCombinations() {
 		return ranker.getNumberOfExplSets();
 	}
@@ -61,6 +65,12 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	public void createRanker (IExplanationRanker ranker) {
 		this.ranker = ranker;
 		ranker.initialize(this);
+	}
+	
+	public IExplanationSet getRankedExpl (int pos) {
+		assert (ranker != null && pos > 0 && ranker.hasAtLeast(pos));
+		
+		return ranker.getRankedExpl(pos);
 	}
 	
 	public void confirmExplanation (IBasicExplanation expl) {

@@ -562,7 +562,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		// *** collection
 		col = ExplanationFactory.newExplanationCollection(set1, set2);
 		
-		/* create Dummy Ranker */
+		/* create SideEffect Ranker */
 		col.createRanker(new SideEffectExplanationRanker());
 		col.resetIter();
 		

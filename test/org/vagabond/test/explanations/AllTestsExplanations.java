@@ -2,6 +2,7 @@ package org.vagabond.test.explanations;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.vagabond.test.explanation.ranking.AllTestRanking;
 import org.vagabond.test.explanations.model.AllTestExplanationsModel;
 
 
@@ -20,7 +21,8 @@ import org.vagabond.test.explanations.model.AllTestExplanationsModel;
 		TestProvAndSideEffect.class,
 		TestProvAndSideEffectQueries.class,
 		TestProvParsers.class,
-		AllTestExplanationsModel.class
+		AllTestExplanationsModel.class,
+		AllTestRanking.class
         })
 public class AllTestsExplanations {
 

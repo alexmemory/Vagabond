@@ -24,6 +24,17 @@ import org.vagabond.util.IdMap;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
 
+/**
+ * A*-search based ranking of explanations. We sort the markers  
+ * for which we have to create full explanations (which ordering is used is unimportant for correctness).
+ * Starting from all possible explanations for the first marker in order (say e1) we iteratively extend
+ * these partial solutions with possible explanations for the next marker in order. Partial solutions are
+ * stored in a min-heap based 
+ * 
+ * @author lord_pretzel
+ *
+ */
+
 public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(
@@ -454,20 +465,28 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public IExplanationSet next() {
-		if (++iterPos >= numSets)
-			throw new NoSuchElementException("only " + numSets + " elements");
-		
-		if (iterPos > iterDone)
-			generateUpTo(iterPos);			
-
-		if (curIterElem == null)
-			curIterElem = sortedSets.first();
-		else
-			curIterElem = sortedSets.higher(curIterElem);
-		
+		advanceIter();
 		return getSetForRankedListElem (curIterElem);
 	}
 
+	private void advanceIter() {
+		if (rankingDone && iterPos + 1 >= numSets)
+			throw new NoSuchElementException("only " + numSets + " elements");
+		
+		if (iterPos + 1 > iterDone)
+			generateUpTo(iterPos + 1);
+		
+		if (iterPos + 1 > iterDone)
+			throw new NoSuchElementException("only " + numSets + " elements");
+		
+		iterPos++;
+		if (curIterElem == null)
+			curIterElem = sortedSets.first();
+		else
+			curIterElem = sortedSets.higher(curIterElem);		
+	}
+	
+	
 	private IExplanationSet getSetForRankedListElem (RankedListElement elem) {
 		IExplanationSet result = ExplanationFactory.newExplanationSet(
 				ExplanationComparators.sameElemComp);		
@@ -515,7 +534,12 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public boolean hasNext() {
-		return iterPos < numSets - 1;
+		if (rankingDone && iterPos < iterDone)
+			return true;
+		if (!rankingDone && iterPos == iterDone)
+			generateUpTo(iterDone + 1);
+		
+		return iterPos < iterDone;
 	}
 	
 	@Override
@@ -540,6 +564,11 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 		curIterElem = null;
 	}
 
+	@Override
+	public boolean isFullyRanked () {
+		return rankingDone;
+	}
+	
 	@Override
 	public int getIterPos() {
 		return iterPos + 1;
@@ -566,6 +595,48 @@ public class SideEffectExplanationRanker implements IExplanationRanker {
 			log.debug("ITER DONE " + (iterDone + 1) + " incomplete " 
 					+ (sortedSets.size() - iterDone - 1));
 		return iterDone + 1;
+	}
+
+	@Override
+	public IExplanationSet getRankedExpl(int rank) {
+		int oldIterPos = iterPos;
+		IExplanationSet result;
+		
+		assert(rank > 0 && (!rankingDone || iterDone >= rank));
+		if (!rankingDone)
+			generateUpTo(rank);
+		
+		if (iterPos > rank)
+			resetIter();
+		
+		while (iterPos < rank)
+			advanceIter();
+		
+		result = getSetForRankedListElem(curIterElem);
+		
+		resetIter();
+		while(iterPos < oldIterPos)
+			advanceIter();
+		
+		return result;
+	}
+
+	@Override
+	public boolean hasAtLeast(int numElem) {
+		if (rankingDone)
+			return numSets >= numElem;
+		
+		try {
+			generateUpTo(numElem - 1);
+			return true;
+		} catch(NoSuchElementException e) {
+			return false;
+		}
+	}
+
+	@Override
+	public int getSideEffectSize(int rank) { //TODO improve perf by 
+		return getRankedExpl(rank).getSideEffectSize();
 	}
 
 }

@@ -35,6 +35,13 @@ public class DummyRanker implements IExplanationRanker {
 	}
 	
 	@Override
+	public IExplanationSet getRankedExpl (int pos) {
+		setIter(pos);
+		
+		return generateExplForIter(iterPos);
+	}
+	
+	@Override
 	public boolean hasNext() {
 		return curIterPos < numExplSets - 1;
 	}
@@ -49,8 +56,6 @@ public class DummyRanker implements IExplanationRanker {
 
 		increaseIter ();
 		set = generateExplForIter(iterPos);
-		
-//		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
 		
 		return set;
 	}
@@ -135,6 +140,16 @@ public class DummyRanker implements IExplanationRanker {
 	
 	public int getTotalNumExpls () {
 		return numExplSets;
+	}
+	
+	private void setIter (int pos) {
+		assert(pos < 0 || pos >= numExplSets);
+		
+		while (curIterPos < pos)
+			increaseIter();
+			
+		while (curIterPos > pos)
+			decreaseIter();
 	}
 
 	private void decreaseIter () {
@@ -260,6 +275,16 @@ public class DummyRanker implements IExplanationRanker {
 	@Override
 	public int getNumberPrefetched() {
 		return 0;
+	}
+
+	@Override
+	public boolean hasAtLeast(int numElem) {
+		return (getNumberOfExplSets() > numElem);
+	}
+
+	@Override
+	public boolean isFullyRanked() {
+		return true;
 	}
 
 	
