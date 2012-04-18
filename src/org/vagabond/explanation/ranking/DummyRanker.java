@@ -287,5 +287,10 @@ public class DummyRanker implements IExplanationRanker {
 		return true;
 	}
 
+	@Override
+	public int getSideEffectSize(int rank) {
+		return getRankedExpl(rank).getSideEffectSize();
+	}
+
 	
 }

@@ -45,7 +45,25 @@ public class PartitionSideEffectRanker implements IPartitionRanker {
 		
 		@Override
 		public boolean equals (Object other) {
-			return compareTo(other) == 0;
+			if (other == null)
+				return false;
+			if (other == this)
+				return true;
+			
+			if (other instanceof FullExplanation) {
+				FullExplanation e = (FullExplanation) other;
+				
+				assert(iterPos.length == e.iterPos.length);
+				
+				for(int i = 0; i < iterPos.length; i++) {
+					if (iterPos[i] != e.iterPos[i])
+						return false;
+				}
+				
+				return true;
+			}
+			
+			return false;
 		}
 		
 		@Override
@@ -71,11 +89,6 @@ public class PartitionSideEffectRanker implements IPartitionRanker {
 				boolean oDom = true, thisDom = true;
 				
 				if (seInit && o.seInit) {
-					if (totalSe < o.totalSe)
-						return -1;
-					if (totalSe > o.totalSe)
-						return 1;
-					
 					if (totalSe < o.totalSe)
 						return -1;
 					if (totalSe > o.totalSe)
@@ -113,7 +126,7 @@ public class PartitionSideEffectRanker implements IPartitionRanker {
 				return this.compareTo(o); // ok done initialization, do again
 			}
 			
-			return Integer.MAX_VALUE;
+			throw new ClassCastException();
 		}
 		
 		private void getSe () {
