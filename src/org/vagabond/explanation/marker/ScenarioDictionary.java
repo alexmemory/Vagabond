@@ -116,6 +116,14 @@ public class ScenarioDictionary {
 		return attrId < rel.getAttrArray().length;
 	}
 	
+	public ArrayList<String> getAttrNameList(String relName) throws Exception {
+		ArrayList<String> attNameList = new ArrayList<String>();
+		for (org.vagabond.xmlmodel.AttrDefType r : rels.get(getRelId(relName)).getAttrArray()) {
+			attNameList.add(r.getName());
+		}
+		return attNameList;
+	}
+	
 	public String getAttrName (int relId, int attrId) {
 		assert(validateRelId(relId) && validateAttrId(relId, attrId));
 		

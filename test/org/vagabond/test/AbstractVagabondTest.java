@@ -16,6 +16,7 @@ import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
+import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
 import org.vagabond.util.ConnectionManager;
 
 public abstract class AbstractVagabondTest {
