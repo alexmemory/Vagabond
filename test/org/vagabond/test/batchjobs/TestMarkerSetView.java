@@ -157,10 +157,12 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 	@Test
 	public void testMarkerSetViewAdd () throws Exception {
 		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
-		ISingleMarker m1 = new AttrValueMarker("person", "4M", "name");
+		ISingleMarker m1 = new AttrValueMarker("person", "1|3|2", "livesin");
+		ISingleMarker m2 = new AttrValueMarker("person", "4M", "name");
 		mv.materialize();
 		assertFalse(mv.add(m0));
-		assertTrue(mv.add(m1));
+		assertFalse(mv.add(m1));
+		assertTrue(mv.add(m2));
 	}
 	
 	@Test
