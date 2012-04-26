@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.marker.MarkerSetView;
+import org.vagabond.explanation.marker.MarkerSetFlattenedView;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.DataType;
@@ -22,7 +22,7 @@ public class MaterializedViewsBroker {
 	private static MaterializedViewsBroker instance;
 	private static int maxViewId = 0;
 		
-	private HashMap<MarkerSetView, Integer> vm = new HashMap<MarkerSetView, Integer>();
+	private HashMap<MarkerSetFlattenedView, Integer> vm = new HashMap<MarkerSetFlattenedView, Integer>();
 	
 	private MaterializedViewsBroker () {
 	}
@@ -39,7 +39,7 @@ public class MaterializedViewsBroker {
 		throw new CloneNotSupportedException();
 	}
 	
-	public synchronized int getViewHandler(MarkerSetView markers) {
+	public synchronized int getViewHandler(MarkerSetFlattenedView markers) {
 		if (vm.containsKey(markers))
 			return vm.get(markers);
 
@@ -53,9 +53,11 @@ public class MaterializedViewsBroker {
 	}
 	
 	public void decompose() {
-		for (MarkerSetView o : vm.keySet()) {
+		for (MarkerSetFlattenedView o : vm.keySet()) {
 			o.decompose();
 		}
+		vm.clear();
+		maxViewId = 0;
 	}
 	
 }

@@ -18,12 +18,15 @@ import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.marker.AttrValueMarker;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.MarkerQueryBatch;
 import org.vagabond.explanation.marker.MarkerSet;
-import org.vagabond.explanation.marker.MarkerSetView;
+import org.vagabond.explanation.marker.MarkerSetFlattenedView;
+import org.vagabond.explanation.marker.MarkerSummary;
+import org.vagabond.explanation.marker.TupleMarker;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
@@ -35,12 +38,12 @@ import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.PropertyWrapper;
 
 
-public class TestMarkerSetView extends AbstractVagabondTest {
+public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 
-	static Logger log = Logger.getLogger(TestMarkerSetView.class);
+	static Logger log = Logger.getLogger(TestMarkerSetFlattenedView.class);
 	
 	private static MarkerSet markers;
-	private static MarkerSetView mv;
+	private static MarkerSetFlattenedView mv;
 	private static String query;
 	
 	@Before
@@ -54,7 +57,7 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'01'::bit varying AS att " + 
 			"FROM target.person " + 
 			"WHERE person.livesin IS NOT NULL";
-		mv = new MarkerSetView(query);
+		mv = new MarkerSetFlattenedView(query);
 		markers = new MarkerSet();
 	}
 	
@@ -99,7 +102,7 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetView mv1 = new MarkerSetView(query1);
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
 		
 		assertFalse(mv.equals(mv1));
 	}
@@ -116,7 +119,7 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 			"WHERE person.livesin IS NULL and tid<>'1M' " +
 			"UNION " +
 			"SELECT 'person', '4M', B'10'::bit varying";
-		MarkerSetView mv1 = new MarkerSetView(query1);
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
 		
 		assertFalse(mv.equals(mv1));
 	}
@@ -131,7 +134,7 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL ";
-		MarkerSetView mv1 = new MarkerSetView(query1);
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
 		
 		assertTrue(mv.equals(mv1));
 	}
@@ -139,10 +142,33 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 	@Test
 	public void testMarkerSetViewUnion () throws Exception {
 		ISingleMarker m0 = new AttrValueMarker("person", "4M", "name");
+		ISingleMarker m1 = new AttrValueMarker("person", "5M", "livesin");
 		markers.add(m0);
+		markers.add(m1);
 		
 		IMarkerSet mv1 = mv.union(markers);
-		assertTrue(mv1.getSize() == 7);
+		assertTrue(mv1.getSize() == 8);
+	}
+	
+	@Test
+	public void testMarkerSetViewContainsAllMarkerSet () throws Exception {
+		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
+		ISingleMarker m2 = new AttrValueMarker("person", "2M", "name");
+		markers.add(m0);
+		markers.add(m2);
+		
+		assertTrue(mv.containsAll(markers));
+	}
+	
+	@Test
+	public void testMarkerSetViewContainsAllView () throws Exception {
+		String query1 = 
+			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
+			"FROM target.person " +
+			"WHERE person.livesin IS NULL";
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		
+		assertTrue(mv.containsAll(mv1));
 	}
 	
 	@Test
@@ -184,14 +210,52 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 		assertTrue(mv.remove(m0));
 		assertFalse(mv.remove(m1));
 		assertTrue(mv.getSize() == 5);
+		
+		ISingleMarker m2 = new TupleMarker("person", "2M");
+		assertTrue(mv.remove(m2));
+		assertTrue(mv.getSize() == 4);
+	}
+	
+	@Test
+	public void testMarkerSetViewRemoveAll () throws Exception {
+		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
+		ISingleMarker m1 = new AttrValueMarker("person", "4M", "livesin");
+		markers.add(m0);
+		markers.add(m1);
+		mv.materialize();
+
+		assertTrue(mv.removeAll(markers));
+		assertTrue(mv.getSize() == 5);
+		
+		String query1 = 
+			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
+			"FROM target.person " +
+			"WHERE person.livesin IS NULL";
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		assertTrue(mv.removeAll(mv1));
+		assertTrue(mv.getSize() == 3);
 	}
 	
 	@Test
 	public void testMarkerSetViewRetainAll () throws Exception {
 		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
+		ISingleMarker m1 = new AttrValueMarker("person", "2M", "name");
+		ISingleMarker m2 = new AttrValueMarker("person", "4M", "name");
 		markers.add(m0);
+		markers.add(m1);
+		markers.add(m2);
+		mv.materialize();
+		
 		assertTrue(mv.retainAll(markers));
-		assertTrue(mv.getSize() == 1);
+		assertTrue(mv.getSize() == 2);
+
+		String query1 = 
+			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
+			"FROM target.person " +
+			"WHERE person.livesin IS NULL";
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		assertFalse(mv.retainAll(mv1));
+		assertTrue(mv.getSize() == 2);
 	}
 	
 	@Test
@@ -200,7 +264,7 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetView mv1 = new MarkerSetView(query1);
+		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
 		assertTrue(mv.intersect(mv1).getSize() == 3);
 	}
 	
@@ -208,9 +272,22 @@ public class TestMarkerSetView extends AbstractVagabondTest {
 	public void testMarkerSetViewIntersectMarkerSet () throws Exception {
 		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
 		ISingleMarker m1 = new AttrValueMarker("person", "4M", "name");
+		ISingleMarker m3 = new AttrValueMarker("person", "2|1|1", "livesin");
 		markers.add(m0);
 		markers.add(m1);
-		assertTrue(mv.intersect(markers).getSize() == 1);
+		markers.add(m3);
+		assertTrue(mv.intersect(markers).getSize() == 2);
 	}
 	
+	@Test
+	public void testMarkerSetViewGetSummary () throws Exception {
+		mv.materialize();
+		MarkerSummary ms = mv.getSummary();
+		
+		assertTrue(ms.size() == 2);
+		ISchemaMarker sm1 = MarkerFactory.newSchemaMarker("person", "name");
+		ISchemaMarker sm2 = MarkerFactory.newSchemaMarker("person", "livesin");
+		assertTrue(ms.contains(sm1));
+		assertTrue(ms.contains(sm2));
+	}
 }
