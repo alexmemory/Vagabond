@@ -194,11 +194,11 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		
 		log.debug("Get the size of markers for query:\n" + query);
 
-		size = querySize(query);
+		size = getQueryResultCount(query);
 		
 		return size;
 	}
-
+	
 	private int querySize(String q) {
 		ResultSet rs;
 		int s = 0;
@@ -227,9 +227,14 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	public int getNumElem() {
 		if (isMaterialized()) return numElem;
 		
+		return getQueryResultCount(query);
+	}
+	
+	public int getQueryResultCount (String q) {
 		ResultSet rs;
 		String sizeQuery = "SELECT COUNT(*) AS num " + 
-							"FROM (" + query + ") AS A";
+							"FROM (" + q + ") AS A";
+		int numElem = -1;
 		
 		try {
 			rs = ConnectionManager.getInstance().execQuery(sizeQuery);
@@ -238,7 +243,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 			}
 			ConnectionManager.getInstance().closeRs(rs);
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
 		
 		return numElem;
@@ -315,15 +320,13 @@ public class MarkerSetFlattenedView extends MarkerSet {
 			AttrValueMarker m0 = (AttrValueMarker)marker;
 			singleMarkerStr = " ('";
 			singleMarkerStr += m0.getRel() + "','";
-			singleMarkerStr += m0.getTid() + "',B'";
-			String attId = "";
+			singleMarkerStr += m0.getTid() + "',";
 			try {
-				attId = getMarkerAtt(m0.getRel(), m0.getAttrId());
+				singleMarkerStr += getPostBitConst(m0);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LoggerUtil.logException(e, log);
 			}
-			singleMarkerStr += attId;
-			singleMarkerStr += "'::bit varying)";
+			singleMarkerStr += ")";
 		} else if (marker instanceof TupleMarker) {
 			ArrayList<String> attrValueMarkerSet = getAttrValueMarkerSet((TupleMarker)marker);
 			for (String s : attrValueMarkerSet)
@@ -347,15 +350,13 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		try {
 			for (String attrName : ScenarioDictionary.getInstance().getAttrNameList(relName)) {
 				singleMarkerStr = " ('" + relName + "','";
-				singleMarkerStr += tid + "',B'";
-				String attId = "";
+				singleMarkerStr += tid + "',";
 				try {
-					attId = getMarkerAtt(relName, ScenarioDictionary.getInstance().getAttrId(relName, attrName));
+					singleMarkerStr += getPostBitConst((IAttributeValueMarker) marker);
 				} catch (Exception e) {
-					e.printStackTrace();
+					LoggerUtil.logException(e, log);
 				}
-				singleMarkerStr += attId;
-				singleMarkerStr += "'::bit varying)";
+				singleMarkerStr += ")";
 				attrValueMarkerSet.add(singleMarkerStr);
 			}
 		} catch (Exception e) {
@@ -386,17 +387,10 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		}
 
 		// Update size and numElem
-		size += getSizeInMarker(s);
+		size += marker.getSize();
 		numElem ++;
 	}
 	
-	public int getSizeInMarker(String str) {
-		// Count how many "bit varying" are in the string
-		String[] x = str.split("bit varying");
-		int y = x.length;
-		return str.split("bit varying").length-1;
-	}
-
 	@Override
 	public boolean add(ISingleMarker marker) {
 		String tempQ = query;
@@ -465,13 +459,36 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	public boolean contains(Object arg0) {
 //		Set<ISingleMarker> markers = getElems(); //TODO: on db side.
 //		return markers.contains(arg0);
+		String q;
+		
 		if (!(arg0 instanceof ISingleMarker))
 			return false;
 
 		ISingleMarker o = (ISingleMarker)arg0;
-		String q = query + " EXCEPT VALUES " + singleMarkerQueryString(o);
+		if (o instanceof ITupleMarker) {
+			q = "SELECT * FROM (" + query + ") AS q WHERE rel = '" 
+			+ o.getRel() + "' AND tid = '" + o.getTid() + "'";
+		} 
+		else {
+			try {
+				IAttributeValueMarker a = (IAttributeValueMarker) o;
+				q = "SELECT * FROM (" + query + ") AS q WHERE rel = '" + a.getRel() + "' AND tid = '" 
+						+ a.getTid() + "' AND att = " + getPostBitConst(a);
+			} catch (Exception e) {
+				LoggerUtil.logException(e, log);
+				return false;
+			}
+		}
 		
-		return size != querySize(q);
+		return getQueryResultCount(q) == o.getSize();		
+	}
+	
+	private String getVarbitConst (int size, boolean value) {
+		String r = "";
+		for(int i = 0; i < size; i++)
+			r += (value) ? "1" : "0";
+		
+		return r;
 	}
 
 	@Override
@@ -491,7 +508,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 			}
 			String q = this.query + " EXCEPT VALUES " + q1;
 			q = removeLastComma(q);
-			return getSize()-querySize(q) == getSizeInMarker(q1);
+			return getSize()-getQueryResultCount(q) == ms.getSize();
 		}
 		
 		return false;
@@ -509,6 +526,10 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		return markers.iterator();
 	}
 	
+	private String getPostBitConst (IAttributeValueMarker m) throws Exception {
+		return "B'" + getMarkerAtt(m.getRel(), m.getAttrId()) + "'::bit varying";
+	}
+	
 	private String getMarkerAtt(String relName, int attId) throws Exception {
 		int attLength = ScenarioDictionary.getInstance().getAttrNameList(relName).size();
 		int attPos = (int)Math.pow(2, attLength-attId-1);
@@ -517,7 +538,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 
 	@Override
 	public boolean remove(Object arg0) {
-		if (!this.contains((ISingleMarker)arg0)) {
+		if (!this.contains((ISingleMarker)arg0)) { //TODO check semantics (half contained tuple marker)
 			return false;
 		}
 		sum = null;
@@ -534,25 +555,26 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		// Only to be called if the view has been materialized
 		String s = singleMarkerQueryString(marker);
 		// Update size and numElem
-		if (marker instanceof AttrValueMarker) {
-			size --;
-			numElem --;
-		}
+//		if (marker instanceof AttrValueMarker) {
+//			size --;
+//			numElem --;
+//		}
 		
-		if (marker instanceof TupleMarker) {
-			String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + s + " )";
-			int changedSize = querySize(sizeq);
-			size -= changedSize;
-			numElem -= changedSize;
-		}
+//		if (marker instanceof TupleMarker) {
+//			String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + s + " )";
+//			int changedSize = querySize(sizeq);
+//			size -= changedSize;
+//			numElem -= changedSize;
+//		}
 		
 		String q = "DELETE FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + s + " )";
 		try {
-			ConnectionManager.getInstance().execUpdate(q);
+			int changedSize = ConnectionManager.getInstance().execUpdate(q);
+			size -= changedSize;
+			numElem -= changedSize;
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
-
 	}
 
 	@Override
@@ -592,20 +614,18 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	
 	private boolean deleteMultipleMarkers(String values) throws Exception {
 		// Only to be called if the view has been materialized
-		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + values + " )";
-		int changedNum = querySize(sizeq);
-		size -= changedNum;
-		numElem -= changedNum;
-		
+//		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + values + " )";
+//		int changedNum = querySize(sizeq);
 		String q = "DELETE FROM " + relName + " WHERE (rel, tid, att) IN ( VALUES " + values + " )";
 		try {
-			ConnectionManager.getInstance().execUpdate(q);
+			int changedNum  = ConnectionManager.getInstance().execUpdate(q);
+			size -= changedNum;
+			numElem -= changedNum;
+			return changedNum>0;
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
-		
-		return changedNum>0;
-
+		return false;
 	}
 	
 	private boolean deleteFromQuery(String q) {
@@ -648,36 +668,36 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	}
 	
 	private boolean keepQuery(String q) {
-		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) NOT IN ( SELECT * FROM ( " + q + " ) AS A)";
-		int changedNum = querySize(sizeq);
-		size -= changedNum;
-		numElem -= changedNum;
+//		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) NOT IN ( SELECT * FROM ( " + q + " ) AS A)";
+//		int changedNum = querySize(sizeq);
 		
 		String q1 = "DELETE FROM " + relName + " WHERE (rel, tid, att) NOT IN (SELECT * FROM ( " + q + " ) AS A)";
 		try {
-			ConnectionManager.getInstance().execUpdate(q1);
+			int changedNum = ConnectionManager.getInstance().execUpdate(q1);
+			size -= changedNum;
+			numElem -= changedNum;
+			return changedNum>0;
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
 		
-		return changedNum>0;
+		return false;
 	}
 	
 	private boolean keepMultipleMarkers(String values) {
 		// Only to be called if the view has been materialized
-		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) NOT IN ( VALUES " + values + " )";
-		int changedNum = querySize(sizeq);
-		size -= changedNum;
-		numElem -= changedNum;
-		
+//		String sizeq = "SELECT * FROM " + relName + " WHERE (rel, tid, att) NOT IN ( VALUES " + values + " )";		
 		String q = "DELETE FROM " + relName + " WHERE (rel, tid, att) NOT IN ( VALUES " + values + " )";
 		try {
-			ConnectionManager.getInstance().execUpdate(q);
+			int changedNum = ConnectionManager.getInstance().execUpdate(q);
+			size -= changedNum;
+			numElem -= changedNum;
+			return changedNum>0;	
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
 		
-		return changedNum>0;
+		return false;
 	}
 
 	@Override
@@ -729,7 +749,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	@Override
 	public IMarkerSet subset (MarkerSummary sum) {
 		Set<ISingleMarker> markers = getElems(); // project only the attributes in sum.
-		IMarkerSet cloneSet;
+		IMarkerSet cloneSet; //TODO later use projection query instead of materializing
 		
 		cloneSet = this.cloneSet();
 		
@@ -766,7 +786,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 			}
 			ConnectionManager.getInstance().closeRs(rs);
 		} catch (Exception e) {
-			;
+			LoggerUtil.logException(e, log);
 		}
 		
 		return result;
@@ -778,7 +798,8 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		int numAttr = ScenarioDictionary.getInstance().getTupleSize(relId);
 		result = new Vector<ISchemaMarker> ();
 		for (int i = 0; i < numAttr; i++)
-			result.add(MarkerFactory.newSchemaMarker(relId, i));
+			if (attrId.charAt(numAttr - i - 1) == '1')
+				result.add(MarkerFactory.newSchemaMarker(relId, i));
 		
 		return result;
 	}

@@ -145,7 +145,7 @@ public class MarkerSet implements IMarkerSet {
 	@Override
 	public boolean remove(Object arg0) {
 		sum = null;
-		return markers.remove(arg0);
+		return markers.remove(arg0); //TODO check semantics
 	}
 
 	@Override

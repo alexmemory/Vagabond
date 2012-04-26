@@ -53,11 +53,6 @@ public class TupleMarker implements ITupleMarker {
 	}
 
 	@Override
-	public int getSize() {
-		return ScenarioDictionary.getInstance().getTupleSize(relId);
-	}
-
-	@Override
 	public String getTid() {
 		return "" + tid;
 	}
@@ -96,5 +91,10 @@ public class TupleMarker implements ITupleMarker {
 
 	public void setRelId(int relId) {
 		this.relId = relId;
+	}
+
+	@Override
+	public int getSize() {
+		return ScenarioDictionary.getInstance().getTupleSize(relId);
 	}
 }

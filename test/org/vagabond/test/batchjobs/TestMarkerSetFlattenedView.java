@@ -151,6 +151,17 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 	}
 	
 	@Test
+	public void testContains () throws Exception {
+		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
+		ISingleMarker m1 = new AttrValueMarker("person", "8", "name");
+		ISingleMarker m2 = new TupleMarker("person", "1M");
+		
+		assertTrue(mv.contains(m0));
+		assertFalse(mv.contains(m1));
+		assertFalse(mv.contains(m2));
+	}
+	
+	@Test
 	public void testMarkerSetViewContainsAllMarkerSet () throws Exception {
 		ISingleMarker m0 = new AttrValueMarker("person", "1M", "name");
 		ISingleMarker m2 = new AttrValueMarker("person", "2M", "name");
@@ -211,7 +222,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 		assertFalse(mv.remove(m1));
 		assertTrue(mv.getSize() == 5);
 		
-		ISingleMarker m2 = new TupleMarker("person", "2M");
+		ISingleMarker m2 = new AttrValueMarker("person", "2M", "name");
 		assertTrue(mv.remove(m2));
 		assertTrue(mv.getSize() == 4);
 	}
@@ -281,6 +292,8 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 	
 	@Test
 	public void testMarkerSetViewGetSummary () throws Exception {
+		MarkerSetFlattenedView fl = new MarkerSetFlattenedView("SELECT * FROM " +
+				"(VALUES ('person','1M','B01'::bit varying), ('person','2M','B01'::bit varying)) AS m(rel,tid,att)");
 		mv.materialize();
 		MarkerSummary ms = mv.getSummary();
 		
@@ -289,5 +302,9 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 		ISchemaMarker sm2 = MarkerFactory.newSchemaMarker("person", "livesin");
 		assertTrue(ms.contains(sm1));
 		assertTrue(ms.contains(sm2));
+		
+		ms = fl.getSummary();
+		assertTrue(ms.size() == 1);
+		assertTrue(ms.contains(sm1));
 	}
 }

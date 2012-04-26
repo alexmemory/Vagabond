@@ -131,6 +131,10 @@ public class MarkerFactory {
 		return result; 
 	}
 	
+	public static ISchemaMarker newSchemaMarker (String relName, int attrId) throws Exception {
+		return newSchemaMarker(ScenarioDictionary.getInstance().getRelId(relName), attrId);
+	}
+	
 	public static ISchemaMarker newSchemaMarker (String relName, String attrName) throws Exception {
 		int relId = ScenarioDictionary.getInstance().getRelId(relName);
 		int attrId = ScenarioDictionary.getInstance().getAttrId(relId, attrName);

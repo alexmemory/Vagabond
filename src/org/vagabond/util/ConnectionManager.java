@@ -77,17 +77,18 @@ public class ConnectionManager {
 		return rs;
 	}
 	
-	public void execUpdate(String query) throws SQLException {
-		execUpdate(con, query);
+	public int execUpdate(String query) throws SQLException {
+		return execUpdate(con, query);
 	}
 	
-	public void execUpdate (Connection userCon, String query) throws SQLException {
+	public int execUpdate (Connection userCon, String query) throws SQLException {
 		Statement st;
+		int numRowsAff;
 		
 		st = userCon.createStatement();
 		
-		st.executeUpdate(query);
-		
+		numRowsAff = st.executeUpdate(query);
+		return numRowsAff;
 	}
 	
 }
