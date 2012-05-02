@@ -11,6 +11,7 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.scoring.ExplanationSizeScore;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
+import org.vagabond.explanation.ranking.scoring.ScoreBasedTotalOrderComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreBasicComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreExplSetComparator;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
@@ -94,6 +95,10 @@ public class RankerFactory {
 	
 	public static Comparator<IBasicExplanation> getScoreBasicComparator (IScoringFunction f) {
 		return new ScoreBasicComparator(f);
+	}
+	
+	public static Comparator<IBasicExplanation> getScoreTotalOrderComparator (IScoringFunction f) {
+		return new ScoreBasedTotalOrderComparator(f);
 	}
 	
 	private static Object instantiatePart (Class c, IScoringFunction f) {

@@ -327,22 +327,25 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		col = ExplanationFactory.newExplanationCollection(set1, set2, set3);
 		
 		/* create Dummy Ranker */
-		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
-		AStarExplanationRanker r = (AStarExplanationRanker) col.getRanker();
-		Comparator<RankedListElement> comp = AStarExplanationRanker.RankedListComparator.comp;
+		AStarExplanationRanker r = (AStarExplanationRanker) new AStarExplanationRanker(SideEffectSizeScore.inst);
+		r.initialize(col);
+		Comparator<RankedListElement> comp = AStarExplanationRanker.rankComp;
 		
 		RankedListElement r1,r2,r3;
-		r1 = r.new RankedListElement(new int[] {1, -2, 0});
-		r2 = r.new RankedListElement(new int[] {0, 1, -2});
-		r3 = r.new RankedListElement(new int[] {2, -2, 0});
+		r1 = r.new RankedListElement(new int[] {0, -2, 0});
+		r2 = r.new RankedListElement(new int[] {1, -2, 0});
+		r3 = r.new RankedListElement(new int[] {-2, 0, 0});
 		
 		log.debug(r1);
 		log.debug(r2);
 		log.debug(r3);
 			
 		assertEquals(-1, comp.compare(r1, r2));
-		assertEquals(-1, comp.compare(r1, r3));
-		assertEquals(0, comp.compare(r2, r3));
+		assertEquals(1, comp.compare(r2, r1));
+		assertEquals(0, comp.compare(r1, r3));
+		assertEquals(0, comp.compare(r3, r1));
+		assertEquals(1, comp.compare(r2, r3));
+		assertEquals(-1, comp.compare(r3, r2));
 	}
 	
 	@Test
@@ -446,9 +449,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		AStarExplanationRanker r = (AStarExplanationRanker) col.getRanker();
 		
-		IExplanationSet s1,s2,s3,e1,e2,e3;
+		IExplanationSet s1,s2,e1,e2;
 		
-		r.hasAtLeast(5);
+		r.rankFull();
 		log.debug(r.getRanking());
 		
 		r.hasAtLeast(2);
@@ -469,6 +472,124 @@ public class TestAStarRanker extends AbstractVagabondTest {
 				ExplanationComparators.setSameElemComp.compare(e2, s2) == 0);
 		
 		assertFalse(r.hasNext()); 
+	}
+	
+	@Test
+	public void testRankFull () throws Exception {
+		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
+		ScenarioDictionary.getInstance().initFromScenario();
+		
+		CopySourceError e11, e12, e21, e22, e23, e31;
+		IExplanationSet set1, set2, set3;
+		IAttributeValueMarker error1, error2, error3; 
+				
+		ExplanationCollection col;
+		
+		error1 = MarkerFactory.newAttrMarker("employee", "1", "city");
+		error2 = MarkerFactory.newAttrMarker("employee", "2", "city");
+		error3 = MarkerFactory.newAttrMarker("employee", "3", "city");
+		
+		// copy error
+		e11 = new CopySourceError();
+		e11.setExplains(error1);
+		e11.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "1")
+				));
+		e11.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E1a", "city"),
+				MarkerFactory.newAttrMarker("employee", "E1b", "city"),
+				error2
+				));
+	
+		e12 = new CopySourceError();
+		e12.setExplains(error1);
+		e12.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e12.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E2", "city"),
+				error2
+				));
+		
+		// first set
+		set1 = ExplanationFactory.newExplanationSet(e11, e12);
+		
+		///////////////////////////////////////////////////////////////////////
+		
+		e21 = new CopySourceError();
+		e21.setExplains(error2);
+		e21.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "1")
+				));
+		e21.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E1a", "city"),
+				MarkerFactory.newAttrMarker("employee", "E1b", "city"),
+				error1
+				));
+	
+		e22 = new CopySourceError();
+		e22.setExplains(error2);
+		e22.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "3")
+				));
+		e22.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E2", "city"),
+				error1
+				));
+		
+		e23 = new CopySourceError();
+		e23.setExplains(error2);
+		e23.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e23.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E3", "city"),
+				error3
+				));
+		
+		// set 2
+		set2 = ExplanationFactory.newExplanationSet(e21,e22,e23);
+
+		
+		e31 = new CopySourceError();
+		e31.setExplains(error3);
+		e31.setSourceSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newTupleMarker("address", "2")
+				));
+		e31.setTargetSE(MarkerFactory.newMarkerSet(
+				MarkerFactory.newAttrMarker("employee", "E3", "city"),
+				error2
+				));
+		
+		set3 = ExplanationFactory.newExplanationSet(e31);
+		
+		/* ensure order in sets */
+		set1.getExplanations();
+		set2.getExplanations();
+		set3.getExplanations();
+		
+		// *** collection
+		col = ExplanationFactory.newExplanationCollection(set1, set2, set3);
+		
+		/* create Dummy Ranker */
+		AStarExplanationRanker r1 = new AStarExplanationRanker(SideEffectSizeScore.inst);
+		r1.initialize(col);
+		AStarExplanationRanker r2 = new AStarExplanationRanker(SideEffectSizeScore.inst);
+		r2.initialize(col);
+		
+		Comparator<RankedListElement> comp = AStarExplanationRanker.rankComp;
+		
+		while(r1.hasNext())
+			r1.next();
+		r2.rankFull();
+		
+		assertEquals(r1.getNumberOfExplSets(), r2.getNumberOfExplSets());
+		assertEquals(r1.getNumberPrefetched(), r2.getNumberPrefetched());
+		
+		r2.resetIter();
+		r1.resetIter();
+		while(r1.hasNext())
+			assertEquals(r1.next(), r2.next());
 	}
 	
 }

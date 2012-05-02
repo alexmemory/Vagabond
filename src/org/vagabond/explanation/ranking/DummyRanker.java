@@ -292,5 +292,10 @@ public class DummyRanker implements IExplanationRanker {
 		return getRankedExpl(rank).getSideEffectSize();
 	}
 
+	@Override
+	public void rankFull() {
+		log.debug("Dummy ranker cannot materialize");
+	}
+
 	
 }

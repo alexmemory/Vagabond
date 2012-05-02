@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -97,6 +98,42 @@ public class SimpleExplanationSet implements IExplanationSet {
 			result.append(expl.toString());
 			result.append("\n\n--");
 		}
+		
+		return result.toString();
+	}
+	
+	public String toSummaryString() {
+		StringBuffer result = new StringBuffer();
+
+		result.append("<" + expls.size() + "|" + targetSideEffects.getSize() + "|");
+		for (IBasicExplanation expl: expls) {
+			char typeC;
+			switch(expl.getType()) {
+			case CopySourceError:
+				typeC = 'C';
+				break;
+			case CorrespondenceError:
+				typeC = 'c';
+				break;
+			case InfluenceSourceError:
+				typeC = 'I';
+				break;
+			case SourceSkeletonMappingError:
+				typeC = 'S';
+				break;
+			case SuperflousMappingError:
+				typeC = 'M';
+				break;
+			case TargetSkeletonMappingError:
+				typeC = 'T';
+				break;
+			default:
+				throw new NoSuchElementException();
+			}
+			
+			result.append(typeC);
+		}
+		result.append(">");
 		
 		return result.toString();
 	}

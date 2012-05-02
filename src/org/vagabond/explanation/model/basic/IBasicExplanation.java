@@ -8,7 +8,7 @@ import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.TransformationType;
 
-public interface IBasicExplanation {
+public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 
 	enum ExplanationType {
 		CopySourceError,

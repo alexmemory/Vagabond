@@ -26,4 +26,5 @@ public interface IExplanationRanker extends Iterator<IExplanationSet> {
 	
 	public boolean hasAtLeast (int numElem); // check that this ranker can produce at least this many explanation sets
 	boolean isFullyRanked();
+	public void rankFull();
 }

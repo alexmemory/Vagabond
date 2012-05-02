@@ -1,23 +1,24 @@
 package org.vagabond.explanation.ranking;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.SimpleExplanationSet;
+import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.util.LoggerUtil;
-
-import static org.vagabond.util.HashFNV.*;
 
 public class SkylineRanker implements IPartitionRanker {
 
@@ -80,6 +81,18 @@ public class SkylineRanker implements IPartitionRanker {
 			return false;
 		}
 		
+		public boolean equalRank (SkyPoint other) {
+			if (other == null)
+				return false;
+			if (other == this)
+				return true;
+			for (int i = 0; i < scores.length; i++)
+				if (scores[i] != other.scores[i])
+					return false;
+		
+			return true;
+		}
+		
 		@Override
 		public int compareTo(SkyPoint o) {
 			if (o == null)
@@ -134,6 +147,8 @@ public class SkylineRanker implements IPartitionRanker {
 			result.append(Arrays.toString(scores));
 			result.append("| ");
 			result.append(skyLine);
+			result.append("| ");
+			result.append(((SimpleExplanationSet) solution).toSummaryString());
 			result.append(")");
 			
 			return result.toString();
@@ -169,10 +184,13 @@ public class SkylineRanker implements IPartitionRanker {
 	private List<SkyPoint> ranking;
 	private int numRanked = 0;
 	private boolean rankDone = false;
-	private int[] dimUpperBounds;
+	
 	private SkyPoint[] dimCandIterPos;
+	private SkyPoint lastSkylinePoint;
+	private int[] dimUpperBounds;
 	private int[] dimLowerBounds; 
 	private boolean[] useCands;
+	
 	private int iterPos;
 	
 	public SkylineRanker (String[] rankSchemes, String finalScheme) {
@@ -202,10 +220,26 @@ public class SkylineRanker implements IPartitionRanker {
 		solutions = new TreeSet<SkyPoint> (getFinalSortComparator());
 	}
 
-	private void resetSkyPointFactory () {
-		points.clear();
+	private void initFields() {
+		iterPos = -1;
+		
+		rankDone = false;
+		SLsizes = new ArrayList<Integer> ();
+		SLpos = new ArrayList<Integer> ();
+		numRanked = 0;
+		numSkylines = 0;
+		lastSkylinePoint = null;
+		Arrays.fill(dimUpperBounds, Integer.MAX_VALUE);
 	}
-	
+
+	@Override
+	public void initialize(ExplPartition part) {
+		for(int i = 0; i < dim; i++)
+			rankers[i].initialize(part);
+		
+		initFields();
+	}
+
 	public SkyPoint newSkyPoint (IExplanationSet expl) {
 		if (!points.containsKey(expl)) {
 			points.put(expl, this.new SkyPoint(expl));
@@ -213,10 +247,14 @@ public class SkylineRanker implements IPartitionRanker {
 				
 		return points.get(expl);
 	}
-	
+
+	private void resetSkyPointFactory () {
+		points.clear();
+	}
+
 	public Comparator<SkyPoint> getDimComparator (final int dimension) {
 		return new Comparator<SkyPoint> () {
-
+	
 			private int dim = dimension;
 			
 			@Override
@@ -226,17 +264,27 @@ public class SkylineRanker implements IPartitionRanker {
 					return -1;
 				if (lVal > rVal)
 					return 1;
-				return 0;
+				
+				int comp = o1.compareTo(o2);
+				if (comp != 0)
+					return comp;
+				
+				comp = ExplanationComparators.setIndElementComp.compare(o1.solution, o2.solution);
+				
+				return comp;
 			}
 			
 		};
 	}
-	
+
 	public Comparator<SkyPoint> getFinalSortComparator () {
 		return new Comparator<SkyPoint> () {
-
+	
 			@Override
 			public int compare(SkyPoint o1, SkyPoint o2) {
+				if (o1 == o2)
+					return 0;
+				
 				if (o1.skyLine < o2.skyLine)
 					return -1;
 				if (o1.skyLine > o2.skyLine)
@@ -257,41 +305,20 @@ public class SkylineRanker implements IPartitionRanker {
 					return -1;
 				if (o1.hashCode() > o2.hashCode())
 					return 1;
-
-				return 0;
+	
+				return ExplanationComparators.setIndElementComp.compare(o1.solution, o2.solution);
 			}
 			
 		};
 	}
 
-	
-	
-	@Override
-	public void initialize(ExplPartition part) {
-		for(int i = 0; i < dim; i++)
-			rankers[i].initialize(part);
-		
-		initFields();
-	}
-	
-	private void initFields() {
-		iterPos = -1;
-		
-		rankDone = false;
-		SLsizes = new ArrayList<Integer> ();
-		SLpos = new ArrayList<Integer> ();
-		numRanked = 0;
-		numSkylines = 0;
-		Arrays.fill(dimUpperBounds, Integer.MAX_VALUE);
-	}
-	
 	@Override
 	public boolean hasNext() {
 		if (rankDone) 
-			return iterPos < numRanked;
+			return iterPos < numRanked - 1;
 		
 		// try to add a new skyline
-		if (iterPos == numRanked)
+		if (iterPos == numRanked - 1)
 			addSkyline();	
 		
 		return iterPos < numRanked;
@@ -335,11 +362,19 @@ public class SkylineRanker implements IPartitionRanker {
 		
 		x = getNextPoint(dimen);
 		if (x != null) {
-			if (x.scores[oDim] < dimUpperBounds[oDim]) {
+			// has lower value than the current best one in this dimension
+			// add to skyline
+			if (x.scores[0] < dimUpperBounds[0] && x.scores[1] < dimUpperBounds[1]) {
 				// update boundaries
 				dimUpperBounds[oDim] = x.scores[oDim];
 				addSkylinePoint(x);
 			} 
+			// has excatly the same scores as the last skyline point
+			// add to skyline
+			else if (x.equalRank(lastSkylinePoint)) {
+				addSkylinePoint(x);
+			}
+			// breached the upper bound, finished with this skyline
 			else if (x.scores[dimen] > dimUpperBounds[dimen])
 				return false;
 			
@@ -362,12 +397,12 @@ public class SkylineRanker implements IPartitionRanker {
 		
 		x.skyLine = numSkylines - 1;
 		solutions.add(x);
-		ranking.add(x);
 		// remove from candidate set
 		for(int i = 0; i < dim; i++)
 			sortedDims.get(i).remove(x);
 		for(int i = 0; i < dim; i++)
 			dimLowerBounds[i] = Math.max(dimLowerBounds[i], x.scores[i]);
+		lastSkylinePoint = x;
 	}
 	
 	private SkyPoint getNextPoint (int dimen) {
@@ -378,15 +413,13 @@ public class SkylineRanker implements IPartitionRanker {
 		// still have candidates produced during last skyline?
 		try {
 			while(useCands[dimen] && (cands.ceiling(dimCandIterPos[dimen]) != null)) {
-				x = cands.ceiling(dimCandIterPos[dimen]);
+				x = cands.higher(dimCandIterPos[dimen]);
 				dimCandIterPos[dimen] = x;
 				return x;
 			}
 			
-			if (useCands[dimen] && dimLowerBounds[dimen] != -1) {
+//			if (useCands[dimen] && dimLowerBounds[dimen] != -1)
 				useCands[dimen] = false;
-				rankers[dimen].iterToScore(dimLowerBounds[dimen]);
-			}
 			
 			if (rankers[dimen].hasNext()) {
 				expl = rankers[dimen].next();
@@ -403,17 +436,30 @@ public class SkylineRanker implements IPartitionRanker {
 
 	private void resetAfterSkyline () {
 		Arrays.fill(dimUpperBounds, Integer.MAX_VALUE);
-		
-		for(int i = 0; i < dim; i++) {
-			rankers[i].resetIter();
-			dimCandIterPos[i] = least;			
-		}
 		Arrays.fill(useCands, true);
+		
+		for(int i = 0; i < dim; i++)
+			dimCandIterPos[i] = least;			
+		
+		// add new skyline points to total ranking using the correct ordering
+		List<SkyPoint> newSols = new ArrayList<SkyPoint> ();
+		Iterator<SkyPoint> iter = solutions.descendingIterator();
+		SkyPoint x;
+		
+		while (iter.hasNext()) {
+			x = iter.next();
+			if (x.skyLine != numSkylines - 1)
+				break;
+			newSols.add(x);
+		}
+		
+		for(int i = newSols.size() -1; i >= 0; i--)
+			ranking.add(newSols.get(i));
 	}
 	
 	@Override
 	public IExplanationSet next() {
-		assert(iterPos < numRanked || !rankDone);
+		assert(iterPos < numRanked - 1 || !rankDone);
 		generateUpTo(iterPos + 1);
 		return getRankedExpl(++iterPos);
 	}
@@ -487,6 +533,7 @@ public class SkylineRanker implements IPartitionRanker {
 
 	@Override
 	public IExplanationSet getRankedExpl(int pos) {
+		assert(pos < ranking.size());
 		return ranking.get(pos).solution;
 	}
 
@@ -520,7 +567,9 @@ public class SkylineRanker implements IPartitionRanker {
 		for(int i = 0; i < rankers.length; i++)
 			rankers[i].rankFull();
 		
-		generateUpTo((int) rankers[0].getNumberPrefetched());
+		log.debug("Number of expl in full ranking " + rankers[0].getNumberPrefetched());
+		
+		generateUpTo((int) rankers[0].getNumberPrefetched() - 1);
 	}
 	
 }

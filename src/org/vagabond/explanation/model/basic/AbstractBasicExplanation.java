@@ -273,4 +273,16 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	public void setRealExplains(IMarkerSet set) {
 		this.realExplains = set;
 	}
+	
+	@Override
+	public int compareTo (IBasicExplanation o) {
+		if (this == o)
+			return 0;
+		
+		int comp = this.getType().compareTo(o.getType());
+		if (comp != 0)
+			return comp;
+		
+		return this.hashCode() - o.hashCode();
+	}
 }

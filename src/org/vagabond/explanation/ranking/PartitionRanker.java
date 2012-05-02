@@ -109,15 +109,17 @@ public class PartitionRanker implements IPartitionRanker {
 		public String toString() {
 			StringBuffer result = new StringBuffer();
 			
-			result.append("F(");
+			result.append("[F(");
 			result.append(Arrays.toString(iterPos));
 			result.append(")");
 			
 			if (seInit) {
-				result.append(" and SE (");
+				result.append(" and Score (");
 				result.append(Arrays.toString(scores));
-				result.append(")");
-			}
+				result.append(")]");
+			} 
+			else 
+				result.append(']');
 			
 			return result.toString();
 		}
@@ -254,10 +256,7 @@ public class PartitionRanker implements IPartitionRanker {
 					}
 				}
 			}
-			if (iterDoneElem == null) {
-				rankDone = true;
-				numExplSets = ranking.size();
-			}
+			updateRankedExpls();
 		}
 	}
 	
@@ -270,14 +269,35 @@ public class PartitionRanker implements IPartitionRanker {
 					iterDoneElem = ranking.higher(iterDoneElem);
 					if (iterDoneElem != null) {
 						iterDone++;
-						rankedExpls.add(iterDoneElem);
 					}
 				}
 			}
-			if (iterDoneElem == null) {
-				rankDone = true;
-				numExplSets = ranking.size();
-			}
+			updateRankedExpls();
+		}
+	}
+	
+	private void updateRankedExpls () {
+		FullExplSummary sum;
+		
+		if (iterDoneElem == null)
+			finishRanking();
+		
+		sum = (rankedExpls.size() == 0) ? iterHead 
+				: rankedExpls.get(rankedExpls.size() - 1);
+		
+		while (iterDone >= rankedExpls.size()) {
+			sum = ranking.higher(sum);
+			rankedExpls.add(sum);
+		}
+	}
+	
+	private void finishRanking () {
+		rankDone = true;
+		numExplSets = ranking.size();
+		FullExplSummary s = ranking.last();
+		while (!s.seInit) {
+			s.computeScore();
+			s = ranking.lower(s);
 		}
 	}
 	
@@ -287,6 +307,7 @@ public class PartitionRanker implements IPartitionRanker {
 		// create first ranked
 		if (elem == null) {
 			iterDoneElem = new FullExplSummary(part.size(), 0);
+			iterDoneElem.computeScore();
 			ranking.add(iterDoneElem);
 			createdTest.add(iterDoneElem);
 			iterDone++;
@@ -407,10 +428,15 @@ public class PartitionRanker implements IPartitionRanker {
 		if (numExplSets != -1) 
 			return numExplSets;
 		
+		if (rankDone) {
+			numExplSets = rankedExpls.size();
+			return numExplSets;
+		}
+		
 		long result = 1L;
 		
 		for(int i = 0; i < part.size(); i++) {
-			if (part.getCol(i).getRanker().isFullyRanked())
+			if (!part.getCol(i).getRanker().isFullyRanked())
 				return -1L;
 			else 
 				result *= part.getCol(i).getRanker().getNumberOfExplSets();
@@ -424,7 +450,7 @@ public class PartitionRanker implements IPartitionRanker {
 
 	@Override
 	public long getNumberPrefetched() {
-		return iterDone;
+		return iterDone + 1;
 	}
 
 	@Override
@@ -465,55 +491,66 @@ public class PartitionRanker implements IPartitionRanker {
 		
 		return generateExplanation (sum);
 	}
-
+	
+	/**
+	 * 
+	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getExplWithHigherScore(int)
+	 */
 	@Override
 	public IExplanationSet getExplWithHigherScore(int score) {
-		return generateExplanation(rankedExpls.get(getSumWithHigherScore(score)));
+		return generateExplanation(rankedExpls.get(getCeilingScore(score + 1)));
 	}
 	
-	private int getSumWithHigherScore (int score) {
+	/**
+	 * 
+	 * @param score
+	 * @return
+	 */
+	private int getCeilingScore (int score) {
 		FullExplSummary highest = null;
-		int pos, step;
+		int min, max, mid;
 		
-		if (rankedExpls.size() > 0)
+		generateUpToScore(score + 1);
+		
+		if (iterDone >= 0)
 			highest = rankedExpls.get(rankedExpls.size() - 1);
 		
 		// do not have 
 		if (highest == null || highest.totalScore < score)
-			generateUpToScore(score + 1);
-		
-		highest = rankedExpls.get(rankedExpls.size() - 1);
-		if (highest.totalScore < score)
 			throw new NoSuchElementException();
 		
-		pos = rankedExpls.size() / 2;
-		step = rankedExpls.size() / 4;
+		max = rankedExpls.size();
+		min = 0;
 		
 		do {
-			int value = rankedExpls.get(pos).totalScore; 
+			mid = ((max - min) / 2) + min ;
+			int value = rankedExpls.get(mid).totalScore; 
 			
 			if (value < score)
-				pos -= step;
+				min = mid + 1;
 			if (value > score)
-				pos += step;
-			if (value == score)
-				return pos;
-			
-			step /= 2;
-		} while(step > 0);
+				max = mid;
+			// if we found a match, find first ranked element with this score
+			if (value == score) {
+				while (mid > 0 && rankedExpls.get(mid - 1).totalScore == score)
+					mid--;
+				return mid;
+			}
+		} while(min != max);
 		
 		// no element with same score, but higher one, return this one
-		if (pos == 0)
-			return 0;
-		if (pos < rankedExpls.size() - 1)
-			return ++pos;
+		while(mid < rankedExpls.size()) {
+			if (rankedExpls.get(mid).totalScore > score)
+				return mid;
+			mid++;
+		}
 		
 		throw new NoSuchElementException ();
 	}
 
 	@Override
 	public void iterToScore(int score) {
-		int pos = getSumWithHigherScore(score);
+		int pos = getCeilingScore(score);
 		FullExplSummary h  = rankedExpls.get(pos);
 		iterPos = pos;
 		curIterElem = h;
@@ -521,7 +558,16 @@ public class PartitionRanker implements IPartitionRanker {
 
 	@Override
 	public void rankFull() {
-		generateUpTo(getNumberOfExplSets());
+		for(int i = 0; i < rankers.length; i++) {
+			rankers[i].rankFull();
+			rankers[i].resetIter();
+		}
+		
+		while(hasNext())
+			next();
+		
+		resetIter();
+//		generateUpTo(getNumberOfExplSets());
 	}
 	
 }

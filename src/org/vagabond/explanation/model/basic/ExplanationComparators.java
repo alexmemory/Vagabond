@@ -1,8 +1,15 @@
 package org.vagabond.explanation.model.basic;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
+import org.vagabond.explanation.marker.MarkerComparators;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.mapping.model.ModelComparators;
+import org.vagabond.util.CollectionUtils;
 
 public interface ExplanationComparators {
 
@@ -20,6 +27,15 @@ public interface ExplanationComparators {
 			Comparator<IBasicExplanation> {
 		@Override
 		public int compare(IBasicExplanation o1, IBasicExplanation o2) {
+			if (o1 == null && o2 == null)
+				return 0;
+			if (o1 == null)
+				return -1;
+			if (o2 == null)
+				return 1;
+			if (o1 == o2)
+				return 0;
+			
 			if (o1.getRealTargetSideEffectSize() != o2.getRealTargetSideEffectSize())
 				return o1.getRealTargetSideEffectSize() - o2.getRealTargetSideEffectSize();
 			if (o1.getSourceSideEffectSize() != o2.getSourceSideEffectSize())
@@ -32,6 +48,58 @@ public interface ExplanationComparators {
 				return o1.getTransformationSideEffectSize() - o2.getTransformationSideEffectSize();
 			return o2.getRealExplains().size() - o1.getRealExplains().size();
 		}
+	}
+	
+	public class BasicExplanationFullSideEffectPlusTieBreakers implements Comparator<IBasicExplanation> {
+
+		@Override
+		public int compare(IBasicExplanation o1, IBasicExplanation o2) {
+			int comp = fullSideEffComp.compare(o1, o2);
+			if (comp != 0)
+				return comp;
+			
+			comp = o1.getType().compareTo(o2.getType());
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareSet(o1.getRealTargetSideEffects(), 
+					o2.getRealTargetSideEffects(), 
+					MarkerComparators.singleMarkerComp);
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareSet(o1.getRealExplains(), 
+					o2.getRealExplains(), 
+					MarkerComparators.singleMarkerComp);
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareCollection(o1.getMappingSideEffects(), 
+					o2.getMappingSideEffects(), ModelComparators.mappingIdComp);
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareCollection(o1.getCorrespondenceSideEffects(), 
+					o2.getCorrespondenceSideEffects(), ModelComparators.corrIdComp);
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareCollection(o1.getSourceSideEffects(), 
+					o2.getSourceSideEffects(), MarkerComparators.singleMarkerComp);
+			if (comp != 0)
+				return comp;
+			
+			comp = CollectionUtils.compareCollection(o1.getTransformationSideEffects(), 
+					o2.getTransformationSideEffects(), ModelComparators.transIdComp);
+			if (comp != 0)
+				return comp;
+			
+			
+			//TODO
+			
+			return 0;
+		}
+		
 	}
 	
 	public class BasicExplanationSideEffectComparator implements
@@ -75,6 +143,8 @@ public interface ExplanationComparators {
 		}
 	}
 
+	public static final BasicExplanationFullSideEffectPlusTieBreakers fullSideEffWithTie
+			= new BasicExplanationFullSideEffectPlusTieBreakers();
 	public static final BasicExplanationFullSideEffectComparator fullSideEffComp 
 			= new BasicExplanationFullSideEffectComparator();
 	public static final BasicExplanationSideEffectComparator sideEffComp 
@@ -86,4 +156,18 @@ public interface ExplanationComparators {
 	
 	public static final ExplSetSameElementComp setSameElemComp
 			= new ExplSetSameElementComp();
+	
+	public static final Comparator<IExplanationSet> setIndElementComp = new Comparator<IExplanationSet> () {
+
+		@Override
+		public int compare(IExplanationSet o1, IExplanationSet o2) {
+			if (o1.size() < o2.size())
+				return -1;
+			if (o1.size() > o2.size())
+				return 1;
+			
+			return CollectionUtils.compareSet(o1, o2, fullSideEffWithTie);
+		}
+	};
+	
 }

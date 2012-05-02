@@ -2,7 +2,13 @@ package org.vagabond.test.explanation.ranking;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -86,13 +92,22 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		log.debug(y.toVerboseString());
 		log.debug(z.toVerboseString());
 		
+		log.debug(x);
+		log.debug(y);
+		log.debug(z);
+		
+		// test equality and native compare
 		assertTrue(x.equals(a));
 		assertFalse(x.equals(y));
 		assertFalse(z.equals(y));
 		assertTrue(x == a);
 		
 		assertEquals(-1, x.compareTo(y));
+		assertEquals(1, y.compareTo(x));
 		assertEquals(0, y.compareTo(z));
+		assertEquals(0, z.compareTo(y));
+		assertEquals(-1, x.compareTo(z));
+		assertEquals(1, z.compareTo(x));
 		
 		assertTrue(x.dominates(y));
 		assertFalse(y.dominates(x));
@@ -104,14 +119,55 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		
 		assertEquals(-1, c1.compare(x, y));
 		assertEquals(1, c1.compare(y, x));
-		assertEquals(0, c1.compare(y, z));
+		assertEquals(1, c1.compare(y, z));
+		assertEquals(-1, c1.compare(z, y));
+		assertEquals(-1, c1.compare(x, z));
+		assertEquals(1, c1.compare(z, x));
+		assertEquals(0, c1.compare(x, x));
+		assertEquals(0, c1.compare(x, a));
+		assertEquals(0, c1.compare(a, x));
+		assertEquals(0, c1.compare(y, y));
+		assertEquals(0, c1.compare(z, z));
 		
-		assertEquals(0, c2.compare(x, y));
-		assertEquals(0, c2.compare(x, z));
+		assertEquals(-1, c2.compare(x, y));
+		assertEquals(1, c2.compare(y, x));
+		assertEquals(-1, c2.compare(x, z));
+		assertEquals(1, c2.compare(z, x));
+		assertEquals(1, c2.compare(y, z));
+		assertEquals(-1, c2.compare(z, y));
+		assertEquals(0, c2.compare(x, x));
+		assertEquals(0, c2.compare(x, a));
+		assertEquals(0, c2.compare(a, x));
+		assertEquals(0, c2.compare(y, y));
+		assertEquals(0, c2.compare(z, z));
 		
+		assertEquals(-1, cf.compare(x, y));
+		assertEquals(1, cf.compare(y,x));
+		assertEquals(0, cf.compare(x, x));
+		assertEquals(0, cf.compare(y, y));
+		assertEquals(0, cf.compare(z, z));
 		
+		// test sorted sets
+		TreeSet<SkyPoint> se = new TreeSet<SkyPoint>(r.getDimComparator(0));
+		TreeSet<SkyPoint> es = new TreeSet<SkyPoint>(r.getDimComparator(1));
+		se.add(x);
+		es.add(x);
+		se.add(y);
+		es.add(y);
+		se.add(z);
+		es.add(z);
+		se.add(a);
+		es.add(a);
 		
-		assertEquals(0, c2.compare(x, y));
+		assertEquals(3, se.size());
+		assertEquals(3, es.size());
+		
+		Set<SkyPoint> seSet = new HashSet<SkyPoint> (se);
+		Set<SkyPoint> esSet = new HashSet<SkyPoint> (es);
+		assertEquals(seSet, esSet);
+		
+		log.debug(se);
+		log.debug(es);
 	}
 	
 	@Test
@@ -130,13 +186,52 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		r  = new SkylineRanker(new String[] {"SideEffect", "ExplSize"}, "SideEffect");
 		r.initialize(e);
 		
-		// compare
+		// generate ranking
 		while(r.hasNext()) {
  			IExplanationSet s = r.next();
 			log.debug(s);
 		}
 		
-		log.debug(e);
+		// compare
+		Field rankingField = SkylineRanker.class.getDeclaredField("ranking");
+		rankingField.setAccessible(true);
+		List<SkyPoint> ranking = (List<SkyPoint>) rankingField.get(r);  
+		
+		Field solutionsField = SkylineRanker.class.getDeclaredField("solutions");
+		solutionsField.setAccessible(true);
+		TreeSet<SkyPoint> solutions = (TreeSet<SkyPoint>) solutionsField.get(r);
+		
+		log.debug(ranking);
+		log.debug(solutions);
+		
+		Iterator<SkyPoint> ra = ranking.iterator(), so = solutions.iterator();
+		while(ra.hasNext() || so.hasNext()) {
+			assertTrue(ra.hasNext());
+			assertTrue(so.hasNext());
+			assertEquals(ra.next(), so.next());
+		}
+		
+		log.debug(ranking);
+		
+		// compare solutions with single ranker
+		Field rankersField = SkylineRanker.class.getDeclaredField("rankers");
+		rankersField.setAccessible(true);
+		IPartitionRanker[] rankers = (IPartitionRanker[]) rankersField.get(r);
+		IPartitionRanker p = rankers[0];
+		assertEquals(p.getNumberPrefetched(), r.getNumberPrefetched());
+		
+		Set<IExplanationSet> skySol = new HashSet<IExplanationSet> ();
+		Set<IExplanationSet> seSol = new HashSet<IExplanationSet> ();
+		
+		r.resetIter();
+		p.resetIter();
+		
+		while(p.hasNext()) {
+			skySol.add(r.next());
+			seSol.add(p.next());
+		}
+		
+		assertEquals("" + skySol + seSol, skySol, seSol);
 	}
 
 	@Test
@@ -154,7 +249,18 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		// ranking
 		r  = new SkylineRanker(new String[] {"SideEffect", "ExplSize"}, "SideEffect");
 		r.initialize(e);
+		
+		// rank partions fully
+		Field rankersField = SkylineRanker.class.getDeclaredField("rankers");
+		rankersField.setAccessible(true);
+		IPartitionRanker[] rankers = (IPartitionRanker[]) rankersField.get(r);
+		for (IPartitionRanker pr: rankers)
+			pr.rankFull();
+		
+		// rank r
 		r.rankFull();
+		
+		assertEquals(rankers[0].getNumberPrefetched(), r.getNumberPrefetched());
 		
 		// compare
 		while(r.hasNext()) {

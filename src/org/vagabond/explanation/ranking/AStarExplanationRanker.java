@@ -13,6 +13,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerComparators;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
@@ -58,7 +59,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 			updateFirstUnset();
 			
-			computeSideEffectSize(this);
+			computeScore(this);
 		}
 		
 		public RankedListElement (int maxSize, int ... elems) {
@@ -86,7 +87,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 			updateFirstUnset();
 							
-			computeSideEffectSize(this);
+			computeScore(this);
 		}
 		
 		public RankedListElement (RankedListElement prefix, int newElem) {
@@ -110,7 +111,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 			// adapt the side effect size
 			updateFirstUnset();
-			computeSideEffectSize(this);
+			computeScore(this);
 			
 			if (log.isDebugEnabled()) {
 				log.debug("extended set " + prefix.toString() + " to " 
@@ -150,7 +151,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		public boolean equals (Object o) {
 			if (o == null || !(o instanceof RankedListElement))
 				return false;
-			return RankedListComparator.comp.compare(this, (RankedListElement) o) == 0;
+			return rankComp.compare(this, (RankedListElement) o) == 0;
 		}
 
 		public boolean extensionWithoutOverlap() {
@@ -207,12 +208,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	}
 	
-	public static class RankedListComparator implements Comparator<RankedListElement> {
+	public static final Comparator<RankedListElement> rankComp = new Comparator<RankedListElement>() {
 
-		public static final RankedListComparator comp = new RankedListComparator();
-		
 		@Override
 		public int compare(RankedListElement o1, RankedListElement o2) {
+			if (o1 == o2)
+				return 0;
 			if (o1.min != o2.min)
 				return o1.min - o2.min; 
 			if (o1.max != o2.max)
@@ -229,10 +230,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 						return o1.elem[i] - o2.elem[i];
 				}
 			}
-			
+
 			return 0;
 		}
-	}
+	};
 	
 	// represents an ordering of the explanations for one error and min/max side-effect sizes
 	protected class OneErrorExplSet extends IdMap<IBasicExplanation> {
@@ -247,8 +248,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 			expList = explSet.getExplanations();
 			
-			// sort on intersected side effects
-			Collections.sort(expList, RankerFactory.getScoreBasicComparator(f));
+			// sort according scoring function
+			Collections.sort(expList, RankerFactory.getScoreTotalOrderComparator(f));
 			for(IBasicExplanation e: expList)
 				put(e);
 			minSE = f.getScore(expList.get(0));
@@ -293,20 +294,32 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 	}
 	
-	public static class OneErrorExplSetComparator implements Comparator<OneErrorExplSet> {
+	public static final Comparator<OneErrorExplSet> oneElemComp = 
+			new Comparator<AStarExplanationRanker.OneErrorExplSet>() {
 
-		public static final OneErrorExplSetComparator comp = new OneErrorExplSetComparator();
-		
 		@Override
 		public int compare(OneErrorExplSet arg0, OneErrorExplSet arg1) {
-			int span1, span2;
+			int span1, span2, comp;
 			
 			span1 = arg0.maxSE - arg0.minSE;
 			span2 = arg1.maxSE - arg1.minSE;
-			return span2 - span1;
-		}
-		
-	}
+			comp = span2 - span1;
+			if (comp != 0)
+				return comp;
+			
+			comp = arg0.minSE - arg1.minSE; 
+			if (comp != 0)
+				return comp;
+			
+			comp = arg0.maxSE - arg1.maxSE; 
+			if (comp != 0)
+				return comp;
+			
+			return MarkerComparators.singleMarkerComp.compare(arg0.error, arg1.error);
+		}	
+	};
+	
+	
 	
 	// fields
 	private int iterPos = -1;
@@ -329,7 +342,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private BitMatrix sameExpl;
 	
 	public AStarExplanationRanker (IScoringFunction f) {
-		sortedSets = new TreeSet<RankedListElement> (RankedListComparator.comp);
+		sortedSets = new TreeSet<RankedListElement> (rankComp);
 		errorExpl = new ArrayList<OneErrorExplSet> ();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker> ();
@@ -371,12 +384,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			numSets *= newOne.size();
 		}
 		
-
-		
-		log.debug("set same explanations: " + sameExpl.toString());
-		
 		// sort on min-max span to improve pruning
-		Collections.sort(errorExpl, OneErrorExplSetComparator.comp);
+		Collections.sort(errorExpl, oneElemComp);
 		for(OneErrorExplSet newOne: errorExpl)
 			errorList.add(newOne.error);
 		
@@ -397,10 +406,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		for(int i = 0; i < allExpl.size(); i++) {
 			for(int k = 0; k < allExpl.size(); k++) {
-				if (allExpl.get(i).equals(allExpl.get(k)))
+				if (i != k && allExpl.get(i).equals(allExpl.get(k)))
 					sameExpl.setSym(i, k);
 			}
 		}
+		log.debug("set same explanations: " + sameExpl.toString());
 		
 		numErrors = errors.size();
 		
@@ -416,7 +426,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		if (log.isDebugEnabled()) {
 			for(int i = 0; i < numErrors; i++) {
-				log.debug("min " + combinedMin[i] + " max " + combinedMax[i]);
+				log.debug("min " + combinedMin[i] + " max " + combinedMax[i] 
+						+ " for " + errorList.get(i) + "\n" + errorExpl.get(i));
 			}
 		}
 		
@@ -474,6 +485,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 				curCand = sortedSets.first();
 			else
 				curCand = sortedSets.higher(lastDoneElem);
+			
+			if (curCand == null)
+				throw new NoSuchElementException("trying to access beyond last " +
+						"element of ranking");
 			
 			// current best candidate is not complete, expand it
 			if (!curCand.isDone())
@@ -573,7 +588,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	}
 
 	//TODO memoize unioned side effects?
-	private void computeSideEffectSize (RankedListElement elem) {
+	private void computeScore (RankedListElement elem) {
 		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation> ();
 		
 		elem.min = 0;
@@ -716,6 +731,16 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	public  void setF(IScoringFunction f) {
 		this.f = f;
+	}
+
+	@Override
+	public void rankFull() {
+		try {
+			generateUpTo (Integer.MAX_VALUE);
+		} catch (NoSuchElementException e) {
+			log.debug("ranking done");
+		}
+		resetIter();
 	}
 
 }

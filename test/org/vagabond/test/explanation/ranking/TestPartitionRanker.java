@@ -1,8 +1,14 @@
 package org.vagabond.test.explanation.ranking;
 
 import static org.junit.Assert.*;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -200,6 +206,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 		assertTrue(ranker.isFullyRanked());
 		
 		assertEquals(ranker.toString(), 15, ranker.getNumberOfExplSets());
+		assertEquals(ranker.toString(), 15, ranker.getNumberPrefetched());
 		
 		for(int i = 1; i < results.size(); i++) {
 			IExplanationSet s1,s2;
@@ -280,7 +287,27 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 			PartitionRanker pr2 = (PartitionRanker) RankerFactory.createPartRanker("SideEffect", e);
 			pr2.rankFull();
 			
+			assertTrue(pr1.isFullyRanked());
+			assertTrue(pr2.isFullyRanked());
+			
+			assertEquals(15, pr1.getNumberOfExplSets());
+			assertEquals(15, pr1.getNumberPrefetched());
+			assertEquals(15, pr2.getNumberPrefetched());
+			
 			assertEquals(pr1.getNumberOfExplSets(), pr2.getNumberOfExplSets());
+			
+			pr1.resetIter();
+			pr2.resetIter();
+			Set<IExplanationSet> res1, res2;
+			res1 = new HashSet<IExplanationSet> ();
+			res2 = new HashSet<IExplanationSet> ();
+			
+			while(pr1.hasNext()) {
+				res1.add(pr1.next());
+				res2.add(pr2.next());
+			}
+			
+			assertTrue(res1.equals(res2));
 			
 			log.debug(pr1 + "\n\n" + pr2);
 	}
@@ -309,12 +336,37 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 			sol.add(ranker.next());
 		}
 		
+		// get list of ranked explanations and check that it contains the same explanation sets as the tree ranking
+		Field rankedExplField = PartitionRanker.class.getDeclaredField("rankedExpls");
+		rankedExplField.setAccessible(true);
+		ArrayList<FullExplSummary> rankedExpl = (ArrayList<FullExplSummary>) rankedExplField.get(ranker);
+		
+		log.debug(rankedExpl);
+		
+		Field rankingField = PartitionRanker.class.getDeclaredField("ranking");
+		rankingField.setAccessible(true);
+		TreeSet<FullExplSummary> ranking = (TreeSet<FullExplSummary>) rankingField.get(ranker);
+		
+		log.debug(ranking);
+		
+		for(FullExplSummary s: ranking) {
+			assertTrue("" + s, rankedExpl.contains(s));
+		}
+		
+		// test get higher score
 		IExplanationSet e1 = ranker.getExplWithHigherScore(0);
 		assertEquals(sol.get(1), e1);
 		
 		IExplanationSet e2 = ranker.getExplWithHigherScore(1);
 		assertEquals(sol.get(7), e2);
 		log.debug(sol);
+		
+		try {
+			IExplanationSet e3 = ranker.getExplWithHigherScore(2);
+			assertFalse(true);
+		} catch (NoSuchElementException ex) {
+			log.debug(ex);
+		}
 	}
 	
 }
