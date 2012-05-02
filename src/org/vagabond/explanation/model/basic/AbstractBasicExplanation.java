@@ -2,6 +2,7 @@ package org.vagabond.explanation.model.basic;
 
 import static org.vagabond.util.LoggerUtil.ObjectColToStringWithMethod;
 import static org.vagabond.util.LoggerUtil.logException;
+import static org.vagabond.util.HashFNV.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
@@ -29,7 +31,8 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	protected IMarkerSet targetSE;
 	protected IMarkerSet realTargetSE;
 	protected IMarkerSet realExplains;
-	private int hash = -1;
+	protected int hash = -1;
+	protected boolean hashed = false; 
 	
 	static {
 		sourceSEDummy = MarkerFactory.newMarkerSet();
@@ -73,10 +76,12 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	public void setTargetSE(IMarkerSet targetSE) {
 		this.targetSE = targetSE;
+		updateHash();
 	}
 	
 	public void addToTargetSE (ISingleMarker marker) {
 		this.targetSE.add(marker);
+		updateHash();
 	}
 
 	@Override
@@ -140,14 +145,23 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		if (!this.getExplanation().equals(err.getExplanation()))
 			return false;
 		
-		if (!this.explains().equals(err.explains()))
-			return false;
-		
 		if (!this.getSourceSideEffects().equals(err.getSourceSideEffects()))
 			return false;
 		
-		if (!this.getTargetSideEffects().equals(err.getTargetSideEffects()))
-			return false;
+		// real side effects have been set?
+		if (!this.getRealExplains().isEmpty()) {
+			if (!this.getRealTargetSideEffects().equals(err.getRealTargetSideEffects()))
+				return false;
+			if (!this.getRealExplains().equals(err.getRealExplains()))
+				return false;
+		} 
+		else {
+			if (!this.getTargetSideEffects().equals(err.getTargetSideEffects()))
+				return false;
+
+			if (!this.explains().equals(err.explains()))
+				return false;
+		}
 		
 		if (!this.getMappingSideEffects().equals(err.getMappingSideEffects()))
 			return false;
@@ -165,14 +179,22 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	@Override
 	public int hashCode () {
-		if (hash == -1)
-		{
-			hash = error.hashCode();
-			hash = hash * 13 + getType().hashCode();
-			hash = hash * 13 + getSourceSideEffects().hashCode();
-			hash = hash * 13 + getTargetSideEffects().hashCode();
-		}
+		if (!hashed)
+			computeHash();
+		
 		return hash;
+	}
+	
+	
+	protected void updateHash() {
+		if (hashed)
+			computeHash();
+	}
+	
+	protected void computeHash () {
+		hash = fnv(error.hashCode());
+		hash = fnv(getType(), hash);
+		hash = fnv(realTargetSE, hash);
 	}
 	
 	@Override
@@ -233,6 +255,15 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	public void setRealTargetSideEffects(IMarkerSet set) {
 		this.realTargetSE = set;
+		updateHash();
+	}
+	
+	@Override
+	public void computeRealTargetSEAndExplains (IMarkerSet errors) {
+		realTargetSE = targetSE.cloneSet().diff(errors);
+		realExplains = MarkerFactory.newMarkerSet(error);
+		realExplains.union(targetSE.cloneSet().intersect(errors));
+		updateHash();
 	}
 	
 	public IMarkerSet getRealExplains() {

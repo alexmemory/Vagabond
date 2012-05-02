@@ -17,7 +17,8 @@ import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.ranking.DummyRanker;
-import org.vagabond.explanation.ranking.SideEffectExplanationRanker;
+import org.vagabond.explanation.ranking.AStarExplanationRanker;
+import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
@@ -341,7 +342,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col = ExplanationFactory.newExplanationCollection(set1, set2);
 		
 		/* create Dummy Ranker */
-		col.createRanker(new SideEffectExplanationRanker());
+		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		col.resetIter();
 		
 		assertEquals (0, col.getIterPos());
@@ -431,7 +432,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col = ExplanationFactory.newExplanationCollection(set1, set2);
 		
 		/* create Dummy Ranker */
-		col.createRanker(new SideEffectExplanationRanker());
+		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		col.resetIter();
 		
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
@@ -563,7 +564,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col = ExplanationFactory.newExplanationCollection(set1, set2);
 		
 		/* create SideEffect Ranker */
-		col.createRanker(new SideEffectExplanationRanker());
+		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		col.resetIter();
 		
 		assertEquals (0, col.getIterPos());
@@ -670,18 +671,27 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col = ExplanationFactory.newExplanationCollection(set1, set2, set3);
 		
 		/* create Dummy Ranker */
-		col.createRanker(new SideEffectExplanationRanker());
+		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		col.resetIter();
 		
+		IExplanationSet s1,s2,s3,e1,e2,e3;
+		
+		assertTrue(col.getRanker().hasAtLeast(2));
+		assertFalse(col.getRanker().hasAtLeast(3));
+		
 		assertEquals (0, col.getIterPos());
-		assertTrue ("e12,e31", ExplanationComparators.setSameElemComp.compare(
-				ExplanationFactory.newExplanationSet(e12,e31), 
-				col.next()) == 0);
+		s1 = col.next();
+		e1 = ExplanationFactory.newExplanationSet(e12,e31);
+		assertTrue ("1", ExplanationComparators.setSameElemComp.compare(e1, s1) == 0);
+		
 		assertEquals (1, col.getIterPos());
 		assertTrue (col.hasNext());
-		assertTrue ("e11,e31", ExplanationComparators.setSameElemComp.compare(
-				ExplanationFactory.newExplanationSet(e11,e31), 
-				col.next()) == 0);
+		s2 = col.next();
+		e2 = ExplanationFactory.newExplanationSet(e11,e31);
+		e3 = ExplanationFactory.newExplanationSet(e11,e31);
+		assertTrue ("2b:\n\n" + e2 + s2, 
+				ExplanationComparators.setSameElemComp.compare(e2, s2) == 0);
+		
 		assertFalse(col.hasNext()); 
 	}
 }

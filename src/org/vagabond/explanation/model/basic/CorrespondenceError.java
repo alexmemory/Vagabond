@@ -1,5 +1,7 @@
 package org.vagabond.explanation.model.basic;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,10 +62,12 @@ public class CorrespondenceError extends AbstractBasicExplanation
 	
 	public void setCorrespondences (Set<CorrespondenceType> correspondence) {
 		this.correspondences = correspondence;
+		updateHash();
 	}
 	
 	public void addCorrespondence (CorrespondenceType corr) {
 		this.correspondences.add(corr);
+		updateHash();
 	}
 
 	@Override
@@ -78,6 +82,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 
 	public void setMapSE(Set<MappingType> mapSE) {
 		this.mapSE = mapSE;
+		updateHash();
 	}
 
 	@Override
@@ -92,5 +97,14 @@ public class CorrespondenceError extends AbstractBasicExplanation
 	
 	public void setTransSE (Collection<TransformationType> transSE) {
 		this.transSE = new HashSet<TransformationType> (transSE);
+		updateHash();
+	}
+	
+	@Override
+	protected void computeHash () {
+		super.computeHash();
+		hash = fnv(correspondences, hash);
+		hash = fnv(mapSE, hash);
+		hash = fnv(transSE, hash);
 	}
 }

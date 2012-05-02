@@ -21,7 +21,7 @@ import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.BitMatrix;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.ewah.EWAHCompressedBitmap;
-import org.vagabond.util.ewah.EWAHView;
+import org.vagabond.util.ewah.BitsetView;
 
 public class TestErrorPartitionGraph extends AbstractVagabondTest {
 
@@ -61,7 +61,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		
 		// check that source and target nodes are  not connected to each other
 		for(int i = off; i < g.getNodes().size(); i++) {
-			EWAHView v = (EWAHView) g.getEdges().getReadonlyRow(i);
+			BitsetView v = (BitsetView) g.getEdges().getReadonlyRow(i);
 			v = v.getView(off, v.sizeInBits());
 			assertFalse(g.getNodes().get(i).toString(), v.intIterator().hasNext());
 		}

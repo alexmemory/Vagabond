@@ -1,5 +1,7 @@
 package org.vagabond.explanation.marker;
 
+import static org.vagabond.util.HashFNV.*;
+
 import org.apache.log4j.Logger;
 import org.vagabond.util.LogProviderHolder;
 
@@ -9,6 +11,7 @@ public class TupleMarker implements ITupleMarker {
 	
 	private int relId;
 	private String tid;
+	private int hash = -1;
 	
 	public TupleMarker () {
 		
@@ -82,7 +85,11 @@ public class TupleMarker implements ITupleMarker {
 	
 	@Override
 	public int hashCode () {
-		return relId + tid.charAt(0);
+		if (hash == -1) {
+			hash = fnv(tid.hashCode());
+			hash = fnv(relId, hash);
+		}
+		return hash;
 	}
 	
 	public int getRelId() {
@@ -91,6 +98,7 @@ public class TupleMarker implements ITupleMarker {
 
 	public void setRelId(int relId) {
 		this.relId = relId;
+		hash = -1;
 	}
 
 	@Override

@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
+import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.IExplanationRanker;
 import org.vagabond.util.IdMap;
@@ -60,6 +62,14 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			totalExpls *= numExpl;
 			numExpls.add(numExpl);
 		}
+	}
+	
+	public void computeRealSEAndExplains () {
+		IMarkerSet errorSet = MarkerFactory.newMarkerSet(errorIds.values());
+		// remove errors from side effects and add them to explains
+		for(IExplanationSet set: explMap.values())
+			for(IBasicExplanation e: set)
+				e.computeRealTargetSEAndExplains(errorSet);
 	}
 	
 	public void createRanker (IExplanationRanker ranker) {

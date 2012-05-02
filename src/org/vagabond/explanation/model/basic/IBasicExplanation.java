@@ -33,6 +33,8 @@ public interface IBasicExplanation {
 	public IMarkerSet getRealExplains();
 	public void setRealExplains(IMarkerSet set);
 	
+	public void computeRealTargetSEAndExplains (IMarkerSet errors);
+	
 	public int getSourceSideEffectSize ();
 	public IMarkerSet getSourceSideEffects ();
 	

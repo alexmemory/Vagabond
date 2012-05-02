@@ -14,8 +14,10 @@ import org.junit.Test;
 import org.vagabond.util.BitMatrix;
 import org.vagabond.util.ewah.Bitmap;
 import org.vagabond.util.ewah.EWAHCompressedBitmap;
-import org.vagabond.util.ewah.EWAHView;
+import org.vagabond.util.ewah.BitsetView;
+import org.vagabond.util.ewah.IBitSet;
 import org.vagabond.util.ewah.IntIterator;
+import org.vagabond.util.ewah.JavaUtilBitSet;
 
 public class TestBitMatrixAndBitset {
 
@@ -38,13 +40,13 @@ public class TestBitMatrixAndBitset {
 		PropertyConfigurator.configure("resource/test/testLog4jproperties.txt");
 	}
 	
-	public static void setBits(int[] bits, EWAHCompressedBitmap map) {
+	public static void setBits(int[] bits, IBitSet map) {
 		for(int i = 0; i < bits.length; i++) {
 			map.set(bits[i]);
 		}
 	}
 	
-	private void randSetBits(int[] bits, EWAHCompressedBitmap map) {
+	private void randSetBits(int[] bits, IBitSet map) {
 		Random rand = new Random();
 		int temp, left, right;
 		final int[] mix = new int[bits.length];
@@ -89,7 +91,7 @@ public class TestBitMatrixAndBitset {
 		assertFalse(iter.hasNext());
 	}
 	
-	private void checkIter (EWAHCompressedBitmap set, int[] bits, int start, int end) {
+	private void checkIter (IBitSet set, int[] bits, int start, int end) {
 		int[] sorted = new int[bits.length];
 		IntIterator iter;
 		
@@ -105,7 +107,7 @@ public class TestBitMatrixAndBitset {
 		assertFalse(iter.hasNext());
 	}
 	
-	private void randCheckIter (EWAHCompressedBitmap set, int[] bit) {
+	private void randCheckIter (IBitSet set, int[] bit) {
 		Random rand = new Random();
 		int start, end;
 		
@@ -181,11 +183,27 @@ public class TestBitMatrixAndBitset {
 	}
 	
 	@Test
+	public void testBitsetSaveSet2 () {
+		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
+		EWAHCompressedBitmap bitset2 = new EWAHCompressedBitmap();
+		
+		setBits(new int[] {121,0}, bitset);
+		setBits(new int[] {0,121}, bitset2);
+		
+		assertEqualsBitset(bitset2,bitset,"0-set");
+	}
+	
+	@Test
 	public void testIter () {
 		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
 		setBits(setBits1, bitset);
 		
 		checkIter(bitset, setBits1);
+		
+		JavaUtilBitSet b2 = new JavaUtilBitSet();
+		setBits(setBits1, b2);
+		
+		checkIter(b2, setBits1);
 	}
 	
 	@Test
@@ -197,15 +215,40 @@ public class TestBitMatrixAndBitset {
 		
 		for(int i = 0; i < 20; i++)
 			randCheckIter(bitset, setBits1);
+		
+		JavaUtilBitSet bitset2 = new JavaUtilBitSet();
+		setBits(setBits1, bitset2);
+		
+		checkIter(bitset2, setBits1, 6,141);
+		
+		for(int i = 0; i < 20; i++)
+			randCheckIter(bitset2, setBits1);
 	}
 	
 	@Test
 	public void testEWAHViews () {
 		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
 		setBits(setBits1, bitset);
-		EWAHView view = new EWAHView(bitset, 5, 10);
-		EWAHView view2 = new EWAHView(bitset, 5, 7);
-		EWAHView view3 = new EWAHView(view, 2, 5);
+		BitsetView view = new BitsetView(bitset, 5, 10);
+		BitsetView view2 = new BitsetView(bitset, 5, 7);
+		BitsetView view3 = new BitsetView(view, 2, 5);
+		
+		checkIter(view, new int[] {0,2});
+		checkIter(view2, new int[] {0});
+		checkIter(view3, new int[] {0});
+		
+		assertEquals(view.toBitsString(), "10100", view.toBitsString());
+		assertEquals(view2.toBitsString(), "10", view2.toBitsString());
+		assertEquals(view3.toBitsString(), "100", view3.toBitsString());
+	}
+	
+	@Test
+	public void testJavaBitsetViews () {
+		JavaUtilBitSet bitset = new JavaUtilBitSet();
+		setBits(setBits1, bitset);
+		BitsetView view = new BitsetView(bitset, 5, 10);
+		BitsetView view2 = new BitsetView(bitset, 5, 7);
+		BitsetView view3 = new BitsetView(view, 2, 5);
 		
 		checkIter(view, new int[] {0,2});
 		checkIter(view2, new int[] {0});
@@ -247,6 +290,13 @@ public class TestBitMatrixAndBitset {
 		assertEquals("01110001 0000010", m.getReadonlyRow(0).toBitsString());
 		assertEquals("01000000 0000000", m.getReadonlyRow(9).toBitsString());
 		assertEquals("00011000 0000000", m.getReadonlyRow(14).toBitsString());
+		
+		IntIterator iter = m.getRowIntIter(14);
+		char[] row = "000110000000000".toCharArray();
+		while(iter.hasNext()) {
+			int val = iter.next();
+			assertTrue("" + val, row[val] == '1');
+		}
 	}
 	
 	

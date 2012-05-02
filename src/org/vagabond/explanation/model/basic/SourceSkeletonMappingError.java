@@ -1,5 +1,7 @@
 package org.vagabond.explanation.model.basic;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,10 +64,12 @@ public class SourceSkeletonMappingError extends AbstractBasicExplanation
 
 	public void setMap(Set<MappingType> maps) {
 		this.mapSE = maps;
+		updateHash();
 	}
 
 	public void addMap(MappingType map) {
 		mapSE.add(map);
+		updateHash();
 	}
 
 	@Override
@@ -80,5 +84,13 @@ public class SourceSkeletonMappingError extends AbstractBasicExplanation
 	
 	public void setTransSE (Collection<TransformationType> transSE) {
 		this.transSE = new HashSet<TransformationType> (transSE);
+		updateHash();
+	}
+	
+	@Override
+	protected void computeHash () {
+		super.computeHash();
+		hash = fnv(mapSE, hash);
+		hash = fnv(transSE, hash);
 	}
 }

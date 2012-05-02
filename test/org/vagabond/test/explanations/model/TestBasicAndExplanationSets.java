@@ -1,5 +1,6 @@
 package org.vagabond.test.explanations.model;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -8,10 +9,14 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.ScenarioDictionary;
+import org.vagabond.explanation.model.ExplanationFactory;
+import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
+import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
@@ -85,5 +90,92 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 		r2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
 		
 		assertEquals(r1,r2);
+	}
+	
+	@Test
+	public void testHashingAndEqualsForBasic () throws Exception {
+		CopySourceError c1, c2, c3, c4;
+		HashSet<IBasicExplanation> set = new HashSet<IBasicExplanation> ();
+		
+		// copy error
+		c1 = new CopySourceError();
+		c1.setExplains(MarkerParser.getInstance().parseMarker("A(person,2,name)"));
+		c1.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+				
+		c2 = new CopySourceError();
+		c2.setExplains(MarkerParser.getInstance().parseMarker("A(person,2,name)"));
+		c2.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		
+		int h1 = c1.hashCode();
+		int h2 = c2.hashCode();
+		
+		set.add(c1);
+		set.add(c2);
+		IMarkerSet s = c1.getTargetSideEffects();
+		s.add(MarkerParser.getInstance().parseMarker("A(person,3,name)"));
+		c1.setTargetSE(s);
+		
+		int h1a = c1.hashCode();
+		assertTrue(h1 + " " + h1a, h1 == h1a);
+		assertTrue(set.contains(c1));
+		
+		IMarkerSet s2 = c1.getRealTargetSideEffects();
+		s2.add(MarkerParser.getInstance().parseMarker("A(person,3,name)"));
+		c1.setRealTargetSideEffects(s2);
+		
+		// equals
+		IMarkerSet errors = MarkerParser.getInstance().parseSet("{A(person,1,name),A(person,2,name)}");
+		
+		c3 = new CopySourceError();
+		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,1,name)"));
+		c3.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,2,name)}"));
+				
+		c4 = new CopySourceError();
+		c4.setExplains(MarkerParser.getInstance().parseMarker("A(person,2,name)"));
+		c4.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c4.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,1,name)}"));
+		
+		c3.computeRealTargetSEAndExplains(errors);
+		c4.computeRealTargetSEAndExplains(errors);
+		
+		assertEquals(c3,c4);
+		assertEquals(0, c3.getRealTargetSideEffectSize());
+		assertEquals(0, c4.getRealTargetSideEffectSize());
+	}
+	
+	@Test
+	public void testExplanationSet () throws Exception {
+		CopySourceError c1, c2;
+		IExplanationSet set1, set2, set3;
+
+		c1 = new CopySourceError();
+		c1.setExplains(MarkerParser.getInstance().parseMarker("A(person,2,name)"));
+		c1.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+				
+		c2 = new CopySourceError();
+		c2.setExplains(MarkerParser.getInstance().parseMarker("A(person,3,name)"));
+		c2.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,2)}"));
+		c2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		
+		set1 = ExplanationFactory.newExplanationSet(c1,c2);
+		set2 = ExplanationFactory.newExplanationSet(c2,c1);
+		set3 = ExplanationFactory.newExplanationSet(c1,c1);
+		
+		assertTrue(set1.equals(set2));
+		assertTrue(set2.equals(set1));
+		assertTrue(set1.hashCode() == set2.hashCode());
+		
+		assertTrue(set1.contains(c1));
+		assertTrue(set1.contains(c2));
+		
+		assertTrue(set2.contains(c1));
+		assertTrue(set2.contains(c2));
+		
+		assertTrue(set3.contains(c1));
+		assertFalse(set3.contains(c2));
 	}
 }

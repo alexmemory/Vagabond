@@ -2,6 +2,7 @@ package org.vagabond.explanation.marker;
 
 import org.apache.log4j.Logger;
 import org.vagabond.util.LogProviderHolder;
+import static org.vagabond.util.HashFNV.*;
 
 public class AttrValueMarker implements IAttributeValueMarker {
 
@@ -63,7 +64,9 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	@Override
 	public int hashCode () {
 		if (hash == 0) {
-			hash = tid.hashCode() * 31 * 31 + relId * 31 + attrId;
+			hash = fnv(tid.getBytes());
+			hash = fnv(relId, relId);
+			hash = fnv(attrId);
 		}
 		
 		return hash; 
@@ -116,6 +119,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 			this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 			this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
 			this.tid = tid;
+			hash = 0;
 	}
 
 	@Override

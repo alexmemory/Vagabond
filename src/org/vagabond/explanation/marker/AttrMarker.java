@@ -1,5 +1,7 @@
 package org.vagabond.explanation.marker;
 
+import static org.vagabond.util.HashFNV.*;
+
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.util.LoggerUtil;
@@ -72,8 +74,10 @@ public class AttrMarker implements ISchemaMarker {
 	
 	@Override
 	public int hashCode () {
-		if (hash == -1)
-			hash = 13 * relId + attrId;
+		if (hash == -1) {
+			hash = fnv(relId);
+			hash = fnv(attrId, hash);
+		}
 		
 		return hash;
 	}
@@ -84,6 +88,7 @@ public class AttrMarker implements ISchemaMarker {
 
 	public void setRelId(int relId) {
 		this.relId = relId;
+		hash = -1;
 	}
 
 	public int getAttrId() {
@@ -92,6 +97,7 @@ public class AttrMarker implements ISchemaMarker {
 
 	public void setAttrId(int attrId) {
 		this.attrId = attrId;
+		hash = -1;
 	}
 	
 }

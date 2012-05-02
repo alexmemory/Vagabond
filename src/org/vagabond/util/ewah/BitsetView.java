@@ -11,26 +11,26 @@ import java.util.List;
  * @author lord_pretzel
  *
  */
-public class EWAHView implements Bitmap {
+public class BitsetView implements Bitmap {
 
 	private int start;
 	private int end;
-	private final EWAHCompressedBitmap map;
+	private final IBitSet map;
 	
-	public EWAHView (EWAHCompressedBitmap map, int start, int end) {
+	public BitsetView (IBitSet map, int start, int end) {
 		this.map = map;
 		this.start = start;
 		this.end = end;
 	}
 	
-	public EWAHView (EWAHView v, int start, int end) {
+	public BitsetView (BitsetView v, int start, int end) {
 		this.map = v.map;
 		this.start = v.start + start;
 		this.end = v.start + end;
 	}
 	
-	public EWAHView getView (int start, int end) {
-		return new EWAHView(this, start, end);
+	public BitsetView getView (int start, int end) {
+		return new BitsetView(this, start, end);
 	}
 	
 	@Override
@@ -56,7 +56,21 @@ public class EWAHView implements Bitmap {
 
 	@Override
 	public IntIterator intIterator() {
-		return new OffsetRangeEWAHintIterator(map, start, end, start);
+		return new IntIterator () {
+
+			private IntIterator supIter = map.intIterator(start, end); 
+			
+			@Override
+			public int next() {
+				return supIter.next() - start;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return supIter.hasNext();
+			}
+			
+		};
 	}
 
 	@Override
@@ -108,7 +122,7 @@ public class EWAHView implements Bitmap {
 		return buf.toString();
 	}
 
-	protected EWAHCompressedBitmap getMap() {
+	protected IBitSet getMap() {
 		return map;
 	}
 

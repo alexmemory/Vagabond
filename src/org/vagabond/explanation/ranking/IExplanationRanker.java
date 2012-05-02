@@ -10,14 +10,13 @@ import org.vagabond.explanation.model.basic.IBasicExplanation;
 
 public interface IExplanationRanker extends Iterator<IExplanationSet> {
 
-//	public void setExplanationCollection (ExplanationCollection coll);
 	public void initialize (ExplanationCollection coll);
 	public boolean ready ();
 	// user confirmed 
 	public void confirmExplanation (IBasicExplanation correctExpl);
 	
 	public IExplanationSet getRankedExpl (int rank);
-	public int getSideEffectSize (int rank);
+	public int getScore (int rank);
 	public int getIterPos();
 	public IExplanationSet previous();
 	public boolean hasPrevious();

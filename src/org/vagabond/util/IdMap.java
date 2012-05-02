@@ -152,6 +152,11 @@ public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 	public Set<Integer> keySet() {
 		return idToObj.keySet();
 	}
+	
+	
+	public Set<Type> valueSet() {
+		return ObjToId.keySet();
+	}
 
 	@Override
 	public Type put(Integer key, Type value) {

@@ -1,5 +1,7 @@
 package org.vagabond.explanation.model.basic;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,14 +65,17 @@ public class SuperflousMappingError extends AbstractBasicExplanation
 
 	public void addMapSE(MappingType map) {
 		mapSE.add(map);
+		updateHash();
 	}
 	
 	public void setMapSE(Set<MappingType> maps) {
 		this.mapSE = maps;
+		updateHash();
 	}
 
 	public void setTargetSE(IMarkerSet targetSE) {
 		this.targetSE = targetSE;
+		updateHash();
 	}
 
 	@Override
@@ -85,6 +90,13 @@ public class SuperflousMappingError extends AbstractBasicExplanation
 	
 	public void setTransSE (Collection<TransformationType> transSE) {
 		this.transSE = new HashSet<TransformationType> (transSE);
+		updateHash();
 	}
 
+	@Override
+	protected void computeHash () {
+		super.computeHash();
+		hash = fnv(mapSE, hash);
+		hash = fnv(transSE, hash);
+	}
 }

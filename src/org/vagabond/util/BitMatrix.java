@@ -3,36 +3,43 @@ package org.vagabond.util;
 import java.util.Iterator;
 
 import org.vagabond.util.ewah.Bitmap;
+import org.vagabond.util.ewah.BitsetFactory;
 import org.vagabond.util.ewah.EWAHCompressedBitmap;
-import org.vagabond.util.ewah.EWAHView;
+import org.vagabond.util.ewah.BitsetView;
+import org.vagabond.util.ewah.IBitSet;
+import org.vagabond.util.ewah.IBitSet.BitsetType;
 import org.vagabond.util.ewah.IntIterator;
 
 
 public class BitMatrix {
 
 	private static final int DEFAULT_BUFFER = 0;
-	
-	private EWAHCompressedBitmap bitmap;
+	private static final BitsetType DEFAULT_BITSET_TYPE = BitsetType.JavaBitSet;
+	private IBitSet bitmap;
 	private int rows, cols;
 	
 	public BitMatrix (int rows, int cols) {
-		this(rows,cols,DEFAULT_BUFFER);		
+		this(rows,cols,DEFAULT_BUFFER, DEFAULT_BITSET_TYPE);		
 	}
 	
 	public BitMatrix (int rows, int cols, String values) {
-		this.rows = rows;
-		this.cols = cols;
-		bitmap = new EWAHCompressedBitmap(values);
+		this (rows, cols, values, DEFAULT_BITSET_TYPE);
 	}
 	
-	public BitMatrix (final int rows, final int cols, final int bitBuf) {
+	public BitMatrix (int rows, int cols, String values, BitsetType bitType) {
+		this.rows = rows;
+		this.cols = cols;
+		bitmap = BitsetFactory.newBitset(bitType, values);
+	}
+	
+	public BitMatrix (final int rows, final int cols, final int bytesInBuf, BitsetType bitType) {
 		this.rows = rows;
 		this.cols = cols;
 		
-		if (bitBuf == 0)
-			bitmap = new EWAHCompressedBitmap();
+		if (bytesInBuf == 0)
+			bitmap = BitsetFactory.newBitset(bitType);
 		else
-			bitmap = new EWAHCompressedBitmap(bitBuf / 64);
+			bitmap = BitsetFactory.newBitset(bitType, bytesInBuf);
 	}
 	
 	public boolean get (int row, int col) {
@@ -67,11 +74,15 @@ public class BitMatrix {
 	}
 	
 	public Bitmap getReadonlyRow (int rowNum) {
-		return new EWAHView(bitmap, rowNum * cols, (rowNum + 1) * cols);
+		return new BitsetView(bitmap, rowNum * cols, (rowNum + 1) * cols);
 	}
 	
 	public Iterator<Integer> getRowIter (int rowNum) {
-		return bitmap.iterator(rowNum * cols, (rowNum + 1) * cols);
+		return getReadonlyRow(rowNum).iterator();
+	}
+	
+	public IntIterator getRowIntIter (int rowNum) {
+		return getReadonlyRow(rowNum).intIterator();
 	}
 
 	@Override
@@ -118,7 +129,7 @@ public class BitMatrix {
 		return cols;
 	}
 
-	public EWAHCompressedBitmap getBitmap() {
+	public IBitSet getBitmap() {
 		return bitmap;
 	}
 }

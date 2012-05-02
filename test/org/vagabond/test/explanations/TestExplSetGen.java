@@ -377,6 +377,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		// complet collection
 		expCol = ExplanationFactory.newExplanationCollection(set1, set2);
+		expCol.computeRealSEAndExplains();
 		
 		col = gen.findExplanations(errSet);
 		log.debug(col);
@@ -489,6 +490,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		// complete collection
 		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1);
 		expCol = ExplanationFactory.newExplanationCollection(set1);
+		expCol.computeRealSEAndExplains();
 		
 		col = gen.findExplanations(errSet);
 		log.debug(col);
@@ -532,6 +534,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		ExplanationCollection ex = new ExplanationCollection();
 		ex.addExplSet(a1, expl);
+		ex.computeRealSEAndExplains();
 		
 		// create
 		ExplanationCollection col1 = gen.findExplanations(MarkerFactory.newMarkerSet(a1));

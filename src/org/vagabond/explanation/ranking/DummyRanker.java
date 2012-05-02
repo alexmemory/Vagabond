@@ -288,7 +288,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getSideEffectSize(int rank) {
+	public int getScore(int rank) {
 		return getRankedExpl(rank).getSideEffectSize();
 	}
 

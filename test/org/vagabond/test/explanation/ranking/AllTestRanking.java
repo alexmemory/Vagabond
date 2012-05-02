@@ -6,8 +6,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	TestDummyExplRanker.class,
-	TestPartitionSideEffectRanker.class,
-	TestSideEffectRanker.class
+	TestPartitionRanker.class,
+	TestAStarRanker.class,
+	TestScoringFunctions.class,
+	TestSkylineRanker.class
         })
 public class AllTestRanking {
 }

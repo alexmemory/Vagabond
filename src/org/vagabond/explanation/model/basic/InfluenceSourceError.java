@@ -1,5 +1,7 @@
 package org.vagabond.explanation.model.basic;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
@@ -33,6 +35,7 @@ public class InfluenceSourceError extends AbstractBasicExplanation
 
 	public void setSourceSE(IMarkerSet sourceSE) {
 		this.sourceSE = sourceSE;
+		updateHash();
 	}
 
 	@Override
@@ -45,14 +48,20 @@ public class InfluenceSourceError extends AbstractBasicExplanation
 		return sourceSE.getSize();
 	}
 	
-	public void setTargetSE(IMarkerSet targetSE) {
-		this.targetSE = targetSE;
-	}
+//	public void setTargetSE(IMarkerSet targetSE) {
+//		this.targetSE = targetSE;
+//	}
 
 
 	@Override
 	public Object getExplanation() {
 		return sourceSE;
+	}
+	
+	@Override
+	protected void computeHash () {
+		super.computeHash();
+		hash = fnv(sourceSE, hash);
 	}
 	
 }

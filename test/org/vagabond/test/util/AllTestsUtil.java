@@ -8,7 +8,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 		TestResultSetUtil.class,
 		TestQueryTemplate.class,
-		TestBitMatrixAndBitset.class
+		TestBitMatrixAndBitset.class,
+		TestBloomFilter.class,
+		TestFNVHash.class
         })
 public class AllTestsUtil {
 }

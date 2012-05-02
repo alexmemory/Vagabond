@@ -17,6 +17,7 @@ public class MarkerSet implements IMarkerSet {
 	
 	protected Set<ISingleMarker> markers;
 	private MarkerSummary sum;
+	private int hash = -1;
 	
 	public MarkerSet () {
 		markers = new HashSet<ISingleMarker> ();
@@ -37,6 +38,14 @@ public class MarkerSet implements IMarkerSet {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public int hashCode () {
+		if (hash == -1) {
+			hash = markers.hashCode();
+		}
+		return hash;
 	}
 	
 	@Override
@@ -74,6 +83,7 @@ public class MarkerSet implements IMarkerSet {
 
 	@Override
 	public boolean add(ISingleMarker marker) {
+		hash = -1;
 		return markers.add(marker);
 	}
 
@@ -113,6 +123,7 @@ public class MarkerSet implements IMarkerSet {
 	@Override
 	public boolean addAll(Collection<? extends ISingleMarker> arg0) {
 		sum = null;
+		hash = -1;
 		return markers.addAll(arg0);
 	}
 
@@ -145,12 +156,14 @@ public class MarkerSet implements IMarkerSet {
 	@Override
 	public boolean remove(Object arg0) {
 		sum = null;
+		hash = -1;
 		return markers.remove(arg0); //TODO check semantics
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
 		sum = null;
+		hash = -1;
 		return markers.removeAll(arg0);
 	}
 

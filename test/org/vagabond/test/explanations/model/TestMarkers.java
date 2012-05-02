@@ -56,6 +56,7 @@ public class TestMarkers extends AbstractVagabondTest {
 		assertEquals(attr.getSize(), 1);
 		assertEquals(attr, attr2);
 		assertEquals(attr2.toString(), "('tramp'(0),1,'name'(0))");
+		assertEquals(attr.hashCode(), attr2.hashCode());
 	}
 	
 	@Test
@@ -65,6 +66,7 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		assertEquals(m1.getSize(), 4);
 		assertEquals(m1, m2);
+		assertEquals(m1.hashCode(), m2.hashCode());
 	}
 	
 	@Test
@@ -106,12 +108,14 @@ public class TestMarkers extends AbstractVagabondTest {
 		set3.union(set2);
 		
 		assertEquals(set,set3);
+		assertEquals(set.hashCode(), set3.hashCode());
 		
 		set6.add(attr);
 		set6.add(attr4);
 		set3.add(attr3);
 		
 		assertEquals(set3,set6);
+		assertEquals(set3.hashCode(), set6.hashCode());
 		
 		set4.add(m1);
 		set4.add(m3);
@@ -119,6 +123,7 @@ public class TestMarkers extends AbstractVagabondTest {
 		set5.add(m2);
 		
 		assertEquals(set4, set5);
+		assertEquals(set4.hashCode(), set5.hashCode());
 		
 		assertEquals(MarkerParser.getInstance().parseSet("{}"), 
 				MarkerParser.getInstance().parseSet("{}"));

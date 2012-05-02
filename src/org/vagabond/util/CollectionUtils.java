@@ -127,4 +127,30 @@ public class CollectionUtils {
 		list.set(pos, newElem);
 	}
 	
+	public static int product (int[] in) {
+		int result = 1;
+		
+		for(int i = 0; i < in.length; i++)
+			result *= in[i];
+		
+		return result;
+	}
+	
+	public static int product (Collection<Integer> in) {
+		int result = 1;
+		
+		for(int i: in)
+			result *= i;
+		
+		return result;
+	}
+	
+	public static int sum (int[] in) {
+		int result = 0;
+		
+		for(int i = 0; i < in.length; i++)
+			result += in[i];
+		
+		return result;
+	}
 }

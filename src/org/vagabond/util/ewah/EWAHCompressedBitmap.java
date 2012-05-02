@@ -9,6 +9,8 @@ package org.vagabond.util.ewah;
 import java.util.*;
 import java.io.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>This implements the patent-free(1) EWAH scheme. Roughly speaking, it is a
  * 64-bit variant of the BBC compression scheme used by Oracle for its bitmap
@@ -48,8 +50,11 @@ import java.io.*;
  * @since 0.1.0
  */
 public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
-Iterable<Integer>, BitmapStorage, WritableBitmap {
+Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom filter for more efficient get
 
+	
+	static Logger log = Logger.getLogger(EWAHCompressedBitmap.class);
+	
 	/**
 	 * Creates an empty bitmap (no bit set to true).
 	 */
@@ -75,22 +80,9 @@ Iterable<Integer>, BitmapStorage, WritableBitmap {
 	 * @param values
 	 */
 	public EWAHCompressedBitmap(final String values) {
-		int pos = 0;
 		this.buffer = new long[defaultbuffersize];
 		this.rlw = new RunningLengthWord(this.buffer, 0);
-		
-		for(char c: values.toCharArray()) {
-			switch(c) {
-				case '0':
-					pos++;
-					break;
-				case '1':
-					set(pos++);
-					break;
-				default:
-					break;
-			}
-		}
+		readFromBitsString (values);
 	}
 
 	/**
@@ -1054,7 +1046,7 @@ Iterable<Integer>, BitmapStorage, WritableBitmap {
 		RunningLengthWord rlw = null, prev = null, next = null;
 		
 		EWAHIterator iter = new EWAHIterator(this.buffer, actualsizeinwords);
-		while (iter.hasNext() && bitPos < i) {
+		while (iter.hasNext() && (bitPos < i || bitPos == 0)) {
 			if (rlw != null)
 				prev = new RunningLengthWord(rlw);
 			rlw = iter.next();
@@ -1236,9 +1228,11 @@ Iterable<Integer>, BitmapStorage, WritableBitmap {
 			this.buffer[startWord + i] = 0;
 		
 		actualsizeinwords += shift;
+		if (log.isDebugEnabled())
+			log.debug(rlw.getNumberOfLiteralWords());
 		
 		// adapt position of last RLW unless we shifted literal words from the last RLW
-		if (rlw.position < startWord);
+		if (rlw.position + rlw.getNumberOfLiteralWords() < startWord)
 			rlw.position += shift;
 	}
 
@@ -1861,6 +1855,10 @@ Iterable<Integer>, BitmapStorage, WritableBitmap {
 	 */
 	@Override
 	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (o ==this)
+			return true;
 		if (o instanceof EWAHCompressedBitmap) {
 			EWAHCompressedBitmap other = (EWAHCompressedBitmap) o;
 			if( this.sizeinbits == other.sizeinbits
@@ -1996,4 +1994,49 @@ Iterable<Integer>, BitmapStorage, WritableBitmap {
 	
 	/** 1 bitmask **/
 	public static final long oneMask = ~0l;
+
+	@Override
+	public boolean intersects(IBitSet other) {
+		if (!(other instanceof EWAHCompressedBitmap))
+			throw new ClassCastException ();
+		return intersects((EWAHCompressedBitmap) other);
+	}
+
+	@Override
+	public IBitSet and(IBitSet other) {
+		if (!(other instanceof EWAHCompressedBitmap))
+			throw new ClassCastException ();
+		return and((EWAHCompressedBitmap) other);
+	}
+
+	@Override
+	public IBitSet or(IBitSet other) {
+		if (!(other instanceof EWAHCompressedBitmap))
+			throw new ClassCastException ();
+		return or((EWAHCompressedBitmap) other);	
+	}
+
+	@Override
+	public int getByteSize() {
+		return buffer.length * Long.SIZE / 8;
+	}
+
+	@Override
+	public void readFromBitsString(String values) {
+		int pos = 0;
+		
+		this.clear();
+		for(char c: values.toCharArray()) {
+			switch(c) {
+				case '0':
+					pos++;
+					break;
+				case '1':
+					set(pos++);
+					break;
+				default:
+					break;
+			}
+		}		
+	}
 }
