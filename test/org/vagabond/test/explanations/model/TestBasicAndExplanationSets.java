@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.util.Comparator;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
+import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
@@ -177,5 +179,54 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 		
 		assertTrue(set3.contains(c1));
 		assertFalse(set3.contains(c2));
+	}
+	
+	@Test
+	public void testComparators () throws Exception {
+		Comparator<IBasicExplanation> C1 = ExplanationComparators.fullSideEffWithTie;
+		Comparator<IExplanationSet> SC1 = ExplanationComparators.setIndElementComp;
+		
+		CopySourceError c1, c2, c3;
+		IExplanationSet set1, set2, set3, set4;
+
+		c1 = new CopySourceError();
+		c1.setExplains(MarkerParser.getInstance().parseMarker("A(person,2,name)"));
+		c1.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,1)}"));
+		c1.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+				
+		c2 = new CopySourceError();
+		c2.setExplains(MarkerParser.getInstance().parseMarker("A(person,3,name)"));
+		c2.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,2)}"));
+		c2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+
+		c3 = new CopySourceError();
+		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,3,name)"));
+		c3.setSourceSE(MarkerParser.getInstance().parseSet("{T(socialworker,2)}"));
+		c3.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		
+		set1 = ExplanationFactory.newExplanationSet(c1,c2);
+		set2 = ExplanationFactory.newExplanationSet(c2,c1);
+		set3 = ExplanationFactory.newExplanationSet(c1,c1);
+		set4 = ExplanationFactory.newExplanationSet(c1,c2,c3);
+		
+		// compare basic explanations
+		assertEquals(-1, C1.compare(c1, c2));
+		assertEquals(1, C1.compare(c2, c1));
+		assertEquals(0, C1.compare(c2, c3));
+		assertEquals(0, C1.compare(c3, c2));
+		
+		// compare explanation sets
+		assertEquals(0, SC1.compare(set1, set2));
+		assertEquals(0, SC1.compare(set2, set1));
+		assertEquals(0, SC1.compare(set1, set4));
+		assertEquals(0, SC1.compare(set4, set1));
+		assertEquals(0, SC1.compare(set4, set2));
+		assertEquals(0, SC1.compare(set2, set4));
+		
+		assertEquals(1, SC1.compare(set1, set3));
+		assertEquals(-1, SC1.compare(set3, set1));
+		
+		assertEquals(-1, SC1.compare(set3, set4));
+		assertEquals(1, SC1.compare(set4, set3));
 	}
 }

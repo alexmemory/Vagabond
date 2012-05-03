@@ -3,6 +3,7 @@ package org.vagabond.explanation.marker;
 import java.util.Comparator;
 
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.util.CollectionUtils;
 
 public interface MarkerComparators {
 
@@ -35,6 +36,15 @@ public interface MarkerComparators {
 			}
 			
 			return 0;
+		}
+		
+	};
+	
+	public static final Comparator<IMarkerSet> markerSetComp = new Comparator<IMarkerSet>() {
+
+		@Override
+		public int compare(IMarkerSet o1, IMarkerSet o2) {
+			return CollectionUtils.compareCollection(o1, o2, singleMarkerComp);
 		}
 		
 	};

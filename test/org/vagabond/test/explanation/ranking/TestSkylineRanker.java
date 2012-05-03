@@ -117,32 +117,43 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		Comparator<SkyPoint> c2 = r.getDimComparator(1);
 		Comparator<SkyPoint> cf = r.getFinalSortComparator();
 		
-		assertEquals(-1, c1.compare(x, y));
-		assertEquals(1, c1.compare(y, x));
-		assertEquals(1, c1.compare(y, z));
-		assertEquals(-1, c1.compare(z, y));
-		assertEquals(-1, c1.compare(x, z));
-		assertEquals(1, c1.compare(z, x));
+		// C1
 		assertEquals(0, c1.compare(x, x));
 		assertEquals(0, c1.compare(x, a));
 		assertEquals(0, c1.compare(a, x));
 		assertEquals(0, c1.compare(y, y));
 		assertEquals(0, c1.compare(z, z));
 		
+		
+		assertEquals(-1, c1.compare(x, y));
+		assertEquals(1, c1.compare(y, x));
+		
+		assertEquals(-1, c1.compare(y, z));
+		assertEquals(1, c1.compare(z, y));
+		
+		assertEquals(-1, c1.compare(x, z));
+		assertEquals(1, c1.compare(z, x));
+		
+		// C2
 		assertEquals(-1, c2.compare(x, y));
 		assertEquals(1, c2.compare(y, x));
+		
 		assertEquals(-1, c2.compare(x, z));
 		assertEquals(1, c2.compare(z, x));
-		assertEquals(1, c2.compare(y, z));
-		assertEquals(-1, c2.compare(z, y));
+		
+		assertEquals(-1, c2.compare(y, z));
+		assertEquals(1, c2.compare(z, y));
+		
 		assertEquals(0, c2.compare(x, x));
 		assertEquals(0, c2.compare(x, a));
 		assertEquals(0, c2.compare(a, x));
 		assertEquals(0, c2.compare(y, y));
 		assertEquals(0, c2.compare(z, z));
 		
+		// CF
 		assertEquals(-1, cf.compare(x, y));
 		assertEquals(1, cf.compare(y,x));
+		
 		assertEquals(0, cf.compare(x, x));
 		assertEquals(0, cf.compare(y, y));
 		assertEquals(0, cf.compare(z, z));

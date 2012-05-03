@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Vector;
 
 import org.apache.xmlbeans.XmlException;
@@ -14,7 +15,9 @@ import org.vagabond.explanation.marker.AttrMarker;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISchemaMarker;
+import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
+import org.vagabond.explanation.marker.MarkerComparators;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.MarkerSummary;
@@ -234,6 +237,82 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		assertEquals(new Pair<IMarkerSet, MarkerSummary> (sub1, sum1), m.getPartAndSum(0));
 		assertEquals(new Pair<IMarkerSet, MarkerSummary> (sub2, sum2), m.getPartAndSum(1));
+	}
+	
+	@Test
+	public void testComparator () throws Exception {
+		Comparator<ISingleMarker> c = MarkerComparators.singleMarkerComp;
+		Comparator<IMarkerSet> mc = MarkerComparators.markerSetComp;
+		
+		IAttributeValueMarker a1 = MarkerFactory.
+				newAttrMarker("tramp","1","name");
+		IAttributeValueMarker a2 = MarkerFactory.newAttrMarker(0, "1", 0);
+		IAttributeValueMarker a3 = MarkerFactory.newAttrMarker(1, "2", 0);
+		IAttributeValueMarker a4 = MarkerFactory.newAttrMarker(1, "2", 0);
+		
+		ITupleMarker m1 = MarkerFactory.newTupleMarker("tramp", "1");
+		ITupleMarker m2 = MarkerFactory.newTupleMarker("tramp", "1");
+		ITupleMarker m3 = MarkerFactory.newTupleMarker("soupkitchen", "1");
+		ITupleMarker m4 = MarkerFactory.newTupleMarker("soupkitchen", "1");
+		
+		IMarkerSet set1 = MarkerFactory.newMarkerSet(a1);
+		IMarkerSet set2 = MarkerFactory.newMarkerSet(a1,a2);
+		IMarkerSet set3 = MarkerFactory.newMarkerSet(a1,a2,a3);
+		IMarkerSet set4 = MarkerFactory.newMarkerSet(a1,a3);
+		IMarkerSet set5 = MarkerFactory.newMarkerSet(a2,a4);
+		IMarkerSet set6 = MarkerFactory.newMarkerSet(a3,a3,a4);
+		
+		// attr markers
+		assertEquals(0, c.compare(a1, a1));
+		assertEquals(0, c.compare(a2, a2));
+		assertEquals(0, c.compare(a3, a3));
+		assertEquals(0, c.compare(a4, a4));
+		
+		assertEquals(0, c.compare(a1, a2));
+		assertEquals(0, c.compare(a1, a2));
+		assertEquals(0, c.compare(a3, a4));
+		assertEquals(0, c.compare(a4, a3));
+		
+		assertEquals(-1, c.compare(a1, a3));
+		assertEquals(1, c.compare(a3, a1));
+		
+		// tuple markers
+		assertEquals(0, c.compare(m1, m1));
+		assertEquals(0, c.compare(m2, m2));
+		assertEquals(0, c.compare(m3, m3));
+		assertEquals(0, c.compare(m4, m4));
+		
+		assertEquals(0, c.compare(m1, m2));
+		assertEquals(0, c.compare(m1, m2));
+		assertEquals(0, c.compare(m3, m4));
+		assertEquals(0, c.compare(m4, m3));
+		
+		assertEquals(-2, c.compare(m1, m3));
+		assertEquals(2, c.compare(m3, m1));
+		
+		// sets
+		assertEquals(0, mc.compare(set1, set1));
+		assertEquals(0, mc.compare(set2, set2));
+		assertEquals(0, mc.compare(set3, set3));
+		assertEquals(0, mc.compare(set4, set4));
+		assertEquals(0, mc.compare(set5, set5));
+		assertEquals(0, mc.compare(set6, set6));
+		
+		assertEquals(0, mc.compare(set1, set2));
+		assertEquals(0, mc.compare(set2, set1));
+		
+		assertEquals(0, mc.compare(set3, set4));
+		assertEquals(0, mc.compare(set4, set5));
+		assertEquals(0, mc.compare(set5, set3));
+		
+		assertEquals(-1, mc.compare(set1, set3));
+		assertEquals(1, mc.compare(set3, set1));
+		
+		assertEquals(-1, mc.compare(set1, set6));
+		assertEquals(1, mc.compare(set6, set1));
+		
+		assertEquals(1, mc.compare(set3, set6));
+		assertEquals(-1, mc.compare(set6, set3));
 	}
 	
 	private void testTupSize(int relId, int size) {
