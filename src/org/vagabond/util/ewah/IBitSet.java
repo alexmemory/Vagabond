@@ -2,7 +2,7 @@ package org.vagabond.util.ewah;
 
 import java.util.Iterator;
 
-public interface IBitSet extends Bitmap {
+public interface IBitSet extends Bitmap, Cloneable {
 
 	public enum BitsetType {
 		JavaBitSet,
@@ -18,6 +18,7 @@ public interface IBitSet extends Bitmap {
 	public IBitSet and (IBitSet other);
 	public IBitSet or (IBitSet other);
 	public void not();
+	public IBitSet clone();
 	
 	public int getByteSize();
 	
