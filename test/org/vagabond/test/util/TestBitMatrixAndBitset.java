@@ -299,6 +299,19 @@ public class TestBitMatrixAndBitset {
 		}
 	}
 	
-	
+	@Test
+	public void testCloning () {
+		JavaUtilBitSet b = new JavaUtilBitSet();
+		setBits(setBits1, b);
+		JavaUtilBitSet b2 = (JavaUtilBitSet) b.clone();
+		
+		assertEquals(b,b2);
+		assertFalse(b == b2);
+		
+		checkIter(b, setBits1);
+		checkIter(b2, setBits1);
+		b.flip(1);
+		checkIter(b2, setBits1);
+	}
 	
 }

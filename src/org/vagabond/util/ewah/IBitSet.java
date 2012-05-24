@@ -18,6 +18,7 @@ public interface IBitSet extends Bitmap, Cloneable {
 	public IBitSet and (IBitSet other);
 	public IBitSet or (IBitSet other);
 	public void not();
+	public Object clone();
 	
 	public int getByteSize();
 	
