@@ -189,4 +189,9 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 	public int sizeInBits() {
 		return super.size();
 	}
+	
+	@Override
+	public Object clone() {
+		return super.clone();
+	}
 }
