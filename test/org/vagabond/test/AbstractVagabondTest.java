@@ -48,6 +48,8 @@ public abstract class AbstractVagabondTest {
 				holder.getScenario().getSchemas().getTargetSchema());
 		ScenarioDictionary.getInstance().setMappings(
 				holder.getScenario().getMappings());
+		ScenarioDictionary.getInstance().initTidMappingGenerating();
+		ScenarioDictionary.getInstance().createOffsetsMapping ();
 	}
 	
 	public static void loadToDB (String fileName) throws Exception {
