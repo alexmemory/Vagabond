@@ -46,6 +46,10 @@ public class ConnectionManager {
 		return con;
 	}
 	
+	public void setConnection (Connection con) {
+		this.con = con;
+	}
+	
 	public void closeCon () throws SQLException {
 		if (con != null) {
 			con.close();
