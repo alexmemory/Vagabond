@@ -225,6 +225,7 @@ public abstract class AbstractVagabondDBTest extends DBTestCase  {
 		GlobalResetter.getInstance().reset();
 		ModelLoader.getInstance().loadToInst(fileName);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
+		ConnectionManager.getInstance().setConnection(con);
 		ScenarioDictionary.getInstance().initFromScenario();
 	}
 	
