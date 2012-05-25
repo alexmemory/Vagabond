@@ -31,6 +31,11 @@ public class MarkerFactory {
 		return new MarkerSet();
 	}
 	
+	
+	public static IMarkerSet newBitMarkerSet(){
+		return new BitMarkerSet();
+	}
+	
 	public static IMarkerSet newMarkerSet (ISingleMarker ... markers) {
 		 MarkerSet result;
 		 
@@ -43,10 +48,28 @@ public class MarkerFactory {
 		 return result;
 	}
 	
+	public static IMarkerSet newBitMarkerSet(ISingleMarker ... markers){
+		BitMarkerSet result = new BitMarkerSet();
+		 for (ISingleMarker marker: markers) {
+			 result.add(marker);
+		 }
+		 
+		 return result;
+	}
+	
 	public static IMarkerSet newMarkerSet (Collection<ISingleMarker> markers) {
 		MarkerSet result;
 		
 		result = new MarkerSet();
+		
+		for (ISingleMarker marker: markers)
+			result.add(marker);
+		
+		return result;
+	}
+	
+	public static IMarkerSet newBitMarkerSet (Collection<ISingleMarker> markers) {
+		BitMarkerSet result = new BitMarkerSet();
 		
 		for (ISingleMarker marker: markers)
 			result.add(marker);
