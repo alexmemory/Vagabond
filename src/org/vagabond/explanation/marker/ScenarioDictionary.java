@@ -1,5 +1,6 @@
 package org.vagabond.explanation.marker;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +9,16 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.vagabond.mapping.model.MapScenarioHolder;
+import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.LoggerUtil;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.MappingsType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
 import org.vagabond.xmlmodel.SchemaType;
+import org.vagabond.util.IdMap;
 
 public class ScenarioDictionary {
 
@@ -29,11 +33,14 @@ public class ScenarioDictionary {
 	private SchemaType targetSchema;
 	private int totalAttrCount = -1;
 	private int totalVarCount = -1;
+	private List<IdMap<String>> TidMapping;
+	private int[][] offsets;
 	
 	private ScenarioDictionary () {
 		rels = new ArrayList<RelationType> ();
 		maps = new ArrayList<MappingType> ();
 		varNames = new ArrayList<ArrayList<String>> ();
+		TidMapping = new ArrayList<IdMap<String>>();
 	}
 	
 	public static ScenarioDictionary getInstance () {
@@ -46,6 +53,8 @@ public class ScenarioDictionary {
 				MapScenarioHolder.getInstance().getScenario().getSchemas()
 						.getTargetSchema());
 		setMappings(MapScenarioHolder.getInstance().getScenario().getMappings());
+		initTidMappingGenerating();
+		createOffsetsMapping ();
 	}
 	
 	public void setMappings (MappingsType mappings) {
@@ -86,8 +95,23 @@ public class ScenarioDictionary {
 			rels.add(rel);
 	}
 	
+	
+	
 	public String getRelName (int relId) {
 		return rels.get(relId).getName();
+	}
+	
+	public String getSchemaPlusRelName (int relId) {
+		RelationType rel;
+		RelationType[] schemaRels;
+		rel = rels.get(relId);
+		
+		schemaRels = sourceSchema.getRelationArray();
+		for(int i = 0; i < schemaRels.length; i++) {
+			if (schemaRels[i] == rel)
+				return "source." + rel.getName();
+		}
+		return "target." + rel.getName();
 	}
 	
 	public int getRelId (String relName) throws Exception {
@@ -262,5 +286,134 @@ public class ScenarioDictionary {
 		
 		return totalVarCount;
 	}
+	
+	
+	
+	
+	
+	
+	public void updateTidTable(){
+		TidMapping.clear();
+		initTidMappingGenerating();
+	}
+	
+	public void initTidMappingGenerating(){
+		for (int i = 0; i < rels.size(); i++)
+			singleTableTidGenerating(i);
+	}
+	
+	public void singleTableTidGenerating(int relId) {
+		ResultSet rs;
+		String fullRelName = getSchemaPlusRelName(relId);
+		String query = "SELECT tid FROM " + fullRelName;
+		TidMapping.add(new IdMap<String>());
+		
+		log.debug("get tids for <" + fullRelName + "> using query:\n" + query);
+		
+		try {
+			rs = ConnectionManager.getInstance().execQuery(query);
+			while(rs.next()) {
+				TidMapping.get(relId).put(rs.getString("tid"));
+			}
+			ConnectionManager.getInstance().closeRs(rs);
+		} catch (Exception e) {
+			LoggerUtil.logException(e, log);
+		}
+		
+	}
+	
+	public void createOffsetsMapping () {
+		int curOffset = 0;
+		
+		offsets = new int[rels.size()][];
+		
+		for(int i = 0; i < rels.size(); i++) {
+			RelationType rel = rels.get(i);
+			offsets[i] = new int[rel.getAttrArray().length];
+			for(int j = 0; j < rel.getAttrArray().length; j++) {
+				offsets[i][j] = curOffset;
+				curOffset += TidMapping.get(i).size();
+			}
+		}
+	}
+	
+	public AttrValueMarker getAttrValueMarkerByIBitSet(int bitpos) throws Exception{
+		int relId= 0;
+		int attrId = 0;
+		int rowIndex = 0;
+		int columnIndex = 0;
+		for (rowIndex = 0; rowIndex < offsets.length; rowIndex++){
+			int[] row  = offsets[rowIndex];
+			if(row != null){
+				for(columnIndex = 0; columnIndex < row.length; columnIndex++){
+					if(offsets[rowIndex][columnIndex]<bitpos){
+						relId = rowIndex;
+						attrId = columnIndex;
+					}
+					
+					else if (offsets[rowIndex][columnIndex] >= bitpos){
+						int tidId = bitpos - offsets[relId][attrId];
+						return new AttrValueMarker(relId, getTidString(tidId, getRelName(relId)), attrId);
+						
+					}
+				}
+				
+			}
+			
+		}
+		return null;
+	}
+	
+	
+	public int getOffset (int relId, int attrId, String tid) throws Exception {
+		return getOffsetForRelAttr(relId, attrId) + getTidInt(tid, relId);
+	}
+	
+	public int getOffsetForRelAttr (String relName, String attrName) throws Exception { 
+		return getOffsetForRelAttr (getRelId(relName), getAttrId(relName, attrName));
+	}
+	
+	public int getOffsetForRelAttr (int relId, int attrId) {
+		return offsets[relId][attrId];
+	}
+	
+	public int getTidInt(String tidString, String relation) throws Exception{
+		return TidMapping.get(getRelId(relation)).getId(tidString);	
+	}
+
+	public int getTidInt(String tidString, int relId) throws Exception{
+		return TidMapping.get(relId).getId(tidString);	
+	}
+	
+	public String getTidString(int tidInt, String relation) throws Exception{
+		return TidMapping.get(getRelId(relation)).get(tidInt);
+		
+	}
+	
+	public int getTotalTidCount(){
+		int totaltid = 0;
+		for (int i = 0; i < TidMapping.size(); i++ ){
+			totaltid += TidMapping.get(i).size();
+		}
+		return totaltid;
+	}
+	
+	
+	public void addTid(String tid, String relation) throws Exception{
+		TidMapping.get(getRelId(relation)).put(tid);
+	}
+	
+	public boolean containTidString(String tid, String relation) throws Exception{
+		return TidMapping.get(getRelId(relation)).containsVal(tid);
+	}
+	
+	public boolean containTidInt(int id, String relation) throws Exception{
+		return TidMapping.get(getRelId(relation)).containsKey(id);
+		
+	}
+	public int maxTidInt(String relation) throws Exception{
+		return TidMapping.get(getRelId(relation)).getMaxId();
+	}
+	
 }
 
