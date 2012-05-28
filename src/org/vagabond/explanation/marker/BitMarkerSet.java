@@ -142,7 +142,7 @@ public class BitMarkerSet implements IMarkerSet {
 
 	public boolean contains(ISingleMarker marker) throws Exception{
 		if (marker instanceof IAttributeValueMarker) {
-			int bitPos = attrMarkerToBitPos ((IAttributeValueMarker) marker);
+			int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) marker);
 			return markers.get(bitPos);
 		}
 		boolean hasSet = false;
@@ -364,7 +364,7 @@ public class BitMarkerSet implements IMarkerSet {
 		boolean result = false;
 		
 		if ((ISingleMarker)arg0 instanceof IAttributeValueMarker) {
-				int bitPos = attrMarkerToBitPos ((IAttributeValueMarker) arg0);
+				int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) arg0);
 				if (markers.get(bitPos)){
 					this.removeSingleBit(bitPos);
 					result = true;
@@ -481,7 +481,7 @@ public class BitMarkerSet implements IMarkerSet {
 	public boolean add(ISingleMarker marker) {
 		hash = -1;
 		if (marker instanceof IAttributeValueMarker) {
-			int bitPos = attrMarkerToBitPos ((IAttributeValueMarker) marker);
+			int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) marker);
 			if (markers.get(bitPos))
 				return false;
 			markers.set(bitPos);
@@ -508,15 +508,6 @@ public class BitMarkerSet implements IMarkerSet {
 		return false;
 	}
 	
-	private int attrMarkerToBitPos (IAttributeValueMarker m) {
-		int result = 0;
-		try {
-			result = ScenarioDictionary.getInstance().getOffset (m.getRelId(), m.getAttrId(), m.getTid());
-			return result;
-		} catch (Exception e) {
-			LoggerUtil.logException(e, log);
-		}
-		return result;
-	}
+
 
 }

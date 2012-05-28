@@ -15,6 +15,15 @@ public class BitsetFactory {
 		}
 	}
 	
+	public static IBitSet newBitsetSingleton (BitsetType type, int pos) {
+		IBitSet bitset;
+		
+		bitset = newBitset(type);
+		bitset.set(pos);
+		
+		return bitset;
+	}
+	
 	public static IBitSet newBitset (BitsetType type, String values) {
 		IBitSet bitset;
 		

@@ -364,6 +364,16 @@ public class ScenarioDictionary {
 		return null;
 	}
 	
+	public int attrMarkerToBitPos (IAttributeValueMarker m) {
+		int result = 0;
+		try {
+			result = ScenarioDictionary.getInstance().getOffset (m.getRelId(), m.getAttrId(), m.getTid());
+			return result;
+		} catch (Exception e) {
+			LoggerUtil.logException(e, log);
+		}
+		return result;
+	}
 	
 	public int getOffset (int relId, int attrId, String tid) throws Exception {
 		return getOffsetForRelAttr(relId, attrId) + getTidInt(tid, relId);

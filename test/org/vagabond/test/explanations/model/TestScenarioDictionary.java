@@ -43,4 +43,6 @@ public class TestScenarioDictionary extends AbstractVagabondTest {
 		assertEquals("2 = M2.c", "c", dic.getVarName(0, 2));
 	}
 	
+
+	
 }

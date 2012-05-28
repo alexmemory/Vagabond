@@ -10,6 +10,7 @@ import java.util.*;
 import java.io.*;
 
 import org.apache.log4j.Logger;
+import org.vagabond.util.LoggerUtil;
 
 /**
  * <p>This implements the patent-free(1) EWAH scheme. Roughly speaking, it is a
@@ -1893,12 +1894,18 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	public Object clone() throws java.lang.CloneNotSupportedException {
-		final EWAHCompressedBitmap clone = (EWAHCompressedBitmap) super.clone();
-		clone.buffer = this.buffer.clone();
-		clone.actualsizeinwords = this.actualsizeinwords;
-		clone.sizeinbits = this.sizeinbits;
-		return clone;
+	public Object clone() {
+		EWAHCompressedBitmap clone;
+		try {
+			clone = (EWAHCompressedBitmap) super.clone();
+			clone.buffer = this.buffer.clone();
+			clone.actualsizeinwords = this.actualsizeinwords;
+			clone.sizeinbits = this.sizeinbits;
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			LoggerUtil.logException(e, log);
+		}
+		return null;
 	}
 
 	/*
