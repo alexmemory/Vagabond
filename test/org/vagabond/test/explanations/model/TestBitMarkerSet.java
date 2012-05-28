@@ -114,7 +114,7 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		assertEquals(tidId2 + 2, d.getOffset(0, 1, "2"));
 		
 		// convert between bitpos and Markers
-		assertEquals(attr, d.getAttrValueMarkerByIBitSet(d.attrMarkerToBitPos(attr)));
+		assertEquals(attr, d.getAttrValueMarkerByIBitSet( d.attrMarkerToBitPos(attr)));
 	}
 	
 	//add, equals, remove, hashcode, getNumElems
