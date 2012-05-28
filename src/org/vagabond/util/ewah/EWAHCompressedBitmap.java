@@ -1894,18 +1894,19 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	public Object clone() {
-		EWAHCompressedBitmap clone;
+	public Object clone()  {
+		EWAHCompressedBitmap clone = null;
 		try {
 			clone = (EWAHCompressedBitmap) super.clone();
-			clone.buffer = this.buffer.clone();
-			clone.actualsizeinwords = this.actualsizeinwords;
-			clone.sizeinbits = this.sizeinbits;
-			return clone;
 		} catch (CloneNotSupportedException e) {
 			LoggerUtil.logException(e, log);
 		}
-		return null;
+
+		clone.buffer = this.buffer.clone();
+		clone.actualsizeinwords = this.actualsizeinwords;
+		clone.sizeinbits = this.sizeinbits;
+		clone.rlw = new RunningLengthWord(clone.buffer, rlw.position);
+		return clone;
 	}
 
 	/*

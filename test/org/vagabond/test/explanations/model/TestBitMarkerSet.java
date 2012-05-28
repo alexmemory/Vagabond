@@ -146,26 +146,48 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		set1.union(set2);
 		assertEquals(set1.getNumElem(), setTwoElement.getNumElem());
 		assertEquals(set1, setTwoElement);
+		
 		set1.intersect(set2);
 		assertEquals(set1,set2);
 		assertFalse(set1.addAll(list));
+		
 		set1.diff(set2);
 		assertEquals(set1, setFirstElement);
+		
 		set1.addAll(list);
 		assertEquals(set1, setTwoElement);
+		
 		set1.removeAll(list);
 		set2 = set1.cloneSet();
 		assertEquals(set2, set1);
+		
+		initialize();
+		
 		set1.add(FourElementMarker1);
 		set1.add(ThreeElementMarker1);
 		assertTrue(set2.addAll(tuppleList));
-		
-		//TODO addAll still has problem when adding tupple list and list!!!!!!
-//  *** assertTrue(set2.addAll(tuppleList)); 
-//	***	I also try addAll(list), and it only adds one element.
-
+		log.debug(((BitMarkerSet) set1).getIBitSetElems().toBitsString());
+		log.debug(((BitMarkerSet) set2).getIBitSetElems().toBitsString());		 
 		assertEquals(set1.getNumElem(), set2.getNumElem());
 		assertEquals(set1, set2);
+	}
+	
+	@Test
+	public void testClone () throws Exception {
+		BitMarkerSet b1,b2;
+		initialize();
+		
+		b1 = (BitMarkerSet) set1;
+		b2 = (BitMarkerSet) set2;
+		
+		set2 = set1.cloneSet();
+		
+		set1.add(FourElementMarker1);
+		set1.add(ThreeElementMarker1);
+		
+		set2.addAll(tuppleList);
+		
+		assertEquals(set1,set2);
 	}
 	
 	
@@ -297,6 +319,20 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		
 		assertEquals(2, set1.getSize());
 		assertEquals(set2, set1);
+		
+		initialize();
+		set1.addAll(tuppleList);
+		
+		assertEquals(7, set1.getNumElem());
+	}
+	
+	@Test
+	public void testAdd () throws Exception {
+		initialize();
+		set1.add(FourElementMarker1);
+		set1.add(ThreeElementMarker1);
+		
+		assertEquals(7, set1.getNumElem());
 	}
 	
 }
