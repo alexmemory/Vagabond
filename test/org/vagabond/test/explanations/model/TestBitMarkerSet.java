@@ -160,11 +160,11 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		set1.add(ThreeElementMarker1);
 		assertTrue(set2.addAll(tuppleList));
 		
-//	***	assertTrue(set2.addAll(tuppleList));
+		assertTrue(set2.addAll(tuppleList));
 //	***	I also try addAll(list), and it only adds one element even when both line set the element
 
-//		assertEquals(set1.getNumElem(), set2.getNumElem());
-//		assertEquals(set1, set2);
+		assertEquals(set1.getNumElem(), set2.getNumElem());
+		assertEquals(set1, set2);
 	}
 	
 	
