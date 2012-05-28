@@ -174,20 +174,18 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 	
 	@Test
 	public void testClone () throws Exception {
-		BitMarkerSet b1,b2;
 		initialize();
-		
-		b1 = (BitMarkerSet) set1;
-		b2 = (BitMarkerSet) set2;
-		
 		set2 = set1.cloneSet();
 		
 		set1.add(FourElementMarker1);
-		set1.add(ThreeElementMarker1);
-		
-		set2.addAll(tuppleList);
-		
+		set1.add(ThreeElementMarker1);		
+		set2.addAll(tuppleList);		
 		assertEquals(set1,set2);
+		
+		initialize();
+		set1.addAll(tuppleList);
+		set2 = set1.cloneSet();
+		assertEquals(set1, set2);
 	}
 	
 	
@@ -206,10 +204,9 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		assertEquals(set1.getNumElem(), setTwoElement.getNumElem());
 		assertTrue(set1.contains(attr));
 		assertTrue(set1.contains(attr3));
-		assertTrue(set1.containsAll(list));
-		
-		
+		assertTrue(set1.containsAll(list));	
 	}
+	
 	// getElems(), iterator(), toString(), toArray()
 	@Test
 	public void testAddAndIterator() throws Exception{

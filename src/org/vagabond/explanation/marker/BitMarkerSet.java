@@ -255,13 +255,8 @@ public class BitMarkerSet implements IMarkerSet {
 	public IMarkerSet cloneSet() {
 		BitMarkerSet cloneSet = new BitMarkerSet();
 		cloneSet.markers = (IBitSet) this.markers.clone();
-//		cloneSet.resetLazyFields();
-//		IntIterator iterator = markers.intIterator();
-//		while(iterator.hasNext()){
-//			cloneSet.markers.set(iterator.next());
-//		}
-		if (sum != null)
-			cloneSet.sum = sum;
+		cloneSet.resetLazyFields();
+		
 		return cloneSet;
 	}
 
