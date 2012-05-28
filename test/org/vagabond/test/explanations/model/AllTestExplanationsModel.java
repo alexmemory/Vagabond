@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 		TestExplanationCollection.class,
 		TestMarkerParser.class,
 		TestMarkers.class,
+		TestBitMarkerSet.class,
 		TestErrorPartitionGraph.class,
 		TestScenarioDictionary.class,
 		TestErrorPartitioning.class
