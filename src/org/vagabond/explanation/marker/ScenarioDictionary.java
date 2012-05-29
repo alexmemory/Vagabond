@@ -400,6 +400,10 @@ public class ScenarioDictionary {
 		
 	}
 	
+	public String getTidString(int tidInt, int relation) throws Exception{
+		return TidMapping.get(relation).get(tidInt);	
+	}
+	
 	public int getTotalTidCount(){
 		int totaltid = 0;
 		for (int i = 0; i < TidMapping.size(); i++ ){
