@@ -297,7 +297,8 @@ public class ScenarioDictionary {
 		initTidMappingGenerating();
 	}
 	
-	public void initTidMappingGenerating(){
+	public void initTidMappingGenerating() {
+		TidMapping.clear();
 		for (int i = 0; i < rels.size(); i++)
 			singleTableTidGenerating(i);
 	}

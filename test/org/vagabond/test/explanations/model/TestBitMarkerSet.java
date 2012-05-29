@@ -94,7 +94,7 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		ScenarioDictionary d = ScenarioDictionary.getInstance();
 		int tidId = d.getTidInt("1", 0);
 		assertEquals(tidId, d.getOffset(0, 0, "1"));
-		assertTrue (tidId < 3);
+		assertTrue (tidId + "", tidId < 3);
 		
 		int tidId2 = d.getTidInt("2", 0);
 		assertEquals(tidId2, d.getOffset(0, 0, "2"));
@@ -120,6 +120,7 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		assertEquals(set1.getNumElem(), setFirstElement.getNumElem());
 		set1.remove(attr);
 		assertFalse(setFirstElement.equals(set1));
+		log.debug(setNoElement.toString() + "\n\n" + set1.toString());
 		assertTrue(setNoElement.equals(set1));
 		
 		set1.add(FourElementMarker1);
