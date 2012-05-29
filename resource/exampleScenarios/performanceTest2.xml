@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="tramp">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>nickname</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>firstseen</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>caredforby</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="socialworker">
+			<Attr><Name>ssn</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>worksfor</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>ssn</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="soupkitchen">
+			<Attr><Name>location</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>budget</Name><DataType>NUMERIC</DataType></Attr>
+			<PrimaryKey><Attr>location</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="tramp_seen">
+			<From tableref="tramp"><Attr>firstseen</Attr></From>
+			<To tableref="soupkitchen"><Attr>location</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="tramp_caredfor">
+			<From tableref="tramp"><Attr>caredforby</Attr></From>
+			<To tableref="socialworker"><Attr>ssn</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="sw_works_for">
+			<From tableref="socialworker"><Attr>worksfor</Attr></From>
+			<To tableref="soupkitchen"><Attr>location</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>livesin</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="tramp"><Attr>nickname</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="socialworker"><Attr>name</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c3">
+		<From tableref="soupkitchen"><Attr>city</Attr></From>
+		<To tableref="person"><Attr>livesin</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence>c1</Correspondence>
+			<Correspondence>c3</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
+			<Atom tableref="socialworker"><Var>d</Var><Var>e</Var><Var>f</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>c</Var><Var>g</Var><Var>h</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>f</Var><Var>i</Var><Var>j</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>a</Var><Var>g</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Uses>
+			<Correspondence>c2</Correspondence>
+			<Correspondence>c3</Correspondence>
+		</Uses>
+		<Foreach>
+			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>c</Var><Var>d</Var><Var>e</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>b</Var><Var>d</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="person">
+		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Code>
+SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k1.tid::text,'') || '|' || COALESCE(k2.tid::text,'') AS tid,
+	t.nickname AS name, k1.city AS livesin 
+FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
+WHERE t.caredforby = s.ssn 
+	AND t.firstseen = k1.location 
+	AND s.worksfor = k2.location 
+UNION ALL
+SELECT COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
+	s.name,	k.city AS livesin
+FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
+WHERE s.worksfor = k.location
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>tramptest</DB>
+	<User>jiang</User>
+	<Password/>
+</ConnectionInfo>
+<Data>
+	<InstanceFile name="tramp">
+		<Path>resource/exampleData</Path>
+		<FileName>tramp.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="socialworker">
+		<Path>resource/exampleData</Path>
+		<FileName>socialworker.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="soupkitchen">
+		<Path>resource/exampleData</Path>
+		<FileName>soupkitchen.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+</Data>
+</this:MappingScenario>
