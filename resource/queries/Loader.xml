@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Loader queries for checking existence of schemas and instances</comment>
+
+<entry key="CheckScenario">
+SELECT bool_and(res)
+FROM (${1}
+UNION ALL
+${2}) AS sub 
+</entry>
+
+<entry key="CheckSchema">
+SELECT count(*) = ${1} AS res FROM pg_class c, pg_namespace n 
+WHERE n.oid = c.relnamespace AND (${2})
+</entry>
+
+<entry key="CheckData">
+SELECT bool_and(res)
+FROM (${1}) AS sub
+</entry>
+
+<entry key="CheckRelData">
+SELECT count(*) = ${1} AS res FROM source.${2}
+</entry>
+
+<entry key="EmptyRel">
+DELETE FROM FROM source.${2};
+</entry>
+
+
+
+</properties>
