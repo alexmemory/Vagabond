@@ -1,8 +1,10 @@
 package org.vagabond.mapping.scenarioToDB;
 
 import java.io.File;
+import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.AttrListType;
@@ -58,6 +60,82 @@ public class SchemaCodeGenerator {
 				"source", result);
 		
 		return result.toString();
+	}
+	
+	public String getCheckCode(MappingScenario map) {		
+		return QueryHolder.getQuery("Loader.CheckScenario")
+				.parameterize(
+				getSchemaCheckCode(map.getSchemas().getSourceSchema(), "source"),
+				getSchemaCheckCode(map.getSchemas().getTargetSchema(), "target"));
+	}
+	
+	public String getSchemaCheckCode (SchemaType schema, String name) {
+		int numRel = schema.getRelationArray().length;
+		StringBuffer cond = new StringBuffer();
+		
+		for(RelationType rel: schema.getRelationArray()) {
+			cond.append("(relname = '" + rel.getName() + "' AND nspname = '" + name + 
+					"') OR " );
+		}
+		cond.delete(cond.length() - 4, cond.length());
+		
+		return QueryHolder.getQuery("Loader.CheckSchema").parameterize
+				(numRel + "", cond.toString());
+	}
+	
+	public String getInstanceDelCode (MappingScenario map) {
+		StringBuffer result = new StringBuffer();
+		
+		for(RelationType rel: map.getSchemas().getSourceSchema()
+				.getRelationArray()) {
+			result.append(QueryHolder.getQuery("Loader.EmptyRel")
+					.parameterize(rel.getName()));
+		}
+		
+		return result.toString();
+	}
+	
+	public String getInstanceCheckCode (MappingScenario map) throws Exception {
+		StringBuffer subq = new StringBuffer();
+	
+		for (RelInstanceType inst: map.getData().getInstanceArray()) {
+			subq.append(getRelDataCheckCode(inst.getName(), 
+					inst.getRowArray().length));
+			subq.append(" UNION ALL ");
+		}
+		
+		for (RelInstanceFileType inst: map.getData().getInstanceFileArray()) {
+			int card = getCSVCard(inst);
+			subq.append(getRelDataCheckCode(inst.getName(), 
+					card));
+			subq.append(" UNION ALL ");
+		}
+		subq.delete(subq.length() - " UNION ALL ".length(), subq.length());
+		
+		return QueryHolder.getQuery("Loader.CheckData").parameterize(
+				subq.toString());
+	}
+	
+	private int getCSVCard(RelInstanceFileType inst) throws Exception {
+		String path = getPath(inst);
+		File file = new File(path);
+		Scanner in;
+		int count = 0;
+		
+		assert(file.exists());
+		
+		in = new Scanner(file);
+		while(in.hasNext()) {
+			in.nextLine();
+			count++;
+		}
+			
+		return count;
+	}
+
+	public String getRelDataCheckCode (String relName, int card) {
+		return QueryHolder.getQuery("Loader.CheckRelData")
+				.parameterize("" + card, relName);
 	}
 	
 	/**
@@ -498,6 +576,15 @@ public class SchemaCodeGenerator {
 		String path;
 		
 		delim = inst.getColumnDelim();
+		path = getPath(inst);
+		
+		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
+				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+	}
+
+	private String getPath(RelInstanceFileType inst) throws Exception {
+		String path;
+		
 		path = inst.getPath();
 		if (!path.endsWith("/"))
 			path += "/";
@@ -505,8 +592,7 @@ public class SchemaCodeGenerator {
 		
 		path = getAbsolutePath(path);
 		
-		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
-				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+		return path;
 	}
 	
 	private String getAbsolutePath (String pathString) throws Exception {

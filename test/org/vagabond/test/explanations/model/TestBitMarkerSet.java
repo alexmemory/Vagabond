@@ -1,17 +1,11 @@
 package org.vagabond.test.explanations.model;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.xmlbeans.XmlException;
-import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.marker.BitMarkerSet;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -19,11 +13,8 @@ import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.ScenarioDictionary;
-import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondDBTest;
-import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.ewah.BitsetFactory;
 import org.vagabond.util.ewah.IBitSet;

@@ -1,10 +1,12 @@
 package org.vagabond.performance.bitmarker;
 
+import java.io.File;
 import java.sql.Connection;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.BitMarkerSet;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -13,6 +15,7 @@ import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
+import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader.LoadMode;
 import org.vagabond.test.TestOptions;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.GlobalResetter;
@@ -306,7 +309,9 @@ public class TestBitMarkerPerformance {
 		Connection con = TestOptions.getInstance().getConnection();
 		
 		GlobalResetter.getInstance().reset();
+		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 		ModelLoader.getInstance().loadToInst(fileName);
+		DatabaseScenarioLoader.getInstance().setOperationalMode(LoadMode.Lazy);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
 		ConnectionManager.getInstance().setConnection(con);
 		ScenarioDictionary.getInstance().initFromScenario();
