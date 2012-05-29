@@ -8,7 +8,9 @@ import java.sql.SQLException;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.xmlbeans.XmlException;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.ScenarioDictionary;
@@ -25,15 +27,22 @@ public abstract class AbstractVagabondTest {
 	public static void setUpLogger () throws FileNotFoundException, IOException, XmlException, ValidationException, SQLException, ClassNotFoundException {
 		PropertyConfigurator.configure("resource/test/testLog4jproperties.txt");
 		QueryHolder.getInstance().loadFromDir(new File ("resource/queries"));
-		ConnectionManager.getInstance().getConnection(
-				TestOptions.getInstance().getHost(),
-				TestOptions.getInstance().getDB(),
-				TestOptions.getInstance().getUser(), 
-				TestOptions.getInstance().getPassword());
 	}
 	
 	@AfterClass
 	public static void tearDown () throws Exception {
+		TestOptions.getInstance().close();
+		ConnectionManager.getInstance().closeCon();
+	}
+	
+	@Before
+	public void settUp () throws FileNotFoundException, SQLException, IOException, ClassNotFoundException {
+		Connection con = TestOptions.getInstance().getConnection();
+		ConnectionManager.getInstance().setConnection(con);
+	}
+	
+	@After
+	public void cleanUpp() throws FileNotFoundException, SQLException, IOException, ClassNotFoundException {
 		TestOptions.getInstance().close();
 		ConnectionManager.getInstance().closeCon();
 	}
@@ -54,7 +63,6 @@ public abstract class AbstractVagabondTest {
 	
 	public static void loadToDB (String fileName) throws Exception {
 		Connection con = TestOptions.getInstance().getConnection();
-		
 		ModelLoader.getInstance().loadToInst(fileName);
 		ScenarioDictionary.getInstance().initFromScenario();
 		DatabaseScenarioLoader.getInstance().loadScenario(con);

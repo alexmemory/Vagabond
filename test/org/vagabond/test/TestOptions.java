@@ -34,7 +34,7 @@ public class TestOptions extends AbstractDatabaseConnection {
 	}
 	
 	public void close() throws SQLException {
-		if (con != null) {
+		if (con != null && !con.isClosed()) {
 			con.close();
 			con = null;
 		}
@@ -42,7 +42,7 @@ public class TestOptions extends AbstractDatabaseConnection {
 
 	public Connection getConnection() throws SQLException {
 		try {
-			if (con == null) {
+			if (con == null || con.isClosed()) {
 				con = DriverManager.getConnection(getUrl(), getUser(), 
 						getPassword());
 			}

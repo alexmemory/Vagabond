@@ -51,7 +51,7 @@ public class ConnectionManager {
 	}
 	
 	public void closeCon () throws SQLException {
-		if (con != null) {
+		if (con != null && !con.isClosed()) {
 			con.close();
 			con = null;
 		}

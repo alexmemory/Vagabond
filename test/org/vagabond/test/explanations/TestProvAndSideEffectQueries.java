@@ -300,8 +300,8 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		testSingleQuery(query, result);
 	}
 	
-	@Test
-	public void testClose () throws Exception {
-		AbstractVagabondDBTest.closeDown();
-	}
+//	@Test
+//	public void testClose () throws Exception {
+//		AbstractVagabondDBTest.closeDown();
+//	}
 }

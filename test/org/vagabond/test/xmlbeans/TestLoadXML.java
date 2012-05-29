@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.mapping.model.MapScenarioHolder;
@@ -26,13 +27,10 @@ import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
 
 public class TestLoadXML extends AbstractVagabondTest {
-
-	static Connection con;
 	
-	@BeforeClass 
-	public static void setUp () throws Exception {
+	@Before
+	public void setUp () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
-		con = TestOptions.getInstance().getConnection();
 	}
 	
 	@Test 
@@ -80,6 +78,7 @@ public class TestLoadXML extends AbstractVagabondTest {
 	
 	@Test 
 	public void testExecuteLoad () throws Exception {
+		Connection con = TestOptions.getInstance().getConnection();
 		MappingScenarioDocument mapDoc = MappingScenarioDocument.Factory.
 				parse(new File("resource/test/testScenario.xml"));
 		DatabaseScenarioLoader.getInstance().loadScenario(con, new MapScenarioHolder(mapDoc));

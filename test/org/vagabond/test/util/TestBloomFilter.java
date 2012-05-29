@@ -120,8 +120,8 @@ public class TestBloomFilter extends AbstractVagabondTest {
 	
 	@Test
 	public void testBloomFilterSpeed () {
-		testBloomSpeed(1000, 1000000, 1000, 0.01);
-		testBloomSpeed(1000, 1000000, 1000, 0.0001);
+//		testBloomSpeed(1000, 1000000, 1000, 0.01);
+//		testBloomSpeed(1000, 1000000, 1000, 0.0001);
 //		testBloomSpeed(1000, 1000000, 1000000, 0.01);
 	}
 	
