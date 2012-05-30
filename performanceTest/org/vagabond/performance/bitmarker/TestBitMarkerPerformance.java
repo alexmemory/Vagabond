@@ -58,26 +58,26 @@ public class TestBitMarkerPerformance {
 	public static void  CloneTest() throws Exception{
 		CloneTestSets(10, 200);
 		CloneTestSets(100, 200);
-		CloneTestSets(1000, 200);
+		CloneTestSets(1000, 20);
 	}
 	
 	
 	public static void  UnionTest() throws Exception{
 		unionSets(10, 200);
 		unionSets(100, 200);
-		unionSets(1000, 200);
+		unionSets(1000, 20);
 	}
 	
 	public static void  IntersectTest() throws Exception{
 		IntersectSets(10, 200);
 		IntersectSets(100, 200);
-		IntersectSets(1000, 200);
+		IntersectSets(1000, 20);
 	}
 	
 	public static void  DiffTest() throws Exception{
 		DiffSets(10, 200);
 		DiffSets(100, 200);
-		DiffSets(1000, 200);
+		DiffSets(1000, 20);
 	}
 	
 	
