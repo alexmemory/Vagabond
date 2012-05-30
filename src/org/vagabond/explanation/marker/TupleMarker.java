@@ -9,22 +9,25 @@ public class TupleMarker implements ITupleMarker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(TupleMarker.class);
 	
-	private int relId;
-	private String tid;
-	private int hash = -1;
-	
-	public TupleMarker () {
-		
-	}
+	private final int relId;
+	private final String tid;
+	private final int hash;
 	
 	public TupleMarker (int relId, String tid) {
 		this.relId = relId;
 		this.tid = tid;
+		this.hash = computeHash();
 	}
 	
 	public TupleMarker (String rel, String tid) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(rel);
 		this.tid = tid;
+		this.hash = computeHash();
+	}
+	
+	private int computeHash() {
+		int val = fnv(tid.hashCode());
+		return fnv(relId, val);
 	}
 	
 	@Override
@@ -38,7 +41,7 @@ public class TupleMarker implements ITupleMarker {
 		if (other instanceof ITupleMarker) {
 			ITupleMarker oMarker = (ITupleMarker) other;
 			
-			if (!(this.getRelId() == oMarker.getRelId()))
+			if (this.relId != oMarker.getRelId())
 				return false;
 			if (!this.getTid().equals(oMarker.getTid()))
 				return false;
@@ -85,20 +88,11 @@ public class TupleMarker implements ITupleMarker {
 	
 	@Override
 	public int hashCode () {
-		if (hash == -1) {
-			hash = fnv(tid.hashCode());
-			hash = fnv(relId, hash);
-		}
 		return hash;
 	}
 	
 	public int getRelId() {
 		return relId;
-	}
-
-	public void setRelId(int relId) {
-		this.relId = relId;
-		hash = -1;
 	}
 
 	@Override

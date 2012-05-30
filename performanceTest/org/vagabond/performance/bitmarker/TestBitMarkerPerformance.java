@@ -23,206 +23,160 @@ import org.vagabond.util.GlobalResetter;
 public class TestBitMarkerPerformance {
 	static Logger log = Logger.getLogger(TestBitMarkerPerformance.class);
 	
-	public static void main (String[] args) throws Exception {
-		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
-		loadToDB("resource/exampleScenarios/performanceTest1.xml");
-		
-		AddingTest();
-		ContainingTest();
-		UnionTest();
-		IntersectTest();
-		DiffTest();
-		CloneTest();
-	}
-	public static void  AddingTest() throws Exception{
-		AddingTestSets(10, 200);
-		AddingTestSets(100, 200);
-		AddingTestSets(1000, 20);
+	public enum SetOps {
+		Union,
+		Intersect,
+		Diff,
+		Clone
 	}
 	
-	public static void  ContainingTest() throws Exception{
-		ContainingTestSets(10, 200);
-		ContainingTestSets(100, 200);
-		ContainingTestSets(1000, 20);
+	private static IAttributeValueMarker attr;
+
+	private static final int NUM_SETS = 5;
+	
+	private static IMarkerSet[][][] testsets;
+	private static int[][] sizesForSetTests = new int[][] {{10,500}, {100,500}, {1000,500}, {10000,500}};
+	
+	public static void main (String[] args) throws Exception {
+		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
+		//loadToDB("resource/exampleScenarios/homeless.xml");
+		loadToDB("resource/exampleScenarios/performanceTest1.xml");
+		genTestSets();
+		
+		IMarkerSet markerset1 = MarkerFactory.newMarkerSet();
+		IMarkerSet bitset1 = MarkerFactory.newMarkerSet();
+		System.out.println("------MarkerSet Adding Test------");
+		AddingTest(markerset1);
+		System.out.println("------BitSet Adding Test------");
+		AddingTest(bitset1);
+
+		System.out.println("------MarkerSet Containing Test------");
+		ContainingTest(false);
+		System.out.println("------BitSet Containing Test------");
+		ContainingTest(true);
+		
+		System.out.println("------Union Test------");
+		UnionTest();
+		System.out.println("------Intersect Test------");
+		IntersectTest();
+		System.out.println("------Difference Test------");
+		DiffTest();
+		System.out.println("------Clone Test------");
+		CloneTest();
+		
+		
 	}
 	
 	
 	public static void  CloneTest() throws Exception{
-		CloneTestSets(10, 200);
-		CloneTestSets(100, 200);
-		CloneTestSets(1000, 20);
+		for(int i = 0; i < sizesForSetTests.length; i++)
+			execSetOp(SetOps.Clone, sizesForSetTests[i][0], sizesForSetTests[i][1]);
 	}
 	
 	
 	public static void  UnionTest() throws Exception{
-		unionSets(10, 200);
-		unionSets(100, 200);
-		unionSets(1000, 20);
+		for(int i = 0; i < sizesForSetTests.length; i++)
+			execSetOp(SetOps.Union, sizesForSetTests[i][0], sizesForSetTests[i][1]);
 	}
 	
 	public static void  IntersectTest() throws Exception{
-		IntersectSets(10, 200);
-		IntersectSets(100, 200);
-		IntersectSets(1000, 20);
+		for(int i = 0; i < sizesForSetTests.length; i++)
+			execSetOp(SetOps.Intersect, sizesForSetTests[i][0], sizesForSetTests[i][1]);
 	}
 	
 	public static void  DiffTest() throws Exception{
-		DiffSets(10, 200);
-		DiffSets(100, 200);
-		DiffSets(1000, 20);
+		for(int i = 0; i < sizesForSetTests.length; i++)
+			execSetOp(SetOps.Diff, sizesForSetTests[i][0], sizesForSetTests[i][1]);
 	}
 	
-	public static void AddingTestSets (int size, int numSets) throws Exception {
+	public static void execSetOp (SetOps oper, int size, int numIter) throws Exception {
 		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
+		IMarkerSet set1, set2;
+		int sizePos = getPosForSize(size);
 		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
+
+		long sumM = 0;
+		long testStart = System.currentTimeMillis();
+		for(int i = 0; i < numIter; i+=2) {
+			long beforeC = System.currentTimeMillis();
+			set1 = testsets[sizePos][0][number.nextInt(NUM_SETS)].cloneSet();
+			set2 = testsets[sizePos][0][number.nextInt(NUM_SETS)];
+			long afterC = System.currentTimeMillis();
+			sumM -= (afterC - beforeC);
+			
+			doSetOp(oper, set1, set2);
+			
+		}
+		long testEnd = System.currentTimeMillis();
+		sumM += (testEnd - testStart);
 		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i++)
-			sets[i].add(randMarker(maxRel, maxTid, maxAttr, number));
-		long test1end = System.currentTimeMillis();
+		long sumB = 0;
+		testStart = System.currentTimeMillis();
+		for(int i = 0; i < numIter; i+=2) {
+			long beforeC = System.currentTimeMillis();
+			set1 = testsets[sizePos][1][number.nextInt(NUM_SETS)].cloneSet();
+			set2 = testsets[sizePos][1][number.nextInt(NUM_SETS)];
+			long afterC = System.currentTimeMillis();
+			sumB -= (afterC - beforeC);
+			
+			doSetOp(oper, set1, set2);	
+		}
+		testEnd = System.currentTimeMillis();
+		sumB += (testEnd - testStart);
 		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i++)
-			bitSets[i].add(randMarker(maxRel, maxTid, maxAttr, number));
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " AddingTest ------");
-		log.debug("MARKER: Adding Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Adding Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
+		log.debug("------ SIZE " + size + " ------");
+		log.debug("MARKER: " + oper.toString() + " Between " + numIter
+				+ " Sets of " + size + " elements each time: " + sumM);
+		log.debug("BITMARKER: " + oper.toString() + " Between " + numIter 
+				+ " Sets of " + size + " elements each time: " + sumB);
 	}
 	
-	
-	public static void ContainingTestSets (int size, int numSets) throws Exception {
-		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
-		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
-		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i++)
-			sets[i].contains(randMarker(maxRel, maxTid, maxAttr, number));
-		long test1end = System.currentTimeMillis();
-		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i++)
-			bitSets[i].contains(randMarker(maxRel, maxTid, maxAttr, number));
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " ContainingTest ------");
-		log.debug("MARKER: Containing Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Containing Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
+	private static void doSetOp(SetOps oper, IMarkerSet set1, IMarkerSet set2) {
+		switch(oper) {
+		case Union:
+			set1.union(set2);
+			break;
+		case Intersect:
+			set1.intersect(set2);
+			break;
+		case Diff:
+			set1.diff(set2);
+			break;
+		case Clone:
+			set1.cloneSet();
+			break;
+		}
 	}
 	
-	
-	
-	public static void CloneTestSets (int size, int numSets) throws Exception {
-		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
-		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
-		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i+=2)
-			sets[i] = sets[i+1].cloneSet();
-		long test1end = System.currentTimeMillis();
-		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i+=2)
-			bitSets[i] = bitSets[i+1].cloneSet();
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " CloneTest ------");
-		log.debug("MARKER: Cloning Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Cloning Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
+	private static int getPosForSize (int size) {
+		for(int i = 0; i < sizesForSetTests.length; i++) {
+			if (sizesForSetTests[i][0] == size)
+				return i;
+		}
+		return -1;
 	}
 	
-	public static void DiffSets (int size, int numSets) throws Exception {
-		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
+
+	
+	public static void genTestSets () throws Exception {
+		Random rand = new Random(0);
+		testsets = new IMarkerSet[sizesForSetTests.length][][];
 		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
+		log.debug("-------- GENERATE TEST SETS ----------");
 		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i+=2)
-			sets[i].diff(sets[i+1]);
-		long test1end = System.currentTimeMillis();
+		for(int i = 0; i < sizesForSetTests.length; i++) {
+			testsets[i] = new IMarkerSet[2][];
 		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i+=2)
-			bitSets[i].diff(bitSets[i+1]);
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " DifferenceTest ------");
-		log.debug("MARKER: Difference Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Difference Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
+			log.debug("\t-- size: " + sizesForSetTests[i][0]);
+			testsets[i][0] = genSets(false, NUM_SETS, sizesForSetTests[i][0], 
+					3, 10000, 3, rand);
+			testsets[i][1] = genSets(true, NUM_SETS, sizesForSetTests[i][0], 
+					3, 10000, 3, rand);
+		}
+		log.debug("-------- DONE: GENERATE TEST SETS ----");
 	}
 	
-	public static void IntersectSets (int size, int numSets) throws Exception {
-		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
-		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
-		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i+=2)
-			sets[i].intersect(sets[i+1]);
-		long test1end = System.currentTimeMillis();
-		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i+=2)
-			bitSets[i].intersect(bitSets[i+1]);
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " IntersectTest ------");
-		log.debug("MARKER: Intersect Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Intersect Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
-	}
-	
-	
-	
-	public static void unionSets (int size, int numSets) throws Exception {
-		Random number = new Random();
-		int maxRel = 3, maxAttr = 3, maxTid = 99999;
-		IMarkerSet[] sets;
-		IMarkerSet[] bitSets;
-		
-		sets = genSets(false, numSets, size, maxRel, maxTid, maxAttr, number);
-		bitSets = genSets(true, numSets, size, maxRel, maxTid, maxAttr, number);
-		
-		long test1start = System.currentTimeMillis();
-		for(int i = 0; i < sets.length; i+=2)
-			sets[i].union(sets[i+1]);
-		long test1end = System.currentTimeMillis();
-		
-		long test2start = System.currentTimeMillis();
-		for(int i = 0; i < bitSets.length; i+=2)
-			bitSets[i].union(bitSets[i+1]);
-		long test2end = System.currentTimeMillis();
-		
-		log.debug("------ SIZE " + size + " UnionTest ------");
-		log.debug("MARKER: Union Between " + numSets + " Sets of " + size + " elements each time: " + (test1end - test1start));
-		log.debug("BITMARKER: Union Between " + numSets + " Sets of " + size + " elements each time: " + (test2end - test2start));
-	}
-	
-	
-	public static IMarkerSet[] genSets (boolean bit, int numSets, int card, int maxRel, int maxTid, int maxAttr, Random number) throws Exception {
+	private static IMarkerSet[] genSets (boolean bit, int numSets, int card, int maxRel, int maxTid, int maxAttr, Random number) throws Exception {
 		IMarkerSet[] result = new IMarkerSet[numSets];
 		
 		for(int i = 0; i < numSets; i++) {
@@ -241,29 +195,52 @@ public class TestBitMarkerPerformance {
 		while(set1.getNumElem() < setNumber)
 			set1.add(randMarker(maxRel, maxTid, maxAttr, number));
 	}
+	
+	
+	
+	public static void  ContainingTest(boolean bit) throws Exception{
+		Random number = new Random();
+		int maxRelid = 3, maxAttr = 3, maxTid = 99999;
+		int testsetOffset = bit ? 1 : 0;
+		
+		// for each size
+		for(int i = 0; i < sizesForSetTests.length; i++) {
+			int numRep = sizesForSetTests[i][1] * 1000;
+			IMarkerSet set1 = testsets[i][testsetOffset][number.nextInt(NUM_SETS)];
+			long before = System.currentTimeMillis();
+			for(int j = 0; j < numRep; j++) {
+				set1.contains(randMarker(maxRelid, maxTid, maxAttr, number));
+			}
+			long end = System.currentTimeMillis();
+			log.debug("Repeated " + numRep + " times checking contains on set of size " + 
+					sizesForSetTests[i][0] +  " in time: "
+					+ (end - before));
+		}
+	}
+	
+	
 
 	public static void  AddingTest(IMarkerSet set1) throws Exception{
 		Random number = new Random();
 		int maxRelid = 3, maxAttr = 3, maxTid = 99999;
 		
-		long before = System.currentTimeMillis();
-		for(int i = 0; i< 10; i++){
-			set1.add(randMarker(maxRelid, maxTid, maxAttr, number));
+		// for each size
+		for(int i = 0; i < sizesForSetTests.length; i++) {
+			int numAdd = sizesForSetTests[i][0];
+			int numRep = sizesForSetTests[i][1];
+			long before = System.currentTimeMillis();
+			
+			for(int j = 0; j < numRep; j++) {
+				set1.clear();
+				for(int k = 0; k < numAdd; k++)
+					set1.add(randMarker(maxRelid, maxTid, maxAttr, number));
+			}
+			
+			long end = System.currentTimeMillis();
+			log.debug("Repeated " + numRep + " times adding " + 
+					numAdd +  " elements to an empty set in time: "
+					+ (end - before));
 		}
-		
-		long breakpoint1 = System.currentTimeMillis();
-		for(int i = 0; i< 100; i++){
-			set1.add(randMarker(maxRelid, maxTid, maxAttr, number));
-		}
-		long breakpoint2 = System.currentTimeMillis();
-		for(int i = 0; i< 890; i++){
-			set1.add(randMarker(maxRelid, maxTid, maxAttr, number));
-		}
-		long end = System.currentTimeMillis();
-		log.debug("Number of element added " + set1.getNumElem() );
-		log.debug("Set Adding 10 elements time: " + (breakpoint1 - before));
-		log.debug("Set Adding 100 elements time: " + (breakpoint2 - breakpoint1));
-		log.debug("Set Adding 1000 elements time: " + (end - before));
 		
 	}
 	

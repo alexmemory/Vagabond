@@ -77,10 +77,6 @@ public class MarkerFactory {
 		return result;
 	}
 	
-	public static IAttributeValueMarker newAttrMarker () {
-		return new AttrValueMarker();
-	}
-	
 	public static IAttributeValueMarker newAttrMarker 
 			(String relName, String tid, String attrName) throws Exception {
 		return new AttrValueMarker(relName, tid, attrName);
@@ -104,10 +100,6 @@ public class MarkerFactory {
 	public static IAttributeValueMarker newAttrMarker 
 		(ITupleMarker tup, String attr) throws Exception {
 		return new AttrValueMarker(tup.getRel(), tup.getTid(), attr);
-	}
-	
-	public static ITupleMarker newTupleMarker () {
-		return new TupleMarker();
 	}
 	
 	public static ITupleMarker newTupleMarker (String relName, String tid) 

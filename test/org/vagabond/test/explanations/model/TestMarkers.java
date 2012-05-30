@@ -5,13 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.marker.AttrMarker;
+import org.vagabond.explanation.marker.AttrValueMarker;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISchemaMarker;
@@ -139,8 +143,23 @@ public class TestMarkers extends AbstractVagabondTest {
 	}
 	
 	@Test
-	public void testMarkerSetGetNumElem () {
+	public void testMarkerSetGetNumElem () throws Exception {
+		IMarkerSet s = MarkerFactory.newMarkerSet();
+		Random rand = new Random(0);
+		int count = 0;
+		List<ISingleMarker> l = new ArrayList<ISingleMarker> ();
 		
+		for(int i = 1; i < 1000; i++) {
+			AttrValueMarker m = (AttrValueMarker) MarkerFactory.newAttrMarker(
+					rand.nextInt(3), "" + rand.nextInt(10000), rand.nextInt(3));
+			if (!l.contains(m)) {
+				count++;
+				l.add(m);
+			}
+			s.add(m);
+			assertEquals(count, s.size());
+			assertEquals(count, s.getNumElem());
+		}
 	}
 	
 	@Test

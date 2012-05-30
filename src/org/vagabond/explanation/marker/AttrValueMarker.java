@@ -8,33 +8,37 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(AttrValueMarker.class);
 	
-	private int hash = 0;
-	private int relId;
-	private int attrId;
-	private String tid;
-	
-	public AttrValueMarker () {
-		relId = -1;
-		attrId = -1;
-		tid = null;
-	}
+	private final int hash;
+	private final int relId;
+	private final int attrId;
+	private final String tid;
 	
 	public AttrValueMarker (int relId, String tid, int attrId) {
+		assert(relId >= 0 && attrId >= 0);
 		this.relId = relId;
 		this.attrId = attrId;
 		this.tid = tid;
+		this.hash = computeHash();
 	}
 	
 	public AttrValueMarker (String relName, String tid, String attrName) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 		this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
 		this.tid = tid;
+		this.hash = computeHash();
 	}
 	
 	public AttrValueMarker (String relName, String tid, int attrId) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 		this.attrId = attrId;
 		this.tid = tid;
+		this.hash = computeHash();
+	}
+	
+	private int computeHash() {
+		int val = fnv(tid.getBytes());
+		val = fnv(relId, val);
+		return fnv(attrId, val);
 	}
 	
 	@Override
@@ -49,9 +53,9 @@ public class AttrValueMarker implements IAttributeValueMarker {
 		
 		if (other instanceof IAttributeValueMarker) {
 			otherAttr = (IAttributeValueMarker) other;
-			if (!otherAttr.getAttrName().equals(this.getAttrName()))
+			if (otherAttr.getAttrId() != this.attrId)
 				return false;
-			if (!otherAttr.getRel().equals(this.getRel()))
+			if (otherAttr.getRelId() != this.relId)
 				return false;
 			if (!otherAttr.getTid().equals(this.getTid()))
 				return false;
@@ -63,12 +67,6 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	
 	@Override
 	public int hashCode () {
-		if (hash == 0) {
-			hash = fnv(tid.getBytes());
-			hash = fnv(relId, relId);
-			hash = fnv(attrId);
-		}
-		
 		return hash; 
 	}
 
@@ -90,7 +88,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	@Override
 	public String getTid() {
-		return "" + tid;
+		return tid;
 	}
 
 	@Override
@@ -112,14 +110,6 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	@Override
 	public int getSize() {
 		return 1;
-	}
-
-	@Override
-	public void setValues(String relName, String tid, String attrName) throws Exception {
-			this.relId = ScenarioDictionary.getInstance().getRelId(relName);
-			this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
-			this.tid = tid;
-			hash = 0;
 	}
 
 	@Override
