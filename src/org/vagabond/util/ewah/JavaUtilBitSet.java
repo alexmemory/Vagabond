@@ -66,6 +66,18 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 		for(int i = 0; i < this.size(); i++)
 			this.flip(i);
 	}
+	
+	@Override
+	public IBitSet andNot(IBitSet other) {
+		BitSet newSet;
+		if (!(other instanceof BitSet))
+			throw new ClassCastException();
+		
+		newSet = (BitSet) this.clone();
+		newSet.andNot((BitSet) other);
+		
+		return (JavaUtilBitSet) newSet;
+	}
 
 
 	@Override
@@ -194,4 +206,6 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 	public Object clone() {
 		return super.clone();
 	}
+
+
 }

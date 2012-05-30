@@ -2129,6 +2129,13 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 	}
 
 	@Override
+	public IBitSet andNot(IBitSet other) {
+		if (!(other instanceof EWAHCompressedBitmap))
+			throw new ClassCastException ();
+		return andNot((EWAHCompressedBitmap) other);
+	}
+	
+	@Override
 	public IBitSet and(IBitSet other) {
 		if (!(other instanceof EWAHCompressedBitmap))
 			throw new ClassCastException ();

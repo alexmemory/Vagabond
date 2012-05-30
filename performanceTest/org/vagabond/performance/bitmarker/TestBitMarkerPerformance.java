@@ -30,8 +30,6 @@ public class TestBitMarkerPerformance {
 		Clone
 	}
 	
-	private static IAttributeValueMarker attr;
-	
 	private static IMarkerSet[][][] testsets;
 	private static int[][] sizesForSetTests = new int[][] {{10,500, 50}, {100,500, 50}, 
 		{1000,500, 10}, {10000,500,5}, {25000,50,2}};

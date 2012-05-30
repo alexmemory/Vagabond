@@ -116,7 +116,7 @@ public class BitMarkerSet implements IMarkerSet {
 			for(ISingleMarker m: other)
 				this.add(m);
 		}
-		sum = null;
+		resetLazyFields();
 		return this;
 	}
 	
@@ -125,16 +125,16 @@ public class BitMarkerSet implements IMarkerSet {
 		if (other instanceof BitMarkerSet) {
 			markers = markers.and(((BitMarkerSet) other).markers);
 		}
-		else{
-		BitMarkerSet newresult = new BitMarkerSet ();
-		for(ISingleMarker m: other) {
-			try{if(this.contains(m))
+		else {
+			BitMarkerSet newresult = new BitMarkerSet ();
+			for(ISingleMarker m: other) {
+				try{if(this.contains(m))
 					newresult.add(m);}
-			catch(Exception e){
-				LoggerUtil.logException(e, log);
+				catch(Exception e){
+					LoggerUtil.logException(e, log);
+				}
 			}
-			}
-		markers = newresult.markers;
+			markers = newresult.markers;
 		}
 		resetLazyFields();
 		return this;
@@ -142,16 +142,19 @@ public class BitMarkerSet implements IMarkerSet {
 
 	public boolean contains(ISingleMarker marker) throws Exception{
 		if (marker instanceof IAttributeValueMarker) {
-			int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) marker);
+			int bitPos = ScenarioDictionary.getInstance()
+					.attrMarkerToBitPos ((IAttributeValueMarker) marker);
 			return markers.get(bitPos);
 		}
 		boolean hasSet = false;
 		if (marker instanceof TupleMarker) {
 			TupleMarker t = (TupleMarker) marker;
-			int numAttr = ScenarioDictionary.getInstance().getTupleSize(t.getRelId());
-			
+			int numAttr = ScenarioDictionary.getInstance()
+					.getTupleSize(t.getRelId());
+
 			for(int i = 0; i < numAttr; i++) {
-				int bitPos = ScenarioDictionary.getInstance().getOffset(t.getRelId(), i, t.getTid());
+				int bitPos = ScenarioDictionary.getInstance()
+						.getOffset(t.getRelId(), i, t.getTid());
 				if (!markers.get(bitPos)) {
 					hasSet = true;
 				}
@@ -162,25 +165,13 @@ public class BitMarkerSet implements IMarkerSet {
 	}
 
 	public IMarkerSet diff(IMarkerSet other) {
-		BitMarkerSet totalunion = new BitMarkerSet ();
-		
-		totalunion.markers = (IBitSet) this.markers.clone();
-		totalunion.union(other);
-		
-		BitMarkerSet totalintersect = new BitMarkerSet();
-		totalintersect.markers = (IBitSet) this.markers.clone();
-		totalintersect.intersect(other);
-		
-		BitMarkerSet result = new BitMarkerSet();
-		IntIterator iterator = totalunion.markers.intIterator();
-		int tempIndex;
-		while(iterator.hasNext()){
-			tempIndex = iterator.next();
-			if (!totalintersect.markers.get(tempIndex))
-				result.markers.set(tempIndex);	
+		if (other instanceof BitMarkerSet) {
+			this.markers = this.markers.andNot(((BitMarkerSet) other).markers);
 		}
-		
-		markers = result.markers;
+		else {
+			for(ISingleMarker m: other)
+				this.remove(m);
+		}
 		resetLazyFields();
 		return this;
 	}
@@ -357,40 +348,43 @@ public class BitMarkerSet implements IMarkerSet {
 	public boolean remove(Object arg0) {
 		resetLazyFields();
 		boolean result = false;
-		
+
 		if ((ISingleMarker)arg0 instanceof IAttributeValueMarker) {
-				int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) arg0);
-				if (markers.get(bitPos)){
-					this.removeSingleBit(bitPos);
-					result = true;
-					}
+			int bitPos = ScenarioDictionary.getInstance()
+					.attrMarkerToBitPos ((IAttributeValueMarker) arg0);
+			if (markers.get(bitPos)){
+				this.removeSingleBit(bitPos);
+				result = true;
 			}
-			
-			
-			if ((ISingleMarker)arg0 instanceof TupleMarker) {
-				TupleMarker t = (TupleMarker) arg0;
-				int numAttr = ScenarioDictionary.getInstance().getTupleSize(t.getRelId());
-				for(int i = 0; i < numAttr; i++) {
-					int bitPos;
-					try {
-						bitPos = ScenarioDictionary.getInstance().getOffset(t.getRelId(), i, t.getTid());
-						if (markers.get(bitPos)) {
-							this.removeSingleBit(bitPos);
-							result = true;
-						}
-					} catch (Exception e) {
-						LoggerUtil.logException(e, log);
-					}
-				}
-			  }
-			
-		return result;
 		}
+
+		if ((ISingleMarker)arg0 instanceof TupleMarker) {
+			TupleMarker t = (TupleMarker) arg0;
+			int numAttr = ScenarioDictionary.getInstance()
+					.getTupleSize(t.getRelId());
+			for(int i = 0; i < numAttr; i++) {
+				int bitPos;
+				try {
+					bitPos = ScenarioDictionary.getInstance().getOffset(
+							t.getRelId(), i, t.getTid());
+					if (markers.get(bitPos)) {
+						this.removeSingleBit(bitPos);
+						result = true;
+					}
+				} catch (Exception e) {
+					LoggerUtil.logException(e, log);
+				}
+			}
+		}
+
+		return result;
+	}
 
 	public void removeSingleBit(int bitpos){
 		resetLazyFields();
 		IntIterator iteratorStart = this.markers.intIterator(0, bitpos);
-		IntIterator iteratorEnd = this.markers.intIterator(bitpos+1, this.markers.getByteSize()*8);
+		IntIterator iteratorEnd = this.markers.intIterator(bitpos+1, 
+				this.markers.getByteSize()*8);
 		IBitSet new_markers = BitsetFactory.newBitset(BitsetType.EWAHBitSet);
 		while(iteratorStart.hasNext())
 			new_markers.set(iteratorStart.next());
@@ -451,7 +445,8 @@ public class BitMarkerSet implements IMarkerSet {
 			IntIterator iterator = markers.intIterator();
 			while(iterator.hasNext())
 				try {
-					list.add((T) ScenarioDictionary.getInstance().getAttrValueMarkerByIBitSet(iterator.next()));
+					list.add((T) ScenarioDictionary.getInstance()
+							.getAttrValueMarkerByIBitSet(iterator.next()));
 				} catch (Exception e) {
 					LoggerUtil.logException(e, log);
 				}
@@ -462,7 +457,8 @@ public class BitMarkerSet implements IMarkerSet {
 			int counter = 0;
 			while(iterator.hasNext())
 				try {
-					arg0[counter++] = (T) ScenarioDictionary.getInstance().getAttrValueMarkerByIBitSet(iterator.next());
+					arg0[counter++] = (T) ScenarioDictionary.getInstance()
+							.getAttrValueMarkerByIBitSet(iterator.next());
 				} catch (Exception e) {
 					LoggerUtil.logException(e, log);
 				}
@@ -476,7 +472,8 @@ public class BitMarkerSet implements IMarkerSet {
 	public boolean add(ISingleMarker marker) {
 		hash = -1;
 		if (marker instanceof IAttributeValueMarker) {
-			int bitPos = ScenarioDictionary.getInstance().attrMarkerToBitPos ((IAttributeValueMarker) marker);
+			int bitPos = ScenarioDictionary.getInstance()
+					.attrMarkerToBitPos ((IAttributeValueMarker) marker);
 			if (markers.get(bitPos))
 				return false;
 			markers.set(bitPos);
@@ -484,13 +481,15 @@ public class BitMarkerSet implements IMarkerSet {
 		}
 		if (marker instanceof TupleMarker) {
 			TupleMarker t = (TupleMarker) marker;
-			int numAttr = ScenarioDictionary.getInstance().getTupleSize(t.getRelId());
+			int numAttr = ScenarioDictionary.getInstance()
+					.getTupleSize(t.getRelId());
 			boolean hasSet = true;
 			
 			for(int i = 0; i < numAttr; i++) {
 				int bitPos;
 				try {
-					bitPos = ScenarioDictionary.getInstance().getOffset(t.getRelId(), i, t.getTid());
+					bitPos = ScenarioDictionary.getInstance()
+							.getOffset(t.getRelId(), i, t.getTid());
 					if (markers.get(bitPos)) 
 						hasSet = false;
 					markers.set(bitPos);

@@ -17,6 +17,7 @@ public interface IBitSet extends Bitmap, Cloneable {
 	public boolean intersects (IBitSet other);
 	public IBitSet and (IBitSet other);
 	public IBitSet or (IBitSet other);
+	public IBitSet andNot (IBitSet other);
 	public void not();
 	public Object clone();
 	
