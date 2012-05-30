@@ -31,11 +31,13 @@ public class TestBitMarkerPerformance {
 	}
 	
 	private static IAttributeValueMarker attr;
-
-	private static final int NUM_SETS = 5;
 	
 	private static IMarkerSet[][][] testsets;
-	private static int[][] sizesForSetTests = new int[][] {{10,500}, {100,500}, {1000,500}, {10000,500}};
+	private static int[][] sizesForSetTests = new int[][] {{10,500, 50}, {100,500, 50}, {1000,500, 10}, {10000,500,5}, {25000,1,2}};
+	
+	private static int maxRel = 3;
+	private static int maxAttr = 3;
+	private static int maxTid = 99999;
 	
 	public static void main (String[] args) throws Exception {
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
@@ -45,23 +47,25 @@ public class TestBitMarkerPerformance {
 		
 		IMarkerSet markerset1 = MarkerFactory.newMarkerSet();
 		IMarkerSet bitset1 = MarkerFactory.newMarkerSet();
-		System.out.println("------MarkerSet Adding Test------");
+		log.debug("------ ADDING TEST ------");
+		log.debug("\t-- MARKER SET --");
 		AddingTest(markerset1);
-		System.out.println("------BitSet Adding Test------");
+		log.debug("\t-- BIT MARKER SET --");
 		AddingTest(bitset1);
 
-		System.out.println("------MarkerSet Containing Test------");
+		log.debug("------ CONTAINMENT TEST ------");
+		log.debug("\t-- MARKER SET --");
 		ContainingTest(false);
-		System.out.println("------BitSet Containing Test------");
+		log.debug("\t-- BIT MARKER SET --");
 		ContainingTest(true);
 		
-		System.out.println("------Union Test------");
+		log.debug("------ UNION TEST ------");
 		UnionTest();
-		System.out.println("------Intersect Test------");
+		log.debug("------ INTERSECT TEST ------");
 		IntersectTest();
-		System.out.println("------Difference Test------");
+		log.debug("------ DIFF TEST ------");
 		DiffTest();
-		System.out.println("------Clone Test------");
+		log.debug("------ CLONE TEST ------");
 		CloneTest();
 		
 		
@@ -93,14 +97,14 @@ public class TestBitMarkerPerformance {
 		Random number = new Random();
 		IMarkerSet set1, set2;
 		int sizePos = getPosForSize(size);
-		
+		int numSets = sizesForSetTests[sizePos][2];
 
 		long sumM = 0;
 		long testStart = System.currentTimeMillis();
 		for(int i = 0; i < numIter; i+=2) {
 			long beforeC = System.currentTimeMillis();
-			set1 = testsets[sizePos][0][number.nextInt(NUM_SETS)].cloneSet();
-			set2 = testsets[sizePos][0][number.nextInt(NUM_SETS)];
+			set1 = testsets[sizePos][0][number.nextInt(numSets)].cloneSet();
+			set2 = testsets[sizePos][0][number.nextInt(numSets)];
 			long afterC = System.currentTimeMillis();
 			sumM -= (afterC - beforeC);
 			
@@ -114,8 +118,8 @@ public class TestBitMarkerPerformance {
 		testStart = System.currentTimeMillis();
 		for(int i = 0; i < numIter; i+=2) {
 			long beforeC = System.currentTimeMillis();
-			set1 = testsets[sizePos][1][number.nextInt(NUM_SETS)].cloneSet();
-			set2 = testsets[sizePos][1][number.nextInt(NUM_SETS)];
+			set1 = testsets[sizePos][1][number.nextInt(numSets)].cloneSet();
+			set2 = testsets[sizePos][1][number.nextInt(numSets)];
 			long afterC = System.currentTimeMillis();
 			sumB -= (afterC - beforeC);
 			
@@ -165,18 +169,20 @@ public class TestBitMarkerPerformance {
 		log.debug("-------- GENERATE TEST SETS ----------");
 		
 		for(int i = 0; i < sizesForSetTests.length; i++) {
+			int numSets = sizesForSetTests[i][2];
 			testsets[i] = new IMarkerSet[2][];
 		
 			log.debug("\t-- size: " + sizesForSetTests[i][0]);
-			testsets[i][0] = genSets(false, NUM_SETS, sizesForSetTests[i][0], 
-					3, 10000, 3, rand);
-			testsets[i][1] = genSets(true, NUM_SETS, sizesForSetTests[i][0], 
-					3, 10000, 3, rand);
+			testsets[i][0] = genSets(false, numSets, sizesForSetTests[i][0], 
+					rand);
+			testsets[i][1] = genSets(true, numSets, sizesForSetTests[i][0], 
+					rand);
 		}
 		log.debug("-------- DONE: GENERATE TEST SETS ----");
 	}
 	
-	private static IMarkerSet[] genSets (boolean bit, int numSets, int card, int maxRel, int maxTid, int maxAttr, Random number) throws Exception {
+	private static IMarkerSet[] genSets (boolean bit, int numSets, int card, 
+			Random number) throws Exception {
 		IMarkerSet[] result = new IMarkerSet[numSets];
 		
 		for(int i = 0; i < numSets; i++) {
@@ -185,14 +191,15 @@ public class TestBitMarkerPerformance {
 			else
 				result[i] = MarkerFactory.newMarkerSet();
 
-			setToElement(result[i], card, maxRel, maxTid, maxAttr, number);
+			populateSet(result[i], card, number);
 		}
 		
 		return result;
 	}
 	
-	public static void setToElement(IMarkerSet set1, int setNumber, int maxRel, int maxTid, int maxAttr, Random number) throws Exception{
-		while(set1.getNumElem() < setNumber)
+	public static void populateSet(IMarkerSet set1, int card, Random number) 
+			throws Exception{
+		for(int i = 0; i < card; i++)
 			set1.add(randMarker(maxRel, maxTid, maxAttr, number));
 	}
 	
@@ -200,16 +207,17 @@ public class TestBitMarkerPerformance {
 	
 	public static void  ContainingTest(boolean bit) throws Exception{
 		Random number = new Random();
-		int maxRelid = 3, maxAttr = 3, maxTid = 99999;
 		int testsetOffset = bit ? 1 : 0;
 		
 		// for each size
 		for(int i = 0; i < sizesForSetTests.length; i++) {
 			int numRep = sizesForSetTests[i][1] * 1000;
-			IMarkerSet set1 = testsets[i][testsetOffset][number.nextInt(NUM_SETS)];
+			int numSets = sizesForSetTests[i][2];
+			IMarkerSet set1 = testsets[i][testsetOffset][number.nextInt(numSets)];
+			
 			long before = System.currentTimeMillis();
 			for(int j = 0; j < numRep; j++) {
-				set1.contains(randMarker(maxRelid, maxTid, maxAttr, number));
+				set1.contains(randMarker(maxRel, maxTid, maxAttr, number));
 			}
 			long end = System.currentTimeMillis();
 			log.debug("Repeated " + numRep + " times checking contains on set of size " + 
@@ -222,7 +230,6 @@ public class TestBitMarkerPerformance {
 
 	public static void  AddingTest(IMarkerSet set1) throws Exception{
 		Random number = new Random();
-		int maxRelid = 3, maxAttr = 3, maxTid = 99999;
 		
 		// for each size
 		for(int i = 0; i < sizesForSetTests.length; i++) {
@@ -233,7 +240,7 @@ public class TestBitMarkerPerformance {
 			for(int j = 0; j < numRep; j++) {
 				set1.clear();
 				for(int k = 0; k < numAdd; k++)
-					set1.add(randMarker(maxRelid, maxTid, maxAttr, number));
+					set1.add(randMarker(maxRel, maxTid, maxAttr, number));
 			}
 			
 			long end = System.currentTimeMillis();
@@ -244,15 +251,16 @@ public class TestBitMarkerPerformance {
 		
 	}
 	
-	private static IAttributeValueMarker randMarker (int maxRel, int maxTid, int maxAttr, Random number) throws Exception {
+	private static IAttributeValueMarker randMarker (int maxRel, int maxTid, 
+			int maxAttr, Random number) throws Exception {
 		int relid;
 		int attrid;
 		int tid;
 		String tidString;
 		
-		relid = number.nextInt(3);
-		tid = number.nextInt(99999);
-		attrid = number.nextInt(3);
+		relid = number.nextInt(maxRel);
+		tid = number.nextInt(maxTid);
+		attrid = number.nextInt(maxAttr);
 		tidString = ScenarioDictionary.getInstance().getTidString(tid, relid);
 		return  MarkerFactory.newAttrMarker(relid,tidString,attrid);
 	}
