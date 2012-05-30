@@ -65,35 +65,37 @@ public class TestBitMarkerPerformance {
 		log.debug("------ DIFF TEST ------");
 		DiffTest();
 		log.debug("------ CLONE TEST ------");
-		CloneTest();
-		
-		
+		CloneTest();	
 	}
 	
 	
 	public static void  CloneTest() throws Exception{
 		for(int i = 0; i < sizesForSetTests.length; i++)
-			execSetOp(SetOps.Clone, sizesForSetTests[i][0], sizesForSetTests[i][1]);
+			execSetOp(SetOps.Clone, sizesForSetTests[i][0], 
+					sizesForSetTests[i][1] * 10);
 	}
 	
 	
 	public static void  UnionTest() throws Exception{
 		for(int i = 0; i < sizesForSetTests.length; i++)
-			execSetOp(SetOps.Union, sizesForSetTests[i][0], sizesForSetTests[i][1]);
+			execSetOp(SetOps.Union, sizesForSetTests[i][0], 
+					sizesForSetTests[i][1] * 10);
 	}
 	
 	public static void  IntersectTest() throws Exception{
 		for(int i = 0; i < sizesForSetTests.length; i++)
-			execSetOp(SetOps.Intersect, sizesForSetTests[i][0], sizesForSetTests[i][1]);
+			execSetOp(SetOps.Intersect, sizesForSetTests[i][0], 
+					sizesForSetTests[i][1] * 10);
 	}
 	
 	public static void  DiffTest() throws Exception{
 		for(int i = 0; i < sizesForSetTests.length; i++)
-			execSetOp(SetOps.Diff, sizesForSetTests[i][0], sizesForSetTests[i][1]);
+			execSetOp(SetOps.Diff, sizesForSetTests[i][0], 
+					sizesForSetTests[i][1] * 10);
 	}
 	
 	public static void execSetOp (SetOps oper, int size, int numIter) throws Exception {
-		Random number = new Random();
+		Random number = new Random(0);
 		IMarkerSet set1, set2;
 		int sizePos = getPosForSize(size);
 		int numSets = sizesForSetTests[sizePos][2];
@@ -205,7 +207,7 @@ public class TestBitMarkerPerformance {
 	
 	
 	public static void  ContainingTest(boolean bit) throws Exception{
-		Random number = new Random();
+		Random number = new Random(0);
 		int testsetOffset = bit ? 1 : 0;
 		
 		// for each size
@@ -228,7 +230,7 @@ public class TestBitMarkerPerformance {
 	
 
 	public static void  AddingTest(IMarkerSet set1) throws Exception{
-		Random number = new Random();
+		Random number = new Random(0);
 		
 		// for each size
 		for(int i = 0; i < sizesForSetTests.length; i++) {

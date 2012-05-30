@@ -2,6 +2,7 @@ package org.vagabond.explanation.ranking;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
@@ -183,7 +184,7 @@ public class PartitionRanker implements IPartitionRanker {
 	private FullExplSummary iterDoneElem = null;
 	private FullExplSummary curIterElem = null;
 	private TreeSet<FullExplSummary> ranking;
-	private BloomFilter<FullExplSummary> createdTest;
+	private HashSet<FullExplSummary> createdTest;
 	
 	private ArrayList<FullExplSummary> rankedExpls;
 	private boolean cacheFullExpl = false;	
@@ -320,10 +321,9 @@ public class PartitionRanker implements IPartitionRanker {
 			FullExplSummary ex = new FullExplSummary(elem, i); 
 			// if extension is not outside the solution space and has
 			// not been produced before (this is test by first checking the
-			// bloom filter (O(1)) and in case the bloom filter answers yes we make sure
-			// by checking the ranking (O(log n)).
+			// hash set (O(1))) 
 			if (rankers[i].hasAtLeast(ex.iterPos[i] + 1)   
-					&& !(createdTest.contains(ex) && ranking.contains(ex))) {
+					&& !createdTest.contains(ex)) {
 				doneWork = true;
 				ranking.add(ex);
 				createdTest.add(ex);
@@ -359,7 +359,7 @@ public class PartitionRanker implements IPartitionRanker {
 
 	public void initialize(ExplPartition part, double bitPerKey, int k, BitsetType type) {
 		int numParts;
-		int exNumElem = 1;
+//		int exNumElem = 1;
 		
 		this.part = part;
 		numParts = part.size();
@@ -376,12 +376,10 @@ public class PartitionRanker implements IPartitionRanker {
 			rankers[i] = RankerFactory.createRanker(rankScheme);
 			rankers[i].initialize(col);
 			
-			exNumElem *= CollectionUtils.product(col.getDimensions()); //TODO check boundaries
+//			exNumElem *= CollectionUtils.product(col.getDimensions()); //TODO check boundaries
 		}
 		
-		createdTest = new BloomFilter<FullExplSummary> (bitPerKey, exNumElem, k, type); //TODO implement dynamic bloom filter?
-		
-		log.debug("Bloom Filter false positive rate: " + createdTest.getFalsePositiveProbability());
+		createdTest = new HashSet<FullExplSummary> ();
 		
 		generateUpTo(0);
 	}
