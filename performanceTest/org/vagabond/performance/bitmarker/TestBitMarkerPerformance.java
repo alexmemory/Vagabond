@@ -33,7 +33,8 @@ public class TestBitMarkerPerformance {
 	private static IAttributeValueMarker attr;
 	
 	private static IMarkerSet[][][] testsets;
-	private static int[][] sizesForSetTests = new int[][] {{10,500, 50}, {100,500, 50}, {1000,500, 10}, {10000,500,5}, {25000,1,2}};
+	private static int[][] sizesForSetTests = new int[][] {{10,500, 50}, {100,500, 50}, 
+		{1000,500, 10}, {10000,500,5}, {25000,50,2}};
 	
 	private static int maxRel = 3;
 	private static int maxAttr = 3;

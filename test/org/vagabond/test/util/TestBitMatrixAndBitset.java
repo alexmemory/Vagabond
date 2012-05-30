@@ -207,6 +207,47 @@ public class TestBitMatrixAndBitset {
 	}
 	
 	@Test
+	public void testLogicalOperations () {
+		EWAHCompressedBitmap b1,b2, ex, res;
+		
+		// OR
+		b1 = new EWAHCompressedBitmap("100");
+		b2 = new EWAHCompressedBitmap("001");
+		ex = new EWAHCompressedBitmap("101");
+		res = b1.or(b2);
+		assertEquals(ex.toBitsString() + " - " + res.toBitsString(), ex, res);
+		
+		// AND
+		b1 = new EWAHCompressedBitmap("101");
+		b2 = new EWAHCompressedBitmap("011");
+		ex = new EWAHCompressedBitmap("001");
+		res = b1.and(b2);
+		assertEquals(ex.toBitsString() + " - " + res.toBitsString(), ex, res);
+		
+		// AND NOT
+		b1 = new EWAHCompressedBitmap("110");
+		b2 = new EWAHCompressedBitmap("011");
+		ex = new EWAHCompressedBitmap("100");
+		ex.setSizeInBits(3);
+		res = b1.andNot(b2);
+		assertEquals(ex.toBitsString() + " - " + res.toBitsString(), ex, res);
+		
+		// XOR
+		b1 = new EWAHCompressedBitmap("110");
+		b2 = new EWAHCompressedBitmap("011");
+		ex = new EWAHCompressedBitmap("101");
+		res = b1.xor(b2);
+		assertEquals(ex.toBitsString() + " - " + res.toBitsString(), ex, res);
+		
+		// NOT
+		b1 = new EWAHCompressedBitmap("101");
+		b1.not();
+		ex = new EWAHCompressedBitmap("010");
+		ex.setSizeInBits(3);
+		assertEquals(ex.toBitsString() + " - " + b1.toBitsString(), ex, b1);
+	}
+	
+	@Test
 	public void testManyInserts () {
 		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
 		Random rand = new Random(0);
