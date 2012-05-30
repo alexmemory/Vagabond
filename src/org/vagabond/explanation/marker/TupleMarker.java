@@ -3,6 +3,7 @@ package org.vagabond.explanation.marker;
 import static org.vagabond.util.HashFNV.*;
 
 import org.apache.log4j.Logger;
+import org.vagabond.util.HashFNV;
 import org.vagabond.util.LogProviderHolder;
 
 public class TupleMarker implements ITupleMarker {
@@ -26,7 +27,7 @@ public class TupleMarker implements ITupleMarker {
 	}
 	
 	private int computeHash() {
-		int val = fnv(tid.hashCode());
+		int val = fnv(tid);
 		return fnv(relId, val);
 	}
 	

@@ -576,7 +576,8 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 		if(! i.hasNext()) return;
 		while (true) {
 			final RunningLengthWord rlw1 = i.next();
-			rlw1.setRunningBit(!rlw1.getRunningBit());
+			if (rlw1.getRunningLength() > 0)
+				rlw1.setRunningBit(!rlw1.getRunningBit());
 			for (int j = 0; j < rlw1.getNumberOfLiteralWords(); ++j) {
 				i.buffer()[i.dirtyWords() + j] = ~i.buffer()[i.dirtyWords() + j];
 			}

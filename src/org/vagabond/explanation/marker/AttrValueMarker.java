@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
 import org.apache.log4j.Logger;
+import org.vagabond.util.HashFNV;
 import org.vagabond.util.LogProviderHolder;
 import static org.vagabond.util.HashFNV.*;
 
@@ -36,7 +37,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	}
 	
 	private int computeHash() {
-		int val = fnv(tid.getBytes());
+		int val = fnv(tid);
 		val = fnv(relId, val);
 		return fnv(attrId, val);
 	}

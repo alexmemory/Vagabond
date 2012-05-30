@@ -62,8 +62,10 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		assertEquals(attr.getSize(), 1);
 		assertEquals(attr, attr2);
-		assertEquals(attr2.toString(), "('tramp'(0),1,'name'(0))");
-		assertEquals(attr.hashCode(), attr2.hashCode());
+		assertEquals(attr2.toString(), attr2.toString(), 
+				"('tramp'(0),1,'name'(0))");
+		assertEquals(attr.toString() + " != " + attr2.toString(), 
+				attr.hashCode(), attr2.hashCode());
 	}
 	
 	@Test
