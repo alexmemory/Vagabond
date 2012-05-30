@@ -193,6 +193,37 @@ public class TestBitMatrixAndBitset {
 		assertEqualsBitset(bitset2,bitset,"0-set");
 	}
 	
+	@Test 
+	public void testBitsetClone () {
+		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
+		EWAHCompressedBitmap bitset2;
+		
+		setBits(new int[] {121,0}, bitset);
+		bitset2 = (EWAHCompressedBitmap) bitset.clone();
+		assertEquals(bitset, bitset2);
+		
+		bitset2.set(1000);
+		assertFalse(bitset.equals(bitset2));
+	}
+	
+	@Test
+	public void testManyInserts () {
+		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();
+		Random rand = new Random(0);
+		
+		for(int i = 0; i < 10000; i++) {
+			int val = rand.nextInt(1000);
+//			log.debug("------------- before " + i + " = " + val);
+			assertTrue("before : " + i + " = " + val, bitset.checkInvariants());
+//			log.debug(bitset.toDebugString());
+			
+			bitset.set(val);
+					
+//			log.debug("after " + i + " = " + val);	
+		}
+		
+	}
+	
 	@Test
 	public void testIter () {
 		EWAHCompressedBitmap bitset = new EWAHCompressedBitmap();

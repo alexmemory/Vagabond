@@ -1039,6 +1039,8 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 		int bitPos = 0;
 		int offset;
 		
+		assert(i >= 0);
+		
 		// try simple set (append style)
 		if (fastSet(i))
 			return;
@@ -1063,7 +1065,8 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 		// the bit to set is in a literal word. Try to set bit directly
 		if(offset >= rlw.getRunningLength() * 64) {
 			offset -= rlw.getRunningLength() * 64;
-			wordPos += (offset / 64) + 1;
+			int literalPos = (offset / 64); 
+			wordPos += literalPos + 1;
 			final long newdata = 1l << (offset % 64);
 			this.buffer[wordPos] = this.buffer[wordPos] | newdata;
 			// if all bits of literal set, then either merge with run length
@@ -1071,30 +1074,65 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 			if (this.buffer[wordPos] == oneMask) {
 				// first literal of current RLW and running bit is set
 				// increase count by one (unless maximal count reached)
-				if (wordPos == 1 
+				if (literalPos == 0 
 						&& (rlw.getRunningBit() || rlw.getRunningLength() == 0) 
 						&& rlw.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
 					rlw.setRunningBit(true);
 					rlw.setRunningLength(rlw.getRunningLength() + 1);
-					shiftCompressedWordsLeft(wordPos + rlw.position + 1, 1);
+					rlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords() - 1);
+					// current RLW has no literals left, try to merge with following RLW
+					if (rlw.getNumberOfLiteralWords() == 0
+							&& next != null
+							&& next.getRunningBit() 
+							&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+						if (rlw.equals(this.rlw))
+							this.rlw.position = next.position;
+						next.setRunningLength(next.getRunningLength() + rlw.getRunningLength());
+						shiftCompressedWordsLeft(rlw.position + 2, 2);
+					} 
+					// else just reduce lenght of rlw by 1
+					else
+						shiftCompressedWordsLeft(rlw.position + 2, 1);
 				}
 				// if last word increase following running length count if possible
 				else if (next != null 
 						&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount 
-						&& (next.getRunningLength() == 0 || next.getRunningBit())) {
+						&& (next.getRunningLength() == 0 || next.getRunningBit())
+						&& literalPos == rlw.getNumberOfLiteralWords() - 1) {
 					next.setRunningBit(true);
 					next.setRunningLength(next.getRunningLength() + 1);
-					shiftCompressedWordsLeft(next.position, 1);
+					rlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords() - 1);
+					// current RLW has no literals left, try to merge with following
+					if (rlw.getNumberOfLiteralWords() == 0 
+							&& next != null
+							&& next.getRunningBit() 
+							&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+							if (rlw.equals(this.rlw))
+								this.rlw.position = next.position;
+							next.setRunningLength(next.getRunningLength() + rlw.getRunningLength());
+							shiftCompressedWordsLeft(rlw.position + 2, 2);
+					}
+					else
+						shiftCompressedWordsLeft(rlw.position + rlw.getNumberOfLiteralWords() + 2, 1);
 				}
 				// cannot merge, have to create new RLW and adapt literal count of current RLW
 				else {
+					int beforeLit = literalPos;
+					int afterLit = rlw.getNumberOfLiteralWords() - literalPos - 1;
+					
+					log.debug("split into " + beforeLit + " and " + afterLit);
+					
 					RunningLengthWord newRlw = new RunningLengthWord(rlw);
-					newRlw.position += wordPos;
+					newRlw.position += literalPos + 1;
 					newRlw.setRunningBit(true);
 					newRlw.setRunningLength(1L);
-					newRlw.getNumberOfLiteralWords();
+					newRlw.setNumberOfLiteralWords(afterLit);
 					
-					rlw.setNumberOfLiteralWords(wordPos - rlw.position - 1);
+					rlw.setNumberOfLiteralWords(beforeLit);
+					// we split the last word, adapt it
+					if (rlw.position == this.rlw.position)
+						this.rlw.position = newRlw.position;
+					log.debug("split because new 1's run");
 				}
 			}
 		}
@@ -1142,13 +1180,14 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 				} 
 			}
 			// No merging possible!
-			// CASE 2) if previous run length = 0 and rlw has no literals then try merge new literal into previous
-			if (newRunLen == 0 && rlw.getNumberOfLiteralWords() == 0 && prev != null 
+			// CASE 2) if previous run length = 0 and then add new literal into
+			// previous if previous still has space
+			if (newRunLen == 0 && prev != null 
 					&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
 				prev.setNumberOfLiteralWords(prev.getNumberOfLiteralWords() + 1);
 				rlw.setRunningLength(afterRunLen);
 				shiftCompressedWordsRight(rlw.position, 1);
-				this.buffer[prev.position + prev.getNumberOfLiteralWords() + 1] = newdata;
+				this.buffer[prev.position + prev.getNumberOfLiteralWords()] = newdata;
 				
 				return;
 			}
@@ -1181,7 +1220,84 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 				this.rlw.position = newRlw.position;
 		}
 	}
-	
+	/**
+	 * Check some invariants in the encoding. The following situations are errors
+	 * Two consecutive words with
+	 * 	1) both run length 0 and less than MAX_DIRTY_WORDS dirty words
+	 * 	2) both no dirty words, the same running bit, and less then MAX_RUNLENGTH 
+	 *     run length encoded words
+	 * @return false if a violation occured
+	 */
+	public boolean checkInvariants () {
+		RunningLengthWord rlw, prev;
+		EWAHIterator i = new EWAHIterator(this.buffer, this.actualsizeinwords);
+		// test that actualsizeinwords complies with info in headers
+		while(i.hasNext()) {
+			i.next();
+			if (i.dirtyWords() > actualsizeinwords) {
+				log.error(i.dirtyWords() + " larger than actual " 
+						+ actualsizeinwords);
+				log.error(toDebugString());
+				return false;
+			}
+				
+			if (i.pointer > actualsizeinwords) {
+				log.error("pointer " + i.pointer + " larger than actual " 
+						+ actualsizeinwords);
+				log.error(toDebugString());
+				return false;
+			}
+		}
+		
+		// check adjacent words for errors
+		rlw = new RunningLengthWord(buffer, 0);
+		prev = rlw;
+		rlw = rlw.getNext();
+		
+		while(rlw.position < actualsizeinwords && 
+				rlw.position + rlw.getNumberOfLiteralWords() < actualsizeinwords) {
+			// case 1)
+			if (prev.getRunningLength() == 0 && rlw.getRunningLength() == 0
+				&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
+				log.error(prev.getNumberOfLiteralWords() + " dirty words followed by " 
+						+ rlw.getNumberOfLiteralWords() + " number of dirty words "
+						+ "\n\n" + toDebugString());
+				return false;
+			}
+			// case 2)
+			if (prev.getRunningLength() > 0 && rlw.getRunningLength() > 0 &&
+					prev.getNumberOfLiteralWords() == 0 &&
+					prev.getRunningBit() == rlw.getRunningBit() 
+					&& prev.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+				log.error("Two running length for same bit of length " 
+					+ prev.getRunningLength() + " and " + rlw.getRunningLength()
+					+ "\n\n" + toDebugString());
+				return false;
+			}
+			prev = rlw;
+			rlw = rlw.getNext();
+		}
+		
+		if (!prev.equals(this.rlw)) {
+			log.error("Last word should have been " + prev.toString() 
+					+ " but was " + this.rlw.toString());
+			return false;
+		}
+		
+		// the largest bit set == sizeinbits
+		IntIterator it = intIterator();
+		int greatest = -1;
+		while(it.hasNext()) {
+			greatest = it.next();
+		}
+		if (this.sizeinbits != greatest + 1) {
+			log.error("sizein bits " + sizeinbits + " but largest value is " 
+					+ greatest + "\n\n" + toDebugString());
+			return false;
+		}
+		
+		return true;
+	}
 
 	public void setRange (final boolean value, int start, int end) {
 		//TODO
@@ -1204,7 +1320,7 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 			this.buffer[i] = 0;
 		
 		actualsizeinwords -= shift;
-		if(startWord < rlw.position)
+		if(startWord <= rlw.position)
 			rlw.position -= shift;
 	}
 	
@@ -1230,11 +1346,11 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 		
 		actualsizeinwords += shift;
 		if (log.isDebugEnabled())
-			log.debug(rlw.getNumberOfLiteralWords());
+			log.debug(this.rlw.getNumberOfLiteralWords());
 		
 		// adapt position of last RLW unless we shifted literal words from the last RLW
-		if (rlw.position + rlw.getNumberOfLiteralWords() < startWord)
-			rlw.position += shift;
+		if (this.rlw.position >= startWord)
+			this.rlw.position += shift;
 	}
 
 	/**
@@ -1672,7 +1788,7 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 	 * Return the bitset as a String of 0's and 1's.
 	 */
 	public String toBitsString () {
-		StringBuffer buf = new StringBuffer();
+		StringBuffer buf = new StringBuffer(actualsizeinwords * wordinbits);
 		int bitPos = 0;
 		final EWAHIterator iter = new EWAHIterator(this.buffer, actualsizeinwords);
 		
@@ -1750,10 +1866,12 @@ Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { //TODO add bloom fil
 	 */
 	public String toDebugString() {
 		String ans = " EWAHCompressedBitmap, size in bits = " + this.sizeinbits
-				+ " size in words = " + this.actualsizeinwords + "\n";
+				+ " size in words = " + this.actualsizeinwords 
+				+ " with last RLW " + this.rlw.toString() +"\n";
 		final EWAHIterator i = new EWAHIterator(this.buffer, this.actualsizeinwords);
 		while (i.hasNext()) {
 			RunningLengthWord localrlw = i.next();
+			ans += localrlw.position + ": ";
 			if (localrlw.getRunningBit()) {
 				ans += localrlw.getRunningLength() + " 1x11\n";
 			} else {

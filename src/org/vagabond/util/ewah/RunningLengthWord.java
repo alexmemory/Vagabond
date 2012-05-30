@@ -116,7 +116,7 @@ public final class RunningLengthWord {
    * 
    */
   public RunningLengthWord next() {
-	  position += getNumberOfLiteralWords();
+	  position += getNumberOfLiteralWords() + 1;
 	  return this;
   }
   
@@ -131,7 +131,7 @@ public final class RunningLengthWord {
   public String toString() {
     return "running bit = " + getRunningBit() + " running length = "
       + getRunningLength() + " number of lit. words "
-      + getNumberOfLiteralWords();
+      + getNumberOfLiteralWords() + " at pos " + position;
   }
 
   @Override

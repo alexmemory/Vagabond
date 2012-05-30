@@ -139,6 +139,11 @@ public class TestMarkers extends AbstractVagabondTest {
 	}
 	
 	@Test
+	public void testMarkerSetGetNumElem () {
+		
+	}
+	
+	@Test
 	public void testSchemaMarker () throws Exception {
 		AttrMarker a1 = (AttrMarker) MarkerFactory.newSchemaMarker(0, 0);
 		AttrMarker a2 = (AttrMarker) MarkerFactory.newSchemaMarker(MarkerFactory.newAttrMarker(0, "1", 0));
