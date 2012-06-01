@@ -1256,8 +1256,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 							&& next.getRunningBit()
 							&& next.getRunningLength() == RunningLengthWord.largestrunninglengthcount) {
 						next.setRunningLength(1L);
-						newRlw.setRunningLength(
-								RunningLengthWord.largestrunninglengthcount);
+						newRlw.setRunningLength(RunningLengthWord.largestrunninglengthcount);
 					}
 
 					// we split the last word, adapt it
@@ -1291,7 +1290,8 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 			if (newRunLen == 0 && afterRunLen == 0) {
 				// merge with previous if exists and possible
 				if (prev != null
-						&& prev.getNumberOfLiteralWords() + newNumLiterals <= RunningLengthWord.largestliteralcount) {
+						&& prev.getNumberOfLiteralWords() + newNumLiterals 
+						<= RunningLengthWord.largestliteralcount) {
 					prev.setNumberOfLiteralWords(prev.getNumberOfLiteralWords()
 							+ newNumLiterals);
 					this.buffer[rlw.position] = newdata;
@@ -1301,27 +1301,9 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 
 					return;
 				}
-				// can merge into following? //TODO recheck this case, probably
-				// not possible
-				else if (next != null
-						&& next.getRunningLength() == 0
-						&& next.getNumberOfLiteralWords() + newNumLiterals <= RunningLengthWord.largestliteralcount) {
-					if (this.rlw.equals(next))
-						this.rlw = next;
-					next.setNumberOfLiteralWords(next.getNumberOfLiteralWords()
-							+ newNumLiterals);
-					this.buffer[rlw.position] = this.buffer[next.position];
-					System.arraycopy(this.buffer, rlw.position + 1,
-							this.buffer, rlw.position + 2,
-							rlw.getNumberOfLiteralWords());
-					this.buffer[rlw.position + 1] = newdata;
-					next.position = rlw.position;
-
-					return;
-				}
 			}
 			// No merging possible!
-			// CASE 2) if previous run length = 0 and then add new literal into
+			// CASE 2) if previous run length = 0 then add new literal into
 			// previous if previous still has space
 			if (newRunLen == 0
 					&& prev != null
@@ -1346,25 +1328,74 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 
 				return;
 			}
-
+			
+			//TODO rlw is full (literals) and next one has no running length and is not full
+			if (afterRunLen == 0 &
+					next != null && rlw.getNumberOfLiteralWords() 
+					== RunningLengthWord.largestliteralcount 
+					&& next.getNumberOfLiteralWords() 
+					< RunningLengthWord.largestliteralcount) {
+				rlw.setRunningLength(rlw.getRunningLength() - 1);
+				shiftCompressedWordsRight(rlw.position +  1, 1);
+				rlw.array = this.buffer;
+				next.array = this.buffer;
+				
+				this.buffer[rlw.position + 1] = newdata;
+				
+				// switch next header with last literal
+				long temp = this.buffer[next.position + 1];
+				this.buffer[next.position + 1] = this.buffer[next.position];
+				this.buffer[next.position] = temp;
+				next.setNumberOfLiteralWords(next.getNumberOfLiteralWords() + 1);
+				
+				if (next.position + 1 == this.rlw.position)
+					this.rlw.position = next.position;
+				
+				return;
+			}
+			
 			// CASE 4) no extension possible. Have to SPLIT the zero sequence
 			// and create new RLW
-			shiftCompressedWordsRight(wordPos + 1, 2);
-			RunningLengthWord newRlw =
-					new RunningLengthWord(this.buffer, wordPos + 2);
-			rlw.array = this.buffer;
+			// new RLW only gets a single literal
+			if (afterRunLen == 0) {
+				assert(rlw.getNumberOfLiteralWords() == RunningLengthWord.largestliteralcount);
+				
+				shiftCompressedWordsRight(rlw.position +  1, 1);
+				shiftCompressedWordsRight(rlw.position + rlw.getNumberOfLiteralWords() + 1, 1);
+				RunningLengthWord newRlw = new RunningLengthWord(this.buffer, 
+						rlw.position + rlw.getNumberOfLiteralWords() + 1);
+				rlw.array = this.buffer;
 
-			newRlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords());
-			newRlw.setRunningLength(afterRunLen);
-			newRlw.setRunningBit(false);
+				newRlw.setNumberOfLiteralWords(1L);
+				newRlw.setRunningLength(0);
+				newRlw.setRunningBit(false);
 
-			rlw.setRunningLength(newRunLen);
-			rlw.setNumberOfLiteralWords(1);
+				rlw.setRunningLength(newRunLen);
 
-			this.buffer[wordPos + 1] = newdata;
+				this.buffer[rlw.position + 1] = newdata;
 
-			if (newRlw.position > this.rlw.position)
-				this.rlw.position = newRlw.position;
+				if (newRlw.position > this.rlw.position)
+					this.rlw.position = newRlw.position;				
+			}
+			// new RLW also gets run length
+			else {
+				shiftCompressedWordsRight(wordPos + 1, 2);
+				RunningLengthWord newRlw =
+						new RunningLengthWord(this.buffer, wordPos + 2);
+				rlw.array = this.buffer;
+
+				newRlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords());
+				newRlw.setRunningLength(afterRunLen);
+				newRlw.setRunningBit(false);
+
+				rlw.setRunningLength(newRunLen);
+				rlw.setNumberOfLiteralWords(1);
+
+				this.buffer[wordPos + 1] = newdata;
+
+				if (newRlw.position > this.rlw.position)
+					this.rlw.position = newRlw.position;
+			}
 		}
 	}
 
@@ -1378,73 +1409,82 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 */
 	public boolean checkInvariants() {
 		RunningLengthWord rlw, prev;
-		EWAHIterator i = new EWAHIterator(this.buffer, this.actualsizeinwords);
-		// test that actualsizeinwords complies with info in headers
-		while (i.hasNext()) {
-			i.next();
-			if (i.dirtyWords() > actualsizeinwords) {
-				log.error(i.dirtyWords() + " larger than actual "
-						+ actualsizeinwords);
-				log.error(toDebugString());
-				return false;
+		
+		
+		try {
+			EWAHIterator i = new EWAHIterator(this.buffer, this.actualsizeinwords);
+			// test that actualsizeinwords complies with info in headers
+			while (i.hasNext()) {
+				i.next();
+				if (i.dirtyWords() > actualsizeinwords) {
+					log.error(i.dirtyWords() + " larger than actual "
+							+ actualsizeinwords);
+					log.error(toDebugString());
+					return false;
+				}
+
+				if (i.pointer > actualsizeinwords) {
+					log.error("pointer " + i.pointer + " larger than actual "
+							+ actualsizeinwords);
+					log.error(toDebugString());
+					return false;
+				}
 			}
 
-			if (i.pointer > actualsizeinwords) {
-				log.error("pointer " + i.pointer + " larger than actual "
-						+ actualsizeinwords);
-				log.error(toDebugString());
-				return false;
-			}
-		}
-
-		// check adjacent words for errors
-		rlw = new RunningLengthWord(buffer, 0);
-		prev = rlw;
-		rlw = rlw.getNext();
-
-		while (rlw.position < actualsizeinwords
-				&& rlw.position + rlw.getNumberOfLiteralWords() < actualsizeinwords) {
-			// case 1)
-			if (prev.getRunningLength() == 0
-					&& rlw.getRunningLength() == 0
-					&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
-				log.error(prev.getNumberOfLiteralWords()
-						+ " dirty words followed by "
-						+ rlw.getNumberOfLiteralWords()
-						+ " number of dirty words " + "\n\n" + toDebugString());
-				return false;
-			}
-			// case 2)
-			if (prev.getRunningLength() > 0
-					&& rlw.getRunningLength() > 0
-					&& prev.getNumberOfLiteralWords() == 0
-					&& prev.getRunningBit() == rlw.getRunningBit()
-					&& prev.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
-				log.error("Two running length for same bit of length "
-						+ prev.getRunningLength() + " and "
-						+ rlw.getRunningLength() + "\n\n" + toDebugString());
-				return false;
-			}
+			// check adjacent words for errors
+			rlw = new RunningLengthWord(buffer, 0);
 			prev = rlw;
 			rlw = rlw.getNext();
-		}
 
-		if (!prev.equals(this.rlw)) {
-			log.error("Last word should have been " + prev.toString()
-					+ " but was " + this.rlw.toString());
-			return false;
-		}
+			while (rlw.position < actualsizeinwords
+					&& rlw.position + rlw.getNumberOfLiteralWords() < actualsizeinwords) {
+				// case 1) second word has no running length -> first one should 
+				// have max literal count 
+				if (rlw.getRunningLength() == 0
+						&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
+					log.error(prev.getNumberOfLiteralWords()
+							+ " dirty words followed by "
+							+ rlw.getNumberOfLiteralWords()
+							+ " number of dirty words " + "\n\n" + toDebugString());
+					return false;
+				}
+				// case 2) both have running length for same bit and first one has 
+				// no literals -> first one should have max running length
+				if (prev.getRunningLength() > 0
+						&& rlw.getRunningLength() > 0
+						&& prev.getNumberOfLiteralWords() == 0
+						&& prev.getRunningBit() == rlw.getRunningBit()
+						&& prev.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+					log.error("Two running length for same bit of length "
+							+ prev.getRunningLength() + " and "
+							+ rlw.getRunningLength() + "\n\n" + toDebugString());
+					return false;
+				}
+				prev = rlw;
+				rlw = rlw.getNext();
+			}
 
-		// the largest bit set == sizeinbits
-		IntIterator it = intIterator();
-		int greatest = -1;
-		while (it.hasNext()) {
-			greatest = it.next();
+			if (!prev.equals(this.rlw)) {
+				log.error("Last word should have been " + prev.toString()
+						+ " but was " + this.rlw.toString());
+				return false;
+			}
+
+			// the largest bit set == sizeinbits
+			IntIterator it = intIterator();
+			int greatest = -1;
+			while (it.hasNext()) {
+				greatest = it.next();
+			}
+			if (this.sizeinbits != greatest + 1) {
+				log.error("sizein bits " + sizeinbits + " but largest value is "
+						+ greatest + "\n\n" + toDebugString());
+				return false;
+			}
 		}
-		if (this.sizeinbits != greatest + 1) {
-			log.error("sizein bits " + sizeinbits + " but largest value is "
-					+ greatest + "\n\n" + toDebugString());
-			return false;
+		catch (Exception e) {
+			LoggerUtil.logException(e, log);
+			log.error(bufferToString());
 		}
 
 		return true;

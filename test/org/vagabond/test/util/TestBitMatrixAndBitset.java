@@ -414,13 +414,60 @@ public class TestBitMatrixAndBitset {
 		// ***************************************
 		// CASE 4 inside 0 sequence
 		// ***************************************
-		// a) 
+		// **********
+		// a) header has no more running length try to merge with previous
+		// a) 1) preceding has enough space to take over the literals
+		testOneCase("4a1", oneZeroSeq + allZeros64 + allOnesExcept12, 70);
 		
-		// b)
+		// a) 2) preceding is full, keep this one
+		testOneCase("4a2", replicate(oneZeroSeq, 5, ' ') + allZeros64 
+				+ allOnesExcept12, 
+				350);
+
+		// **********
+		// b) header still has running length, we changed the first running length word
+		// b) 1) previous has enough space to take over new literal
+		testOneCase("4b1", oneZeroSeq + replicate(allZeros64,2,' ') 
+				+ allOnesExcept12, 
+				70);
 		
-		// c)
+		// b) 2) previous is full, create new header
+		testOneCase("4b2", replicate(oneZeroSeq, 5, ' ') 
+				+ replicate(allZeros64,2,' ') + allOnesExcept12, 
+				350);
 		
-		// d)
+		// **********		
+		// c) we set bit in last running length word, try to add literal as new
+		// first literal of currrent header
+		// c) 1)  current header has enough space
+		testOneCase("4c1", replicate(allZeros64,2,' ') + allOnesExcept12, 
+				70);
+		
+		// c) 2)  current header is full create new header
+		testOneCase("4c2", replicate(allZeros64,2,' ') 
+				+ replicate(allOnesExcept12,5,' '), 
+				70);
+		
+		// **********
+		// d) current header is full and next one has running length 0 and is not full
+		testOneCase("4d", replicate(allZeros64,2,' ') 
+				+ replicate(allOnesExcept12,5,' ') + oneZeroSeq, 
+				70);
+		
+		// **********
+		// e) no merging or extension of other header possible have to create new
+		// header and split 0 sequence
+		// e) 1) header is full and the bit to set is in last word of 0 sequence
+		// add max literal count to new word (before old one)
+		testOneCase("4c2", replicate(allZeros64,2,' ') 
+				+ replicate(allOnesExcept12,5,' '), 
+				70);		
+		
+		// e) 2) simple splitting
+		testOneCase("4c2", replicate(allZeros64,3,' ') 
+				+ allOnesExcept12, 
+				70);
+		
 		changeMaxLiteralAndRunLength(-1, -1);
 	}
 
@@ -434,10 +481,11 @@ public class TestBitMatrixAndBitset {
 		ex.set(setBit);
 		b.set(setBit);
 		assertTrue(b.checkInvariants());
-		assertEquals(
-				name + "\n\n" + ex.toBitsString() + "\n\n" + b.toBitsString(),
+		assertEquals(name + "\n\n" + b.toDebugString() 
+				+ "\n\n" + ex.toBitsString() 
+				+ "\n\n" + b.toBitsString(),
 				ex, b);
-
+		log.debug("CASE <" + name + "> sucessful:\n" + b.toDebugString());
 		return b;
 	}
 
