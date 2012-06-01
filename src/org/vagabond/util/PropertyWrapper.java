@@ -182,19 +182,33 @@ public class PropertyWrapper extends Properties {
 	}
 	
 	public boolean getBool (String name) {
-		return Boolean.parseBoolean(this.getProperty(name));
+		return Boolean.parseBoolean(this.getProperty(name).trim());
 	}
 	
 	public float getFloat (String name) {
-		return Float.parseFloat(this.getProperty(name));
+		return Float.parseFloat(this.getProperty(name).trim());
 	}
 	
 	public int getInt (String name) {
-		return Integer.parseInt(this.getProperty(name));
+		return Integer.parseInt(this.getProperty(name).trim());
+	}
+	
+	public int getInt (String name, int defVal) {
+		String val = this.getProperty(name);
+		if (val == null)
+			return defVal;
+		return Integer.parseInt(val.trim());
 	}
 	
 	public long getLongProperty (String key) {
-		return Long.parseLong(this.getProperty(key));
+		return Long.parseLong(this.getProperty(key).trim());
+	}
+	
+	public long getLong (String key, long defVal) {
+		String val = this.getProperty(key);
+		if (val == null)
+			return defVal;
+		return Long.parseLong(val.trim());
 	}
 	
 	public boolean containsKeyOrSub (String key) {

@@ -21,6 +21,14 @@ public interface IBitSet extends Bitmap, Cloneable {
 	public void not();
 	public Object clone();
 	
+	/**
+	 * @return logical size of this bitset
+	 */
+	public int sizeInBits();
+	/**
+	 * 
+	 * @return physical size of the bitset
+	 */
 	public int getByteSize();
 	
 	public String toBitsString ();

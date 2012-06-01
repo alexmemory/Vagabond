@@ -148,6 +148,16 @@
 		</jar>
 	</target>
 	
+	<target name="JarForSTBench" depends="Compile,GenerateXMLbindings">
+		<jar destfile="${basedir}/../STBenchmark/lib/trampexgen.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${loaderMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+	</target>
+	
 	<target name="JarVagabondLoader" >
 		<mkdir dir="${loadermacdir}"/>
 		<mkdir dir="${loaderwindir}"/>
@@ -198,7 +208,7 @@
 			nonavbar="false" 
 			notree="false" 
 			packagenames="org.tramp.expl" 
-			source="1.5" 
+			source="1.6" 
 			sourcepath="${sourcedir}" 
 			splitindex="true" 
 			use="true" 

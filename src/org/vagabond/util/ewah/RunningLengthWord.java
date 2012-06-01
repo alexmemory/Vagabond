@@ -19,7 +19,7 @@ public final class RunningLengthWord {
    * @param a an array of 64-bit words
    * @param p position in the array where the running length word is located.
    */
-  RunningLengthWord(final long[] a, final int p) {
+  public RunningLengthWord(final long[] a, final int p) {
     this.array = a;
     this.position = p;
   }
@@ -88,7 +88,7 @@ public final class RunningLengthWord {
    * @return the running length
    */
   public long getRunningLength() {
-    return (this.array[this.position] >>> 1) & largestrunninglengthcount;
+    return (this.array[this.position] >>> 1) & largestrunninglengthbits;
   }
 
   /**
@@ -160,10 +160,13 @@ public final class RunningLengthWord {
   private static final int literalbits = 64 - 1 - runninglengthbits;
   
   /** largest number of dirty words in a run. */
-  public static final long largestliteralcount = (1l << literalbits) - 1;
+  public static long largestliteralcount = (1l << literalbits) - 1;
   
   /** largest number of clean words in a run */
-  public static final long largestrunninglengthcount = (1l << runninglengthbits) - 1;
+  public static long largestrunninglengthcount = (1l << runninglengthbits) - 1;
+  
+  /** bitmask for largest running length */
+  public static final long largestrunninglengthbits = (1l << runninglengthbits) - 1;
   
   private static final long shiftedlargestrunninglengthcount = largestrunninglengthcount << 1;
   

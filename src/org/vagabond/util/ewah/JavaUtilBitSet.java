@@ -29,6 +29,24 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 		super(size);
 	}
 	
+	public JavaUtilBitSet (String values) {
+		super();
+		
+		int pos = 0;
+		for(char c: values.toCharArray()) {
+			switch(c) {
+				case '1':
+					this.set(pos);
+				case '0':
+					pos++;
+					break;
+				default:
+					// do nothing
+					break;
+			}
+		}
+	}
+	
 	
 	@Override
 	public boolean intersects(IBitSet other) {
@@ -84,7 +102,7 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 	public String toBitsString () {
 		StringBuffer result = new StringBuffer();
 		
-		for(int i = 0; i < size(); i++) {
+		for(int i = 0; i < super.length(); i++) {
 			if (get(i))
 				result.append('1');
 			else
@@ -114,6 +132,11 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 		}
 		
 		return 0;
+	}
+	
+	@Override
+	public int sizeInBits () {
+		return super.length();
 	}
 
 	@Override
@@ -198,14 +221,34 @@ public class JavaUtilBitSet extends BitSet implements IBitSet {
 	}
 
 	@Override
-	public int sizeInBits() {
-		return super.size();
-	}
-	
-	@Override
 	public Object clone() {
 		return super.clone();
 	}
 
+	@Override
+	public boolean equals (Object o) {
+		if (o == null)
+			return false;
+		if (this == o)
+			return true;
+		if (o instanceof BitSet) {
+			BitSet b = (BitSet) o;
+			return super.equals(b);
+		}
+		if (o instanceof IBitSet) {
+			IBitSet b = (IBitSet) o;
+			if (this.sizeInBits() != b.sizeInBits())
+				return false;
+			IntIterator i = intIterator();
+			IntIterator j = b.intIterator();
+			
+			while(i.hasNext())
+				if (i.next() != j.next())
+					return false;
+			return true;
+		}
+		
+		return false;
+	}
 
 }
