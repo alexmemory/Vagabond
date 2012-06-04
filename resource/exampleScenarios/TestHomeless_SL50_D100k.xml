@@ -107,22 +107,22 @@ WHERE s.worksfor = k.location
 <ConnectionInfo>
 	<Host>localhost</Host>
 	<DB>tramptest</DB>
-	<User>jiang</User>
+	<User>postgres</User>
 	<Password/>
 </ConnectionInfo>
 <Data>
 	<InstanceFile name="tramp">
-		<Path>resource/exampleData</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>tramp.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
 	<InstanceFile name="socialworker">
-		<Path>resource/exampleData</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>socialworker.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
 	<InstanceFile name="soupkitchen">
-		<Path>resource/exampleData</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>soupkitchen.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
