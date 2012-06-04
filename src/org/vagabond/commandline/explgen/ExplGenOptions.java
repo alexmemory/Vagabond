@@ -1,44 +1,68 @@
 package org.vagabond.commandline.explgen;
 
 import java.io.File;
+import java.util.List;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.OptionDef;
+import org.kohsuke.args4j.spi.OptionHandler;
+import org.kohsuke.args4j.spi.Parameters;
+import org.kohsuke.args4j.spi.Setter;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
+import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.xmlmodel.ConnectionInfoType;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
 public class ExplGenOptions {
 
-	@Option(name="-u", usage="user name for connecting to the database")
+	@Option(name = "-u", usage = "user name for connecting to the database")
 	private String dbUser = "postgres";
-	
-	@Option(name="-p", usage="password for database user")
+
+	@Option(name = "-p", usage = "password for database user")
 	private String dbPassword = "";
-	
-	@Option(name="-d", usage="name of the database to connect to")
+
+	@Option(name = "-d", usage = "name of the database to connect to")
 	private String dbName = "tramptest";
-	
-	@Option(name="-h", usage="URL of the database to connect to")
+
+	@Option(name = "-h", usage = "URL of the database to connect to")
 	private String dbURL = "localhost";
-	
-	@Option(name="-x", usage="xml mapping scenario document")
+
+	@Option(name = "-x", usage = "xml mapping scenario document")
 	private File xmlDoc;
-	
-	@Option(name="-m", usage="File that stores markers")
+
+	@Option(name = "-m", usage = "File that stores markers")
 	private File markerFile = null;
-	
-	@Option(name="-M", usage="List of error markers")
+
+	@Option(name = "-M", usage = "List of error markers")
 	private String markers = null;
-	
-	@Option(name="-loadScen", usage="Load the scenario to the database")
+
+	@Option(name = "-loadScen", usage = "Load the scenario to the database")
 	private boolean loadScen = false;
+
+	@Option(name = "-ranker", usage = "Select the type of ranker to use {}")
+	private String rankerScheme = "Dummy";
+
+	@Option(name = "-lazy", usage = "Use together with -loadScen. Check if " +
+			"relations are already populated before loading data.")
+	private boolean lazy = false;
 	
-	public ExplGenOptions () {
+	@Option(name = "-rankExpls", usage = "Rank the generated explanations")
+	private boolean useRanker = false;
+	
+	@Option(name = "-rankSkyline", 
+			usage = "Use Skyline ranker with this ranking schemes", 
+			metaVar = "[scheme 1] [scheme 2] ...")
+	private String[] skylineRankers = null;
 		
+	public ExplGenOptions() {
+		CmdLineParser.registerHandler(String[].class, StringArrayOptionHandler.class);
 	}
 
-	public void setDBOptions (MappingScenario map) {
+	public void setDBOptions(MappingScenario map) {
 		ConnectionInfoType con = map.getConnectionInfo();
-		
+
 		if (con != null) {
 			dbUser = con.getUser();
 			dbPassword = con.getPassword();
@@ -46,7 +70,7 @@ public class ExplGenOptions {
 			dbURL = con.getHost();
 		}
 	}
-	
+
 	public String getDbUser() {
 		return dbUser;
 	}
@@ -110,6 +134,42 @@ public class ExplGenOptions {
 	public boolean isLoadScen() {
 		return loadScen;
 	}
+
+	public String getRankerScheme() {
+		return rankerScheme;
+	}
+
+	public void setRankerScheme(String rankerScheme) throws Exception {
+		if (RankerFactory.getRankerSchemes().contains(rankerScheme))
+			this.rankerScheme = rankerScheme;
+		throw new Exception("Unknown ranker scheme <" + rankerScheme
+				+ "> expected one of " + RankerFactory.getRankerSchemes());
+	}
+
+	public boolean isLazy() {
+		return lazy;
+	}
+
+	public void setLazy(boolean lazy) {
+		this.lazy = lazy;
+	}
+
+	public boolean isUseRanker() {
+		return useRanker;
+	}
+
+	public void setUseRanker(boolean useRanker) {
+		this.useRanker = useRanker;
+	}
+
+	public String[] getSkylineRankers() {
+		return skylineRankers;
+	}
+
+	public void setSkylineRankers(String[] skylineRankers) {
+		this.skylineRankers = skylineRankers;
+	}
 	
 	
+
 }

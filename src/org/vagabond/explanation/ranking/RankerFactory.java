@@ -1,5 +1,6 @@
 package org.vagabond.explanation.ranking;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,14 @@ public class RankerFactory {
 		return result;
 	}
 	
+	public static SkylineRanker createSkylineRanker (String[] rankSchemes, String finalScheme, 
+			ExplPartition part) {
+		SkylineRanker result = new SkylineRanker(rankSchemes, finalScheme);
+		result.initialize(part);
+		
+		return result;
+	}
+	
 	public static IScoringFunction getScoreFunction (String rankerScheme) {
 		return inst.rankerSchemes.get(rankerScheme).scoreFunction;
 	}
@@ -114,5 +123,9 @@ public class RankerFactory {
 			return new AStarExplanationRanker(f);
 		
 		return null;
+	}
+	
+	public static Collection<String> getRankerSchemes () {
+		return inst.rankerSchemes.keySet();
 	}
 }

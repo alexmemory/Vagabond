@@ -13,6 +13,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.util.CollectionUtils;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.ewah.JavaUtilBitSet;
 import org.vagabond.util.ewah.IBitSet.BitsetType;
 
@@ -20,7 +21,7 @@ import com.skjegstad.utils.BloomFilter;
 
 public class PartitionRanker implements IPartitionRanker {
 
-	static Logger log = Logger.getLogger(PartitionRanker.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(PartitionRanker.class);
 	
 	public static final int MAX_BITSET_SIZE = (int) (64 * Math.pow(1024, 3)); // 64 MB
 	
@@ -342,7 +343,7 @@ public class PartitionRanker implements IPartitionRanker {
 		IExplanationSet result = ExplanationFactory.newExplanationSet();
 		
 		for(int i = 0; i < pos.iterPos.length; i++)
-			result.union(part.getCol(i).getRankedExpl(pos.iterPos[i]));
+			result.union(rankers[i].getRankedExpl(pos.iterPos[i]));
 		
 		return result;
 	}
@@ -354,12 +355,11 @@ public class PartitionRanker implements IPartitionRanker {
 
 	@Override
 	public void initialize(ExplPartition part) {
-		initialize(part, 10.0d, 3, BitsetType.JavaBitSet);
+		initialize(part, BitsetType.JavaBitSet);
 	}
 
-	public void initialize(ExplPartition part, double bitPerKey, int k, BitsetType type) {
+	public void initialize(ExplPartition part, BitsetType type) {
 		int numParts;
-//		int exNumElem = 1;
 		
 		this.part = part;
 		numParts = part.size();
@@ -375,8 +375,6 @@ public class PartitionRanker implements IPartitionRanker {
 			ExplanationCollection col = part.get(i);
 			rankers[i] = RankerFactory.createRanker(rankScheme);
 			rankers[i].initialize(col);
-			
-//			exNumElem *= CollectionUtils.product(col.getDimensions()); //TODO check boundaries
 		}
 		
 		createdTest = new HashSet<FullExplSummary> ();
@@ -434,10 +432,10 @@ public class PartitionRanker implements IPartitionRanker {
 		long result = 1L;
 		
 		for(int i = 0; i < part.size(); i++) {
-			if (!part.getCol(i).getRanker().isFullyRanked())
+			if (!rankers[i].isFullyRanked())
 				return -1L;
 			else 
-				result *= part.getCol(i).getRanker().getNumberOfExplSets();
+				result *= rankers[i].getNumberOfExplSets();
 		}
 		
 		if (result != -1)
@@ -565,7 +563,6 @@ public class PartitionRanker implements IPartitionRanker {
 			next();
 		
 		resetIter();
-//		generateUpTo(getNumberOfExplSets());
 	}
 	
 }

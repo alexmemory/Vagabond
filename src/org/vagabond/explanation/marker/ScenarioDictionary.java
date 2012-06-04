@@ -1,6 +1,7 @@
 package org.vagabond.explanation.marker;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public class ScenarioDictionary {
 		return instance;
 	}
 	
-	public void initFromScenario () {
+	public void initFromScenario () throws Exception {
 		setSchemas(MapScenarioHolder.getInstance().getScenario().getSchemas()
 						.getSourceSchema(),
 				MapScenarioHolder.getInstance().getScenario().getSchemas()
@@ -292,18 +293,18 @@ public class ScenarioDictionary {
 	
 	
 	
-	public void updateTidTable(){
+	public void updateTidTable() throws Exception{
 		TidMapping.clear();
 		initTidMappingGenerating();
 	}
 	
-	public void initTidMappingGenerating() {
+	public void initTidMappingGenerating() throws Exception {
 		TidMapping.clear();
 		for (int i = 0; i < rels.size(); i++)
 			singleTableTidGenerating(i);
 	}
 	
-	public void singleTableTidGenerating(int relId) {
+	public void singleTableTidGenerating(int relId) throws SQLException, ClassNotFoundException {
 		ResultSet rs;
 		String fullRelName = getSchemaPlusRelName(relId);
 		String query = "SELECT tid FROM " + fullRelName;
@@ -311,15 +312,11 @@ public class ScenarioDictionary {
 		
 		log.debug("get tids for <" + fullRelName + "> using query:\n" + query);
 		
-		try {
-			rs = ConnectionManager.getInstance().execQuery(query);
-			while(rs.next()) {
-				TidMapping.get(relId).put(rs.getString("tid"));
-			}
-			ConnectionManager.getInstance().closeRs(rs);
-		} catch (Exception e) {
-			LoggerUtil.logException(e, log);
+		rs = ConnectionManager.getInstance().execQuery(query);
+		while(rs.next()) {
+			TidMapping.get(relId).put(rs.getString("tid"));
 		}
+		ConnectionManager.getInstance().closeRs(rs);
 		
 	}
 	

@@ -18,11 +18,12 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.SimpleExplanationSet;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
+import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
 
 public class SkylineRanker implements IPartitionRanker {
 
-	static Logger log = Logger.getLogger(SkylineRanker.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(SkylineRanker.class);
 	
 	private static final int NO_SKYLINE = Integer.MAX_VALUE;
 	

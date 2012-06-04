@@ -11,7 +11,7 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.util.LogProviderHolder;
 
 public class ExplanationRanker {
-	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationCollection.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(ExplanationRanker.class);
 	
 	private ExplanationCollection explCollection;
 	private List<IExplanationSet> sortedExpls;

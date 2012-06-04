@@ -77,6 +77,10 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		ranker.initialize(this);
 	}
 	
+	public void setRanker (IExplanationRanker ranker) {
+		this.ranker = ranker;
+	}
+	
 	public IExplanationSet getRankedExpl (int pos) {
 		assert (ranker != null && pos > 0 && ranker.hasAtLeast(pos));
 		

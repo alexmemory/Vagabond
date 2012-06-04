@@ -4,18 +4,28 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.util.LoggerUtil;
 
 public class TestScenarioDictionary extends AbstractVagabondTest {
 
+	static Logger log = Logger.getLogger(TestScenarioDictionary.class);
+	
 	@Before
 	public void setUp () throws XmlException, IOException, ValidationException {
-		setSchemas("resource/exampleScenarios/homeless.xml");
+		
+		try {
+			setSchemas("resource/exampleScenarios/homeless.xml");
+		}
+		catch (Exception e) {
+			LoggerUtil.logException(e, log);
+		}
 	}
 	
 	@Test

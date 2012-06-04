@@ -19,7 +19,7 @@ import org.apache.log4j.Priority;
  */
 public class LoggerUtil {
 
-	public static void logException (Exception e, Logger log) {
+	public static void logException (Throwable e, Logger log) {
 		log.error(getCompleteTrace(e));
 	}
 	
@@ -28,12 +28,12 @@ public class LoggerUtil {
 		log.error(message + "\n\n" + getCompleteTrace(e));
 	}
 	
-	public static void logDebugException (Exception e, Logger log) {
+	public static void logDebugException (Throwable e, Logger log) {
 		if (log.isDebugEnabled())
 			log.debug(getCompleteTrace(e));
 	}
 	
-	public static String getCompleteTrace (Exception e) {
+	public static String getCompleteTrace (Throwable e) {
 		StringBuilder trace;
 		Throwable exception;
 		

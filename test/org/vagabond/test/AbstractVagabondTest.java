@@ -47,7 +47,7 @@ public abstract class AbstractVagabondTest {
 		ConnectionManager.getInstance().closeCon();
 	}
 	
-	public static void setSchemas (String fileName) throws XmlException, IOException, ValidationException {
+	public static void setSchemas (String fileName) throws Exception {
 		MapScenarioHolder holder;
 		
 		holder = ModelLoader.getInstance().load(new File(fileName));

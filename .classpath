@@ -9,7 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/trampJavaModel.jar" sourcepath="xbeans/src"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.1-405.jdbc3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/args4j-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlbeans-qname.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlpublic.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsr173_1.0_api.jar"/>
@@ -18,6 +17,7 @@
 	<classpathentry kind="lib" path="lib/dbunit.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/args4j-2.0.17.jar" sourcepath="/Users/lord_pretzel/Downloads/args4j-2.0.17-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
