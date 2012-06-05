@@ -185,12 +185,32 @@ public class PropertyWrapper extends Properties {
 		return Boolean.parseBoolean(this.getProperty(name).trim());
 	}
 	
+	public boolean getBool (String name, boolean defVal) {
+		String val = this.getProperty(name);
+		if (val == null)
+			return defVal;
+		return Boolean.parseBoolean(val.trim());
+	}
+	
 	public float getFloat (String name) {
 		return Float.parseFloat(this.getProperty(name).trim());
 	}
 	
 	public int getInt (String name) {
 		return Integer.parseInt(this.getProperty(name).trim());
+	}
+	
+	public <E extends Enum<E>> Enum<E> getEnumProperty (String name, 
+			Class<E> enumClass) {
+		return Enum.valueOf(enumClass, getProperty(name));
+	}
+	
+	public <E extends Enum<E>> Enum<E> getEnumProperty (String name, 
+			Class<E> enumClass, Enum<E> defVal) {
+		String val = getProperty(name);
+		if (val == null)
+			return defVal;
+		return Enum.valueOf(enumClass, getProperty(name));
 	}
 	
 	public int getInt (String name, int defVal) {
