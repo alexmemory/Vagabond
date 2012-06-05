@@ -82,7 +82,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 	@Test
 	public void testSimpleGraph () throws Exception {
 		ErrorPartitionGraph g;
-		setSchemas("resource/test/simpleTest.xml");
+		loadToDB("resource/test/simpleTest.xml");
 		g = new ErrorPartitionGraph();
 		
 		log.debug(g.toString());
@@ -118,7 +118,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 	@Test
 	public void testSeveralCompGraph () throws Exception {
 		ErrorPartitionGraph g;
-		setSchemas("resource/test/severalComps.xml");
+		loadToDB("resource/test/severalComps.xml");
 		g = new ErrorPartitionGraph();
 		
 		log.debug(g.toString());
@@ -151,7 +151,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 	public void testConnComponentsSimple () throws Exception {
 		ErrorPartitionGraph g;
 		Set<ErrorNode> nodes, compNodes;
-		setSchemas("resource/test/simpleTest.xml");
+		loadToDB("resource/test/simpleTest.xml");
 		g = new ErrorPartitionGraph();
 		
 		g.getComponents();
@@ -169,7 +169,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		ErrorPartitionGraph g;
 		Set<ErrorNode> nodes, compNodes;
 		
-		setSchemas("resource/test/severalComps.xml");
+		loadToDB("resource/test/severalComps.xml");
 		g = new ErrorPartitionGraph();
 		
 		log.debug(g);
@@ -191,7 +191,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 	public void testParitioning () throws Exception {
 		ErrorPartitionGraph g;
 		
-		setSchemas("resource/test/severalComps.xml");
+		loadToDB("resource/test/severalComps.xml");
 		g = new ErrorPartitionGraph();
 		
 		MarkerSummary ex1 = MarkerParser.getInstance().parseMarkerSummary("{S(u,u1)}");

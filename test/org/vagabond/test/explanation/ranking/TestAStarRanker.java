@@ -231,8 +231,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	
 	@Test
 	public void testComparisonOp () throws Exception {
-		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-		ScenarioDictionary.getInstance().initFromScenario();
+		setUp("resource/test/simpleTest.xml");
+//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
+//		ScenarioDictionary.getInstance().initFromScenario();
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;
@@ -350,8 +351,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	
 	@Test
 	public void testMeanOverlap () throws Exception {
-		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-		ScenarioDictionary.getInstance().initFromScenario();
+		setUp("resource/test/simpleTest.xml");
+//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
+//		ScenarioDictionary.getInstance().initFromScenario();
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;
@@ -476,8 +478,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	
 	@Test
 	public void testRankFull () throws Exception {
-		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-		ScenarioDictionary.getInstance().initFromScenario();
+		setUp("resource/test/simpleTest.xml");
+//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
+//		ScenarioDictionary.getInstance().initFromScenario();
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;

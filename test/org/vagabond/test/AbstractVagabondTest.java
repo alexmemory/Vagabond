@@ -64,8 +64,8 @@ public abstract class AbstractVagabondTest {
 	public static void loadToDB (String fileName) throws Exception {
 		Connection con = TestOptions.getInstance().getConnection();
 		ModelLoader.getInstance().loadToInst(fileName);
-		ScenarioDictionary.getInstance().initFromScenario();
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
+		ScenarioDictionary.getInstance().initFromScenario();
 	}
 	
 }

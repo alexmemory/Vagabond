@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -29,10 +30,9 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestExplanationCollection.class);
 	
-	@BeforeClass
-	public static void setUp () throws Exception {
-		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-		ScenarioDictionary.getInstance().initFromScenario();
+	@Before
+	public void setUp () throws Exception {
+		loadToDB("resource/test/simpleTest.xml");
 	}
 	
 	@Test

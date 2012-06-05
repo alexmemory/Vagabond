@@ -18,7 +18,7 @@ public class TestErrorPartitioning extends AbstractVagabondTest {
 	private ErrorPartitioner partitioner;
 	
 	private void setUp (String filename) throws Exception {
-		setSchemas(filename);
+		loadToDB(filename);
 		g = new ErrorPartitionGraph();
 		partitioner = new ErrorPartitioner();
 	}

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -22,8 +23,8 @@ public class TestMarkerParser extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestMarkerParser.class);
 	
-	@BeforeClass
-	public static void load () throws Exception {
+	@Before
+	public void load () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
 	}
 	

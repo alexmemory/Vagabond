@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.test.AbstractVagabondTest;
@@ -16,8 +17,8 @@ import org.vagabond.util.ResultSetUtil;
 
 public class TestResultSetUtil extends AbstractVagabondTest {
 
-	@BeforeClass
-	public static void setUp () throws Exception {
+	@Before
+	public void setUp () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
 	}
 	

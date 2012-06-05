@@ -10,7 +10,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="Schemas" type="this:SchemasType" minOccurs="1" maxOccurs="1"/>
-				<xs:element name="Correspondences" type="this:CorrespondencesType" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="Correspondences" type="this:CorrespondencesType" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="Mappings" type="this:MappingsType" minOccurs="1" maxOccurs="1"/>
 				<xs:element name="Transformations" type="this:TransformationsType" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="ConnectionInfo" type="this:ConnectionInfoType" minOccurs="0" maxOccurs="1"/>
@@ -158,9 +158,22 @@
 
 	<xs:complexType name="RelAtomType">
 		<xs:sequence>
-			<xs:element name="Var" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Var" type="xs:string"/>
+				<xs:element name="SKFunction" type="this:SKFunction"/>
+			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="tableref" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="SKFunction">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded" >
+				<xs:element name="Var" type="xs:string" />
+				<xs:element name="SKFunction" type="this:SKFunction" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="skname" type="xs:string"/>
 	</xs:complexType>
 	
 	<!-- ************ Transformation Types **************************** -->

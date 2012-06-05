@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.generation.QueryHolder;
@@ -83,10 +84,9 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		return result;
 	}
 	
-	@BeforeClass
-	public static void setUp () throws Exception {	
+	@Before
+	public void setUp () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
-		QueryHolder.getInstance().loadFromDir(new File ("resource/queries"));
 		
 		pGen = ProvenanceGenerator.getInstance();
 		seGen = new SourceProvenanceSideEffectGenerator();

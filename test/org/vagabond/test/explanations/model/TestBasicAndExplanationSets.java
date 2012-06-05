@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IMarkerSet;
@@ -29,11 +30,9 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestBasicAndExplanationSets.class);
 	
-	@BeforeClass
-	public static void setUp () throws Exception {
-		ModelLoader.getInstance().loadToInst(
-				"resource/exampleScenarios/homelessDebugged.xml");
-		ScenarioDictionary.getInstance().initFromScenario();
+	@Before
+	public void setUp () throws Exception {
+		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 	}
 	
 	@Test
