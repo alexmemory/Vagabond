@@ -137,7 +137,7 @@
 	
 	<xs:complexType name="MappingType">
 		<xs:sequence>
-			<xs:element name="Uses">
+			<xs:element name="Uses" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="Correspondence" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
