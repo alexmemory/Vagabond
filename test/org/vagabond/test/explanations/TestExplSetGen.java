@@ -74,7 +74,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		e2 = new CorrespondenceError();
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
-		e2.setCorrespondences(corrs);
+		e2.setCorrSE(corrs);
 		e2.setMapSE(maps);
 		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerFactory.newMarkerSet(
@@ -155,7 +155,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e2 = new CorrespondenceError();
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
-		e2.setCorrespondences(corrs);
+		e2.setCorrSE(corrs);
 		e2.setMapSE(maps);
 		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerParser.getInstance().parseSet(
@@ -228,7 +228,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		e2 = new CorrespondenceError();
 		e2.setExplains((IAttributeValueMarker) m.getElemList().get(0));
-		e2.setCorrespondences(corrs);
+		e2.setCorrSE(corrs);
 		e2.setMapSE(maps);
 		e2.setTransSE(trans);
 		e2.setTargetSE(MarkerParser.getInstance().parseSet(
@@ -299,7 +299,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		r1 = new CorrespondenceError();
 		r1.setExplains(e1);
-		r1.setCorrespondences(corrs);
+		r1.setCorrSE(corrs);
 		r1.setMapSE(maps);
 		r1.setTransSE(trans);
 		r1.setTargetSE(MarkerParser.getInstance().parseSet(
@@ -334,7 +334,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		r2 = new CorrespondenceError();
 		r2.setExplains(e2);
-		r2.setCorrespondences(corrs);
+		r2.setCorrSE(corrs);
 		r2.setMapSE(maps);
 		r2.setTransSE(trans);
 		r2.setTargetSE(MarkerParser.getInstance().parseSet(
@@ -467,7 +467,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		trans.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		
 		r1 = new CorrespondenceError(e1);
-		r1.setCorrespondences(corrs);
+		r1.setCorrSE(corrs);
 		r1.setMapSE(maps);
 		r1.setTargetSE(MarkerParser.getInstance()
 				.parseSet("{A(person,2,name),A(person,3,name),A(person,4,name)}"));

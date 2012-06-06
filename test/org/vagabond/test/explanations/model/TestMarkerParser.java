@@ -74,19 +74,19 @@ public class TestMarkerParser extends AbstractVagabondTest {
 		Vector<ITupleMarker> result, expect;
 		
 		expect = CollectionUtils.makeVec(
-				MarkerFactory.newTupleMarker("employee", "1"),
-				MarkerFactory.newTupleMarker("employee", "2"));
+				MarkerFactory.newTupleMarker("employee", "2|2"),
+				MarkerFactory.newTupleMarker("employee", "4|2"));
 		
-		result = MarkerParser.getInstance().parseWL("  {T(employee,1)," +
-				" T(employee,2) }");
+		result = MarkerParser.getInstance().parseWL("  {T(employee,2|2)," +
+				" T(employee,4|2) }");
 		
 		assertEquals(expect, result);
 		
 		expect = CollectionUtils.makeVec(
-				MarkerFactory.newTupleMarker("employee", "1"),
+				MarkerFactory.newTupleMarker("employee", "2|2"),
 				null);
 		
-		result = MarkerParser.getInstance().parseWL("  {T(employee,1)," +
+		result = MarkerParser.getInstance().parseWL("  {T(employee,2|2)," +
 				" null }");
 		
 		assertEquals(expect, result);

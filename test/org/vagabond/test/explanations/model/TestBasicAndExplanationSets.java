@@ -80,13 +80,13 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 		
 		r1 = new CorrespondenceError();
 		r1.setExplains(MarkerParser.getInstance().parseMarker("A(person,1,name)"));
-		r1.setCorrespondences(corrs);
+		r1.setCorrSE(corrs);
 		r1.setMapSE(maps);
 		r1.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
 		
 		r2 = new CorrespondenceError();
 		r2.setExplains(MarkerParser.getInstance().parseMarker("A(person,1,name)"));
-		r2.setCorrespondences(corrs);
+		r2.setCorrSE(corrs);
 		r2.setMapSE(maps);
 		r2.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
 		

@@ -5,7 +5,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-		TestLoadXML.class
+		TestLoadXML.class,
+		TestLoadExplanations.class
         })
 public class AllTestsXML {
 

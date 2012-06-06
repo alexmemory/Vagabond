@@ -3,8 +3,10 @@ package org.vagabond.test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.xmlbeans.XmlException;
@@ -20,6 +22,7 @@ import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.IdMap;
 
 public abstract class AbstractVagabondTest {
 
@@ -66,6 +69,21 @@ public abstract class AbstractVagabondTest {
 		ModelLoader.getInstance().loadToInst(fileName);
 		DatabaseScenarioLoader.getInstance().loadScenario(con);
 		ScenarioDictionary.getInstance().initFromScenario();
+	}
+	
+	public static void setTids(String rel, String[] tids) throws Exception {
+		int relId = ScenarioDictionary.getInstance().getRelId(rel);
+		List<IdMap<String>> tidMaps;
+		IdMap<String> tidMap;
+		Field tidMapField = ScenarioDictionary.class.getDeclaredField("TidMapping");
+		
+		tidMapField.setAccessible(true);
+		tidMaps = (List<IdMap<String>>) tidMapField.get(ScenarioDictionary.getInstance());
+		tidMap = tidMaps.get(relId);
+		tidMap.clear();
+		
+		for(int i = 0; i < tids.length; i++)
+			tidMap.put(tids[i]);
 	}
 	
 }

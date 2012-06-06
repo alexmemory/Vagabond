@@ -6,6 +6,7 @@ import static org.vagabond.util.HashFNV.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
@@ -94,6 +95,10 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		return sourceSEDummy;
 	}
 	
+	public void setSourceSE (IMarkerSet m) {
+		updateHash();
+	}
+	
 	@Override
 	public int getMappingSideEffectSize() {
 		return 0;
@@ -104,6 +109,10 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		return mapSEDummy;
 	}
 
+	public void setMapSE(Set<MappingType> maps)  {
+		updateHash();
+	}
+	
 	@Override
 	public int getCorrSideEffectSize() {
 		return 0;
@@ -114,6 +123,11 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		return corrSEDummy;
 	}
 
+	public void setCorrSE(Set<CorrespondenceType> correspondence) {
+		updateHash();
+	}
+
+	
 	@Override
 	public int getTransformationSideEffectSize() {
 		return 0;
@@ -122,6 +136,10 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	@Override
 	public Collection<TransformationType> getTransformationSideEffects() {
 		return transSEDummy;
+	}
+	
+	public void setTransSE (Collection<TransformationType> transSE) {
+		updateHash();
 	}
 	
 	@Override

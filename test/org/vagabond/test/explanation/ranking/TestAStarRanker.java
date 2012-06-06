@@ -232,8 +232,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	@Test
 	public void testComparisonOp () throws Exception {
 		setUp("resource/test/simpleTest.xml");
-//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-//		ScenarioDictionary.getInstance().initFromScenario();
+
+		setTids("employee", new String[] {"1","2","3","E1a","E1b","E2","E3"});		
+		setTids("address", new String[] { "1", "2", "3"});
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;
@@ -351,9 +352,11 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	
 	@Test
 	public void testMeanOverlap () throws Exception {
-		setUp("resource/test/simpleTest.xml");
-//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-//		ScenarioDictionary.getInstance().initFromScenario();
+		setUp("resource/test/simpleTest.xml");		
+		
+		setTids("employee", new String[] {"1","2","3","E1a","E1b","E2","E3"});		
+		setTids("address", new String[] { "1", "2", "3"});
+
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;
@@ -479,8 +482,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 	@Test
 	public void testRankFull () throws Exception {
 		setUp("resource/test/simpleTest.xml");
-//		ModelLoader.getInstance().loadToInst("resource/test/simpleTest.xml");
-//		ScenarioDictionary.getInstance().initFromScenario();
+
+		setTids("employee", new String[] {"1","2","3","E1a","E1b","E2","E3"});		
+		setTids("address", new String[] { "1", "2", "3"});
 		
 		CopySourceError e11, e12, e21, e22, e23, e31;
 		IExplanationSet set1, set2, set3;

@@ -68,6 +68,7 @@ public class SuperflousMappingError extends AbstractBasicExplanation
 		updateHash();
 	}
 	
+	@Override
 	public void setMapSE(Set<MappingType> maps) {
 		this.mapSE = maps;
 		updateHash();

@@ -44,9 +44,9 @@ public class TestScoringFunctions extends AbstractVagabondTest {
 		c2.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name)}"));
 
 		CopySourceError c3 = new CopySourceError();
-		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,0,name)"));
+		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,2|1|1,name)"));
 		c3.setSourceSE(MarkerParser.getInstance().parseSet("{A(socialworker,1,name)}"));
-		c3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name),A(person,4,name)}"));
+		c3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name),A(person,1|3|2,name)}"));
 
 		IExplanationSet e1 = ExplanationFactory.newExplanationSet(c1,c2);
 		IExplanationSet e2 = ExplanationFactory.newExplanationSet(c3);
@@ -78,9 +78,9 @@ public class TestScoringFunctions extends AbstractVagabondTest {
 		c2.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name)}"));
 
 		CopySourceError c3 = new CopySourceError();
-		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,0,name)"));
+		c3.setExplains(MarkerParser.getInstance().parseMarker("A(person,2|1|1,name)"));
 		c3.setSourceSE(MarkerParser.getInstance().parseSet("{A(socialworker,1,name)}"));
-		c3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name),A(person,4,name)}"));
+		c3.setTargetSE(MarkerParser.getInstance().parseSet("{A(person,3,name),A(person,1|3|2,name)}"));
 
 		IExplanationSet e1 = ExplanationFactory.newExplanationSet(c1,c2);
 		IExplanationSet e2 = ExplanationFactory.newExplanationSet(c3);

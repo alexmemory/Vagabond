@@ -60,7 +60,8 @@ public class CorrespondenceError extends AbstractBasicExplanation
 		return correspondences.size();
 	}
 	
-	public void setCorrespondences (Set<CorrespondenceType> correspondence) {
+	@Override
+	public void setCorrSE (Set<CorrespondenceType> correspondence) {
 		this.correspondences = correspondence;
 		updateHash();
 	}
@@ -80,6 +81,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 		return mapSE;
 	}
 
+	@Override
 	public void setMapSE(Set<MappingType> mapSE) {
 		this.mapSE = mapSE;
 		updateHash();
@@ -95,6 +97,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 		return transSE.size();
 	}
 	
+	@Override
 	public void setTransSE (Collection<TransformationType> transSE) {
 		this.transSE = new HashSet<TransformationType> (transSE);
 		updateHash();

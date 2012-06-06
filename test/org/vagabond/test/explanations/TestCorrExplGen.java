@@ -61,7 +61,7 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		transSE.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		
 		expect = new CorrespondenceError(error);
-		expect.setCorrespondences(corrs);
+		expect.setCorrSE(corrs);
 		expect.setMapSE(maps);
 		expect.setTargetSE(tSE);
 		expect.setTransSE(transSE);
@@ -118,7 +118,7 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		transSE.add(MapScenarioHolder.getInstance().getTransformation("T1"));
 		
 		expect = new CorrespondenceError(error);
-		expect.setCorrespondences(corrs);
+		expect.setCorrSE(corrs);
 		expect.setMapSE(maps);
 		expect.setTargetSE(tSE);
 		expect.setTransSE(transSE);

@@ -46,6 +46,7 @@ public class CopySourceError extends AbstractBasicExplanation implements IBasicE
 		return sourceSE;
 	}
 
+	@Override
 	public void setSourceSE(IMarkerSet sourceSE) {
 		this.sourceSE = sourceSE;
 		updateHash();

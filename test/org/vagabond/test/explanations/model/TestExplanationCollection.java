@@ -1,7 +1,10 @@
 package org.vagabond.test.explanations.model;
 
 import static org.junit.Assert.*;
+
+import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
@@ -23,6 +26,7 @@ import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.util.IdMap;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 
@@ -64,7 +68,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e2 = new CorrespondenceError();
 		e2.setExplains(error);
-		e2.setCorrespondences(corrs);
+		e2.setCorrSE(corrs);
 		e2.setMapSE(maps);
 		e2.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -124,7 +128,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e2 = new CorrespondenceError();
 		e2.setExplains(error);
-		e2.setCorrespondences(corrs);
+		e2.setCorrSE(corrs);
 		e2.setMapSE(maps);
 		e2.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -151,6 +155,9 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		ExplanationCollection col;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
+		
+		setTids("employee", new String[] {"2|2","1|2", "2", "4|2", "1|1", 
+				"1|4", "1|5", "1|6", "5|4"});
 		
 		error1 = MarkerFactory.newAttrMarker("employee", "2|2", "city");
 		error2 = MarkerFactory.newAttrMarker("employee", "1|2", "city");
@@ -185,7 +192,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e21 = new CorrespondenceError();
 		e21.setExplains(error2);
-		e21.setCorrespondences(corrs);
+		e21.setCorrSE(corrs);
 		e21.setMapSE(maps);
 		e21.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -268,6 +275,8 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		assertEquals(1, col.getIterPos());
 	}
 	
+
+
 	@Test
 	public void testSideEffectRanking () throws Exception {
 		CopySourceError e11, e12, e22;
@@ -275,6 +284,11 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		IExplanationSet set1, set2;
 		IAttributeValueMarker error1, error2; 
 				
+		setTids("employee", new String[] {"8|8","9|9", "4|2",  
+				"1|1", "7|2",  "1|4", "1|5", "1|6", "f|4"});
+		setTids("address", new String[] { "2", "3", "4"});
+		
+		
 		ExplanationCollection col;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
@@ -312,7 +326,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e21 = new CorrespondenceError();
 		e21.setExplains(error2);
-		e21.setCorrespondences(corrs);
+		e21.setCorrSE(corrs);
 		e21.setMapSE(maps);
 		e21.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -364,7 +378,12 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		CorrespondenceError e21;
 		IExplanationSet set1, set2;
 		IAttributeValueMarker error1, error2; 
-				
+			
+		setTids("employee", new String[] {"8|8","9|9", "4|2",  
+				"1|1", "7|2",  "1|4", "1|5", "1|6", "f|4"});
+		setTids("address", new String[] { "2", "3", "4", "5"});
+		
+		
 		ExplanationCollection col;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
@@ -402,7 +421,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e21 = new CorrespondenceError();
 		e21.setExplains(error2);
-		e21.setCorrespondences(corrs);
+		e21.setCorrSE(corrs);
 		e21.setMapSE(maps);
 		e21.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -480,7 +499,12 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		CorrespondenceError e21, e13;
 		IExplanationSet set1, set2;
 		IAttributeValueMarker error1, error2; 
-				
+		
+		setTids("employee", new String[] {"8|8","9|9", "4|2",  
+				"1|1", "7|2",  "1|4", "1|5", "1|6", "f|4"});
+		setTids("address", new String[] { "2", "3", "4", "5"});
+		
+		
 		ExplanationCollection col;
 		HashSet<CorrespondenceType> corrs;
 		HashSet<MappingType> maps;
@@ -513,7 +537,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e13 = new CorrespondenceError();
 		e13.setExplains(error1);
-		e13.setCorrespondences(corrs);
+		e13.setCorrSE(corrs);
 		e13.setMapSE(maps);
 		e13.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -533,7 +557,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		maps.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		e21 = new CorrespondenceError();
 		e21.setExplains(error2);
-		e21.setCorrespondences(corrs);
+		e21.setCorrSE(corrs);
 		e21.setMapSE(maps);
 		e21.setTargetSE(MarkerFactory.newMarkerSet(
 				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
@@ -582,6 +606,10 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		IExplanationSet set1, set2, set3;
 		IAttributeValueMarker error1, error2, error3; 
 				
+		setTids("employee", new String[] {"1","2","3","E1a","E1b","E2","E3"});		
+		setTids("address", new String[] { "1", "2", "3"});
+		
+		
 		ExplanationCollection col;
 		
 		error1 = MarkerFactory.newAttrMarker("employee", "1", "city");

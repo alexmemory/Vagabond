@@ -29,6 +29,9 @@ public class TestErrorPartitioning extends AbstractVagabondTest {
 	public void testPartitionMarkers () throws Exception {
 		setUp("resource/test/severalComps.xml");
 		
+		setTids("u", new String[] {"1","2"});
+		setTids("v", new String[] {"4"});
+		
 		IAttributeValueMarker attr = MarkerFactory.newAttrMarker(3,"1",0);
 		IAttributeValueMarker attr2 = MarkerFactory.newAttrMarker(3, "2", 0);
 		

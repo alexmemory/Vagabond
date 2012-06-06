@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hamcrest.CoreMatchers;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.mapping.stats.StatsQueryExecutor;
 import org.vagabond.util.CollectionUtils;
@@ -148,6 +149,15 @@ public class MapScenarioHolder {
 		throw new Exception ("no transformation for id <" + id + ">");
 	}
 	
+	public Set<TransformationType> getTransformation (String ... names) throws Exception {
+		Set<TransformationType> result = new HashSet<TransformationType> ();
+		
+		for(String name: names)
+			result.add(getTransformation(name));
+		
+		return result;
+	}
+	
 	public List<TransformationType> getTransForRels (Collection<String> rels) 
 			throws Exception {
 		List<TransformationType> result;
@@ -225,6 +235,15 @@ public class MapScenarioHolder {
 		return doc;
 	}
 	
+	public Set<MappingType> getMappings (String ... names) throws Exception {
+		Set<MappingType> result = new HashSet<MappingType> ();
+		
+		for(String name: names)
+			result.add(getMapping(name));
+		
+		return result;
+	}
+	
 	public MappingType getMapping (String name) throws Exception {
 		for(MappingType map: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
@@ -270,6 +289,15 @@ public class MapScenarioHolder {
 			corr = getCorr(corrName);
 			result.add(corr);
 		}
+		
+		return result;
+	}
+	
+	public Set<CorrespondenceType> getCorrespondences (String ... ids) throws Exception {
+		Set<CorrespondenceType> result = new HashSet<CorrespondenceType> ();
+		
+		for(String id: ids)
+			result.add(getCorr(id));
 		
 		return result;
 	}

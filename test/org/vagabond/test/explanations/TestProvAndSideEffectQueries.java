@@ -43,6 +43,9 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 		String query;
 		String result;
 
+		setTids("employee", new String[] {"1"});
+		setTids("address", new String[] {"2", "3"});
+		
 		errSet = MarkerFactory.newMarkerSet(
 				MarkerFactory.newTupleMarker("employee", "1")
 				);

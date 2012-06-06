@@ -5,29 +5,36 @@ import static org.vagabond.util.HashFNV.*;
 import org.apache.log4j.Logger;
 import org.vagabond.util.HashFNV;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.LoggerUtil;
 
 public class TupleMarker implements ITupleMarker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(TupleMarker.class);
 	
 	private final int relId;
-	private final String tid;
+	private final int tidId;
 	private final int hash;
 	
-	public TupleMarker (int relId, String tid) {
+	public TupleMarker (int relId, int tidId) {
 		this.relId = relId;
-		this.tid = tid;
+		this.tidId = tidId;
+		this.hash = computeHash();
+	}
+	
+	public TupleMarker (int relId, String tid) throws Exception {
+		this.relId = relId;
+		this.tidId = ScenarioDictionary.getInstance().getTidInt(tid, relId);
 		this.hash = computeHash();
 	}
 	
 	public TupleMarker (String rel, String tid) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(rel);
-		this.tid = tid;
+		this.tidId = ScenarioDictionary.getInstance().getTidInt(tid, relId);
 		this.hash = computeHash();
 	}
 	
 	private int computeHash() {
-		int val = fnv(tid);
+		int val = fnv(tidId);
 		return fnv(relId, val);
 	}
 	
@@ -44,7 +51,7 @@ public class TupleMarker implements ITupleMarker {
 			
 			if (this.relId != oMarker.getRelId())
 				return false;
-			if (!this.getTid().equals(oMarker.getTid()))
+			if (this.tidId != oMarker.getTidInt())
 				return false;
 			
 			return true;
@@ -61,12 +68,18 @@ public class TupleMarker implements ITupleMarker {
 
 	@Override
 	public String getTid() {
-		return "" + tid;
+		try {
+			return ScenarioDictionary.getInstance().getTidString(tidId, relId);
+		}
+		catch (Exception e) {
+			LoggerUtil.logExceptionAndFail(e, log);
+		}
+		return null;
 	}
 
 	@Override
 	public int getTidInt() {
-		return Integer.parseInt(tid);
+		return tidId;
 	}
 
 	@Override
@@ -76,7 +89,7 @@ public class TupleMarker implements ITupleMarker {
 
 	@Override
 	public String toString () {
-		return "('" + getRel() + "'(" + getRelId() + "),'" + tid + "')"; 
+		return "('" + getRel() + "'(" + getRelId() + "),'" + tidId + "')"; 
 	}
 
 	public String toUserString () {
@@ -99,5 +112,10 @@ public class TupleMarker implements ITupleMarker {
 	@Override
 	public int getSize() {
 		return ScenarioDictionary.getInstance().getTupleSize(relId);
+	}
+
+	@Override
+	public int getTidId() {
+		return tidId;
 	}
 }

@@ -117,6 +117,9 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		QueryTemplate q;
 		String[] param;
 
+		setTids("employee", new String[] {"1"});
+		setTids("address", new String[] {"2","3"});
+		
 		q = new QueryTemplate("SELECT prov.tid\n" +
 				"FROM\n" +
 				"(SELECT *\n" +
@@ -217,6 +220,9 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		String[] param;
 		QueryTemplate q;
 
+		setTids("employee", new String[] {"1"});
+		setTids("address", new String[] {"2","3"});
+		
 		q = new QueryTemplate("SELECT tid\n" +
 				"FROM \n" +
 				"(SELECT tid, (prov_source_address_tid = $1 OR prov_source_address_tid = $2 ) AS hasSub\n" +
@@ -256,6 +262,9 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		String[] param;
 		QueryTemplate q;
 
+		setTids("employee", new String[] {"1"});
+		setTids("address", new String[] {"2","3"});
+		
 		q = new QueryTemplate("SELECT realside.tid, prov_source_person_tid,prov_source_address_tid\n" +
 				"FROM\n" +
 				"(SELECT tid FROM \n" +

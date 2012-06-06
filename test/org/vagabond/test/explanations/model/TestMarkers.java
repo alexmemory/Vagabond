@@ -39,13 +39,8 @@ public class TestMarkers extends AbstractVagabondTest {
 	static Logger log = Logger.getLogger(TestMarkers.class);
 	
 	@Before
-	public void setUp () throws XmlException, IOException, ValidationException {
-		try {
-			setSchemas("resource/exampleScenarios/homeless.xml");
-		}
-		catch (Exception e) {
-			LoggerUtil.logException(e, log);
-		}
+	public void setUp () throws Exception {
+		loadToDB("resource/exampleScenarios/homeless.xml");
 	}
 	
 	@Test
@@ -162,7 +157,7 @@ public class TestMarkers extends AbstractVagabondTest {
 		
 		for(int i = 1; i < 1000; i++) {
 			AttrValueMarker m = (AttrValueMarker) MarkerFactory.newAttrMarker(
-					rand.nextInt(3), "" + rand.nextInt(10000), rand.nextInt(3));
+					rand.nextInt(3), rand.nextInt(10000), rand.nextInt(3));
 			if (!l.contains(m)) {
 				count++;
 				l.add(m);

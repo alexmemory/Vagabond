@@ -33,6 +33,11 @@ public class LoggerUtil {
 			log.debug(getCompleteTrace(e));
 	}
 	
+	public static void logExceptionAndFail (Exception e, Logger log) {
+		log.fatal(getCompleteTrace(e));
+		System.exit(1);
+	}
+	
 	public static String getCompleteTrace (Throwable e) {
 		StringBuilder trace;
 		Throwable exception;

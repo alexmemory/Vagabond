@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:this="org/vagabond/xmlmodel/explanderror"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/vagabond/xmlmodel/explanderror">
+
+	<!-- ***************************************************** -->
+	<!-- ELEMENTS -->
+	<!-- ***************************************************** -->
+	<xs:element name="ExplanationAndErrors">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Explanations" type="this:ExplanationsType"
+					minOccurs="0" />
+				<xs:element name="Errors" type="this:ErrorsType"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- ***************************************************** -->
+	<!-- EXPLANATIONS TYPES -->
+	<!-- ***************************************************** -->
+	<xs:complexType name="ExplanationsType">
+		<xs:sequence>
+			<xs:element name="Explanation" type="this:ExplanationType"
+				minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ExplanationType">
+		<xs:sequence>
+			<xs:element name="Explains" type="this:AttributeMarkerType" />
+			<xs:element name="Coverage" type="this:MarkerSetType" />
+			<xs:element name="MappingSE" type="this:MapScenObjectSetType"
+				minOccurs="0" />
+			<xs:element name="SourceInstSE" type="this:MarkerSetType"
+				minOccurs="0" />
+			<xs:element name="CorrespondenceSE" type="this:MapScenObjectSetType"
+				minOccurs="0" />
+			<xs:element name="TransformationSE" type="this:MapScenObjectSetType"
+				minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="type" type="this:TypeOfExplanationType"
+			use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="MapScenObjectSetType">
+		<xs:simpleContent>
+			<xs:extension base="this:StringListType">
+				<xs:attribute name="type" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:simpleType name="StringListType">
+		<xs:list itemType="xs:string" />
+	</xs:simpleType>
+
+	<xs:simpleType name="TypeOfExplanationType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="SuperfluousMapping" />
+			<xs:enumeration value="SourceSkeleton" />
+			<xs:enumeration value="TargetSkeleton" />
+			<xs:enumeration value="Correspondence" />
+			<xs:enumeration value="SourceCopy" />
+			<xs:enumeration value="SourceJoinValue" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TypeOfMappingScenElementType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="Mapping" />
+			<xs:enumeration value="SourceInstance" />
+			<xs:enumeration value="Correspondence" />
+			<xs:enumeration value="Transformation" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+	<!-- ***************************************************** -->
+	<!-- ERROR TYPES -->
+	<!-- ***************************************************** -->
+	<xs:complexType name="ErrorsType">
+		<xs:sequence>
+			<xs:element name="Error" type="this:MarkerSetType"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="MarkerSetType">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="AttrMarker" type="this:AttributeMarkerType" />
+				<xs:element name="TupleMarker" type="this:TupleMarkerType" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="AttributeMarkerType">
+		<xs:choice>
+			<xs:sequence>
+				<xs:element name="Relation" type="xs:string" />
+				<xs:element name="TupleID" type="xs:string" />
+				<xs:element name="Attribute" type="xs:string" />
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="RelId" type="xs:int" />
+				<xs:element name="TID" type="xs:int" />
+				<xs:element name="AttrId" type="xs:int" />
+			</xs:sequence>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="TupleMarkerType">
+		<xs:choice>
+			<xs:sequence>
+				<xs:element name="Relation" type="xs:string" />
+				<xs:element name="TupleID" type="xs:string" />
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="RelId" type="xs:int" />
+				<xs:element name="TID" type="xs:int" />
+			</xs:sequence>
+		</xs:choice>
+	</xs:complexType>
+
+</xs:schema>

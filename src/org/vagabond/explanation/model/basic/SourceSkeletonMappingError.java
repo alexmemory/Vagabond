@@ -62,7 +62,8 @@ public class SourceSkeletonMappingError extends AbstractBasicExplanation
 		return mapSE;
 	}
 
-	public void setMap(Set<MappingType> maps) {
+	@Override
+	public void setMapSE(Set<MappingType> maps) {
 		this.mapSE = maps;
 		updateHash();
 	}
@@ -82,6 +83,7 @@ public class SourceSkeletonMappingError extends AbstractBasicExplanation
 		return transSE.size();
 	}
 	
+	@Override
 	public void setTransSE (Collection<TransformationType> transSE) {
 		this.transSE = new HashSet<TransformationType> (transSE);
 		updateHash();

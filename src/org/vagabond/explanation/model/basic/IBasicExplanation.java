@@ -20,7 +20,9 @@ public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 	}
 	
 	public ExplanationType getType ();
+	
 	public ISingleMarker explains();
+	public void setExplains (ISingleMarker explains);
 	public Object getExplanation();
 	
 	public int getTargetSideEffectSize();

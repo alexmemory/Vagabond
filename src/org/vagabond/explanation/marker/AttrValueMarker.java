@@ -3,6 +3,8 @@ package org.vagabond.explanation.marker;
 import org.apache.log4j.Logger;
 import org.vagabond.util.HashFNV;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.util.LoggerUtil;
+
 import static org.vagabond.util.HashFNV.*;
 
 public class AttrValueMarker implements IAttributeValueMarker {
@@ -12,32 +14,41 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	private final int hash;
 	private final int relId;
 	private final int attrId;
-	private final String tid;
+	private final int tidId;
 	
-	public AttrValueMarker (int relId, String tid, int attrId) {
+	public AttrValueMarker(int relId, int tidId, int attrId) {
+		this.relId = relId;
+		this.attrId = attrId;
+		this.tidId = tidId;
+		this.hash = computeHash();
+	}
+	
+	public AttrValueMarker (int relId, String tid, int attrId) throws Exception {
 		assert(relId >= 0 && attrId >= 0);
 		this.relId = relId;
 		this.attrId = attrId;
-		this.tid = tid;
+		this.tidId = ScenarioDictionary.getInstance().getTidInt(tid, relId);
 		this.hash = computeHash();
 	}
 	
 	public AttrValueMarker (String relName, String tid, String attrName) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 		this.attrId = ScenarioDictionary.getInstance().getAttrId(this.relId, attrName);
-		this.tid = tid;
+		this.tidId = ScenarioDictionary.getInstance().getTidInt(tid, relId);
 		this.hash = computeHash();
 	}
 	
 	public AttrValueMarker (String relName, String tid, int attrId) throws Exception {
 		this.relId = ScenarioDictionary.getInstance().getRelId(relName);
 		this.attrId = attrId;
-		this.tid = tid;
+		this.tidId = ScenarioDictionary.getInstance().getTidInt(tid, relId);
 		this.hash = computeHash();
 	}
 	
+	
+
 	private int computeHash() {
-		int val = fnv(tid);
+		int val = fnv(tidId);
 		val = fnv(relId, val);
 		return fnv(attrId, val);
 	}
@@ -58,7 +69,7 @@ public class AttrValueMarker implements IAttributeValueMarker {
 				return false;
 			if (otherAttr.getRelId() != this.relId)
 				return false;
-			if (!otherAttr.getTid().equals(this.getTid()))
+			if (otherAttr.getTidId() != this.tidId)
 				return false;
 			return true;
 		}
@@ -89,7 +100,13 @@ public class AttrValueMarker implements IAttributeValueMarker {
 
 	@Override
 	public String getTid() {
-		return tid;
+		try {
+			return ScenarioDictionary.getInstance().getTidString(tidId, relId);
+		}
+		catch (Exception e) {
+			LoggerUtil.logExceptionAndFail(e, log);
+		}
+		return null; // keep compiler quiet
 	}
 
 	@Override
@@ -121,6 +138,11 @@ public class AttrValueMarker implements IAttributeValueMarker {
 	@Override
 	public String toUserStringNoRel() {
 		return " tuple: " + getTid() + " attribute: " + getAttrName();
+	}
+
+	@Override
+	public int getTidId() {
+		return tidId;
 	}
 	
 	
