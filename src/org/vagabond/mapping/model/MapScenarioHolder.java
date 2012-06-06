@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.hamcrest.CoreMatchers;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.mapping.stats.StatsQueryExecutor;
 import org.vagabond.util.CollectionUtils;

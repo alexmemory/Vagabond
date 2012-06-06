@@ -12,7 +12,7 @@ public class TestLoadExplanations extends AbstractVagabondTest {
 	}
 
 	@Test
-	public void testSingleExpl () {
+	public void testExplForSimple () {
 		
 	}
 	
