@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:ExplanationAndErrors xmlns:this="org/vagabond/xmlmodel/explanderror"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Explanations>
+		<Explanation type="Correspondence">
+			<Explains>
+				<Relation>employee</Relation>
+				<TupleID>1|1</TupleID>
+				<Attribute>name</Attribute>
+			</Explains>
+			<Coverage>
+				<AttrMarker>
+					<Relation>employee</Relation>
+					<TupleID>1|1</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+				<AttrMarker>
+					<Relation>employee</Relation>
+					<TupleID>2|2</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+				<AttrMarker>
+					<Relation>employee</Relation>
+					<TupleID>3|</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+				<AttrMarker>
+					<Relation>employee</Relation>
+					<TupleID>4|2</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+			</Coverage>
+			<MappingSE>M1 M2</MappingSE>
+			<CorrespondenceSE>c1</CorrespondenceSE>
+			<TransformationSE>T1</TransformationSE>
+		</Explanation>
+		<Explanation type="SourceCopy">
+			<Explains>
+				<Relation>employee</Relation>
+				<TupleID>1|1</TupleID>
+				<Attribute>name</Attribute>
+			</Explains>
+			<Coverage>
+				<AttrMarker>
+					<Relation>employee</Relation>
+					<TupleID>1|1</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+			</Coverage>
+			<SourceInstSE>
+				<AttrMarker>
+					<Relation>person</Relation>
+					<TupleID>1</TupleID>
+					<Attribute>name</Attribute>
+				</AttrMarker>
+			</SourceInstSE>
+		</Explanation>
+	</Explanations>
+</this:ExplanationAndErrors>

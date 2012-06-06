@@ -42,6 +42,10 @@ public class ExplanationAndErrorXMLLoader {
 
 	}
 
+	public static ExplanationAndErrorXMLLoader getInstance() {
+		return inst;
+	}
+
 	public IExplanationSet loadExplanations(File file) throws Exception {
 		return loadExplanations(new FileInputStream(file));
 	}
@@ -54,12 +58,12 @@ public class ExplanationAndErrorXMLLoader {
 		ExplanationAndErrorsDocument doc = getDoc(in);
 		return translate(doc);
 	}
-	
-	public ExplanationAndErrorsDocument translateToXML (IExplanationSet e) {
+
+	public ExplanationAndErrorsDocument translateToXML(IExplanationSet e) {
 		ExplanationAndErrorsDocument result;
-		
+
 		result = ExplanationAndErrorsDocument.Factory.newInstance();
-		
+
 		return result;
 	}
 
@@ -81,32 +85,48 @@ public class ExplanationAndErrorXMLLoader {
 	private IBasicExplanation translateExpl(ExplanationType e) throws Exception {
 		TypeOfExplanationType.Enum type = e.getType();
 		AbstractBasicExplanation result;
+		IBasicExplanation.ExplanationType javaType = getBasicExplType(type);
+		
+		log.debug("Generate explanation of type <" + javaType.toString() + ">");
+		
+		result = (AbstractBasicExplanation) ExplanationFactory
+						.newBasicExpl(javaType);
+		result.setExplains(translate(e.getExplains()));
+		
+		if (e.isSetCorrespondenceSE())
+			result.setCorrSE(MapScenarioHolder.getInstance().getCorrespondences(
+					getStringArray(e.getCorrespondenceSE())));
+		
+		if (e.isSetMappingSE())
+			result.setMapSE(MapScenarioHolder.getInstance().getMappings(
+					getStringArray(e.getMappingSE())));
+		if (e.isSetSourceInstSE())
+			result.setSourceSE(extractMarkerSet(e.getSourceInstSE()));
 
-		result =
-				(AbstractBasicExplanation) ExplanationFactory
-						.newBasicExpl(getBasicExplType(type));
+		IMarkerSet targetSe = extractMarkerSet(e.getCoverage());
+		targetSe.remove(result.explains());
+		result.setTargetSE(targetSe);
 
-		result.setCorrSE(MapScenarioHolder.getInstance().getCorrespondences(
-				getStringArray(e.getCorrespondenceSE())));
-		result.setMapSE(MapScenarioHolder.getInstance().getMappings(
-				getStringArray(e.getMappingSE())));
-		result.setSourceSE(extractMarkerSet(e.getSourceInstSE()));
-		result.setTargetSE(extractMarkerSet(e.getCoverage()));
-		result.setTransSE(MapScenarioHolder.getInstance().getTransformation(
-				getStringArray(e.getTransformationSE())));
+		if( e.isSetTransformationSE())
+			result.setTransSE(MapScenarioHolder.getInstance().getTransformations(
+					getStringArray(e.getTransformationSE())));
 
+		log.debug("Explanation is: " + result.toString());
+		
 		return result;
 	}
 
 	private IMarkerSet extractMarkerSet(MarkerSetType set) throws Exception {
 		IMarkerSet result = MarkerFactory.newMarkerSet();
 
-		for (AttributeMarkerType a : set.getAttrMarkerArray()) {
+		if (set == null)
+			return MarkerFactory.newMarkerSet();
+
+		for (AttributeMarkerType a : set.getAttrMarkerArray())
 			result.add(translate(a));
-		}
-		for (TupleMarkerType t : set.getTupleMarkerArray()) {
+
+		for (TupleMarkerType t : set.getTupleMarkerArray())
 			result.add(translate(t));
-		}
 
 		return result;
 	}
@@ -125,8 +145,8 @@ public class ExplanationAndErrorXMLLoader {
 			return MarkerFactory.newAttrMarker(a.getRelId(), a.getTID(),
 					a.getAttrId());
 		else
-			return MarkerFactory.newAttrMarker(a.getRelation(), a.getTupleID(),
-					a.getAttribute());
+			return MarkerFactory.newAttrMarker(a.getRelation().trim(), a.getTupleID().trim(),
+					a.getAttribute().trim());
 	}
 
 	private String[] getStringArray(MapScenObjectSetType set) {

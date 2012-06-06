@@ -148,7 +148,7 @@ public class MapScenarioHolder {
 		throw new Exception ("no transformation for id <" + id + ">");
 	}
 	
-	public Set<TransformationType> getTransformation (String ... names) throws Exception {
+	public Set<TransformationType> getTransformations (String ... names) throws Exception {
 		Set<TransformationType> result = new HashSet<TransformationType> ();
 		
 		for(String name: names)

@@ -4,11 +4,15 @@ import java.util.Comparator;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.model.basic.CopySourceError;
+import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
+import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
+import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
 import org.vagabond.util.LogProviderHolder;
+import org.vagabond.xmlmodel.CorrespondenceType;
 
 public class ExplanationFactory {
 
@@ -76,6 +80,12 @@ public class ExplanationFactory {
 			return new InfluenceSourceError();
 		case SuperflousMappingError:
 			return new SuperflousMappingError();
+		case CorrespondenceError:
+			return new CorrespondenceError();
+		case SourceSkeletonMappingError:
+			return new SourceSkeletonMappingError();
+		case TargetSkeletonMappingError:
+			return new TargetSkeletonMappingError();
 		default:
 			throw new Exception("now explanation class for type: <" 
 					+ type + ">");

@@ -28,7 +28,7 @@
 
 	<xs:complexType name="ExplanationType">
 		<xs:sequence>
-			<xs:element name="Explains" type="this:AttributeMarkerType" minOccurs="0"/>
+			<xs:element name="Explains" type="this:AttributeMarkerType"/>
 			<xs:element name="Coverage" type="this:MarkerSetType" />
 			<xs:element name="MappingSE" type="this:MapScenObjectSetType"
 				minOccurs="0" />
@@ -43,10 +43,17 @@
 			use="required" />
 	</xs:complexType>
 
-	<xs:complexType name="MapScenObjectSetType">
+	<xs:complexType name="MapScenObjectSetWithTypeType">
 		<xs:simpleContent>
 			<xs:extension base="this:StringListType">
 				<xs:attribute name="type" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="MapScenObjectSetType">
+		<xs:simpleContent>
+			<xs:extension base="this:StringListType">
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
