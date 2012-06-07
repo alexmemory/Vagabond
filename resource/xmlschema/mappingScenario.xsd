@@ -83,6 +83,7 @@
 		<xs:sequence>
 			<xs:element name="Relation" type="this:RelationType" minOccurs="1" maxOccurs="unbounded" />
 			<xs:element name="ForeignKey" type="this:ForeignKeyType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="FD" type="this:FDType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -108,6 +109,15 @@
 			<xs:element name="To" type="this:AttrRefType" />
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="FDType">
+		<xs:sequence>
+			<xs:element name="From" type="this:AttrRefType" />
+			<xs:element name="To" type="this:AttrRefType" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="tableref" type="xs:string"/>
 	</xs:complexType>
 	
 	<xs:complexType name="AttrRefType">
