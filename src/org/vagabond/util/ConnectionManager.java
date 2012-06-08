@@ -35,10 +35,10 @@ public class ConnectionManager {
 	}
 	
 	public Connection getConnection (String URL, String dbName, 
-			String user, String password) throws SQLException {
+			String user, String password, int port) throws SQLException {
 		closeCon();
 		con =  DriverManager.getConnection(
-				"jdbc:postgresql://" + URL + ":5432/" + dbName, user, password);
+				"jdbc:postgresql://" + URL + ":" + port + "/" + dbName, user, password);
 		return con;
 	}
 	

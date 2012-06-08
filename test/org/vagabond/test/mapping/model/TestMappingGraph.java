@@ -18,13 +18,17 @@ public class TestMappingGraph extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestMappingGraph.class);
 	
-	@Before
 	public void setUp () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
 	}
 	
+	public void setUp (String filename) throws Exception {
+		loadToDB(filename);
+	}
+	
 	@Test
 	public void testSimpleGraph () throws Exception {
+		setUp();
 		MappingGraph g; 
 		MappingGraphRel node;
 		
@@ -44,6 +48,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 	
 	@Test
 	public void testGetJoinAttrs () throws Exception {
+		setUp();
 		Set<Pair<Integer,String>> result;
 		MappingGraph g; 
 
@@ -61,6 +66,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 	
 	@Test
 	public void testAttrMapping () throws Exception {
+		setUp();
 		MappingGraph g; 
 		int[][][] result, expect = {
 				{{0},{1}},
@@ -78,6 +84,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 	
 	@Test
 	public void testAttrMappingHomeless () throws Exception {
+		setUp("resource/exampleScenarios/homelessDebugged.xml");
 		MappingGraph g; 
 		int[][][] result, expect = {
 				{{0},{},{},{1}},
@@ -85,8 +92,6 @@ public class TestMappingGraph extends AbstractVagabondTest {
 				{{0},{1},{}}
 				};
 		
-		
-		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 		g = MapScenarioHolder.getInstance().getGraphForMapping("M1");
 		result = g.getAtomPosToTargetPosMap(0);
 		
@@ -97,6 +102,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 	
 	@Test
 	public void testGetAtomPosForTargetVar () throws Exception {
+		setUp();
 		MappingGraph g;
 		int[][] result, expect = {
 				{},
@@ -109,6 +115,27 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		compare2DArray (expect, result);
 	}
 	
+	@Test
+	public void testRepeatedRelAtoms () throws Exception {
+		setUp("resource/exampleScenarios/homeless.xml");
+		MappingGraph g;
+		Set<String> expVars = CollectionUtils.makeSet(getVars('a','j'));
+		int[][] result, ex = new int[][] { {} , {} };
+		
+		g = MapScenarioHolder.getInstance().getGraphForMapping("M1");
+		result = g.getAtomPosForTargetPos("employee", 1);
+		
+		assertEquals(expVars, g.getAllVars());
+		compare2DArray(result, ex);
+	}
+	
+	private String[] getVars(char from, char to) {
+		String[] result = new String[to - from + 1];
+		for(int i = 0; i <= (to - from); i++)
+			result[i] = ((char) (from + i)) + "";
+		return result;
+	}
+
 	private void logArray (int[][][] array) {
 		StringBuffer result;
 		

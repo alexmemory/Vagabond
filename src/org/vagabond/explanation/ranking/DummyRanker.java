@@ -77,7 +77,8 @@ public class DummyRanker implements IExplanationRanker {
 			iterPos.add(0);
 			numExplSets *= coll.getDimensions().get(i);
 		}
-		iterPos.set(0, -1);
+		if (iterPos.size() != 0)
+			iterPos.set(0, -1);
 		fixedPos = new boolean[numErrors];
 		Arrays.fill(fixedPos, false);
 		
@@ -91,8 +92,6 @@ public class DummyRanker implements IExplanationRanker {
 				e.getRealExplains().union(
 						e.getTargetSideEffects().cloneSet().intersect(errors));
 			}
-		
-//			explSet.getExplanations();
 		}
 		
 		init = true;

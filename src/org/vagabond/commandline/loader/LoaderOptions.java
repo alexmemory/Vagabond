@@ -16,6 +16,9 @@ public class LoaderOptions {
 	
 	@Option(name="-p", usage="password for database user")
 	private String dbPassword = "";
+
+	@Option(name = "-P", usage = "port for database connection")
+	private int port = 5432;
 	
 	@Option(name="-d", usage="name of the database to connect to")
 	private String dbName = "tramptest";
@@ -89,6 +92,14 @@ public class LoaderOptions {
 
 	public void setNoData(boolean noData) {
 		this.noData = noData;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 	
 	

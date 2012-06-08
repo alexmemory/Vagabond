@@ -191,4 +191,10 @@ public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 	public Collection<Type> values() {
 		return ObjToId.keySet();
 	}
+	
+	@Override
+	public String toString () {
+		return ObjToId.toString() + "\n\n" + idToObj.toString();		
+	}
 }
+

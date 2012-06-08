@@ -64,7 +64,7 @@ public class CommandLineLoader {
 		
 		dbCon = ConnectionManager.getInstance().getConnection(
 				options.getDbURL(), options.getDbName(), options.getDbUser(),
-				options.getDbPassword());
+				options.getDbPassword(), options.getPort());
 		if (options.isNoData())
 			DatabaseScenarioLoader.getInstance().loadScenarioNoData(dbCon, map);
 		else

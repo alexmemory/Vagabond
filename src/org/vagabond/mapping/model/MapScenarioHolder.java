@@ -34,7 +34,7 @@ public class MapScenarioHolder {
 	
 	private static MapScenarioHolder instance = new MapScenarioHolder();
 	
-	private MappingScenarioDocument doc; 
+	protected MappingScenarioDocument doc; 
 	private Map<MappingType, MappingGraph> graphsForMaps;
 	private Map<TransformationType, RelationType[]> transToSource;
 	private Map<TransformationType, RelationType> transToTarget;
@@ -60,7 +60,7 @@ public class MapScenarioHolder {
 		init();
 	}
 	
-	private void init() {
+	protected void init() {
 		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
 		transToSource = new HashMap<TransformationType, RelationType[]> ();
 		transToTarget = new HashMap<TransformationType, RelationType> ();

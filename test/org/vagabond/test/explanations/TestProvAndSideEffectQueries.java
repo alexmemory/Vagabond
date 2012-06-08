@@ -249,7 +249,8 @@ public class TestProvAndSideEffectQueries extends AbstractVagabondDBTest {
 				TestOptions.getInstance().getHost(),
 				TestOptions.getInstance().getDB(),
 				TestOptions.getInstance().getUser(), 
-				TestOptions.getInstance().getPassword());
+				TestOptions.getInstance().getPassword(),
+				Integer.parseInt(TestOptions.getInstance().getPort()));
 		
 		errSet = MarkerParser.getInstance().parseSet("{T(employee,1)}");
 		errSet2 = MarkerParser.getInstance().parseSet("{T(address,2),T(address,3)}");

@@ -60,11 +60,11 @@ public class CommandLineExplGen {
 		// setup DB connection
 		ConnectionManager.getInstance().getConnection(options.getDbURL(),
 				options.getDbName(), options.getDbUser(),
-				options.getDbPassword());
-		ScenarioDictionary.getInstance().initFromScenario();
+				options.getDbPassword(), options.getPort());
 
 		if (options.isLoadScen())
 			loadScenarioOnDB();
+		ScenarioDictionary.getInstance().initFromScenario();
 	}
 
 	private void createExpls(PrintStream out) throws Exception {

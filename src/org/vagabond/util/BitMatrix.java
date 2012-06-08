@@ -22,17 +22,21 @@ public class BitMatrix {
 		this(rows,cols,DEFAULT_BUFFER, DEFAULT_BITSET_TYPE);		
 	}
 	
-	public BitMatrix (int rows, int cols, String values) {
+	public BitMatrix (final int rows, final int cols, final BitsetType bitType) { 
+		this(rows, cols, DEFAULT_BUFFER, bitType);
+	}
+	
+	public BitMatrix (final int rows, final int cols, final String values) {
 		this (rows, cols, values, DEFAULT_BITSET_TYPE);
 	}
 	
-	public BitMatrix (int rows, int cols, String values, BitsetType bitType) {
+	public BitMatrix (final int rows, final int cols, final String values, final BitsetType bitType) {
 		this.rows = rows;
 		this.cols = cols;
 		bitmap = BitsetFactory.newBitset(bitType, values);
 	}
 	
-	public BitMatrix (final int rows, final int cols, final int bytesInBuf, BitsetType bitType) {
+	public BitMatrix (final int rows, final int cols, final int bytesInBuf, final BitsetType bitType) {
 		this.rows = rows;
 		this.cols = cols;
 		
