@@ -242,6 +242,7 @@ FROM (SELECT 'R3_' || COALESCE(R3.tid::text,'') || '|' || 'S2_' || COALESCE(S2.t
 	<DB>tramptest</DB>
 	<User>jiang</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<InstanceFile name="R1">

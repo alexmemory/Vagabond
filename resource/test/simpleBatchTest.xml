@@ -59,8 +59,8 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
-			<Correspondence>c3</Correspondence>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c3" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
@@ -74,8 +74,8 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c2</Correspondence>
-			<Correspondence>c3</Correspondence>
+			<Correspondence ref="c2" />
+			<Correspondence ref="c3" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
@@ -88,7 +88,7 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="person">
-		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
 		<Code>
 SELECT (((COALESCE(t.tid::text, ''::text) || '|'::text) || COALESCE(s.tid::text, ''::text)) || '|'::text) || COALESCE(k.tid::text, ''::text) AS tid, 
     t.name, k.city AS livesin
@@ -105,6 +105,7 @@ UNION
 	<DB>tramptest</DB>
 	<User>jiang</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="socialworker">

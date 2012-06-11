@@ -42,7 +42,7 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
+			<Correspondence ref="c1" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="r"><Var>a</Var><Var>b</Var></Atom>
@@ -54,7 +54,7 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c2</Correspondence>
+			<Correspondence ref="c2"  />
 		</Uses>
 		<Foreach>
 			<Atom tableref="t"><Var>a</Var><Var>b</Var></Atom>
@@ -66,14 +66,14 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="u">
-		<Implements><Mapping>M1</Mapping></Implements>
+		<Implements><Mapping ref="M1" /></Implements>
 		<Code>
 SELECT r.tid AS tid, r.r1 AS u1
 FROM source.r ANNOT('M1') JOIN source.s ANNOT('M1') ON r.r2 = s.s1
 		</Code>
 	</Transformation>
 	<Transformation id="T2" creates="v">
-		<Implements><Mapping>M2</Mapping></Implements>
+		<Implements><Mapping ref="M2" /></Implements>
 		<Code>
 SELECT t.tid AS tid, t.t1 AS v1
 FROM source.t ANNOT('M2')
@@ -85,6 +85,7 @@ FROM source.t ANNOT('M2')
 	<DB>tramptest</DB>
 	<User>lordpretzel</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="r">

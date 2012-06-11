@@ -38,8 +38,8 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
-			<Correspondence>c2</Correspondence>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c2" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="employee"><Var>a</Var><Var>b</Var></Atom>
@@ -52,14 +52,14 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="person">
-		<Implements><Mapping>M1</Mapping></Implements>
+		<Implements><Mapping ref="M1" /></Implements>
 		<Code>
 SELECT e.tid AS tid, e.name AS name, 'SK1(' || e.name || ',' || e.city || ')' AS address
 FROM source.employee ANNOT('M1') e
 		</Code>
 	</Transformation>
 	<Transformation id="T2" creates="address">
-		<Implements><Mapping>M1</Mapping></Implements>
+		<Implements><Mapping ref="M1"  /></Implements>
 		<Code>
 SELECT e.tid AS tid, 'SK1(' || e.name || ',' || e.city || ')' AS id, e.city AS city
 FROM source.employee ANNOT('M1') e
@@ -71,6 +71,7 @@ FROM source.employee ANNOT('M1') e
 	<DB>tramptest</DB>
 	<User>postgres</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="employee">

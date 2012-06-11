@@ -120,10 +120,10 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		setUp("resource/exampleScenarios/homeless.xml");
 		MappingGraph g;
 		Set<String> expVars = CollectionUtils.makeSet(getVars('a','j'));
-		int[][] result, ex = new int[][] { {} , {} };
+		int[][] result, ex = new int[][] { {} , {}, {1}, {} };
 		
 		g = MapScenarioHolder.getInstance().getGraphForMapping("M1");
-		result = g.getAtomPosForTargetPos("employee", 1);
+		result = g.getAtomPosForTargetPos("person", 1);
 		
 		assertEquals(expVars, g.getAllVars());
 		compare2DArray(result, ex);
@@ -164,7 +164,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		for(int i = 0; i < result.length; i++) {
 			assertEquals(expect[i].length, result[i].length);
 			for(int j = 0; j < result[i].length; j++) {
-				assertEquals(expect[i][j], result[i][j]);
+				assertEquals("at< " + i + "," + j + ">",expect[i][j], result[i][j]);
 			}
 		}
 	}

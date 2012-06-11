@@ -109,6 +109,7 @@ WHERE s.worksfor = k.location
 	<DB>tramptest</DB>
 	<User>jiang</User>
 	<Password/>
+		<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<InstanceFile name="tramp">

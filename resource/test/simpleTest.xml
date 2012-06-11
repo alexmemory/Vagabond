@@ -38,7 +38,7 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
+			<Correspondence ref="c1" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
@@ -49,7 +49,7 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c1</Correspondence><Correspondence>c2</Correspondence>
+			<Correspondence ref="c1" /><Correspondence ref="c2" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
@@ -62,7 +62,7 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="employee">
-		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
 		<Code>
 SELECT COALESCE(p.tid::text,'') || '|' || COALESCE(a.tid::text,'') AS tid, p.name AS name, a.city AS city
 FROM
@@ -76,6 +76,7 @@ FROM
 	<DB>tramptest</DB>
 	<User>lordpretzel</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="person">

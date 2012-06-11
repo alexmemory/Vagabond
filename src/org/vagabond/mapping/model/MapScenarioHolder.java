@@ -20,6 +20,7 @@ import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
+import org.vagabond.xmlmodel.StringRefType;
 import org.vagabond.xmlmodel.TransformationType;
 
 /**
@@ -177,11 +178,18 @@ public class MapScenarioHolder {
 		
 		for(TransformationType t: doc.getMappingScenario().getTransformations()
 				.getTransformationArray()) {
-			if (CollectionUtils.search(t.getImplements().getMappingArray(), id))
+			if (search(t.getImplements().getMappingArray(), id))
 				result.add(t);
 		}
 		
 		return result.toArray(new TransformationType[] {});
+	}
+	
+	private boolean search (StringRefType[] array, String id) {
+		for(StringRefType r: array)
+			if (r.getRef().equals(id))
+				return true;
+		return false;
 	}
 	
 	public RelationType getRelCreateByTrans (TransformationType t) throws Exception {
@@ -284,8 +292,8 @@ public class MapScenarioHolder {
 		
 		result = new HashSet<CorrespondenceType> ();
 		
-		for(String corrName: map.getUses().getCorrespondenceArray()) {
-			corr = getCorr(corrName);
+		for(StringRefType corrName: map.getUses().getCorrespondenceArray()) {
+			corr = getCorr(corrName.getRef());
 			result.add(corr);
 		}
 		
@@ -308,8 +316,8 @@ public class MapScenarioHolder {
 		
 		for(MappingType map: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
-			for (String use: map.getUses().getCorrespondenceArray()) {
-				if (use.equals(corr.getId()))
+			for (StringRefType use: map.getUses().getCorrespondenceArray()) {
+				if (use.getRef().equals(corr.getId()))
 					maps.add(map);
 			}
 		}

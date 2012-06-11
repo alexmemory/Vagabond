@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.junit.Before;
@@ -27,10 +28,22 @@ import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
 
 public class TestLoadXML extends AbstractVagabondTest {
+
+	static Logger log = Logger.getLogger(TestLoadXML.class);
 	
 	@Before
 	public void setUp () throws Exception {
 		loadToDB("resource/test/simpleTest.xml");
+	}
+	
+	@Test
+	public void loadAndValidateAll () throws XmlException, IOException {
+		loadAndValidate("resource/test/testScenario.xml");
+		loadAndValidate("resource/test/simpleTest.xml");
+		loadAndValidate("resource/test/simpleBatchTest.xml");
+		loadAndValidate("resource/test/testWithCopy.xml");
+		loadAndValidate("resource/test/targetSkeletonError.xml");
+		loadAndValidate("resource/test/severalComps.xml");
 	}
 	
 	@Test 
@@ -92,6 +105,11 @@ public class TestLoadXML extends AbstractVagabondTest {
 		DatabaseScenarioLoader.getInstance().loadScenario(con, new MapScenarioHolder(mapDoc));
 	}
 	
+	private void loadAndValidate (String file) throws XmlException, IOException {
+		MappingScenario m = loadAnXml (file);
+		assertTrue(file + "\n\n" + m.toString(), validate (m));
+	}
+	
 	private MappingScenario loadAnXml (String file) throws XmlException, IOException {
 		MappingScenarioDocument doc = 
 			MappingScenarioDocument.Factory.parse(new File(file));
@@ -107,7 +125,7 @@ public class TestLoadXML extends AbstractVagabondTest {
 		
 		result = map.validate(options);
 		for(Object error: errors) {
-			System.out.println(error);
+			log.error(error);
 		}
 		
 		return result;

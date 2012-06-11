@@ -210,12 +210,12 @@
 	<target name="GenerateXMLSourceCode">
 		<description>This task generates the java source files from the xsd schema.</description>
 		<xmlbean schema="${schema}" 
-			classgendir="${XBeansBin}/model" 
+			classgendir="${binarydir}" 
 			srcgendir="${XBeansSrc}/model" 
 			classpathref="project.class.path.xml" 
 			javasource="1.6" />
 		<xmlbean schema="${schemaExpl}" 
-			classgendir="${XBeansBin}/expl" 
+			classgendir="${binarydir}" 
 			srcgendir="${XBeansSrc}/expl" 
 			classpathref="project.class.path.xml" 
 			javasource="1.6" />

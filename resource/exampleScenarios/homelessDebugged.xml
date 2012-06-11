@@ -59,8 +59,8 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
-			<Correspondence>c3</Correspondence>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c3" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
@@ -73,7 +73,7 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c2</Correspondence>
+			<Correspondence ref="c2" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
@@ -85,7 +85,7 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="person">
-		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
 		<Code>
 SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid, 
 t.name, k.city AS livesin 
@@ -103,6 +103,7 @@ FROM source.socialworker ANNOT('M2') s
 	<DB>tramptest</DB>
 	<User>lordpretzel</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="tramp">

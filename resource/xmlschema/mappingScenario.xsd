@@ -1,255 +1,331 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The  -->
-<xs:schema xmlns:this="org/vagabond/xmlmodel" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="org/vagabond/xmlmodel">
-	
+<!-- The -->
+<xs:schema xmlns:this="org/vagabond/xmlmodel" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="org/vagabond/xmlmodel">
+
 	<!-- ***************************************************** -->
-	<!--  -->
+	<!-- -->
 	<!-- ***************************************************** -->
-	
+
 	<xs:element name="MappingScenario">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="Schemas" type="this:SchemasType" minOccurs="1" maxOccurs="1"/>
-				<xs:element name="Correspondences" type="this:CorrespondencesType" minOccurs="0" maxOccurs="1"/>
-				<xs:element name="Mappings" type="this:MappingsType" minOccurs="1" maxOccurs="1"/>
-				<xs:element name="Transformations" type="this:TransformationsType" minOccurs="0" maxOccurs="1"/>
-				<xs:element name="ConnectionInfo" type="this:ConnectionInfoType" minOccurs="0" maxOccurs="1"/>
-				<xs:element name="Data" type="this:DataType" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Schemas" type="this:SchemasType"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="Correspondences" type="this:CorrespondencesType"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element name="Mappings" type="this:MappingsType"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="Transformations" type="this:TransformationsType"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element name="ConnectionInfo" type="this:ConnectionInfoType"
+					minOccurs="0" maxOccurs="1" />
+				<xs:element name="Data" type="this:DataType" minOccurs="0"
+					maxOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
-		
-		<!-- ************* Key and Keyrefs **************** -->
+
+		<!-- ************* Key **************** -->
+		<xs:key name="RelId">
+			<xs:selector
+				xpath=".//Schemas/SourceSchema/Relation | .//Schemas/TargetSchema/Relation" />
+			<xs:field xpath="./@name" />
+		</xs:key>
 		<xs:key name="SourceRelId">
-			<xs:selector xpath=".//Schemas/SourceSchema/Relation"/>
-			<xs:field xpath="./@name"/>
+			<xs:selector xpath=".//Schemas/SourceSchema/Relation" />
+			<xs:field xpath="./@name" />
 		</xs:key>
 		<xs:key name="TargetRelId">
-			<xs:selector xpath=".//Schemas/TargetSchema/Relation"/>
-			<xs:field xpath="./@name"/>
+			<xs:selector xpath=".//Schemas/TargetSchema/Relation" />
+			<xs:field xpath="./@name" />
 		</xs:key>
 		<xs:key name="CorrespondenceId">
-			<xs:selector xpath=".//Correspondences/Correspondence"/>
-			<xs:field xpath="./@id"/>
+			<xs:selector xpath=".//Correspondences/Correspondence" />
+			<xs:field xpath="./@id" />
 		</xs:key>
 		<xs:key name="MappingsId">
-			<xs:selector xpath=".//Mappings/Mapping"/>
-			<xs:field xpath="./@id"/>
+			<xs:selector xpath=".//Mappings/Mapping" />
+			<xs:field xpath="./@id" />
 		</xs:key>
 		<xs:key name="TransformationsId">
-			<xs:selector xpath=".//Transformations/Transformation"/>
-			<xs:field xpath="./@id"/>
-		</xs:key>		
+			<xs:selector xpath=".//Transformations/Transformation" />
+			<xs:field xpath="./@id" />
+		</xs:key>
+
+		<!-- ************ Keyrefs ******************** -->
+		<xs:keyref name="RefFKsToRels" refer="this:RelId">
+			<xs:selector
+				xpath=".//Schemas/*/ForeignKey/From | .//Schemas/*/ForeignKey/To" />
+			<xs:field xpath="@tableref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefCorrToRels" refer="this:RelId">
+			<xs:selector xpath=".//Correspondences/Correspondence/From | .//Correspondences/Correspondence/To" />
+			<xs:field xpath="@tableref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefMapToCorr" refer="this:CorrespondenceId">
+			<xs:selector xpath=".//Mappings/Mapping/Uses/Correspondence" />
+			<xs:field xpath="@ref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefMapAtomToRels" refer="this:RelId">
+			<xs:selector xpath=".//Mappings/Mapping/*/Atom" />
+			<xs:field xpath="@tableref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefTransToRels" refer="this:RelId">
+			<xs:selector xpath=".//Transformations/Transformation" />
+			<xs:field xpath="@creates" />
+		</xs:keyref>
+
+		<xs:keyref name="RefTransToMaps" refer="this:MappingsId">
+			<xs:selector xpath=".//Transformations/Transformation/Implements/Mapping" />
+			<xs:field xpath="@ref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefDataToRels" refer="this:SourceRelId">
+			<xs:selector xpath=".//Data/Instance | .//Data/InstanceFile" />
+			<xs:field xpath="@name" />
+		</xs:keyref>
+
+
 	</xs:element>
-	
+
 	<!-- ***************************************************** -->
 	<!-- Elements for lists of entities -->
 	<!-- ***************************************************** -->
-	
+
 	<xs:complexType name="SchemasType">
 		<xs:sequence>
-			<xs:element name="SourceSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="TargetSchema" type="this:SchemaType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="SourceSchema" type="this:SchemaType"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="TargetSchema" type="this:SchemaType"
+				minOccurs="1" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="CorrespondencesType">
 		<xs:sequence>
-			<xs:element name="Correspondence" type="this:CorrespondenceType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Correspondence" type="this:CorrespondenceType"
+				minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="MappingsType">
 		<xs:sequence>
-			<xs:element name="Mapping" type="this:MappingType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Mapping" type="this:MappingType"
+				minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-	</xs:complexType>		
-	 
+	</xs:complexType>
+
 	<xs:complexType name="TransformationsType">
 		<xs:sequence>
-			<xs:element name="Transformation" type="this:TransformationType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Transformation" type="this:TransformationType"
+				minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
-	
-	
+
+
 
 	<!-- ***************************************************** -->
-	<!-- complex Types for single entities					   -->
+	<!-- complex Types for single entities -->
 	<!-- ***************************************************** -->
-	
+
 	<!-- ************ Schema Types **************************** -->
-	
+
 	<xs:complexType name="SchemaType">
 		<xs:sequence>
-			<xs:element name="Relation" type="this:RelationType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="ForeignKey" type="this:ForeignKeyType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="FD" type="this:FDType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Relation" type="this:RelationType"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="ForeignKey" type="this:ForeignKeyType"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="FD" type="this:FDType" minOccurs="0"
+				maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="RelationType">
 		<xs:sequence>
-			<xs:element name="Attr" type="this:AttrDefType" minOccurs="1" maxOccurs="unbounded" />
-			<xs:element name="PrimaryKey" type="this:AttrListType" minOccurs="0" maxOccurs="1" />	
+			<xs:element name="Attr" type="this:AttrDefType" minOccurs="1"
+				maxOccurs="unbounded" />
+			<xs:element name="PrimaryKey" type="this:AttrListType"
+				minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="AttrDefType">
 		<xs:sequence>
-			<xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="DataType" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="NotNull" type="this:EmptyElementType" minOccurs="0" />
+			<xs:element name="Name" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="DataType" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="NotNull" type="this:EmptyElementType"
+				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="ForeignKeyType">
 		<xs:sequence>
 			<xs:element name="From" type="this:AttrRefType" />
 			<xs:element name="To" type="this:AttrRefType" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="FDType">
 		<xs:sequence>
 			<xs:element name="From" type="this:AttrRefType" />
 			<xs:element name="To" type="this:AttrRefType" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
-		<xs:attribute name="tableref" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string" />
+		<xs:attribute name="tableref" type="xs:string" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="AttrRefType">
 		<xs:sequence>
-			<xs:element name="Attr" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Attr" type="xs:string" minOccurs="1"
+				maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="tableref" type="xs:string"/>
+		<xs:attribute name="tableref" type="xs:string" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="AttrListType">
 		<xs:sequence>
-			<xs:element name="Attr" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Attr" type="xs:string" minOccurs="1"
+				maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<!-- ************ Correspondence Types **************************** -->
-	
+
 	<xs:complexType name="CorrespondenceType">
 		<xs:sequence>
-			<xs:element name="From" type="this:AttrRefType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="To" type="this:AttrRefType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="From" type="this:AttrRefType" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="To" type="this:AttrRefType" minOccurs="1"
+				maxOccurs="1" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string" />
 	</xs:complexType>
-	
+
 	<!-- ************ Mapping Types **************************** -->
-	
+
 	<xs:complexType name="MappingType">
 		<xs:sequence>
 			<xs:element name="Uses" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="Correspondence" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+						<xs:element name="Correspondence" type="this:StringRefType"
+							minOccurs="1" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="Foreach" type="this:MapExprType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="Exists" type="this:MapExprType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Foreach" type="this:MapExprType"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="Exists" type="this:MapExprType"
+				minOccurs="1" maxOccurs="1" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="MapExprType">
 		<xs:sequence>
-			<xs:element name="Atom" type="this:RelAtomType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Atom" type="this:RelAtomType" minOccurs="1"
+				maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="RelAtomType">
 		<xs:sequence>
 			<xs:choice minOccurs="1" maxOccurs="unbounded">
-				<xs:element name="Var" type="xs:string"/>
-				<xs:element name="SKFunction" type="this:SKFunction"/>
-			</xs:choice>
-		</xs:sequence>
-		<xs:attribute name="tableref" type="xs:string"/>
-	</xs:complexType>
-	
-	<xs:complexType name="SKFunction">
-		<xs:sequence>
-			<xs:choice minOccurs="1" maxOccurs="unbounded" >
 				<xs:element name="Var" type="xs:string" />
 				<xs:element name="SKFunction" type="this:SKFunction" />
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="skname" type="xs:string"/>
+		<xs:attribute name="tableref" type="xs:string" />
 	</xs:complexType>
-	
+
+	<xs:complexType name="SKFunction">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Var" type="xs:string" />
+				<xs:element name="SKFunction" type="this:SKFunction" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="skname" type="xs:string" />
+	</xs:complexType>
+
 	<!-- ************ Transformation Types **************************** -->
-	
+
 	<xs:complexType name="TransformationType">
 		<xs:sequence>
 			<xs:element name="Implements">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="Mapping" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+						<xs:element name="Mapping" type="this:StringRefType" minOccurs="1"
+							maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="Code" type="xs:string" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string"/>
-		<xs:attribute name="creates" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string" />
+		<xs:attribute name="creates" type="xs:string" />
 	</xs:complexType>
-	
+
 	<!-- ************ Connection Info Types ************************* -->
-	
+
 	<xs:complexType name="ConnectionInfoType">
 		<xs:sequence>
 			<xs:element name="Host" type="xs:anyURI" />
-			<xs:element name="DB" type="xs:string"/>
-			<xs:element name="User" type="xs:string"/>
-			<xs:element name="Password" type="xs:string"/>
+			<xs:element name="DB" type="xs:string" />
+			<xs:element name="User" type="xs:string" />
+			<xs:element name="Password" type="xs:string" />
 			<xs:element name="Port" type="xs:int" />
-		</xs:sequence>	
+		</xs:sequence>
 	</xs:complexType>
-	
+
 	<!-- ************ Data Types ************************* -->
-	
+
 	<xs:complexType name="DataType">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="Instance" type="this:RelInstanceType" />
 			<xs:element name="InstanceFile" type="this:RelInstanceFileType" />
 		</xs:choice>
 	</xs:complexType>
-	
+
 	<xs:complexType name="RelInstanceType">
 		<xs:sequence>
 			<xs:element name="Row" minOccurs="1" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="Value" type="xs:string"
-								 minOccurs="1" maxOccurs="unbounded"/>
+						<xs:element name="Value" type="xs:string" minOccurs="1"
+							maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-		</xs:sequence>	
-		<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="RelInstanceFileType">
 		<xs:sequence>
 			<xs:element name="Path" type="xs:string" />
 			<xs:element name="FileName" type="xs:string" />
-			<xs:element name="ColumnDelim" type="xs:string" minOccurs="0"/>
+			<xs:element name="ColumnDelim" type="xs:string" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="required" />
 	</xs:complexType>
-	
+
 	<!-- ************ Helper Types **************************** -->
-	
+	<xs:complexType name="StringRefType">
+		<xs:attribute name="ref" type="xs:string" />
+	</xs:complexType>
+
 	<xs:complexType name="EmptyElementType">
-  	</xs:complexType>
-	
+	</xs:complexType>
+
 </xs:schema>

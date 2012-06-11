@@ -71,6 +71,7 @@ FROM source.employee ANNOT('M1') e
 	<DB>tramptest</DB>
 	<User>postgres</User>
 	<Password/>
+	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="employee">
