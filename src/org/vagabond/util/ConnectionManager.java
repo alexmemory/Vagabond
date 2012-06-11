@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
+import org.vagabond.mapping.model.MapScenarioHolder;
+import org.vagabond.xmlmodel.ConnectionInfoType;
 
 /**
  * Singleton for conveniently creating database connections.
@@ -32,6 +34,11 @@ public class ConnectionManager {
 		}
 		
 		return instance;
+	}
+	
+	public Connection getConnection (MapScenarioHolder map) throws SQLException {
+		ConnectionInfoType info = map.getScenario().getConnectionInfo();
+		return getConnection(info.getHost(), info.getDB(), info.getUser(), info.getPassword(), info.getPort());
 	}
 	
 	public Connection getConnection (String URL, String dbName, 

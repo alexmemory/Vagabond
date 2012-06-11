@@ -81,7 +81,7 @@
 	
 	<xs:complexType name="SchemaType">
 		<xs:sequence>
-			<xs:element name="Relation" type="this:RelationType" minOccurs="1" maxOccurs="unbounded" />
+			<xs:element name="Relation" type="this:RelationType" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="ForeignKey" type="this:ForeignKeyType" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="FD" type="this:FDType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
@@ -154,7 +154,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="Foreach" type="this:MapExprType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Foreach" type="this:MapExprType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="Exists" type="this:MapExprType" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string"/>
@@ -211,6 +211,7 @@
 			<xs:element name="DB" type="xs:string"/>
 			<xs:element name="User" type="xs:string"/>
 			<xs:element name="Password" type="xs:string"/>
+			<xs:element name="Port" type="xs:int" />
 		</xs:sequence>	
 	</xs:complexType>
 	

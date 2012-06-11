@@ -279,8 +279,10 @@ public class SchemaCodeGenerator {
 			result.append(attr.getNotNull() == null ? ",\n" : " NOT NULL,\n");
 		}
 		
-		getPrimKey(rel.getPrimaryKey(), result);
-		
+		if (rel.isSetPrimaryKey())
+			getPrimKey(rel.getPrimaryKey(), result);
+		else
+			result.delete(result.length() - 2,result.length() - 1);
 		result.append(") WITH OIDS;\n");
 	}
 	
