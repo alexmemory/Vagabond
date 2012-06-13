@@ -1,5 +1,7 @@
 package org.vagabond.util;
 
+import org.apache.commons.collections.primitives.IntList;
+
 public class DirectedGraph<T> extends Graph<T> {
 
 	public DirectedGraph(boolean isSparse) {
@@ -25,7 +27,7 @@ public class DirectedGraph<T> extends Graph<T> {
 	}
 
 	public IntList topologicalSort () {
-		
+		return null;
 	}
 	
 }
