@@ -70,6 +70,28 @@ public class BitMatrix {
 		bitmap.set(row * cols + col);
 	}
 	
+	public int numOnesInRow (int row) {
+		IntIterator iter = getReadonlyRow(row).intIterator();
+		int count = 0;
+		
+		for(;iter.hasNext(); iter.next())
+			return count++;
+		return count;
+	}
+	
+	public int numOnes () {
+		return bitmap.cardinality();
+	}
+	
+	public int numOnesInCol (int col) {
+		int count = 0;
+		for(int i = 0; i < rows; i++) {
+			if (bitmap.get(i * cols + col))
+				count++;
+		}
+		return count;
+	}
+	
 	public int firstOneInCol (int col) {
 		for(int i = 0; i < rows; i++) {
 			if (bitmap.get(i * cols + col))

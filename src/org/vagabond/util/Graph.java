@@ -22,9 +22,18 @@ public class Graph<T> {
 	}
 
 	public void addNode(T node) throws Exception {
-		nodeIds.put(node);
+		if (!nodeIds.containsVal(node))
+			nodeIds.put(node);
 	}
 
+	public void addNodesAndEdge (T node, T other) {
+	    if (nodeIds.getId(node) == -1)
+			nodeIds.put(node);
+		if (nodeIds.getId(other) == -1)
+			nodeIds.put(other);
+		addEdge(node, other);
+	}
+	
 	public void addEdge(T node, T other) {
 		edges.setSym(nodeIds.getId(node), nodeIds.getId(other));
 	}
@@ -39,16 +48,20 @@ public class Graph<T> {
 		return nodeIds.getId(node);
 	}
 
-	public void hasEdge(T node, T other) {
-		edges.get(nodeIds.getId(node), nodeIds.getId(other));
+	public boolean hasNode (T node) {
+		return nodeIds.getId(node) == -1;
+	}
+	
+	public boolean hasEdge(T node, T other) {
+		return edges.get(nodeIds.getId(node), nodeIds.getId(other));
 	}
 	
 	public boolean hasEdge(T node) {
-		return hasEdge(nodeIds.get(node));
+		return hasEdge(nodeIds.getId(node));
 	}
 	
 	public boolean hasEdge(int nodeId) {
-		return edges.getReadonlyRow(nodeId).intIterator().hasNext();
+		return edges.firstOneInRow(nodeId) != -1;
 	}
 	
 	public void hasEdge(int nodeId, int otherId) {
@@ -65,5 +78,17 @@ public class Graph<T> {
 	
 	public int getNumNodes() {
 		return nodeIds.size();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		
+		result.append("**** Graph Nodes ****\n\n");
+		result.append(nodeIds.toString());
+		result.append("\n\n**** edge matrix ****\n\n");
+		result.append(edges.toString());
+		
+		return result.toString();
 	}
 }

@@ -674,9 +674,17 @@ public class TestBitMatrixAndBitset {
 
 		m = new DynamicBitMatrix(15, 15, largevalue);
 		assertEquals("01110001 0000010", m.getReadonlyRow(0).toBitsString());
+		assertEquals("10110000 1100000", m.getReadonlyRow(1).toBitsString());
 		assertEquals("01000000 0000000", m.getReadonlyRow(9).toBitsString());
 		assertEquals("00011000 0000000", m.getReadonlyRow(14).toBitsString());
 
+		assertEquals(1, m.firstOneInRow(0));
+		assertEquals(1, m.firstOneInRow(9));
+		assertEquals(3, m.firstOneInRow(14));
+		
+		assertEquals(0, m.firstOneInCol(1));
+		assertEquals(1, m.firstOneInCol(8));
+		
 		IntIterator iter = m.getRowIntIter(14);
 		char[] row = "000110000000000".toCharArray();
 		while (iter.hasNext()) {

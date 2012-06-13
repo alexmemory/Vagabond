@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
 		TestQueryTemplate.class,
 		TestBitMatrixAndBitset.class,
 		TestBloomFilter.class,
-		TestFNVHash.class
+		TestFNVHash.class,
+		TestGraph.class
         })
 public class AllTestsUtil {
 }

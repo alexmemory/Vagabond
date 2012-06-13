@@ -58,6 +58,16 @@ public class DynamicBitMatrix extends BitMatrix {
 		}
 		return -1;
 	}
+	
+	@Override
+	public int numOnesInCol (int col) {
+		int count = 0;
+		for(int i = 0; i < rows; i++) {
+			if (get(i, col))
+				count++;
+		}
+		return count;
+	}
 
 	@Override
 	public Bitmap getReadonlyRow (int rowNum) {

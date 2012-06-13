@@ -48,7 +48,10 @@ public class IdMap<Type> implements Map<Integer,Type>, Iterator<Type> {
 	}
 	
 	public int getId (Type value) {
-		return ObjToId.get(value);
+		Integer i = ObjToId.get(value);
+		if (i == null)
+			return -1;
+		return i;
 	}
 	
 	public int getSize () {
