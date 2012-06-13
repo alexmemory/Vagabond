@@ -6,6 +6,14 @@ public class DirectedGraph<T> extends Graph<T> {
 		super(isSparse);
 	}
 	
+	public void addNodesAndEdge (T node, T other) {
+		if (!nodeIds.containsVal(node))
+			nodeIds.put(node);
+		if (!nodeIds.containsVal(other))
+			nodeIds.put(other);
+		addEdge(node, other);
+	}
+	
 	public void addEdge(T node, T other) {
 		edges.set(nodeIds.getId(node), nodeIds.getId(other));
 	}
@@ -16,4 +24,8 @@ public class DirectedGraph<T> extends Graph<T> {
 		edges.set(nodeId, otherId);
 	}
 
+	public IntList topologicalSort () {
+		
+	}
+	
 }
