@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.util.BitMatrix;
+import org.vagabond.util.DynamicBitMatrix;
 import org.vagabond.util.ewah.Bitmap;
 import org.vagabond.util.ewah.EWAHCompressedBitmap;
 import org.vagabond.util.ewah.BitsetView;
@@ -137,7 +138,7 @@ public class TestBitMatrixAndBitset {
 	private void checkRows(String[] rows, BitMatrix m) {
 		for (int i = 0; i < rows.length; i++) {
 			assertEquals(
-					"Row " + i + " " + rows[i] + "\n\n" + m.getReadonlyRow(i),
+					"Row " + i + ": " + rows[i] + "\n\n" + m.getReadonlyRow(i),
 					rows[i], m.getReadonlyRow(i).toBitsString());
 		}
 	}
@@ -640,6 +641,48 @@ public class TestBitMatrixAndBitset {
 			int val = iter.next();
 			assertTrue("" + val, row[val] == '1');
 		}
+	}
+	
+	@Test
+	public void testDynamicBitmatrix () {
+		DynamicBitMatrix m = new DynamicBitMatrix();
+
+		log.debug(m.toString() + "\n\n");
+
+		m.set(2, 1);
+		m.set(1, 0);
+		m.set(1, 1);
+
+		log.debug(m.toString());
+
+		assertTrue("2,1", m.get(2, 1));
+		assertTrue("1,0", m.get(1, 0));
+		assertTrue("1,1", m.get(1, 1));
+		assertFalse("0,0", m.get(0, 0));
+		assertFalse("0,1", m.get(0, 1));
+
+		log.debug(m.getBitmap().toBitsString());
+		
+		checkRows(new String[] { "00", "11", "01" }, m);
+
+		assertEquals("first one in col 0", 1, m.firstOneInCol(0));
+		assertEquals("first one in col 1", 1, m.firstOneInCol(1));
+
+		assertEquals("first one in row 0", -1, m.firstOneInRow(0));
+		assertEquals("first one in row 1", 0, m.firstOneInRow(1));
+		assertEquals("first one in row 2", 1, m.firstOneInRow(2));
+
+		m = new DynamicBitMatrix(15, 15, largevalue);
+		assertEquals("01110001 0000010", m.getReadonlyRow(0).toBitsString());
+		assertEquals("01000000 0000000", m.getReadonlyRow(9).toBitsString());
+		assertEquals("00011000 0000000", m.getReadonlyRow(14).toBitsString());
+
+		IntIterator iter = m.getRowIntIter(14);
+		char[] row = "000110000000000".toCharArray();
+		while (iter.hasNext()) {
+			int val = iter.next();
+			assertTrue("" + val, row[val] == '1');
+		}		
 	}
 
 	@Test

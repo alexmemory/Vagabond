@@ -27,6 +27,12 @@ public class ValidationException extends Exception {
 		super(message);
 		this.errors = errors;
 	}
+	
+	public ValidationException (final String message) {
+		super(message);
+		errors = new ArrayList();
+	}
+	
 		
 	public String getMessage () {
 		return super.getMessage() + getErrorString();

@@ -13,9 +13,9 @@ import java.util.List;
  */
 public class BitsetView implements Bitmap {
 
-	private int start;
-	private int end;
-	private final IBitSet map;
+	protected final int start;
+	protected final int end;
+	protected final IBitSet map;
 	
 	public BitsetView (IBitSet map, int start, int end) {
 		this.map = map;

@@ -14,9 +14,18 @@ import org.vagabond.util.ewah.IntIterator;
 public class BitMatrix {
 
 	private static final int DEFAULT_BUFFER = 0;
-	private static final BitsetType DEFAULT_BITSET_TYPE = BitsetType.JavaBitSet;
-	private IBitSet bitmap;
-	private int rows, cols;
+	protected static final BitsetType DEFAULT_BITSET_TYPE = BitsetType.JavaBitSet;
+	protected IBitSet bitmap;
+	protected int rows;
+	protected int cols;
+	
+	protected BitMatrix () {
+		bitmap = BitsetFactory.newBitset(DEFAULT_BITSET_TYPE);
+	}
+	
+	protected BitMatrix (BitsetType type) {
+		bitmap = BitsetFactory.newBitset(type);
+	}
 	
 	public BitMatrix (int rows, int cols) {
 		this(rows,cols,DEFAULT_BUFFER, DEFAULT_BITSET_TYPE);		

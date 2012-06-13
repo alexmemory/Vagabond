@@ -87,6 +87,14 @@ public class CollectionUtils {
 		return false;
 	}
 	
+	public static <T> int searchPos (T[] array, T element) {
+		for(int i = 0; i < array.length; i++) {
+			if (array[i].equals(element))
+				return i;
+		}
+		return -1;
+	}
+	
 
 	
 	public static <T> List<T> filter (List<T> in, int[] positions) {
@@ -145,6 +153,28 @@ public class CollectionUtils {
 			result *= i;
 		
 		return result;
+	}
+	
+	public static String[] concatArrays (String[] ... arrays) {
+		String[] result;
+		int len = 0;
+		
+		for(int i = 0; i < arrays.length; i++)
+			len += arrays[i].length;
+		
+		result = new String[len];
+		
+		int offset = 0;
+		for(int i = 0; i < arrays.length; i++) {
+			System.arraycopy(arrays[i], 0, result, offset, arrays[i].length);
+			offset += arrays[i].length;
+		}
+		
+		return result;
+	}
+	
+	public static String[] concat (String[] array, String ... elems) {
+		return concatArrays(array, elems);
 	}
 	
 	public static int sum (int[] in) {

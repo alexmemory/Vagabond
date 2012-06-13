@@ -15,6 +15,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
+import org.vagabond.xmlmodel.SchemasType;
 
 /**
  * Singleton class for loading mapping scenarios from XML documents. Internally
@@ -129,8 +130,38 @@ public class ModelLoader {
 
 		if (!result)
 			throw new ValidationException(errors);
+		
+		stricterValidation(doc);
 	}
 
+	public void stricterValidation (MappingScenarioDocument doc) throws ValidationException {
+		SchemasType schemas = doc.getMappingScenario().getSchemas();
+		int numSourceRels = schemas.getSourceSchema().getRelationArray().length;
+		int numTargetRels = schemas.getTargetSchema().getRelationArray().length;
+		int numTrans, numData;
+		
+		boolean hasTrans = doc.getMappingScenario().isSetTransformations();
+		boolean hasCorrs = doc.getMappingScenario().isSetCorrespondences();
+		boolean hasData = doc.getMappingScenario().isSetData();
+		
+		if (numTargetRels == 0)
+			throw new ValidationException("no target relations");
+
+		if (hasData) {
+			numData = doc.getMappingScenario().getData().getInstanceArray().length + 
+					doc.getMappingScenario().getData().getInstanceFileArray().length;
+			if (numData != numSourceRels)
+				throw new ValidationException("need the same amount of data elements as source relations");
+		}
+		
+		if (hasTrans) {
+			numTrans = doc.getMappingScenario().getTransformations().getTransformationArray().length;
+			if (numTrans < numTargetRels)
+				throw new ValidationException("have to have at least as many transformation than target relations");
+		}
+			
+	}
+	
 	public void storeModel(OutputStream o, MappingScenarioDocument doc)
 			throws IOException, ValidationException {
 		validate(doc);

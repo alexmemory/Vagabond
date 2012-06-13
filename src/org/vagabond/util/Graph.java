@@ -5,28 +5,26 @@ import org.vagabond.util.ewah.IBitSet.BitsetType;
 
 public class Graph<T> {
 
-	private IdMap<T> nodeIds;
-	private BitMatrix edges;
-	private int numNodes;
+	protected IdMap<T> nodeIds;
+	protected DynamicBitMatrix edges;
+	protected int numNodes;
 
-	public Graph(int numNodes, boolean isSparse) {
+	public Graph(boolean isSparse) {
 		IBitSet.BitsetType type =
 				isSparse ? BitsetType.EWAHBitSet : BitsetType.JavaBitSet;
 		nodeIds = new IdMap<T>();
-		this.numNodes = numNodes;
-		edges = new BitMatrix(numNodes, numNodes, type);
+		this.numNodes = 0;
+		edges = new DynamicBitMatrix(type);
 	}
 
-	public Graph(int numNodes, boolean isSparse, T[] nodes) throws Exception {
-		this(numNodes, isSparse);
+	public Graph(boolean isSparse, T[] nodes) throws Exception {
+		this(isSparse);
 		for (T node : nodes)
 			addNode(node);
 	}
 
 	public void addNode(T node) throws Exception {
 		nodeIds.put(node);
-		if (nodeIds.size() > numNodes)
-			throw new Exception("Graph size was predetermined to " + numNodes);
 	}
 
 	public void addEdge(T node, T other) {
@@ -51,5 +49,11 @@ public class Graph<T> {
 		assert (nodeId >= 0 && nodeId < numNodes 
 				&& otherId >= 0 && otherId < numNodes);
 		edges.get(nodeId, otherId);
+	}
+	
+	public void deleteEdge(int nodeId, int otherId) {
+		assert (nodeId >= 0 && nodeId < numNodes 
+				&& otherId >= 0 && otherId < numNodes);
+		//TODO
 	}
 }

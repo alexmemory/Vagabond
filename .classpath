@@ -19,6 +19,8 @@
 	<classpathentry kind="lib" path="lib/args4j-2.0.17.jar" sourcepath="/Users/lord_pretzel/Downloads/args4j-2.0.17-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/vagabondExplXMLModel.jar" sourcepath="xbeans/src/expl"/>
 	<classpathentry exported="true" kind="lib" path="lib/vagabondXMLModel.jar" sourcepath="xbeans/src/model"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-primitives-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
