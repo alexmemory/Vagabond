@@ -5,7 +5,6 @@ import org.apache.commons.collections.primitives.IntList;
 import org.apache.log4j.Logger;
 import org.vagabond.util.ewah.IBitSet.BitsetType;
 import org.vagabond.util.ewah.Bitmap;
-import org.vagabond.util.ewah.BitsetView;
 import org.vagabond.util.ewah.IntIterator;
 import org.vagabond.util.ewah.PositionTranslator;
 import org.vagabond.util.ewah.TranslatedBitsetView;
@@ -26,6 +25,12 @@ public class DynamicBitMatrix extends BitMatrix {
 		elemOffset.add(0);
 		rows = 0;
 		cols = 0;
+	}
+	
+	public DynamicBitMatrix(int rows, int cols) {
+		this(DEFAULT_BITSET_TYPE);
+		this.rows = rows;
+		this.cols = cols;
 	}
 	
 	public DynamicBitMatrix(int rows, int cols, String values) {

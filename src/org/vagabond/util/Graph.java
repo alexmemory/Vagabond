@@ -7,13 +7,11 @@ public class Graph<T> {
 
 	protected IdMap<T> nodeIds;
 	protected DynamicBitMatrix edges;
-	protected int numNodes;
 
 	public Graph(boolean isSparse) {
 		IBitSet.BitsetType type =
 				isSparse ? BitsetType.EWAHBitSet : BitsetType.JavaBitSet;
 		nodeIds = new IdMap<T>();
-		this.numNodes = 0;
 		edges = new DynamicBitMatrix(type);
 	}
 
@@ -32,8 +30,8 @@ public class Graph<T> {
 	}
 
 	public void addEdge(int nodeId, int otherId) {
-		assert (nodeId >= 0 && nodeId < numNodes 
-				&& otherId >= 0 && otherId < numNodes);
+		assert (nodeId >= 0 && nodeId < nodeIds.size()
+				&& otherId >= 0 && otherId < nodeIds.size());
 		edges.setSym(nodeId, otherId);
 	}
 	
@@ -45,15 +43,27 @@ public class Graph<T> {
 		edges.get(nodeIds.getId(node), nodeIds.getId(other));
 	}
 	
+	public boolean hasEdge(T node) {
+		return hasEdge(nodeIds.get(node));
+	}
+	
+	public boolean hasEdge(int nodeId) {
+		return edges.getReadonlyRow(nodeId).intIterator().hasNext();
+	}
+	
 	public void hasEdge(int nodeId, int otherId) {
-		assert (nodeId >= 0 && nodeId < numNodes 
-				&& otherId >= 0 && otherId < numNodes);
+		assert (nodeId >= 0 && nodeId < nodeIds.size()
+				&& otherId >= 0 && otherId < nodeIds.size());
 		edges.get(nodeId, otherId);
 	}
 	
 	public void deleteEdge(int nodeId, int otherId) {
-		assert (nodeId >= 0 && nodeId < numNodes 
-				&& otherId >= 0 && otherId < numNodes);
+		assert (nodeId >= 0 && nodeId < nodeIds.size()
+				&& otherId >= 0 && otherId < nodeIds.size());
 		//TODO
+	}
+	
+	public int getNumNodes() {
+		return nodeIds.size();
 	}
 }
