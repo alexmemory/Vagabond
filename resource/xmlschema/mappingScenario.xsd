@@ -177,8 +177,8 @@
 
 	<xs:complexType name="FDType">
 		<xs:sequence>
-			<xs:element name="From" type="this:AttrRefType" />
-			<xs:element name="To" type="this:AttrRefType" />
+			<xs:element name="From" type="this:AttrListType" />
+			<xs:element name="To" type="this:AttrListType" />
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" />
 		<xs:attribute name="tableref" type="xs:string" />
