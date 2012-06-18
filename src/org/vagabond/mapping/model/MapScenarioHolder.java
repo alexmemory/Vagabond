@@ -158,6 +158,7 @@ public class MapScenarioHolder {
 		return result;
 	}
 	
+	
 	public List<TransformationType> getTransForRels (Collection<String> rels) 
 			throws Exception {
 		List<TransformationType> result;

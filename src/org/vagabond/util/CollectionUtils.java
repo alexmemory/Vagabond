@@ -177,6 +177,36 @@ public class CollectionUtils {
 		return concatArrays(array, elems);
 	}
 	
+	public static String[] insertAtPositions (String[] orig, String[] values, int[] positions) {
+		int len = orig.length + values.length;
+		String[] result = new String[len];
+		
+		for(int i = 0; i < values.length; i++)
+			result[positions[i]] = values[i];
+		
+		int offset = 0, curPos = 0;
+		for(int i = 0; i < orig.length; i++, offset++) {
+			while (curPos < values.length && offset == positions[curPos]) {
+				curPos++;
+				offset++;
+			}
+			if (offset < len)
+				result[offset] = orig[i];
+		}
+		
+		return result;
+	}
+	
+	public static int[] createSequence(int from, int len) {
+		int[] result = new int[len];
+		
+		for(int i = 0; i < len; i++) {
+			result[i] = from + i;
+		}
+		
+		return result;
+	}
+	
 	public static int sum (int[] in) {
 		int result = 0;
 		
