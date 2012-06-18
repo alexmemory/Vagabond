@@ -78,7 +78,7 @@
 		</copy>
 	</target>
 
-	<target name="Compile" depends="CopyResources">
+	<target name="Compile" depends="CopyResources,GenerateXMLbindings">
 		<javac srcdir="${sourcedir}" destdir="${binarydir}" classpathref="libraries" debug="on">
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
@@ -88,6 +88,8 @@
 		<delete includeemptydirs="true">
 			<fileset dir="${binarydir}" includes="**/*" />
 		</delete>
+		<delete file="${XBeansJar}" />
+		<delete file="${XBeansJarExpl}" />
 		<mkdir dir="${binarydir}" />
 		<mkdir dir="${builddir}" />
 		<echo message="${jarClasspath}" />
