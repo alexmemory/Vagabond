@@ -57,7 +57,7 @@ import org.vagabond.util.LoggerUtil;
  * 
  * @since 0.1.0
  */
-public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
+public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 		Iterable<Integer>, BitmapStorage, WritableBitmap, IBitSet { // TODO add
 																	// bloom
 																	// filter
@@ -136,7 +136,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	private void
+	protected void
 			xor(final EWAHCompressedBitmap a, final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
@@ -285,7 +285,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	private void
+	protected void
 			and(final EWAHCompressedBitmap a, final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
@@ -516,7 +516,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 *            the other bitmap
 	 * @return the EWAH compressed bitmap
 	 */
-	private void andNot(final EWAHCompressedBitmap a,
+	protected void andNot(final EWAHCompressedBitmap a,
 			final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
@@ -750,7 +750,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	public void
+	protected void
 			or(final EWAHCompressedBitmap a, final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
@@ -1195,13 +1195,14 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 					if (rlw.getNumberOfLiteralWords() == 0
 							&& next != null
 							&& next.getRunningBit()
-							&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+							&& next.getRunningLength() + rlw.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
 						if (rlw.equals(this.rlw))
 							this.rlw.position = next.position;
 						next.setRunningLength(next.getRunningLength()
 								+ rlw.getRunningLength());
 						shiftCompressedWordsLeft(rlw.position + 2, 2);
 					}
+					// merging doesn't work because of size 
 					// else just reduce length of rlw by 1
 					else
 						shiftCompressedWordsLeft(rlw.position + 2, 1);
