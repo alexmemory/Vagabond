@@ -750,7 +750,7 @@ public final class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	private void
+	protected void
 			or(final EWAHCompressedBitmap a, final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
