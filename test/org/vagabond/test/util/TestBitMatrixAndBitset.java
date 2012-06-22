@@ -20,6 +20,7 @@ import org.vagabond.util.ewah.BitsetView;
 import org.vagabond.util.ewah.IBitSet;
 import org.vagabond.util.ewah.IntIterator;
 import org.vagabond.util.ewah.JavaUtilBitSet;
+import org.vagabond.util.ewah.NewEWAHBitmap;
 import org.vagabond.util.ewah.RunningLengthWord;
 
 public class TestBitMatrixAndBitset {
@@ -482,9 +483,11 @@ public class TestBitMatrixAndBitset {
 	private EWAHCompressedBitmap
 			testOneCase(String name, String in, int setBit) {
 		EWAHCompressedBitmap b;
+
 		JavaUtilBitSet ex;
 
 		b = new EWAHCompressedBitmap(in);
+		b2 = new NewEWAHBitmap(in);
 		ex = new JavaUtilBitSet(in);
 		ex.set(setBit);
 		b.set(setBit);

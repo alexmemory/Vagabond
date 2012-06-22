@@ -19,6 +19,13 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 		super();
 		Init();
 	}
+	
+	public NewEWAHBitmap(String in) {
+		this.buffer = new long[defaultbuffersize];
+		this.rlw = new RunningLengthWord(this.buffer, 0);
+		Init();
+		readFromBitsString(in);
+	}
 
 	public void Init() {
 		CompressPosRep = new long[buffer.length];
