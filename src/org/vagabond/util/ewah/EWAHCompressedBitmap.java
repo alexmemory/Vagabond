@@ -136,8 +136,8 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	protected void
-			xor(final EWAHCompressedBitmap a, final BitmapStorage container) {
+	protected void xor(final EWAHCompressedBitmap a,
+			final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
 		if (!(i.hasNext() && j.hasNext())) {// this never happens...
@@ -285,8 +285,8 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	protected void
-			and(final EWAHCompressedBitmap a, final BitmapStorage container) {
+	protected void and(final EWAHCompressedBitmap a,
+			final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
 		if (!(i.hasNext() && j.hasNext())) {// this never happens...
@@ -750,8 +750,8 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 * @param container
 	 *            where we store the result
 	 */
-	protected void
-			or(final EWAHCompressedBitmap a, final BitmapStorage container) {
+	protected void or(final EWAHCompressedBitmap a,
+			final BitmapStorage container) {
 		final EWAHIterator i = a.getEWAHIterator();
 		final EWAHIterator j = getEWAHIterator();
 		if (!(i.hasNext() && j.hasNext())) {// this never happens...
@@ -1202,7 +1202,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 								+ rlw.getRunningLength());
 						shiftCompressedWordsLeft(rlw.position + 2, 2);
 					}
-					// merging doesn't work because of size 
+					// merging doesn't work because of size
 					// else just reduce length of rlw by 1
 					else
 						shiftCompressedWordsLeft(rlw.position + 2, 1);
@@ -1210,7 +1210,8 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 				// if last word increase following running length count if
 				// possible
 				else if (next != null
-						&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount
+						&& next.getRunningLength()  
+								< RunningLengthWord.largestrunninglengthcount
 						&& (next.getRunningLength() == 0 || next
 								.getRunningBit())
 						&& literalPos == rlw.getNumberOfLiteralWords() - 1) {
@@ -1221,14 +1222,26 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 					// following
 					if (rlw.getNumberOfLiteralWords() == 0
 							&& next != null
-							&& next.getRunningBit()
-							&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
-						if (rlw.equals(this.rlw))
-							this.rlw.position = next.position;
-						next.setRunningLength(next.getRunningLength()
-								+ rlw.getRunningLength());
-						shiftCompressedWordsLeft(rlw.position + 2, 2);
+							&& next.getRunningBit()) {
+						long totalRunLen = next.getRunningLength() + rlw.getRunningLength(); 
+						
+						// merging into next possible?
+						if (totalRunLen < RunningLengthWord.largestrunninglengthcount) {
+							next.setRunningLength(next.getRunningLength()
+									+ rlw.getRunningLength());
+							shiftCompressedWordsLeft(rlw.position + 2, 2);
+						}
+						// run length to large, move run length from next to current
+						// and shift next one to the left
+						else {
+							rlw.setRunningLength(RunningLengthWord.
+									largestrunninglengthcount);
+							next.setRunningLength(totalRunLen - RunningLengthWord
+									.largestrunninglengthcount);
+							shiftCompressedWordsLeft(rlw.position + 2, 1);
+						}
 					}
+					// remove RLW
 					else
 						shiftCompressedWordsLeft(
 								rlw.position + rlw.getNumberOfLiteralWords()
@@ -1291,8 +1304,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 			if (newRunLen == 0 && afterRunLen == 0) {
 				// merge with previous if exists and possible
 				if (prev != null
-						&& prev.getNumberOfLiteralWords() + newNumLiterals 
-						<= RunningLengthWord.largestliteralcount) {
+						&& prev.getNumberOfLiteralWords() + newNumLiterals <= RunningLengthWord.largestliteralcount) {
 					prev.setNumberOfLiteralWords(prev.getNumberOfLiteralWords()
 							+ newNumLiterals);
 					this.buffer[rlw.position] = newdata;
@@ -1329,42 +1341,44 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 
 				return;
 			}
-			
-			//TODO rlw is full (literals) and next one has no running length and is not full
-			if (afterRunLen == 0 &
-					next != null && rlw.getNumberOfLiteralWords() 
-					== RunningLengthWord.largestliteralcount 
-					&& next.getNumberOfLiteralWords() 
-					< RunningLengthWord.largestliteralcount) {
+
+			// TODO rlw is full (literals) and next one has no running length
+			// and is not full
+			if (afterRunLen == 0
+					& next != null
+					&& rlw.getNumberOfLiteralWords() == RunningLengthWord.largestliteralcount
+					&& next.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
 				rlw.setRunningLength(rlw.getRunningLength() - 1);
-				shiftCompressedWordsRight(rlw.position +  1, 1);
+				shiftCompressedWordsRight(rlw.position + 1, 1);
 				rlw.array = this.buffer;
 				next.array = this.buffer;
-				
+
 				this.buffer[rlw.position + 1] = newdata;
-				
+
 				// switch next header with last literal
 				long temp = this.buffer[next.position + 1];
 				this.buffer[next.position + 1] = this.buffer[next.position];
 				this.buffer[next.position] = temp;
 				next.setNumberOfLiteralWords(next.getNumberOfLiteralWords() + 1);
-				
+
 				if (next.position + 1 == this.rlw.position)
 					this.rlw.position = next.position;
-				
+
 				return;
 			}
-			
+
 			// CASE 4) no extension possible. Have to SPLIT the zero sequence
 			// and create new RLW
 			// new RLW only gets a single literal
 			if (afterRunLen == 0) {
-				assert(rlw.getNumberOfLiteralWords() == RunningLengthWord.largestliteralcount);
-				
-				shiftCompressedWordsRight(rlw.position +  1, 1);
-				shiftCompressedWordsRight(rlw.position + rlw.getNumberOfLiteralWords() + 1, 1);
-				RunningLengthWord newRlw = new RunningLengthWord(this.buffer, 
-						rlw.position + rlw.getNumberOfLiteralWords() + 1);
+				assert (rlw.getNumberOfLiteralWords() == RunningLengthWord.largestliteralcount);
+
+				shiftCompressedWordsRight(rlw.position + 1, 1);
+				shiftCompressedWordsRight(
+						rlw.position + rlw.getNumberOfLiteralWords() + 1, 1);
+				RunningLengthWord newRlw =
+						new RunningLengthWord(this.buffer, rlw.position
+								+ rlw.getNumberOfLiteralWords() + 1);
 				rlw.array = this.buffer;
 
 				newRlw.setNumberOfLiteralWords(1L);
@@ -1376,7 +1390,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 				this.buffer[rlw.position + 1] = newdata;
 
 				if (newRlw.position > this.rlw.position)
-					this.rlw.position = newRlw.position;				
+					this.rlw.position = newRlw.position;
 			}
 			// new RLW also gets run length
 			else {
@@ -1410,13 +1424,14 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 */
 	public boolean checkInvariants() {
 		RunningLengthWord rlw, prev;
-		
-		
+
 		try {
-			EWAHIterator i = new EWAHIterator(this.buffer, this.actualsizeinwords);
-			// test that actualsizeinwords complies with info in headers
+			EWAHIterator i =
+					new EWAHIterator(this.buffer, this.actualsizeinwords);
+			// test that actualsizeinwords complies with info in headers and
+			// test that literal number is not > max
 			while (i.hasNext()) {
-				i.next();
+				RunningLengthWord w = i.next();
 				if (i.dirtyWords() > actualsizeinwords) {
 					log.error(i.dirtyWords() + " larger than actual "
 							+ actualsizeinwords);
@@ -1430,6 +1445,20 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 					log.error(toDebugString());
 					return false;
 				}
+
+				if (w.getNumberOfLiteralWords() > RunningLengthWord.largestrunninglengthcount) {
+					log.error("larger than max literals"
+							+ w.getNumberOfLiteralWords());
+					log.error(toDebugString());
+					return false;
+				}
+
+				if (w.getRunningLength() > RunningLengthWord.largestrunninglengthcount) {
+					log.error("larger than max running length "
+							+ w.getRunningLength());
+					log.error(toDebugString());
+					return false;
+				}
 			}
 
 			// check adjacent words for errors
@@ -1439,17 +1468,19 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 
 			while (rlw.position < actualsizeinwords
 					&& rlw.position + rlw.getNumberOfLiteralWords() < actualsizeinwords) {
-				// case 1) second word has no running length -> first one should 
-				// have max literal count 
+				// case 1) second word has no running length -> first one should
+				// have max literal count
 				if (rlw.getRunningLength() == 0
 						&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
 					log.error(prev.getNumberOfLiteralWords()
 							+ " dirty words followed by "
 							+ rlw.getNumberOfLiteralWords()
-							+ " number of dirty words " + "\n\n" + toDebugString());
+							+ " number of dirty words " + "\n\n"
+							+ toDebugString());
 					return false;
 				}
-				// case 2) both have running length for same bit and first one has 
+				// case 2) both have running length for same bit and first one
+				// has
 				// no literals -> first one should have max running length
 				if (prev.getRunningLength() > 0
 						&& rlw.getRunningLength() > 0
@@ -1478,8 +1509,9 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 				greatest = it.next();
 			}
 			if (this.sizeinbits != greatest + 1) {
-				log.error("sizein bits " + sizeinbits + " but largest value is "
-						+ greatest + "\n\n" + toDebugString());
+				log.error("sizein bits " + sizeinbits
+						+ " but largest value is " + greatest + "\n\n"
+						+ toDebugString());
 				return false;
 			}
 		}

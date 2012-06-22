@@ -390,8 +390,9 @@ public class TestBitMatrixAndBitset {
 		// length
 		testOneCase("3b1a", allOnes64 + allOnesExcept12 + oneZeroSeq, 76);
 		// b) 1) b) current header is full
-
-		// b) 1) c) current header still space to increase run lenght but no
+		b = testOneCase("3b1b", replicate(allOnes64, 5, ' ') + allOnesExcept12 + allOnes64, 332);
+		log.error(b.toDebugString());
+		// b) 1) c) current header still space to increase run length but no
 		// literals left
 		testOneCase("3b1c", allOnes64 + allOnesExcept12 + allOnes64, 76);
 
@@ -399,18 +400,24 @@ public class TestBitMatrixAndBitset {
 		// b) 2) was last literal and following running bit is 1
 		// b) 2) a) current header still has literal and next one has space to
 		// increase run length
-		testOneCase("3b1a", oneZeroSeq + allOnesExcept12 + allOnes64, 76);
+		testOneCase("3b2a", oneZeroSeq + allOnesExcept12 + allOnes64, 76);
 		
 		// b) 2) b) next header is full
-		testOneCase("3b1b", oneZeroSeq + allOnesExcept12 
+		testOneCase("3b2b", oneZeroSeq + allOnesExcept12 
 				+ replicate(allOnes64, 5, ' '), 
 				76);
 		// b) 2) c) current header has no literals left and next one has space
 		// to increase run length
-		testOneCase("3b1a", allOnesExcept12 + oneZeroSeq, 12);
+		testOneCase("3b2c", allOnesExcept12 + oneZeroSeq + 
+				replicate(allOnes64, 4, ' '), 12);
 
+		// b) 2) d) current header has no literals left but combined run length
+		// of current and next header exceeds maximum
+		testOneCase("3b2c", replicate(allOnes64, 3, ' ') + allOnesExcept12 + oneZeroSeq + 
+				replicate(allOnes64, 4, ' '), 204);
+		
 		// b) 3) no merging possible because in the middle of literal sequence
-		testOneCase("3b1a", oneZeroSeq + allOnesExcept12 + oneZeroSeq, 76);
+		testOneCase("3b3", oneZeroSeq + allOnesExcept12 + oneZeroSeq, 76);
 
 		// ***************************************
 		// CASE 4 inside 0 sequence
