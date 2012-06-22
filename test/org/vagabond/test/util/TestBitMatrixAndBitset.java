@@ -487,7 +487,7 @@ public class TestBitMatrixAndBitset {
 		JavaUtilBitSet ex;
 
 		b = new EWAHCompressedBitmap(in);
-		b2 = new NewEWAHBitmap(in);
+//		b2 = new NewEWAHBitmap(in);
 		ex = new JavaUtilBitSet(in);
 		ex.set(setBit);
 		b.set(setBit);
