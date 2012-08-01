@@ -1887,7 +1887,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 	 *            the number of words to allocate
 	 * @return True if the operation was a success.
 	 */
-	private boolean reserve(final int size) {
+	protected boolean reserve(final int size) {
 		if (size > this.buffer.length) {
 			final long oldbuffer[] = this.buffer;
 			this.buffer = new long[size];
