@@ -11,15 +11,16 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 
 	static Logger log = Logger.getLogger(NewEWAHBitmap.class);
 
-	private static long[] CompressPosRep;
-	private static long[] UnCompressPosRep;
-	private static int usedwords;
+	private long[] CompressPosRep;
+	private long[] UnCompressPosRep;
+	private int CompressUsedWord;
+	private int UnCompressUsedWords;
 
 	public NewEWAHBitmap() {
 		super();
 		Init();
 	}
-	
+
 	public NewEWAHBitmap(String in) {
 		this.buffer = new long[defaultbuffersize];
 		this.rlw = new RunningLengthWord(this.buffer, 0);
@@ -32,7 +33,8 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 		UnCompressPosRep = new long[buffer.length];
 		CompressPosRep[0] = 0;
 		UnCompressPosRep[0] = 0;
-		usedwords = 1;
+		CompressUsedWord = 1;
+		UnCompressUsedWords = 1;
 	}
 
 	public long[] getCompressRep() {
@@ -51,15 +53,42 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 	}
 
 	@Override
+	public EWAHCompressedBitmap xor(final EWAHCompressedBitmap a) {
+		final NewEWAHBitmap container = new NewEWAHBitmap();
+		container.reserve(this.actualsizeinwords + a.actualsizeinwords);
+		xor(a, container);
+		return container;
+	}
+
+	@Override
 	protected void and(EWAHCompressedBitmap a, BitmapStorage container) {
 		super.and(a, container);
 		((NewEWAHBitmap) container).createHeaderMapping();
 	}
 
 	@Override
+	public EWAHCompressedBitmap and(final EWAHCompressedBitmap a) {
+		final NewEWAHBitmap container = new NewEWAHBitmap();
+		container
+				.reserve(this.actualsizeinwords > a.actualsizeinwords ? this.actualsizeinwords
+						: a.actualsizeinwords);
+		and(a, container);
+		return container;
+	}
+
+	@Override
 	protected void andNot(EWAHCompressedBitmap a, BitmapStorage container) {
 		super.andNot(a, container);
 		((NewEWAHBitmap) container).createHeaderMapping();
+	}
+
+	public EWAHCompressedBitmap andNot(final EWAHCompressedBitmap a) {
+		final NewEWAHBitmap container = new NewEWAHBitmap();
+		container
+				.reserve(this.actualsizeinwords > a.actualsizeinwords ? this.actualsizeinwords
+						: a.actualsizeinwords);
+		andNot(a, container);
+		return container;
 	}
 
 	@Override
@@ -72,6 +101,14 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 	protected void or(EWAHCompressedBitmap a, BitmapStorage container) {
 		super.or(a, container);
 		((NewEWAHBitmap) container).createHeaderMapping();
+	}
+
+	@Override
+	public EWAHCompressedBitmap or(final EWAHCompressedBitmap a) {
+		final NewEWAHBitmap container = new NewEWAHBitmap();
+		container.reserve(this.actualsizeinwords + a.actualsizeinwords);
+		or(a, container);
+		return container;
 	}
 
 	// TODO the classes called these function will handle the array problem
@@ -153,21 +190,20 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 	@Override
 	public boolean fastSet(final int i) {
 		boolean result = super.fastSet(i);
-		int pointer = (int) CompressPosRep[-1];
 		RunningLengthWord rlw = new RunningLengthWord(this.buffer,
-				(int) CompressPosRep[-1]);
-		long currentsize = UnCompressPosRep[-1];
+				(int) CompressPosRep[CompressUsedWord - 1]);
+		long currentsize = UnCompressPosRep[UnCompressUsedWords - 1];
+		rlw.next();
 
 		// while current header position does not includes i.
-		while (pointer < (i / 64)) {
-			pointer += rlw.getNumberOfLiteralWords() + 1;
-			rlw.position = pointer;
-
+		while (rlw.position + rlw.size() < actualsizeinwords) {
 			checkArraySize();
-			CompressPosRep[usedwords] = rlw.position;
-			UnCompressPosRep[usedwords] = currentsize;
 			currentsize += rlw.size();
-			usedwords++;
+			CompressPosRep[CompressUsedWord] = rlw.position;
+			UnCompressPosRep[UnCompressUsedWords] = currentsize;
+			CompressUsedWord++;
+			UnCompressUsedWords++;
+			rlw.next();
 		}
 		return result;
 	}
@@ -198,14 +234,19 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 		super.clear();
 		CompressPosRep[0] = 0;
 		UnCompressPosRep[0] = 0;
-		usedwords = 1;
+		CompressUsedWord = 1;
+		UnCompressUsedWords = 1;
 
 	}
 
 	@Override
-	// TODO the codes are not finished.
 	public EWAHCompressedBitmap slice(final int start, final int length) {
-		return super.slice(start, length);
+		EWAHCompressedBitmap rawResult = super.slice(start, length);
+		NewEWAHBitmap result = new NewEWAHBitmap();
+		result.buffer = rawResult.buffer;
+		result.rlw = rawResult.rlw;
+		result.createHeaderMapping();
+		return (EWAHCompressedBitmap) result;
 	}
 
 	@Override
@@ -214,11 +255,11 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 		((NewEWAHBitmap) this).createHeaderMapping();
 	}
 
-	// TODO how do I accomondate the change in setSizeInBits, it will only
-	// enlarge right? does it create header word?
 	@Override
 	public boolean setSizeInBits(int size, boolean defaultvalue) {
-		return super.setSizeInBits(size, defaultvalue);
+		boolean result = super.setSizeInBits(size, defaultvalue);
+		((NewEWAHBitmap) this).createHeaderMapping();
+		return result;
 	}
 
 	@Override
@@ -265,24 +306,63 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 				if (literalPos == 0
 						&& (rlw.getRunningBit() || rlw.getRunningLength() == 0)
 						&& rlw.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+					int bufferdeletepos = -1;
+					if (next != null)
+						bufferdeletepos = next.position;
 					rlw.setRunningBit(true);
 					rlw.setRunningLength(rlw.getRunningLength() + 1);
 					rlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords() - 1);
+					// case 4: HLL -> HL
+					// comp: [0, 3...] -> [0, 2...]
+					// uncomp: [0, 4..] -> [0, 4...]
+					
+					if (bufferdeletepos != -1) {
+						int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+						shiftCompIndexToLeft(deletepos, 0, -1);
+					}
+
 					// current RLW has no literals left, try to merge with
 					// following RLW
 					if (rlw.getNumberOfLiteralWords() == 0
 							&& next != null
 							&& next.getRunningBit()
 							&& next.getRunningLength() + rlw.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
+						bufferdeletepos = rlw.position;
+						int nextBufferDeletePos = next.position;
 						// if (rlw.equals(this.rlw))
 						// this.rlw.position = next.position;
 						next.setRunningLength(next.getRunningLength()
 								+ rlw.getRunningLength());
 						shiftCompressedWordsLeft(rlw.position + 2, 2);
+						// case 6 literal merge to front: HLHL -> HL
+						// comp: [0, 2, 4...] -> [0, 2...]
+						// uncomp: [0, 3, 6..] -> [0, 6...]
+						
+						int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+						int uncompDeletepos = findCompresIndexByBufferIndex(nextBufferDeletePos);
+						shiftCompIndexToLeft(deletepos, 1, -2);
+						shiftUnCompIndexToLeft(uncompDeletepos, 1, 0);
 					}
 					// else just reduce length of rlw by 1
 					else
 						shiftCompressedWordsLeft(rlw.position + 2, 1);
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
 				}
 				// if last word increase following running length count if
 				// possible
@@ -291,9 +371,17 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 						&& (next.getRunningLength() == 0 || next
 								.getRunningBit())
 						&& literalPos == rlw.getNumberOfLiteralWords() - 1) {
+					int nextBufferDeletePos = next.position;
 					next.setRunningBit(true);
 					next.setRunningLength(next.getRunningLength() + 1);
 					rlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords() - 1);
+					// case 5: HLLH -> HLH
+					// comp: [0, 3, 5...] -> [0, 2, 4...]
+					// uncomp: [0, 4, 7..] -> [0, 3, 7...]
+					int deletepos = findCompresIndexByBufferIndex(nextBufferDeletePos);
+					shiftCompIndexToLeft(deletepos, 0, -1);
+					UnCompressPosRep[deletepos] -= 1;
+					
 					// current RLW has no literals left, try to merge with
 					// following
 					if (rlw.getNumberOfLiteralWords() == 0
@@ -302,17 +390,48 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 							&& next.getRunningLength() < RunningLengthWord.largestrunninglengthcount) {
 						if (rlw.equals(this.rlw))
 							this.rlw.position = next.position;
+						int bufferdeletepos = rlw.position;
+						nextBufferDeletePos = next.position;
 						next.setRunningLength(next.getRunningLength()
 								+ rlw.getRunningLength());
 						shiftCompressedWordsLeft(rlw.position + 2, 2);
+						// case 6 leteral merge to back: HLHL -> HL
+						// comp: [0, 2, 4...] -> [0, 2...]
+						// uncomp: [0, 3, 6..] -> [0, 6...]
+						deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+						int uncompDeletepos = findCompresIndexByBufferIndex(nextBufferDeletePos);
+						shiftCompIndexToLeft(deletepos, 1, -2);
+						shiftUnCompIndexToLeft(uncompDeletepos, 1, 0);
+
 					} else
 						shiftCompressedWordsLeft(
 								rlw.position + rlw.getNumberOfLiteralWords()
 										+ 2, 1);
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
 				}
 				// cannot merge, have to create new RLW and adapt literal count
 				// of current RLW
 				else {
+					int nextBufferdeletepos = -1;
+					if (next != null)
+						nextBufferdeletepos = next.position;
+					
+					
 					int beforeLit = literalPos;
 					int afterLit = rlw.getNumberOfLiteralWords() - literalPos
 							- 1;
@@ -326,6 +445,17 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 					newRlw.setNumberOfLiteralWords(afterLit);
 
 					rlw.setNumberOfLiteralWords(beforeLit);
+					// case 7: HLLLH -> HLHLH
+					// comp: [0, 4...] -> [0, 2, 4...]
+					// uncomp: [0, 5..] -> [0, 3, 5...]
+					
+					if (nextBufferdeletepos != -1){
+						int movingPos = findCompresIndexByBufferIndex(nextBufferdeletepos);
+						shiftCompIndexToRight(movingPos, 1, 0);
+						CompressPosRep[movingPos] = CompressPosRep[movingPos - 1] + literalPos;
+						shiftUncompIndexToRight(movingPos, 1, 0);
+						UnCompressPosRep[movingPos] = rlw.getRunningLength() + literalPos;
+					}
 
 					// if next one is full running length 1's we have to switch
 					// running lengths
@@ -334,8 +464,18 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 							&& next.getRunningLength() == RunningLengthWord.largestrunninglengthcount) {
 						next.setRunningLength(1L);
 						newRlw.setRunningLength(RunningLengthWord.largestrunninglengthcount);
-					}
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
 
+					}
 					// we split the last word, adapt it
 					if (rlw.position == this.rlw.position)
 						this.rlw.position = newRlw.position;
@@ -368,15 +508,20 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 				// merge with previous if exists and possible
 				if (prev != null
 						&& prev.getNumberOfLiteralWords() + newNumLiterals <= RunningLengthWord.largestliteralcount) {
+					int bufferdeletepos = rlw.position;
 					prev.setNumberOfLiteralWords(prev.getNumberOfLiteralWords()
 							+ newNumLiterals);
-					int bufferdeletepos = rlw.position;
 					this.buffer[rlw.position] = newdata;
 
 					if (this.rlw.equals(rlw))
 						this.rlw = prev;
 
-					shiftIndexToLeft(bufferdeletepos, 1, 0);
+					// case 10: HLHLL -> HLLLL
+					// comp: [0, 2, 5...] -> [0, 5...]
+					// uncomp: [0, 3, 6..] -> [0, 6...]
+					int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+					shiftCompIndexToLeft(deletepos, 1, 0);
+					shiftUnCompIndexToLeft(deletepos, 1, 0);
 
 					return;
 				}
@@ -387,10 +532,18 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 			if (newRunLen == 0
 					&& prev != null
 					&& prev.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
+				int bufferdeletepos = rlw.position;
 				prev.setNumberOfLiteralWords(prev.getNumberOfLiteralWords() + 1);
 				rlw.setRunningLength(afterRunLen);
 				shiftCompressedWordsRight(rlw.position, 1);
 				this.buffer[prev.position + prev.getNumberOfLiteralWords()] = newdata;
+
+				// case 11: HLHL -> HLLHL
+				// comp: [0, 2, 4...] -> [0, 3, 5...]
+				// uncomp: [0, 3, 6..] -> [0, 4, 6...]
+				int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+				shiftCompIndexToLeft(deletepos, 0, 1);
+				UnCompressPosRep[deletepos] += 1;
 
 				return;
 			}
@@ -399,11 +552,22 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 			// try to extend R with the new literal.
 			if (afterRunLen == 0
 					&& rlw.getNumberOfLiteralWords() < RunningLengthWord.largestliteralcount) {
+				int bufferdeletepos = -1;
+				if (next != null)
+					bufferdeletepos = next.position;
 				rlw.setNumberOfLiteralWords(rlw.getNumberOfLiteralWords() + 1);
 				rlw.setRunningLength(newRunLen);
 				shiftCompressedWordsRight(rlw.position + 1, 1);
 				this.buffer[rlw.position + 1] = newdata;
 
+				// case 12: HLL -> HLLL
+				// comp: [0, 3...] -> [0, 4...]
+				// uncomp: [0, 4..] -> [0, 5...]
+				if (bufferdeletepos != -1) {
+					int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
+					shiftCompIndexToLeft(deletepos, 0, 1);
+					shiftUnCompIndexToLeft(deletepos, 0, 1);
+				}
 				return;
 			}
 
@@ -438,6 +602,9 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 			if (afterRunLen == 0) {
 				assert (rlw.getNumberOfLiteralWords() == RunningLengthWord.largestliteralcount);
 
+				int bufferdeletepos = -1;
+				if (next != null)
+					bufferdeletepos = next.position;
 				shiftCompressedWordsRight(rlw.position + 1, 1);
 				shiftCompressedWordsRight(
 						rlw.position + rlw.getNumberOfLiteralWords() + 1, 1);
@@ -455,6 +622,18 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 
 				if (newRlw.position > this.rlw.position)
 					this.rlw.position = newRlw.position;
+
+				// case 13: HLL -> HLHLL
+				// comp: [0, 3...] -> [0, 2, 5...]
+				// uncomp: [0, 5..] -> [0, 2, 5...]
+				if (bufferdeletepos != -1) {
+					int movingpos = findCompresIndexByBufferIndex(bufferdeletepos);
+					shiftCompIndexToRight(movingpos, 1, 2);
+					CompressPosRep[movingpos] = CompressPosRep[movingpos - 1] + 2;
+					shiftUncompIndexToRight(movingpos, 1, 0);
+					UnCompressPosRep[movingpos] = UnCompressPosRep[movingpos - 1] + 2;
+				}
+
 			}
 			// new RLW also gets run length
 			else {
@@ -478,33 +657,72 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 		}
 	}
 
-	private void shiftIndexToLeft(int bufferdeletepos, int shift, int substract) {
-		int deletepos = findCompresIndexByBufferIndex(bufferdeletepos);
-
-		if (deletepos + shift == usedwords)
+	private void shiftCompIndexToLeft(int deletepos, int shift, int add) {
+		if (deletepos + shift == CompressUsedWord)
 			return;
 		System.arraycopy(CompressPosRep, deletepos + shift, CompressPosRep,
-				deletepos, usedwords - shift - deletepos);
-		System.arraycopy(UnCompressPosRep, deletepos + shift, UnCompressPosRep,
-				deletepos, usedwords - shift - deletepos);
-		if (substract !=0) {
-			for(int i = deletepos; i < usedwords; i++)
-				CompressPosRep[i] = CompressPosRep[i] - substract;
+				deletepos, CompressUsedWord - shift - deletepos);
+		if (add != 0) {
+			for (int i = deletepos; i < CompressUsedWord; i++)
+				CompressPosRep[i] += add;
 		}
-			
-		usedwords--;
+
+		CompressUsedWord -= shift;
+	}
+
+	private void shiftUnCompIndexToLeft(int deletepos, int shift, int add) {
+		if (deletepos + shift == UnCompressUsedWords)
+			return;
+		System.arraycopy(UnCompressPosRep, deletepos + shift, UnCompressPosRep,
+				deletepos, UnCompressUsedWords - shift - deletepos);
+		if (add != 0) {
+			for (int i = deletepos; i < UnCompressUsedWords; i++)
+				UnCompressPosRep[i] += add;
+		}
+
+		UnCompressUsedWords -= shift;
+	}
+
+	private void shiftCompIndexToRight(int movingpos, int shift, int add) {
+		if (add != 0) {
+			for (int i = movingpos; i < CompressUsedWord; i++)
+				CompressPosRep[i] += add;
+		}
+
+		long[] result = new long[CompressUsedWord + shift];
+		System.arraycopy(CompressPosRep, 0, result, 0, movingpos);
+		System.arraycopy(CompressPosRep, movingpos, result, movingpos + shift,
+				CompressUsedWord - movingpos);
+
+		CompressPosRep = result;
+		CompressUsedWord += shift;
+	}
+
+	private void shiftUncompIndexToRight(int movingpos, int shift, int add) {
+		if (add != 0) {
+			for (int i = movingpos; i < UnCompressUsedWords; i++)
+				UnCompressPosRep[i] += add;
+		}
+
+		long[] result = new long[UnCompressUsedWords + shift];
+		System.arraycopy(UnCompressPosRep, 0, result, 0, movingpos);
+		System.arraycopy(UnCompressPosRep, movingpos, result,
+				movingpos + shift, UnCompressUsedWords - movingpos);
+
+		UnCompressPosRep = result;
+		UnCompressUsedWords += shift;
 	}
 
 	private int findCompresIndexByBufferIndex(int bufferdeletepos) {
-		int midpoint = (usedwords - 1) / 2;
+		int midpoint = (CompressUsedWord - 1) / 2;
 		int leftpoint = 0;
-		int rightpoint = usedwords - 1;
+		int rightpoint = CompressUsedWord - 1;
 
 		while (true) {
 			if (bufferdeletepos > CompressPosRep[midpoint]) {
 				leftpoint = midpoint;
 				midpoint = leftpoint + (rightpoint - leftpoint) / 2;
-				if (CompressPosRep[-1] <= bufferdeletepos)
+				if (CompressPosRep[CompressUsedWord - 1] <= bufferdeletepos)
 					return rightpoint;
 				else if (midpoint == leftpoint)
 					return leftpoint;
@@ -521,7 +739,7 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 	}
 
 	private void checkArraySize() {
-		if (usedwords == CompressPosRep.length) {
+		if (CompressUsedWord == CompressPosRep.length) {
 			final long oldLiteralRep[] = CompressPosRep;
 			final long oldWordRep[] = UnCompressPosRep;
 			CompressPosRep = new long[oldLiteralRep.length * 2];
@@ -535,16 +753,16 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 
 	// return the index to uncompressposrep that contains the bitpos.
 	public int getHeaderIndex(int bitpos) {
-		int midpoint = (usedwords - 1) / 2;
+		int midpoint = (UnCompressUsedWords - 1) / 2;
 		int leftpoint = 0;
-		int rightpoint = usedwords - 1;
+		int rightpoint = UnCompressUsedWords - 1;
 		int bitWordIndex = bitpos / 64;
 
 		while (true) {
 			if (bitWordIndex > UnCompressPosRep[midpoint]) {
 				leftpoint = midpoint;
 				midpoint = leftpoint + (rightpoint - leftpoint) / 2;
-				if (UnCompressPosRep[-1] <= bitWordIndex)
+				if (UnCompressPosRep[UnCompressUsedWords - 1] <= bitWordIndex)
 					return rightpoint;
 				else if (midpoint == leftpoint)
 					return leftpoint;
