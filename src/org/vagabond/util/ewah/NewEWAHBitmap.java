@@ -189,14 +189,16 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 
 	@Override
 	public boolean fastSet(final int i) {
-		boolean result = super.fastSet(i);
+		if (!super.fastSet(i))
+			return false;
+		
 		RunningLengthWord rlw = new RunningLengthWord(this.buffer,
 				(int) CompressPosRep[CompressUsedWord - 1]);
 		long currentsize = UnCompressPosRep[UnCompressUsedWords - 1];
 		rlw.next();
 
 		// while current header position does not includes i.
-		while (rlw.position + rlw.size() < actualsizeinwords) {
+		while (rlw.position < actualsizeinwords && rlw.position + rlw.size() < actualsizeinwords) {
 			checkArraySize();
 			currentsize += rlw.size();
 			CompressPosRep[CompressUsedWord] = rlw.position;
@@ -205,7 +207,8 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 			UnCompressUsedWords++;
 			rlw.next();
 		}
-		return result;
+		
+		return true;
 	}
 
 	@Override
