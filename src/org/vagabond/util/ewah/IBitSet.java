@@ -6,7 +6,8 @@ public interface IBitSet extends Bitmap, Cloneable {
 
 	public enum BitsetType {
 		JavaBitSet,
-		EWAHBitSet
+		EWAHBitSet,
+		IndexEWAHBitSet
 	}
 	
 	public boolean get (int position);

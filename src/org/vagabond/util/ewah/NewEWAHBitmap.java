@@ -349,23 +349,7 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 					// else just reduce length of rlw by 1
 					else
 						shiftCompressedWordsLeft(rlw.position + 2, 1);
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 				}
 				// if last word increase following running length count if
 				// possible
@@ -410,22 +394,7 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 						shiftCompressedWordsLeft(
 								rlw.position + rlw.getNumberOfLiteralWords()
 										+ 2, 1);
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 				}
 				// cannot merge, have to create new RLW and adapt literal count
 				// of current RLW
@@ -455,7 +424,8 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 					if (nextBufferdeletepos != -1){
 						int movingPos = findCompresIndexByBufferIndex(nextBufferdeletepos);
 						shiftCompIndexToRight(movingPos, 1, 0);
-						CompressPosRep[movingPos] = CompressPosRep[movingPos - 1] + literalPos;
+						long newComp = (movingPos == 0) ? 0 : CompressPosRep[movingPos - 1]; 
+						CompressPosRep[movingPos] = newComp + literalPos;
 						shiftUncompIndexToRight(movingPos, 1, 0);
 						UnCompressPosRep[movingPos] = rlw.getRunningLength() + literalPos;
 					}
@@ -467,17 +437,6 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 							&& next.getRunningLength() == RunningLengthWord.largestrunninglengthcount) {
 						next.setRunningLength(1L);
 						newRlw.setRunningLength(RunningLengthWord.largestrunninglengthcount);
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-
 					}
 					// we split the last word, adapt it
 					if (rlw.position == this.rlw.position)
