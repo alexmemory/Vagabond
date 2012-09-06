@@ -79,7 +79,8 @@
 	</target>
 
 	<target name="Compile" depends="CopyResources,GenerateXMLbindings">
-		<javac srcdir="${sourcedir}" destdir="${binarydir}" classpathref="libraries" debug="on">
+		<javac srcdir="${sourcedir}" destdir="${binarydir}" 
+			classpathref="libraries" debug="on" includeantruntime="false">
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 	</target>
