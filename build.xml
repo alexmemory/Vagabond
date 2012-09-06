@@ -135,6 +135,7 @@
 	<target name="Jar" depends="Compile,GenerateXMLbindings">
 		<antcall target="JarVagabondLoader" />
 		<antcall target="JarVagabondExplGen" />
+		<antcall target="JarForOtherProjects" />
 	</target>
 
 	<target name="JarForGui" depends="Compile,GenerateXMLbindings">
@@ -157,6 +158,16 @@
 		</jar>
 	</target>
 
+	<target name="JarForOtherProjects" depends="Compile,GenerateXMLbindings">
+		<jar destfile="${builddir}/trampexgen.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${loaderMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+	</target>
+	
 	<target name="JarVagabondLoader">
 		<mkdir dir="${loadermacdir}" />
 		<mkdir dir="${loaderwindir}" />
