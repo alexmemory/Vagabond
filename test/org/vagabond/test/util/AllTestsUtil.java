@@ -9,6 +9,7 @@ import org.junit.runners.Suite;
 		TestResultSetUtil.class,
 		TestQueryTemplate.class,
 		TestBitMatrixAndBitset.class,
+		TestNewBitMatrixAndBitset.class,
 		TestBloomFilter.class,
 		TestFNVHash.class,
 		TestGraph.class

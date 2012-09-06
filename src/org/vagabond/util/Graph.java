@@ -49,7 +49,7 @@ public class Graph<T> {
 	}
 
 	public boolean hasNode (T node) {
-		return nodeIds.getId(node) == -1;
+		return nodeIds.getId(node) != -1;
 	}
 	
 	public boolean hasEdge(T node, T other) {

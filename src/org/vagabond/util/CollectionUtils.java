@@ -244,4 +244,13 @@ public class CollectionUtils {
 		
 		return 0;
 	}
+	
+	public static int max (int ... args) {
+		int result = Integer.MIN_VALUE;
+		
+		for(int i = 0; i < args.length; i++)
+			result = (result < args[i]) ? args[i] : result;
+		
+		return result;
+	}
 }

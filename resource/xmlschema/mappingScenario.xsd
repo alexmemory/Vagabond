@@ -184,6 +184,15 @@
 		<xs:attribute name="tableref" type="xs:string" />
 	</xs:complexType>
 
+	<xs:complexType name="FuncOrAttrRefType">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Attr" type="xs:string" />
+				<xs:element name="Function" type="this:FunctionType" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="AttrRefType">
 		<xs:sequence>
 			<xs:element name="Attr" type="xs:string" minOccurs="1"
@@ -243,6 +252,8 @@
 			<xs:choice minOccurs="1" maxOccurs="unbounded">
 				<xs:element name="Var" type="xs:string" />
 				<xs:element name="SKFunction" type="this:SKFunction" />
+				<xs:element name="Function" type="this:FunctionType" />
+				<xs:element name="Constant" type="xs:string" />
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="tableref" type="xs:string" />
@@ -253,10 +264,25 @@
 			<xs:choice minOccurs="1" maxOccurs="unbounded">
 				<xs:element name="Var" type="xs:string" />
 				<xs:element name="SKFunction" type="this:SKFunction" />
+				<xs:element name="Function" type="this:FunctionType" />
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="skname" type="xs:string" />
 	</xs:complexType>
+	
+	<xs:complexType name="FunctionType">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Var" type="xs:string" />
+				<xs:element name="SKFunction" type="this:SKFunction" />
+				<xs:element name="Function" type="this:FunctionType" />
+				<xs:element name="Constant" type="xs:string" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="fname" type="xs:string" />
+	</xs:complexType>
+	
+	
 
 	<!-- ************ Transformation Types **************************** -->
 
