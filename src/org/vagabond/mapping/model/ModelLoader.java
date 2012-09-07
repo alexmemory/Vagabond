@@ -15,6 +15,10 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
+import org.vagabond.xmlmodel.MappingType;
+import org.vagabond.xmlmodel.RelAtomType;
+import org.vagabond.xmlmodel.RelationType;
+import org.vagabond.xmlmodel.SchemaType;
 import org.vagabond.xmlmodel.SchemasType;
 
 /**
@@ -93,8 +97,7 @@ public class ModelLoader {
 		return new MapScenarioHolder(getDoc(inStream));
 	}
 
-	private MappingScenarioDocument getDoc(InputStream in) throws XmlException,
-			IOException, ValidationException {
+	private MappingScenarioDocument getDoc(InputStream in) throws Exception {
 		MappingScenarioDocument doc;
 
 		doc = MappingScenarioDocument.Factory.parse(in);
@@ -108,13 +111,11 @@ public class ModelLoader {
 	 * 
 	 * @param doc
 	 *            The XMLBeans object for the document.
-	 * @throws ValidationException
-	 *             If the document does not conform to the XML schema for
-	 *             mapping scenarios.
+	 * @throws Exception If validation fails
 	 */
 
 	public void validate(MappingScenarioDocument doc)
-			throws ValidationException {
+			throws Exception {
 		List<?> errors = new ArrayList();
 		XmlOptions options = new XmlOptions();
 		boolean result;
@@ -134,15 +135,19 @@ public class ModelLoader {
 		stricterValidation(doc);
 	}
 
-	public void stricterValidation (MappingScenarioDocument doc) throws ValidationException {
+	public void stricterValidation (MappingScenarioDocument doc) throws Exception {
 		SchemasType schemas = doc.getMappingScenario().getSchemas();
 		int numSourceRels = schemas.getSourceSchema().getRelationArray().length;
 		int numTargetRels = schemas.getTargetSchema().getRelationArray().length;
 		int numTrans, numData;
+		MapScenarioHolder scen = new MapScenarioHolder(doc);
 		
 		boolean hasTrans = doc.getMappingScenario().isSetTransformations();
 		boolean hasCorrs = doc.getMappingScenario().isSetCorrespondences();
 		boolean hasData = doc.getMappingScenario().isSetData();
+		
+		SchemaType src = doc.getMappingScenario().getSchemas().getSourceSchema();
+		SchemaType trg = doc.getMappingScenario().getSchemas().getTargetSchema();
 		
 		if (numTargetRels == 0)
 			throw new ValidationException("no target relations");
@@ -159,27 +164,47 @@ public class ModelLoader {
 			if (numTrans < numTargetRels)
 				throw new ValidationException("have to have at least as many transformation than target relations");
 		}
-			
+		
+		// test that atoms in mappings have right arity
+		for(MappingType m: doc.getMappingScenario().getMappings()
+				.getMappingArray()) {
+			// check that atoms have the right number of arguments
+			for(RelAtomType a: m.getForeach().getAtomArray())
+				checkAtomNumArgs(scen, a, false);
+			for(RelAtomType a: m.getExists().getAtomArray())
+				checkAtomNumArgs(scen, a, true);
+		}
+	}
+
+	private void checkAtomNumArgs(MapScenarioHolder scen, RelAtomType a, 
+			boolean trg)
+			throws Exception {
+		String relName = a.getTableref();
+		RelationType r = scen.getRelForName(relName, trg);
+		int numAttr = r.sizeOfAttrArray();
+		if (numAttr != a.sizeOfConstantArray() + a.sizeOfFunctionArray() 
+				+ a.sizeOfSKFunctionArray() + a.sizeOfVarArray())
+			throw new Exception ("Atom " + a.toString() + " has not the" +
+					" same number of arguments as the relation it refers " +
+					"to " + r.toString());
 	}
 	
 	public void storeModel(OutputStream o, MappingScenarioDocument doc)
-			throws IOException, ValidationException {
+			throws Exception {
 		validate(doc);
 		doc.save(o);
 	}
 
-	public void storeModel(OutputStream o) throws IOException,
-			ValidationException {
+	public void storeModel(OutputStream o) throws Exception {
 		storeModel(o, MapScenarioHolder.getInstance().getDocument());
 	}
 
 	public void storeModel(String fileName, MappingScenarioDocument doc)
-			throws FileNotFoundException, IOException, ValidationException {
+			throws Exception {
 		storeModel(new FileOutputStream(fileName), doc);
 	}
 
-	public void storeModel(String fileName) throws FileNotFoundException,
-			IOException, ValidationException {
+	public void storeModel(String fileName) throws Exception {
 		storeModel(fileName, MapScenarioHolder.getInstance().getDocument());
 	}
 
