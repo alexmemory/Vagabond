@@ -71,13 +71,10 @@ public class ModelLoader {
 	 * @param inFile
 	 *            The XML file to load from.
 	 * @return The mapping scenario.
-	 * @throws XmlException
-	 * @throws IOException
-	 * @throws ValidationException
+	 * @throws Exception 
 	 */
 
-	public MapScenarioHolder load(File inFile) throws XmlException,
-			IOException, ValidationException {
+	public MapScenarioHolder load(File inFile) throws Exception {
 		return new MapScenarioHolder(getDoc(new FileInputStream(inFile)));
 	}
 
@@ -87,13 +84,10 @@ public class ModelLoader {
 	 * @param inStream
 	 *            The input stream to read from.
 	 * @return The mapping scenario.
-	 * @throws XmlException
-	 * @throws IOException
-	 * @throws ValidationException
+	 * @throws Exception 
 	 */
 
-	public MapScenarioHolder load(InputStream inStream) throws XmlException,
-			IOException, ValidationException {
+	public MapScenarioHolder load(InputStream inStream) throws Exception {
 		return new MapScenarioHolder(getDoc(inStream));
 	}
 
@@ -169,8 +163,9 @@ public class ModelLoader {
 		for(MappingType m: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
 			// check that atoms have the right number of arguments
-			for(RelAtomType a: m.getForeach().getAtomArray())
-				checkAtomNumArgs(scen, a, false);
+			if (m.isSetForeach())
+				for(RelAtomType a: m.getForeach().getAtomArray())
+					checkAtomNumArgs(scen, a, false);
 			for(RelAtomType a: m.getExists().getAtomArray())
 				checkAtomNumArgs(scen, a, true);
 		}
