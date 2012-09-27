@@ -97,7 +97,7 @@ public class PartitionRanker implements IPartitionRanker {
 		
 		
 		private void computeScore () {
-			log.debug("Compute Score for: " + this.toString());
+			if (log.isDebugEnabled()) {log.debug("Compute Score for: " + this.toString());};
 			totalScore = 0;
 			for(int i = 0; i < iterPos.length; i++) {
 //				ExplanationCollection col = part.get(i); 
@@ -225,7 +225,7 @@ public class PartitionRanker implements IPartitionRanker {
 		
 		curIterElem = ranking.higher(curIterElem);
 		
-		log.debug("cur elem: " + curIterElem.toString());
+		if (log.isDebugEnabled()) {log.debug("cur elem: " + curIterElem.toString());};
 		
 		return generateExplanation (curIterElem);
 	}

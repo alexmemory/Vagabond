@@ -244,7 +244,7 @@ public class SchemaCodeGenerator {
 		if (addForeignKeys)
 			getAllSourceForeignKeysCode(schema, schemaName, result);
 		
-		log.debug("created DDL script for schema " + schemaName + ":\n" + result.toString());
+		if (log.isDebugEnabled()) {log.debug("created DDL script for schema " + schemaName + ":\n" + result.toString());};
 	}
 	
 	/**
@@ -517,7 +517,7 @@ public class SchemaCodeGenerator {
 		result = new StringBuffer();
 		getRowInsert(schemaName, relName, row, result);
 		
-		log.debug("Created INSERT statement:\n" + result);
+		if (log.isDebugEnabled()) {log.debug("Created INSERT statement:\n" + result);};
 		return result.toString();
 	}
 	
@@ -559,7 +559,7 @@ public class SchemaCodeGenerator {
 		result = new StringBuffer();
 		getCopy(schemaName, inst, result);
 		
-		log.debug("Created COPY command: " + result.toString());
+		if (log.isDebugEnabled()) {log.debug("Created COPY command: " + result.toString());};
 		
 		return result.toString();
 	}

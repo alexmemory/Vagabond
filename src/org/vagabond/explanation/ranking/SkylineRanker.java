@@ -568,7 +568,7 @@ public class SkylineRanker implements IPartitionRanker {
 		for(int i = 0; i < rankers.length; i++)
 			rankers[i].rankFull();
 		
-		log.debug("Number of expl in full ranking " + rankers[0].getNumberPrefetched());
+		if (log.isDebugEnabled()) {log.debug("Number of expl in full ranking " + rankers[0].getNumberPrefetched());};
 		
 		generateUpTo((int) rankers[0].getNumberPrefetched() - 1);
 	}

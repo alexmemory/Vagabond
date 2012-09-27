@@ -408,7 +408,7 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 					int afterLit = rlw.getNumberOfLiteralWords() - literalPos
 							- 1;
 
-					log.debug("split into " + beforeLit + " and " + afterLit);
+					if (log.isDebugEnabled()) {log.debug("split into " + beforeLit + " and " + afterLit);};
 
 					RunningLengthWord newRlw = new RunningLengthWord(rlw);
 					newRlw.position += literalPos + 1;
@@ -441,7 +441,7 @@ public class NewEWAHBitmap extends EWAHCompressedBitmap {
 					// we split the last word, adapt it
 					if (rlw.position == this.rlw.position)
 						this.rlw.position = newRlw.position;
-					log.debug("split because new 1's run");
+					if (log.isDebugEnabled()) {log.debug("split because new 1's run");};
 				}
 			}
 		}

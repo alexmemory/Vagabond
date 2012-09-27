@@ -103,8 +103,8 @@ public class CorrespondencExplanationGenerator implements
 		query = QueryHolder.getQuery("Correspondence.GetSideEffects")
 				.parameterize("target." + rel, mapList.toString());
 		
-		log.debug("Run side effect query for <" + rel + "> with query <\n" 
-				+ query + ">");
+		if (log.isDebugEnabled()) {log.debug("Run side effect query for <" + rel + "> with query <\n" 
+				+ query + ">");};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 
@@ -167,7 +167,7 @@ public class CorrespondencExplanationGenerator implements
 			}
 		}
 		
-		log.debug("Correpsondence candidates are " + corrCandi.toString());
+		if (log.isDebugEnabled()) {log.debug("Correpsondence candidates are " + corrCandi.toString());};
 		
 	}
 	

@@ -54,7 +54,7 @@ public class CommandLineLoader {
 	private void parseOptions (String[] args) throws CmdLineException {
 		CmdLineParser parser;
 		
-		log.debug("Command line args are: <" + LoggerUtil.arrayToString(args) + ">");
+		if (log.isDebugEnabled()) {log.debug("Command line args are: <" + LoggerUtil.arrayToString(args) + ">");};
 		parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 	}

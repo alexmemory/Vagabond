@@ -37,8 +37,8 @@ public class AlterSourceProvenanceSideEffectGenerator
 		query = QueryHolder.getQuery("ProvSE.GetSideEffectUsingAgg")
 				.parameterize("target." + relName, conditions.toString());
 		
-		log.debug("Compute side effect query for\nrelname <" + relName + 
-				">\nconditions <" + conditions + ">\nwith query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute side effect query for\nrelname <" + relName + 
+				">\nconditions <" + conditions + ">\nwith query:\n" + query);};
 		
 		return query;
 	}

@@ -160,8 +160,8 @@ public class TargetSkeletonMappingExplanationGenerator implements
 		
 		query = QueryHolder.getQuery("SuperMap.GetSideEffects")
 				.parameterize("target." + rel, mapList.toString());
-		log.debug("Run side effect query for <" + rel + "> with query <\n" 
-				+ query + ">");
+		if (log.isDebugEnabled()) {log.debug("Run side effect query for <" + rel + "> with query <\n" 
+				+ query + ">");};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		

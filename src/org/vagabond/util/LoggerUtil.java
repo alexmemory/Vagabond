@@ -30,7 +30,7 @@ public class LoggerUtil {
 	
 	public static void logDebugException (Throwable e, Logger log) {
 		if (log.isDebugEnabled())
-			log.debug(getCompleteTrace(e));
+			if (log.isDebugEnabled()) {log.debug(getCompleteTrace(e));};
 	}
 	
 	public static void logExceptionAndFail (Exception e, Logger log) {
@@ -123,7 +123,7 @@ public class LoggerUtil {
 		
 		result.deleteCharAt(result.length() - 1);
 		
-		log.debug(result.toString());
+		if (log.isDebugEnabled()) {log.debug(result.toString());};
 	}
 		
 	public static void logArray (Logger log, Object[] array, String message) {
@@ -142,12 +142,12 @@ public class LoggerUtil {
 		}
 		result.deleteCharAt(result.length() - 1);
 		
-		log.debug(result.toString());
+		if (log.isDebugEnabled()) {log.debug(result.toString());};
 	}
 	
 	public static void logObjectColWithMethod (Logger log, Collection<?> objs,
 			Class<?> objClass, String methodName) throws  Exception {
-		log.debug(ObjectColToStringWithMethod(objs,objClass, methodName));
+		if (log.isDebugEnabled()) {log.debug(ObjectColToStringWithMethod(objs,objClass, methodName));};
 	}
 	
 	public static String ObjectColToStringWithMethod (Collection<?> objs, 

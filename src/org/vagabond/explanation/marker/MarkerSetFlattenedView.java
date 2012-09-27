@@ -148,7 +148,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		int size2 = -1;;
 		ResultSet rs;
 
-		log.debug("Check if markers for query:\n" + query1 + "\n and query: \n" + query2 +"\n are the same.");
+		if (log.isDebugEnabled()) {log.debug("Check if markers for query:\n" + query1 + "\n and query: \n" + query2 +"\n are the same.");};
 
 		try {
 			rs = ConnectionManager.getInstance().execQuery(query1);
@@ -176,7 +176,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		if (isMaterialized()) {
 			String q = "SELECT * FROM " + relName;
 
-			log.debug("Get the size of markers for query:\n" + q);
+			if (log.isDebugEnabled()) {log.debug("Get the size of markers for query:\n" + q);};
 
 			size = querySize(q);
 		} else {
@@ -192,7 +192,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		if (isMaterialized())
 			return size;
 		
-		log.debug("Get the size of markers for query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Get the size of markers for query:\n" + query);};
 
 		size = getQueryResultCount(query);
 		
@@ -254,7 +254,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		Set<ISingleMarker> markers = new HashSet<ISingleMarker> ();
 		ResultSet rs;
 		
-		log.debug("Compute markers for query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute markers for query:\n" + query);};
 
 		try {
 			String q = query;

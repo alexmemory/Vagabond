@@ -48,17 +48,17 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		this.error = error;
 		
 		partionedSE = partitionSourceSE();
-		log.debug("partioned source SE: " + partionedSE);
+		if (log.isDebugEnabled()) {log.debug("partioned source SE: " + partionedSE);};
 		relsForAffTarget = getRelAffectedByRels(partionedSE.keySet());
-		log.debug("rels affected by source SE rels are: " + relsForAffTarget);
+		if (log.isDebugEnabled()) {log.debug("rels affected by source SE rels are: " + relsForAffTarget);};
 		
 		for(String targetRel: relsForAffTarget.keySet()) {
 			query = getSideEffectQuery(targetRel, 
 					relsForAffTarget.get(targetRel), 
 					partionedSE);
 			
-			log.debug("Compute side effects for target relation <"
-					+ targetRel + "> using query:\n" + query);
+			if (log.isDebugEnabled()) {log.debug("Compute side effects for target relation <"
+					+ targetRel + "> using query:\n" + query);};
 			
 			rs = ConnectionManager.getInstance().execQuery(query);
 			parseTargetSE(targetRel, rs, result);
@@ -110,7 +110,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 			}
 		}
 		
-		log.debug("Relations affected by <" + inputRels + "> are:\n" + result);
+		if (log.isDebugEnabled()) {log.debug("Relations affected by <" + inputRels + "> are:\n" + result);};
 		
 		return result;
 	}
@@ -131,7 +131,7 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 			mSet.add(marker);
 		}
 		
-		log.debug("paritioned source side effects into:\n" + parts);
+		if (log.isDebugEnabled()) {log.debug("paritioned source side effects into:\n" + parts);};
 		
 		return parts;
 	}
@@ -163,8 +163,8 @@ public class SourceProvenanceSideEffectGenerator implements ISideEffectGenerator
 		query = QueryHolder.getQuery("ProvSE.GetSideEffect")
 				.parameterize("target." + relName, conditions.toString());
 		
-		log.debug("Compute side effect query for\nrelname <" + relName + 
-				">\nconditions <" + conditions + ">\nwith query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute side effect query for\nrelname <" + relName + 
+				">\nconditions <" + conditions + ">\nwith query:\n" + query);};
 		
 		return query;
 	}

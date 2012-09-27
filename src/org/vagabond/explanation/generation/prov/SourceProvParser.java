@@ -43,7 +43,7 @@ public class SourceProvParser {
 		String colName;
 		String relName;
 
-		log.debug("parse schema of result set");
+		if (log.isDebugEnabled()) {log.debug("parse schema of result set");};
 		
 		colNames = ResultSetUtil.getResultColumns(dbResult);
 		
@@ -57,7 +57,7 @@ public class SourceProvParser {
 			}
 		}
 		
-		log.debug("Tid attribute positions" +  tidAttrPos.toString());
+		if (log.isDebugEnabled()) {log.debug("Tid attribute positions" +  tidAttrPos.toString());};
 		logArray(log, colNames, "ColNames");
 		logArray(log, relNames.toArray(), "RelNames");
 		
@@ -73,11 +73,11 @@ public class SourceProvParser {
 			witList = new Vector<ITupleMarker> ();
 			for (int i = 0; i < relNames.size(); i++) {
 				tid = dbResult.getString(tidAttrPos.get(i));
-				log.debug("parsed tid <" + tid + ">");
+				if (log.isDebugEnabled()) {log.debug("parsed tid <" + tid + ">");};
 				
 				if (tid != null) {
 					tup = MarkerFactory.newTupleMarker(relNames.get(i), tid);
-					log.debug("add tuple marker " + tup);
+					if (log.isDebugEnabled()) {log.debug("add tuple marker " + tup);};
 					witList.add(tup);	
 					allProv.addTupleInProv(tup);
 				}
@@ -85,7 +85,7 @@ public class SourceProvParser {
 					witList.add(null);
 			}
 			
-			log.debug("created witness list " + witList);
+			if (log.isDebugEnabled()) {log.debug("created witness list " + witList);};
 			allProv.addWitnessList(witList);
 		}
 	}

@@ -78,7 +78,7 @@ public class DynamicBitMatrix extends BitMatrix {
 			public int translateToBitpos(int in) {
 				int row = in / cols;
 				int col = in % cols;
-				log.debug("from in <" + in + "> to r:<" + row + ">, c:<" + col + ">");
+				if (log.isDebugEnabled()) {log.debug("from in <" + in + "> to r:<" + row + ">, c:<" + col + ">");};
 				return translate(row, col);
 			}
 			
@@ -93,7 +93,7 @@ public class DynamicBitMatrix extends BitMatrix {
 			rows = row + 1;
 		if (cols <= col)
 			cols = col + 1;
-		log.debug("new dim <" + rows + "," + cols + ">");
+		if (log.isDebugEnabled()) {log.debug("new dim <" + rows + "," + cols + ">");};
 		bitmap.set(translate(row, col));
 	}
 
@@ -106,7 +106,7 @@ public class DynamicBitMatrix extends BitMatrix {
 			offset += col;
 		else
 			offset += col + row + 1;
-		log.debug("translated r:<" + row + "> c:<" + col + "> to <" + offset + ">");
+		if (log.isDebugEnabled()) {log.debug("translated r:<" + row + "> c:<" + col + "> to <" + offset + ">");};
 		
 		return offset;
 	}
@@ -115,7 +115,7 @@ public class DynamicBitMatrix extends BitMatrix {
 		while(elemOffset.size() <= max) {
 			int curMaxEl = elemOffset.size() - 1;
 			int newOffset = elemOffset.get(curMaxEl) + (2 * curMaxEl) + 1;
-			log.debug("add new offset for <" + (curMaxEl + 1) + "> is <" + newOffset + ">");
+			if (log.isDebugEnabled()) {log.debug("add new offset for <" + (curMaxEl + 1) + "> is <" + newOffset + ">");};
 			elemOffset.add(newOffset);
 		}
 	}

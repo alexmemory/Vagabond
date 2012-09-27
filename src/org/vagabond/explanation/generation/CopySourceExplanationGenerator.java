@@ -54,11 +54,11 @@ public class CopySourceExplanationGenerator
 		expl.setSourceSE(sourceSE);
 		expl.setTargetSE(targetSE);
 		
-		log.debug("Generated Explanation:\n" + expl.toString());
+		if (log.isDebugEnabled()) {log.debug("Generated Explanation:\n" + expl.toString());};
 		
 		result.addExplanation(expl);
 		
-		log.debug("Generated Explanation:\n" + expl.toString());
+		if (log.isDebugEnabled()) {log.debug("Generated Explanation:\n" + expl.toString());};
 		
 		return result;
 	}
@@ -80,7 +80,7 @@ public class CopySourceExplanationGenerator
 			wl = prov.getWitnessList(i);
 			m = prov.getMapProv().get(i);
 			
-			log.debug("WL: <" + wl + "> and map <" + m + ">");
+			if (log.isDebugEnabled()) {log.debug("WL: <" + wl + "> and map <" + m + ">");};
 			
 			for(int j = 0; j < wl.size(); j++) {
 				ITupleMarker wlElem = wl.get(j);
@@ -93,7 +93,7 @@ public class CopySourceExplanationGenerator
 						IAttributeValueMarker newMarker;
 						
 						newMarker = MarkerFactory.newAttrMarker(wlElem, attr);
-						log.debug("added marker: " + newMarker);
+						if (log.isDebugEnabled()) {log.debug("added marker: " + newMarker);};
 						result.add(newMarker);
 					}
 				}
@@ -113,7 +113,7 @@ public class CopySourceExplanationGenerator
 					.getAtomPosForTargetPos(error.getRel(), error.getAttrId()));
 		}
 		
-		log.debug("created mapping to atom vars affected by target attr mapping.");
+		if (log.isDebugEnabled()) {log.debug("created mapping to atom vars affected by target attr mapping.");};
 		
 		return result;
 	}

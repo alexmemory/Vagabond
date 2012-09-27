@@ -310,7 +310,7 @@ public class ScenarioDictionary {
 		String query = "SELECT tid FROM " + fullRelName;
 		TidMapping.add(new IdMap<String>());
 		
-		log.debug("get tids for <" + fullRelName + "> using query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("get tids for <" + fullRelName + "> using query:\n" + query);};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		while(rs.next()) {

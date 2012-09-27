@@ -78,8 +78,8 @@ public class CommandLineExplGen {
 
 			if (options.getSkylineRankers() != null) {
 				SkylineRanker rank;
-				log.debug("Create skyline ranker for scheme "
-						+ Arrays.toString(options.getSkylineRankers()));
+				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
+						+ Arrays.toString(options.getSkylineRankers()));};
 				rank = RankerFactory.createSkylineRanker(
 								options.getSkylineRankers(),
 								options.getRankerScheme(), p);
@@ -88,8 +88,8 @@ public class CommandLineExplGen {
 			else {
 				IPartitionRanker rank;
 
-				log.debug("Create ranker for scheme "
-						+ options.getRankerScheme());
+				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
+						+ options.getRankerScheme());};
 				rank = RankerFactory.createPartRanker(
 								options.getRankerScheme(), p);
 				iter = rank;
@@ -112,7 +112,7 @@ public class CommandLineExplGen {
 				while (!in.ready())
 					Thread.sleep(100);
 				read = in.readLine().trim();
-				log.debug("user pressed " + read);
+				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
 				cont = !read.trim().startsWith("n");
 			}
 		}
@@ -135,7 +135,7 @@ public class CommandLineExplGen {
 			throw new Exception("either marker file (-m) or markers (-M) have"
 					+ "to be specified");
 
-		log.debug("Markers are :<" + markers + ">");
+		if (log.isDebugEnabled()) {log.debug("Markers are :<" + markers + ">");};
 
 		return markers;
 	}
@@ -157,8 +157,8 @@ public class CommandLineExplGen {
 	private void parseOptions(String[] args) throws CmdLineException {
 		CmdLineParser parser;
 
-		log.debug("Command line args are: <" + LoggerUtil.arrayToString(args)
-				+ ">");
+		if (log.isDebugEnabled()) {log.debug("Command line args are: <" + LoggerUtil.arrayToString(args)
+				+ ">");};
 		parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 	}

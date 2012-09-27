@@ -114,7 +114,7 @@ public class ModelLoader {
 		XmlOptions options = new XmlOptions();
 		boolean result;
 
-		log.debug("validate mapping scenario");
+		if (log.isDebugEnabled()) {log.debug("validate mapping scenario");};
 
 		options.setErrorListener(errors);
 

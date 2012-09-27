@@ -87,7 +87,7 @@ public class ExplanationAndErrorXMLLoader {
 		AbstractBasicExplanation result;
 		IBasicExplanation.ExplanationType javaType = getBasicExplType(type);
 		
-		log.debug("Generate explanation of type <" + javaType.toString() + ">");
+		if (log.isDebugEnabled()) {log.debug("Generate explanation of type <" + javaType.toString() + ">");};
 		
 		result = (AbstractBasicExplanation) ExplanationFactory
 						.newBasicExpl(javaType);
@@ -111,7 +111,7 @@ public class ExplanationAndErrorXMLLoader {
 			result.setTransSE(MapScenarioHolder.getInstance().getTransformations(
 					getStringArray(e.getTransformationSE())));
 
-		log.debug("Explanation is: " + result.toString());
+		if (log.isDebugEnabled()) {log.debug("Explanation is: " + result.toString());};
 		
 		return result;
 	}
@@ -197,7 +197,7 @@ public class ExplanationAndErrorXMLLoader {
 		XmlOptions options = new XmlOptions();
 		boolean result;
 
-		log.debug("validate explanation XML");
+		if (log.isDebugEnabled()) {log.debug("validate explanation XML");};
 
 		options.setErrorListener(errors);
 

@@ -80,7 +80,7 @@ public class DatabaseScenarioLoader {
 		
 		ddl = SchemaCodeGenerator.getInstance().
 				getSchemaCodeNoFKeys(map.getScenario());
-		log.debug("execute Schema DDL:\n" + ddl);
+		if (log.isDebugEnabled()) {log.debug("execute Schema DDL:\n" + ddl);};
 		executeDDL(dbCon, ddl);
 		
 		if (map.hasData() && !noData)
@@ -88,7 +88,7 @@ public class DatabaseScenarioLoader {
 		
 		ddl = SchemaCodeGenerator.getInstance().getAllSourceForeignKeysCode
 				(map.getScenario().getSchemas().getSourceSchema(), "source");
-		log.debug("execute Foreign Key DDL:\n" + ddl);
+		if (log.isDebugEnabled()) {log.debug("execute Foreign Key DDL:\n" + ddl);};
 		executeDDL(dbCon, ddl);
 	}
 
@@ -111,7 +111,7 @@ public class DatabaseScenarioLoader {
 		ResultSet rs;
 		boolean result;
 		
-		log.debug("run boolean query <" + sql + ">");
+		if (log.isDebugEnabled()) {log.debug("run boolean query <" + sql + ">");};
 		
 		st = dbCon.createStatement();
 		rs = st.executeQuery(sql);

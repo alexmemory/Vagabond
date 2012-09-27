@@ -1254,7 +1254,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 					int afterLit =
 							rlw.getNumberOfLiteralWords() - literalPos - 1;
 
-					log.debug("split into " + beforeLit + " and " + afterLit);
+					if (log.isDebugEnabled()) {log.debug("split into " + beforeLit + " and " + afterLit);};
 
 					RunningLengthWord newRlw = new RunningLengthWord(rlw);
 					newRlw.position += literalPos + 1;
@@ -1276,7 +1276,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 					// we split the last word, adapt it
 					if (rlw.position == this.rlw.position)
 						this.rlw.position = newRlw.position;
-					log.debug("split because new 1's run");
+					if (log.isDebugEnabled()) {log.debug("split because new 1's run");};
 				}
 			}
 		}
@@ -1571,7 +1571,7 @@ public class EWAHCompressedBitmap implements Cloneable, Externalizable,
 
 		actualsizeinwords += shift;
 		if (log.isDebugEnabled())
-			log.debug(this.rlw.getNumberOfLiteralWords());
+			if (log.isDebugEnabled()) {log.debug(this.rlw.getNumberOfLiteralWords());};
 
 		// adapt position of last RLW unless we shifted literal words from the
 		// last RLW

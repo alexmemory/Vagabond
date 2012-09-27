@@ -59,17 +59,17 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 		createSourceSEAttrMap(partionedSE);
 		relsForAffTarget = getRelAffectedByRels(partionedSE.keySet());
 		
-		log.debug("partioned source SE: " + partionedSE);
-		log.debug("rels affected by source SE rels are: " + relsForAffTarget);
-		log.debug("create sourceSE attr map: " + sourceSEtidToAttrs);
+		if (log.isDebugEnabled()) {log.debug("partioned source SE: " + partionedSE);};
+		if (log.isDebugEnabled()) {log.debug("rels affected by source SE rels are: " + relsForAffTarget);};
+		if (log.isDebugEnabled()) {log.debug("create sourceSE attr map: " + sourceSEtidToAttrs);};
 		
 		for(String targetRel: relsForAffTarget.keySet()) {
 			query = getSideEffectQuery(targetRel, 
 					relsForAffTarget.get(targetRel), 
 					partionedSE);
 			
-			log.debug("Compute side effects for target relation <"
-					+ targetRel + "> using query:\n" + query);
+			if (log.isDebugEnabled()) {log.debug("Compute side effects for target relation <"
+					+ targetRel + "> using query:\n" + query);};
 			
 			rs = ConnectionManager.getInstance().execQuery(query);
 			parseTargetSE(targetRel, rs, result);
@@ -122,14 +122,14 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 		for(int i = 0; i < parse.size(); i++) {
 			curProv = parse.get(i).getValue();
 			tid = parse.get(i).getKey();
-			log.debug("--------- for TID: " + tid);
+			if (log.isDebugEnabled()) {log.debug("--------- for TID: " + tid);};
 			
 			// iterate through all witness lists wl for this target tuple
 			for(int j = 0; j < curProv.getWitnessLists().size(); j++) {
 				wl = curProv.getWitnessList(j);
 				m = curProv.getMapProv().get(j);
 				
-				log.debug("---- wl: " + wl + " and map " + m.getId());
+				if (log.isDebugEnabled()) {log.debug("---- wl: " + wl + " and map " + m.getId());};
 				
 				// for each tid in wl get sourceSE to determine source attrs
 				// and use mapping attribute-map to know for which target attributes
@@ -138,7 +138,7 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 					ITupleMarker wlElem = wl.get(k);					
 					
 					if (wlElem != null) {
-						log.debug("-- tup: " + wlElem);
+						if (log.isDebugEnabled()) {log.debug("-- tup: " + wlElem);};
 						
 						wRelName = curProv.getRelNames().get(k);
 						int[][][] attrMap = getAttrMapping(rel, m.getId());
@@ -153,7 +153,7 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 								for(int tAttrPos: targetPos) {
 									ISingleMarker newMark = MarkerFactory
 											.newAttrMarker(rel, tid, tAttrPos);
-									log.debug("add side effect: " + newMark);
+									if (log.isDebugEnabled()) {log.debug("add side effect: " + newMark);};
 									sideEff.add(newMark);
 								}
 							}
@@ -216,8 +216,8 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 				.parameterize("target." + relName, conditions.toString(), 
 						getProvTidAttrs(relName));
 		
-		log.debug("Compute side effect query for\nrelname <" + relName + 
-				">\nconditions <" + conditions + ">\nwith query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute side effect query for\nrelname <" + relName + 
+				">\nconditions <" + conditions + ">\nwith query:\n" + query);};
 		
 		return query;
 	}

@@ -64,11 +64,11 @@ public class SourceAndMapProvParser {
 			// add to current prov rep
 			for (int i = 2; i <= dbResult.getMetaData().getColumnCount(); i++) {
 				pTid = dbResult.getString(i);
-				log.debug("parsed tid <" + pTid + ">");
+				if (log.isDebugEnabled()) {log.debug("parsed tid <" + pTid + ">");};
 				
 				if (pTid != null) {
 					tup = MarkerFactory.newTupleMarker(unnumRels.get(i - 2), pTid);
-					log.debug("add tuple marker " + tup);
+					if (log.isDebugEnabled()) {log.debug("add tuple marker " + tup);};
 					witList.add(tup);	
 					curProv.addTupleInProv(tup);
 				}
@@ -76,7 +76,7 @@ public class SourceAndMapProvParser {
 					witList.add(null);
 			}
 			
-			log.debug("created witness list " + witList);
+			if (log.isDebugEnabled()) {log.debug("created witness list " + witList);};
 			curProv.addWitnessList(witList);
 		}
 	}

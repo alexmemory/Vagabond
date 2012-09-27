@@ -29,7 +29,7 @@ public class MarkerQueryBatch extends MarkerSet {
 		
 		query = QueryHolder.getQuery("MarkerQueryBatch.GetQuery")
 				.parameterize(relName, predicate);
-		log.debug("Compute markers for query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute markers for query:\n" + query);};
 
 		rs = ConnectionManager.getInstance().execQuery(query);
 		

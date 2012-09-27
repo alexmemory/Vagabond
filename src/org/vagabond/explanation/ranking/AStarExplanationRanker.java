@@ -114,8 +114,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			computeScore(this);
 			
 			if (log.isDebugEnabled()) {
-				log.debug("extended set " + prefix.toString() + " to " 
-						+ toString());
+				if (log.isDebugEnabled()) {log.debug("extended set " + prefix.toString() + " to " 
+						+ toString());};
 			}
 		}
 		
@@ -410,7 +410,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 					sameExpl.setSym(i, k);
 			}
 		}
-		log.debug("set same explanations: " + sameExpl.toString());
+		if (log.isDebugEnabled()) {log.debug("set same explanations: " + sameExpl.toString());};
 		
 		numErrors = errors.size();
 		
@@ -426,8 +426,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		if (log.isDebugEnabled()) {
 			for(int i = 0; i < numErrors; i++) {
-				log.debug("min " + combinedMin[i] + " max " + combinedMax[i] 
-						+ " for " + errorList.get(i) + "\n" + errorExpl.get(i));
+				if (log.isDebugEnabled()) {log.debug("min " + combinedMin[i] + " max " + combinedMax[i] 
+						+ " for " + errorList.get(i) + "\n" + errorExpl.get(i));};
 			}
 		}
 		
@@ -543,7 +543,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		for(int i = 0; i < errorExpl.get(curExp.firstUnset).size(); i++) {
 			RankedListElement newOne = new RankedListElement (curExp, i);
-			log.debug("Was included? : " + sortedSets.contains(newOne) + "\n" + newOne);
+			if (log.isDebugEnabled()) {log.debug("Was included? : " + sortedSets.contains(newOne) + "\n" + newOne);};
 			if ((!disOverlap || !newOne.lastAdditionHasOverlap()) && !sortedSets.contains(newOne))
 				sortedSets.add(newOne);
 		}
@@ -582,7 +582,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 				result.addUnique(errorExpl.get(i).get(elem.elem[i]));
 		
 		if (log.isDebugEnabled())
-			log.debug("set for iter is \n"  + result.toString());
+			if (log.isDebugEnabled()) {log.debug("set for iter is \n"  + result.toString());};
 		
 		return result;
 	}
@@ -678,8 +678,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public int getNumberPrefetched() {
 		if (log.isDebugEnabled())
-			log.debug("ITER DONE " + (iterDone + 1) + " incomplete " 
-					+ (sortedSets.size() - iterDone - 1));
+			if (log.isDebugEnabled()) {log.debug("ITER DONE " + (iterDone + 1) + " incomplete " 
+					+ (sortedSets.size() - iterDone - 1));};
 		return iterDone + 1;
 	}
 
@@ -738,7 +738,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		try {
 			generateUpTo (Integer.MAX_VALUE);
 		} catch (NoSuchElementException e) {
-			log.debug("ranking done");
+			if (log.isDebugEnabled()) {log.debug("ranking done");};
 		}
 		resetIter();
 	}

@@ -19,6 +19,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.InfluenceSourceError;
 import org.vagabond.explanation.model.prov.MapAndWLProvRepresentation;
+import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.MappingGraph;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.Pair;
@@ -113,7 +114,7 @@ public class InfluenceSourceExplanationGenerator
 	}
 	
 	private Map<String, Set<Pair<Integer,String>>> findJoinAttrsCandiForMaps 
-			(Set<MappingType> maps) {
+			(Set<MappingType> maps) throws Exception {
 		int errorAttrId = ((AttrValueMarker) error).getAttrId();
 		Map<String, Set<Pair<Integer,String>>> mapsToJoinAttrs;
 		
@@ -121,20 +122,18 @@ public class InfluenceSourceExplanationGenerator
 		
 		for(MappingType map: maps) {
 			String varName = null;
-			Set<Pair<Integer,String>> joinAttrs;
-			MappingGraph mGraph;
-			
-			mGraph = new MappingGraph(map);
+			Set<Pair<Integer,String>> joinAttrs = new HashSet<Pair<Integer,String>> ();
+			MappingGraph mGraph = MapScenarioHolder.getInstance()
+					.getGraphForMapping(map);
 			
 			// find the var name for the attribute of the error marker in the target
 			for (RelAtomType targetRel: map.getExists().getAtomArray()) {
-				if (targetRel.getTableref().equals(error.getRel())) {
+				if (targetRel.getTableref().equals(error.getRel())) { //TODO selfjoin in target relation
 					varName = targetRel.getVarArray(errorAttrId);
-					break;
+					joinAttrs.addAll(mGraph.getJoinVarsAndAtoms(varName));
 				}
 			}
 			
-			joinAttrs = mGraph.getJoinVarsAndAtoms(varName);
 			mapsToJoinAttrs.put(map.getId(), joinAttrs);
 		}
 		

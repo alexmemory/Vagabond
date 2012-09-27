@@ -41,7 +41,7 @@ public class MarkerParser {
 					+ marker.charAt(0) + ">");
 		}
 		
-		log.debug("parsed marker: <" + result + ">");
+		if (log.isDebugEnabled()) {log.debug("parsed marker: <" + result + ">");};
 		
 		return result;
 	}
@@ -58,7 +58,7 @@ public class MarkerParser {
 		split = marker.substring(2, marker.length() - 1).split(",");
 		result = new AttrMarker(split[0], split[1]);
 		
-		log.debug("parsed marker: <" + result + ">");
+		if (log.isDebugEnabled()) {log.debug("parsed marker: <" + result + ">");};
 		
 		return result;
 	}
@@ -77,7 +77,7 @@ public class MarkerParser {
 			result.add(mark);
 		}
 		
-		log.debug("parsed markers from input stream :<" + result + ">");
+		if (log.isDebugEnabled()) {log.debug("parsed markers from input stream :<" + result + ">");};
 		
 		return result;
 	}
@@ -120,7 +120,7 @@ public class MarkerParser {
 			result.add(parseSchemaMarker(elem));
 		}
 		
-		log.debug("parsed marker summary: <" + result + ">");
+		if (log.isDebugEnabled()) {log.debug("parsed marker summary: <" + result + ">");};
 		
 		return result;
 	}
@@ -143,7 +143,7 @@ public class MarkerParser {
 			result.add(parseMarker(elem));
 		}
 		
-		log.debug("parsed marker set: <" + result + ">");
+		if (log.isDebugEnabled()) {log.debug("parsed marker set: <" + result + ">");};
 		
 		return result;
 	}

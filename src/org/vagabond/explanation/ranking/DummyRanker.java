@@ -52,7 +52,7 @@ public class DummyRanker implements IExplanationRanker {
 		
 		assert(hasNext());
 		
-		log.debug("cur iter pos = " + iterPos.toString());
+		if (log.isDebugEnabled()) {log.debug("cur iter pos = " + iterPos.toString());};
 
 		increaseIter ();
 		set = generateExplForIter(iterPos);
@@ -166,7 +166,7 @@ public class DummyRanker implements IExplanationRanker {
 			{
 				iterPos.set(i, curPos - 1);
 				curIterPos--;
-				log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);
+				if (log.isDebugEnabled()) {log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);};
 				return;
 			}
 			else {
@@ -195,7 +195,7 @@ public class DummyRanker implements IExplanationRanker {
 			{
 				iterPos.set(i, curPos + 1);
 				curIterPos++;
-				log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);
+				if (log.isDebugEnabled()) {log.debug("new iter pos is <" + iterPos + "> : " + curIterPos);};
 				return;
 			}
 			else {
@@ -208,7 +208,7 @@ public class DummyRanker implements IExplanationRanker {
 				iterPos.set(i, numExpls.get(i) -1);
 		
 		curIterPos++;
-		log.debug("iterator reached end: <" + iterPos + "> : " + curIterPos);
+		if (log.isDebugEnabled()) {log.debug("iterator reached end: <" + iterPos + "> : " + curIterPos);};
 	}
 		
 	@SuppressWarnings("unused")
@@ -258,10 +258,10 @@ public class DummyRanker implements IExplanationRanker {
 		assert(hasPrevious());
 		
 		decreaseIter ();
-		log.debug("cur iter pos = " + iterPos.toString());
+		if (log.isDebugEnabled()) {log.debug("cur iter pos = " + iterPos.toString());};
 		set = generateExplForIter(iterPos);
 		
-		log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);
+		if (log.isDebugEnabled()) {log.debug("ExplSet for iter <" + iterPos + "> is \n" + set);};
 		
 		return set;
 	}
@@ -293,7 +293,7 @@ public class DummyRanker implements IExplanationRanker {
 
 	@Override
 	public void rankFull() {
-		log.debug("Dummy ranker cannot materialize");
+		if (log.isDebugEnabled()) {log.debug("Dummy ranker cannot materialize");};
 	}
 
 	

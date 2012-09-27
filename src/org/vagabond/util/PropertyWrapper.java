@@ -71,8 +71,8 @@ public class PropertyWrapper extends Properties {
 	
 	public void addFromXMLFile (File inFile) 
 			throws FileNotFoundException, IOException {
-		log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
-					+ prefix + ">");
+		if (log.isDebugEnabled()) {log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
+					+ prefix + ">");};
 		PropertyWrapper sub = new PropertyWrapper();
 		sub.loadFromXML(new FileInputStream(inFile));
 		addAll(sub);
@@ -87,8 +87,8 @@ public class PropertyWrapper extends Properties {
 	
 	public void addFromFile (File inFile) 
 			throws FileNotFoundException, IOException {
-		log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
-					+ prefix + ">");
+		if (log.isDebugEnabled()) {log.debug("load from file <" + inFile.getAbsolutePath() + "> with prefix <" 
+					+ prefix + ">");};
 		PropertyWrapper sub = new PropertyWrapper(inFile, false);
 		addAll(sub);
 	}
@@ -97,7 +97,7 @@ public class PropertyWrapper extends Properties {
 		Set<String> keys = wrap.stringPropertyNames();
 		
 		for (String key: keys) {
-			log.debug("add key <" + key + "> with value <" + wrap.getProperty(key) + ">");
+			if (log.isDebugEnabled()) {log.debug("add key <" + key + "> with value <" + wrap.getProperty(key) + ">");};
 			this.setProperty(key, wrap.getProperty(key)); 
 		}
 	}
@@ -260,7 +260,7 @@ public class PropertyWrapper extends Properties {
 		
 		result = value.split(",");  
 		
-		log.debug("get Array Property: " + result);
+		if (log.isDebugEnabled()) {log.debug("get Array Property: " + result);};
 		
 		return result;
 	}
@@ -299,7 +299,7 @@ public class PropertyWrapper extends Properties {
 			result.add(elements[i]);
 		}
 		
-		log.debug("get Vector Property (" + key + "):" + result.toString());
+		if (log.isDebugEnabled()) {log.debug("get Vector Property (" + key + "):" + result.toString());};
 		
 		return result;
 	}
@@ -320,7 +320,7 @@ public class PropertyWrapper extends Properties {
 			result.setProperty(keyValues[i].split("=")[0], keyValues[i].split("=")[1]);
 		}
 		
-		log.debug("get PropertiesProperty (" + key + "): " + result.toString());
+		if (log.isDebugEnabled()) {log.debug("get PropertiesProperty (" + key + "): " + result.toString());};
 		
 		return result;
 	}

@@ -54,7 +54,7 @@ public class ProvenanceGenerator {
 		
 		query = QueryHolder.getQuery("MapAndTransProv.GetMapProv")
 				.parameterize("target." + error.getRel(), error.getTid());
-		log.debug("Compute MapProv for <" + error + "> with query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Compute MapProv for <" + error + "> with query:\n" + query);};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
@@ -63,8 +63,8 @@ public class ProvenanceGenerator {
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
-		log.debug("Get map strings provenance for <" + error 
-				+ "> returned <" + maps + ">");
+		if (log.isDebugEnabled()) {log.debug("Get map strings provenance for <" + error 
+				+ "> returned <" + maps + ">");};
 		
 		return maps;
 	}
@@ -80,8 +80,8 @@ public class ProvenanceGenerator {
 		for (String map: mapStrings)
 			maps.add(MapScenarioHolder.getInstance().getMapping(map));
 		
-		log.debug("Get mapping provenance for <" + error 
-				+ "> returned <" + maps + ">");
+		if (log.isDebugEnabled()) {log.debug("Get mapping provenance for <" + error 
+				+ "> returned <" + maps + ">");};
 		
 		return maps;
 	}
@@ -93,8 +93,8 @@ public class ProvenanceGenerator {
 		String query;
 		
 		query = getCopyCSQuery(error);
-		log.debug("Parameterized copy source explanation query for <" 
-				+ error + ">:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("Parameterized copy source explanation query for <" 
+				+ error + ">:\n" + query);};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		parser = new SourceProvParser(rs);
@@ -129,7 +129,7 @@ public class ProvenanceGenerator {
 		parser = new SourceProvParser(rs);
 		prov = parser.getAllProv();
 		
-		log.debug("compute prov for <" + error + ">:\n" + prov);
+		if (log.isDebugEnabled()) {log.debug("compute prov for <" + error + ">:\n" + prov);};
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
@@ -184,8 +184,8 @@ public class ProvenanceGenerator {
 			}
 		}
 		
-		log.debug("compute base rel access to mapping map for <" + targetRel + ">:\n"
-				+ result); 
+		if (log.isDebugEnabled()) {log.debug("compute base rel access to mapping map for <" + targetRel + ">:\n"
+				+ result);}; 
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
@@ -202,8 +202,8 @@ public class ProvenanceGenerator {
 		query = QueryHolder.getQuery("MetaQ.GetProvQueryResultAttrs")
 				.parameterize("target." + targetRel);
 		
-		log.debug("compute provenance schema for <" + targetRel 
-				+ "> with query: <" + query + ">");
+		if (log.isDebugEnabled()) {log.debug("compute provenance schema for <" + targetRel 
+				+ "> with query: <" + query + ">");};
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
