@@ -109,7 +109,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		
 		// first collection
 		ExplanationCollection col1 = explSetGen.findExplanations(MarkerFactory.newMarkerSet(a1));
-		log.debug(col1);
+		if (log.isDebugEnabled()) {log.debug(col1);};
 		col1.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		
 		AStarExplanationRanker r1 = (AStarExplanationRanker) col1.getRanker();
@@ -144,7 +144,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		// second collection
 		ExplanationCollection col2 = explSetGen.findExplanations(MarkerFactory.newMarkerSet(a2));
 		col2.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));		
-		log.debug(col2);
+		if (log.isDebugEnabled()) {log.debug(col2);};
 		AStarExplanationRanker r2 = (AStarExplanationRanker) col2.getRanker();
 
 		// check ranker
@@ -175,7 +175,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		IAttributeValueMarker a2 = MarkerFactory.newAttrMarker("v", "1", "v1");
 				
 		ExplanationCollection col1 = explSetGen.findExplanations(MarkerFactory.newMarkerSet(a1));
-		log.debug(col1);
+		if (log.isDebugEnabled()) {log.debug(col1);};
 		col1.createRanker(new AStarExplanationRanker(ExplanationSizeScore.inst));
 		
 		AStarExplanationRanker r1 = (AStarExplanationRanker) col1.getRanker();
@@ -210,7 +210,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		// second collection
 		ExplanationCollection col2 = explSetGen.findExplanations(MarkerFactory.newMarkerSet(a2));
 		col2.createRanker(new AStarExplanationRanker(ExplanationSizeScore.inst));		
-		log.debug(col2);
+		if (log.isDebugEnabled()) {log.debug(col2);};
 		AStarExplanationRanker r2 = (AStarExplanationRanker) col2.getRanker();
 
 		// check ranker
@@ -338,9 +338,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		r2 = r.new RankedListElement(new int[] {1, -2, 0});
 		r3 = r.new RankedListElement(new int[] {-2, 0, 0});
 		
-		log.debug(r1);
-		log.debug(r2);
-		log.debug(r3);
+		if (log.isDebugEnabled()) {log.debug(r1);};
+		if (log.isDebugEnabled()) {log.debug(r2);};
+		if (log.isDebugEnabled()) {log.debug(r3);};
 			
 		assertEquals(-1, comp.compare(r1, r2));
 		assertEquals(1, comp.compare(r2, r1));
@@ -457,7 +457,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		IExplanationSet s1,s2,e1,e2;
 		
 		r.rankFull();
-		log.debug(r.getRanking());
+		if (log.isDebugEnabled()) {log.debug(r.getRanking());};
 		
 		r.hasAtLeast(2);
 		assertTrue(r.hasAtLeast(2));

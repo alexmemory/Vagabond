@@ -56,13 +56,13 @@ public class TestProvParsers extends AbstractVagabondTest {
 								"OR prov_source_address_tid = 3 )",
 						"prov_source_person_tid, prov_source_address_tid");
 		
-		log.debug("exec query:\n" + query);
+		if (log.isDebugEnabled()) {log.debug("exec query:\n" + query);};
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
 		parser = new SourceAndMapProvParser(rs, "employee");
 		
 		rep = parser.getAllProv();
-		log.debug("result is:\n" + rep);
+		if (log.isDebugEnabled()) {log.debug("result is:\n" + rep);};
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		

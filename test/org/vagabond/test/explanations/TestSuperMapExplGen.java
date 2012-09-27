@@ -53,7 +53,7 @@ public class TestSuperMapExplGen extends AbstractVagabondTest {
 		
 		result = gen.findExplanations(err);
 		expl = (SuperflousMappingError) result.getExplanations().get(0);
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(m1, expl.getMappingSideEffects());
 		assertEquals(exp, expl.getTargetSideEffects());

@@ -70,7 +70,7 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		
 		ExplPartition e = explGen.findExplanations(m);
 		
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 		
 		PartitionRanker ranker = (PartitionRanker) RankerFactory.createPartRanker("ExplSize", e);		
 		
@@ -88,13 +88,13 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		er1.resetIter();
 		a = r.newSkyPoint(er1.next());
 		
-		log.debug(x.toVerboseString());
-		log.debug(y.toVerboseString());
-		log.debug(z.toVerboseString());
+		if (log.isDebugEnabled()) {log.debug(x.toVerboseString());};
+		if (log.isDebugEnabled()) {log.debug(y.toVerboseString());};
+		if (log.isDebugEnabled()) {log.debug(z.toVerboseString());};
 		
-		log.debug(x);
-		log.debug(y);
-		log.debug(z);
+		if (log.isDebugEnabled()) {log.debug(x);};
+		if (log.isDebugEnabled()) {log.debug(y);};
+		if (log.isDebugEnabled()) {log.debug(z);};
 		
 		// test equality and native compare
 		assertTrue(x.equals(a));
@@ -177,8 +177,8 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		Set<SkyPoint> esSet = new HashSet<SkyPoint> (es);
 		assertEquals(seSet, esSet);
 		
-		log.debug(se);
-		log.debug(es);
+		if (log.isDebugEnabled()) {log.debug(se);};
+		if (log.isDebugEnabled()) {log.debug(es);};
 	}
 	
 	@Test
@@ -200,7 +200,7 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		// generate ranking
 		while(r.hasNext()) {
  			IExplanationSet s = r.next();
-			log.debug(s);
+			if (log.isDebugEnabled()) {log.debug(s);};
 		}
 		
 		// compare
@@ -212,8 +212,8 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		solutionsField.setAccessible(true);
 		TreeSet<SkyPoint> solutions = (TreeSet<SkyPoint>) solutionsField.get(r);
 		
-		log.debug(ranking);
-		log.debug(solutions);
+		if (log.isDebugEnabled()) {log.debug(ranking);};
+		if (log.isDebugEnabled()) {log.debug(solutions);};
 		
 		Iterator<SkyPoint> ra = ranking.iterator(), so = solutions.iterator();
 		while(ra.hasNext() || so.hasNext()) {
@@ -222,7 +222,7 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 			assertEquals(ra.next(), so.next());
 		}
 		
-		log.debug(ranking);
+		if (log.isDebugEnabled()) {log.debug(ranking);};
 		
 		// compare solutions with single ranker
 		Field rankersField = SkylineRanker.class.getDeclaredField("rankers");
@@ -276,10 +276,10 @@ public class TestSkylineRanker extends AbstractVagabondTest {
 		// compare
 		while(r.hasNext()) {
  			IExplanationSet s = r.next();
-			log.debug(s);
+			if (log.isDebugEnabled()) {log.debug(s);};
 		}
 		
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 	}
 
 	

@@ -28,8 +28,8 @@ public class TestFNVHash extends AbstractVagabondTest {
 		System.arraycopy(a1, 0, a2, 0, a1.length);
 		a2[3]++;
 		
-		log.debug(Integer.toBinaryString(fnv(a1)));
-		log.debug(Integer.toBinaryString(fnv(a2)));
+		if (log.isDebugEnabled()) {log.debug(Integer.toBinaryString(fnv(a1)));};
+		if (log.isDebugEnabled()) {log.debug(Integer.toBinaryString(fnv(a2)));};
 	}
 	
 }

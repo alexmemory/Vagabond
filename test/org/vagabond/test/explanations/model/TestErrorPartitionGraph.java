@@ -85,7 +85,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		loadToDB("resource/test/simpleTest.xml");
 		g = new ErrorPartitionGraph();
 		
-		log.debug(g.toString());
+		if (log.isDebugEnabled()) {log.debug(g.toString());};
 		
 		checkSym(g);
 		
@@ -121,7 +121,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		loadToDB("resource/test/severalComps.xml");
 		g = new ErrorPartitionGraph();
 		
-		log.debug(g.toString());
+		if (log.isDebugEnabled()) {log.debug(g.toString());};
 		
 		checkSym(g);
 		
@@ -141,7 +141,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		testMappingComp("M1", new String[] {"a","b","c"}, g);
 		testMappingComp("M2", new String[] {"a","b"}, g);
 		
-		log.debug(g.getEdges().getBitmap().toBitsString());
+		if (log.isDebugEnabled()) {log.debug(g.getEdges().getBitmap().toBitsString());};
 		
 		assertEquals("source offset", 5, g.getSourceOffset());
 		checkRelVarConn(g);
@@ -172,8 +172,8 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		loadToDB("resource/test/severalComps.xml");
 		g = new ErrorPartitionGraph();
 		
-		log.debug(g);
-		log.debug(g.getEdges());
+		if (log.isDebugEnabled()) {log.debug(g);};
+		if (log.isDebugEnabled()) {log.debug(g.getEdges());};
 		
 		g.getComponents();
 		nodes = new HashSet<ErrorNode>();
@@ -181,7 +181,7 @@ public class TestErrorPartitionGraph extends AbstractVagabondTest {
 		compNodes = new HashSet<ErrorNode>();
 		compNodes.addAll(g.getNodesForComponents(g.getNode(ErrorGraphNodeType.MappingVar, 0, 0)));
 		
-		log.debug(g.getComponents());
+		if (log.isDebugEnabled()) {log.debug(g.getComponents());};
 		
 		assertEquals(2, g.getNumComponents());
 		assertEquals(nodes, compNodes);

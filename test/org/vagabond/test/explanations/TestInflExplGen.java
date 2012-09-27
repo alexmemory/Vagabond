@@ -40,7 +40,7 @@ public class TestInflExplGen extends AbstractVagabondTest {
 		expect = ExplanationFactory.newExplanationSet(expl);
 		
 		result = gen.findExplanations(err);
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(expect,result);
 	}
@@ -74,7 +74,7 @@ public class TestInflExplGen extends AbstractVagabondTest {
 		expect = ExplanationFactory.newExplanationSet(expl1, expl2, expl3);
 		
 		result = gen.findExplanations(err);
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(expect,result);
 	}

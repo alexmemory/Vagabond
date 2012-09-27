@@ -120,7 +120,7 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		assertEquals(set1.getNumElem(), setFirstElement.getNumElem());
 		set1.remove(attr);
 		assertFalse(setFirstElement.equals(set1));
-		log.debug(setNoElement.toString() + "\n\n" + set1.toString());
+		if (log.isDebugEnabled()) {log.debug(setNoElement.toString() + "\n\n" + set1.toString());};
 		assertTrue(setNoElement.equals(set1));
 		
 		set1.add(FourElementMarker1);
@@ -158,8 +158,8 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		set1.add(FourElementMarker1);
 		set1.add(ThreeElementMarker1);
 		assertTrue(set2.addAll(tuppleList));
-		log.debug(((BitMarkerSet) set1).getIBitSetElems().toBitsString());
-		log.debug(((BitMarkerSet) set2).getIBitSetElems().toBitsString());		 
+		if (log.isDebugEnabled()) {log.debug(((BitMarkerSet) set1).getIBitSetElems().toBitsString());};
+		if (log.isDebugEnabled()) {log.debug(((BitMarkerSet) set2).getIBitSetElems().toBitsString());};		 
 		assertEquals(set1.getNumElem(), set2.getNumElem());
 		assertEquals(set1, set2);
 	}
@@ -229,14 +229,14 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		int bitpos = ScenarioDictionary.getInstance().attrMarkerToBitPos(attr);
 		String bitString = bitString(bitpos);
 		assertEquals("bitpos " + bitpos, bitString, b.getIBitSetElems().toBitsString());
-		log.debug(bitString);
+		if (log.isDebugEnabled()) {log.debug(bitString);};
 		
 		b.add(attr3);
 		
 		int bitpos2 = ScenarioDictionary.getInstance().attrMarkerToBitPos(attr3);
 		String bitString2 = bitString(bitpos2, bitpos);
 		assertEquals("bitpos " + bitpos2, bitString2, b.getIBitSetElems().toBitsString());
-		log.debug(bitString2);
+		if (log.isDebugEnabled()) {log.debug(bitString2);};
 		
 		
 		b.add(attr5);
@@ -244,7 +244,7 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		int bitpos3 = ScenarioDictionary.getInstance().attrMarkerToBitPos(attr5);
 		String bitString3 = bitString(bitpos3, bitpos2, bitpos);
 		assertEquals("bitpos " + bitpos3, bitString3, b.getIBitSetElems().toBitsString());
-		log.debug(bitString2);
+		if (log.isDebugEnabled()) {log.debug(bitString2);};
 	}
 	
 	private String bitString  (int ... bitset) {

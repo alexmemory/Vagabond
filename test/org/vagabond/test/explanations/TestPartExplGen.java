@@ -53,7 +53,7 @@ public class TestPartExplGen extends AbstractVagabondTest {
 		
 		ExplPartition e = explGen.findExplanations(m);
 		
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 		
 		assertEquals(ex, e);
 	}

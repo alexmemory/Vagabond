@@ -486,7 +486,7 @@ public class TestNewBitMatrixAndBitset {
 				+ "\n\n" + ex.toBitsString() 
 				+ "\n\n" + b.toBitsString(),
 				ex, b);
-		log.debug("CASE <" + name + "> sucessful:\n" + b.toDebugString());
+		if (log.isDebugEnabled()) {log.debug("CASE <" + name + "> sucessful:\n" + b.toDebugString());};
 		return b;
 	}
 
@@ -520,9 +520,9 @@ public class TestNewBitMatrixAndBitset {
 			maxRunField.setLong(null, maxRunLen);
 			assert (RunningLengthWord.largestliteralcount == maxLiteral);
 			assert (RunningLengthWord.largestrunninglengthcount == maxRunLen);
-			log.debug("new values are: "
+			if (log.isDebugEnabled()) {log.debug("new values are: "
 					+ RunningLengthWord.largestliteralcount + " and "
-					+ RunningLengthWord.largestrunninglengthcount);
+					+ RunningLengthWord.largestrunninglengthcount);};
 		}
 	}
 
@@ -607,13 +607,13 @@ public class TestNewBitMatrixAndBitset {
 	public void testMatrix() {
 		BitMatrix m = new BitMatrix(3, 2);
 
-		log.debug(m.toString() + "\n\n");
+		if (log.isDebugEnabled()) {log.debug(m.toString() + "\n\n");};
 
 		m.set(2, 1);
 		m.set(1, 0);
 		m.set(1, 1);
 
-		log.debug(m.toString());
+		if (log.isDebugEnabled()) {log.debug(m.toString());};
 
 		assertTrue("2,1", m.get(2, 1));
 		assertTrue("1,0", m.get(1, 0));
@@ -647,13 +647,13 @@ public class TestNewBitMatrixAndBitset {
 	public void testDynamicBitmatrix () {
 		DynamicBitMatrix m = new DynamicBitMatrix();
 
-		log.debug(m.toString() + "\n\n");
+		if (log.isDebugEnabled()) {log.debug(m.toString() + "\n\n");};
 
 		m.set(2, 1);
 		m.set(1, 0);
 		m.set(1, 1);
 
-		log.debug(m.toString());
+		if (log.isDebugEnabled()) {log.debug(m.toString());};
 
 		assertTrue("2,1", m.get(2, 1));
 		assertTrue("1,0", m.get(1, 0));
@@ -661,7 +661,7 @@ public class TestNewBitMatrixAndBitset {
 		assertFalse("0,0", m.get(0, 0));
 		assertFalse("0,1", m.get(0, 1));
 
-		log.debug(m.getBitmap().toBitsString());
+		if (log.isDebugEnabled()) {log.debug(m.getBitmap().toBitsString());};
 		
 		checkRows(new String[] { "00", "11", "01" }, m);
 

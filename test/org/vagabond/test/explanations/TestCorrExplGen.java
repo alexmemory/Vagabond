@@ -68,7 +68,7 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		
 		expls = gen.findExplanations(error);
 		err = (CorrespondenceError) expls.getExplanations().get(0);
-		log.debug(expls);
+		if (log.isDebugEnabled()) {log.debug(expls);};
 		
 		assertEquals(corrs, err.getCorrespondenceSideEffects());
 		assertEquals(tSE, err.getTargetSideEffects());		
@@ -125,7 +125,7 @@ public class TestCorrExplGen extends AbstractVagabondTest {
 		
 		expls = gen.findExplanations(error);
 		err = (CorrespondenceError) expls.getExplanations().get(0);
-		log.debug(expls);
+		if (log.isDebugEnabled()) {log.debug(expls);};
 		
 		assertEquals(corrs, err.getCorrespondenceSideEffects());
 		assertEquals(tSE, err.getTargetSideEffects());		

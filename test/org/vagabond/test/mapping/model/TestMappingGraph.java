@@ -33,7 +33,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		MappingGraphRel node;
 		
 		g = MapScenarioHolder.getInstance().getGraphForMapping("M2");
-		log.debug(g);
+		if (log.isDebugEnabled()) {log.debug(g);};
 		
 		node = g.getForeachAtomsForVar("a").iterator().next();
 		assertEquals(0, node.getPos());
@@ -55,7 +55,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 		g = MapScenarioHolder.getInstance().getGraphForMapping("M2");
 		result = g.getJoinVarsAndAtoms("c");
 		
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(CollectionUtils.makeSet(new Pair<Integer,String>(0, "b")),
 				result);
@@ -156,7 +156,7 @@ public class TestMappingGraph extends AbstractVagabondTest {
 			}
 		}
 		
-		log.debug(result.toString());
+		if (log.isDebugEnabled()) {log.debug(result.toString());};
 	}
 	
 	private void compare2DArray (int[][] expect, int[][] result) {

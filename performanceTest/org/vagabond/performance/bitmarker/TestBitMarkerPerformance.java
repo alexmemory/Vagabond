@@ -46,25 +46,25 @@ public class TestBitMarkerPerformance {
 		
 		IMarkerSet markerset1 = MarkerFactory.newMarkerSet();
 		IMarkerSet bitset1 = MarkerFactory.newMarkerSet();
-		log.debug("------ ADDING TEST ------");
-		log.debug("\t-- MARKER SET --");
+		if (log.isDebugEnabled()) {log.debug("------ ADDING TEST ------");};
+		if (log.isDebugEnabled()) {log.debug("\t-- MARKER SET --");};
 		AddingTest(markerset1);
-		log.debug("\t-- BIT MARKER SET --");
+		if (log.isDebugEnabled()) {log.debug("\t-- BIT MARKER SET --");};
 		AddingTest(bitset1);
 
-		log.debug("------ CONTAINMENT TEST ------");
-		log.debug("\t-- MARKER SET --");
+		if (log.isDebugEnabled()) {log.debug("------ CONTAINMENT TEST ------");};
+		if (log.isDebugEnabled()) {log.debug("\t-- MARKER SET --");};
 		ContainingTest(false);
-		log.debug("\t-- BIT MARKER SET --");
+		if (log.isDebugEnabled()) {log.debug("\t-- BIT MARKER SET --");};
 		ContainingTest(true);
 		
-		log.debug("------ UNION TEST ------");
+		if (log.isDebugEnabled()) {log.debug("------ UNION TEST ------");};
 		UnionTest();
-		log.debug("------ INTERSECT TEST ------");
+		if (log.isDebugEnabled()) {log.debug("------ INTERSECT TEST ------");};
 		IntersectTest();
-		log.debug("------ DIFF TEST ------");
+		if (log.isDebugEnabled()) {log.debug("------ DIFF TEST ------");};
 		DiffTest();
-		log.debug("------ CLONE TEST ------");
+		if (log.isDebugEnabled()) {log.debug("------ CLONE TEST ------");};
 		CloneTest();	
 	}
 	
@@ -129,11 +129,11 @@ public class TestBitMarkerPerformance {
 		testEnd = System.currentTimeMillis();
 		sumB += (testEnd - testStart);
 		
-		log.debug("------ SIZE " + size + " ------");
-		log.debug("MARKER: " + oper.toString() + " Between " + numIter
-				+ " Sets of " + size + " elements each time: " + sumM);
-		log.debug("BITMARKER: " + oper.toString() + " Between " + numIter 
-				+ " Sets of " + size + " elements each time: " + sumB);
+		if (log.isDebugEnabled()) {log.debug("------ SIZE " + size + " ------");};
+		if (log.isDebugEnabled()) {log.debug("MARKER: " + oper.toString() + " Between " + numIter
+				+ " Sets of " + size + " elements each time: " + sumM);};
+		if (log.isDebugEnabled()) {log.debug("BITMARKER: " + oper.toString() + " Between " + numIter 
+				+ " Sets of " + size + " elements each time: " + sumB);};
 	}
 	
 	private static void doSetOp(SetOps oper, IMarkerSet set1, IMarkerSet set2) {
@@ -167,19 +167,19 @@ public class TestBitMarkerPerformance {
 		Random rand = new Random(0);
 		testsets = new IMarkerSet[sizesForSetTests.length][][];
 		
-		log.debug("-------- GENERATE TEST SETS ----------");
+		if (log.isDebugEnabled()) {log.debug("-------- GENERATE TEST SETS ----------");};
 		
 		for(int i = 0; i < sizesForSetTests.length; i++) {
 			int numSets = sizesForSetTests[i][2];
 			testsets[i] = new IMarkerSet[2][];
 		
-			log.debug("\t-- size: " + sizesForSetTests[i][0]);
+			if (log.isDebugEnabled()) {log.debug("\t-- size: " + sizesForSetTests[i][0]);};
 			testsets[i][0] = genSets(false, numSets, sizesForSetTests[i][0], 
 					rand);
 			testsets[i][1] = genSets(true, numSets, sizesForSetTests[i][0], 
 					rand);
 		}
-		log.debug("-------- DONE: GENERATE TEST SETS ----");
+		if (log.isDebugEnabled()) {log.debug("-------- DONE: GENERATE TEST SETS ----");};
 	}
 	
 	private static IMarkerSet[] genSets (boolean bit, int numSets, int card, 
@@ -221,9 +221,9 @@ public class TestBitMarkerPerformance {
 				set1.contains(randMarker(maxRel, maxTid, maxAttr, number));
 			}
 			long end = System.currentTimeMillis();
-			log.debug("Repeated " + numRep + " times checking contains on set of size " + 
+			if (log.isDebugEnabled()) {log.debug("Repeated " + numRep + " times checking contains on set of size " + 
 					sizesForSetTests[i][0] +  " in time: "
-					+ (end - before));
+					+ (end - before));};
 		}
 	}
 	
@@ -245,9 +245,9 @@ public class TestBitMarkerPerformance {
 			}
 			
 			long end = System.currentTimeMillis();
-			log.debug("Repeated " + numRep + " times adding " + 
+			if (log.isDebugEnabled()) {log.debug("Repeated " + numRep + " times adding " + 
 					numAdd +  " elements to an empty set in time: "
-					+ (end - before));
+					+ (end - before));};
 		}
 		
 	}

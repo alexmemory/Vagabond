@@ -25,7 +25,7 @@ public class TestCreateXML {
 		a.addVar("c");
 		XmlCursor x = a.newCursor();
 		x.toFirstChild();
-		log.debug(x.getObject());
-		log.debug(a);
+		if (log.isDebugEnabled()) {log.debug(x.getObject());};
+		if (log.isDebugEnabled()) {log.debug(a);};
 	}
 }

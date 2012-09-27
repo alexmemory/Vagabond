@@ -126,8 +126,8 @@ public abstract class AbstractVagabondDBTest extends DBTestCase  {
     	String xmlResultSet;
     	
     	xmlResultSet = transformStringResultSetToXML(resultSet);
-    	log.debug("query:\n" + query + "\n\nexpected result:\n" 
-    			+ xmlResultSet);
+    	if (log.isDebugEnabled()) {log.debug("query:\n" + query + "\n\nexpected result:\n" 
+    			+ xmlResultSet);};
     	expecteds = (new XmlDataSet(new StringReader(xmlResultSet)))
     			.getTables(); 
 		

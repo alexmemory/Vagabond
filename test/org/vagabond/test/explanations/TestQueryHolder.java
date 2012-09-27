@@ -19,7 +19,7 @@ public class TestQueryHolder extends AbstractVagabondTest {
 	public void testLoad () throws FileNotFoundException, IOException {
 		QueryHolder.getInstance().loadFromDir(new File("resource/queries/"));
 		
-		log.debug(QueryHolder.getInstance().getQueries().stringPropertyNames());
+		if (log.isDebugEnabled()) {log.debug(QueryHolder.getInstance().getQueries().stringPropertyNames());};
 		assertTrue(QueryHolder.hasQuery("CopyCS.GetProv"));
 	}
 	

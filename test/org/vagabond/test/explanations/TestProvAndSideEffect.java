@@ -148,7 +148,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		
 		resultQuery = seGen.getSideEffectQuery
 				("employee", sourceRels, sourceErr).trim();
-		log.debug(resultQuery);
+		if (log.isDebugEnabled()) {log.debug(resultQuery);};
 		
 		compareQuery(q, param, resultQuery);
 	}
@@ -168,7 +168,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		expect.add(new Pair<String, Set<MappingType>>("address", value));
 		
 		result = pGen.getBaseRelAccessToMapping("employee");
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(expect, result);
 	}
@@ -189,7 +189,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 				MarkerParser.getInstance().parseWL("{T(person,3),null}")));
 		expect.setTuplesInProv(MarkerParser.getInstance().parseSet("{T(person,3)}"));
 		result = pGen.computePIAndMapProv(error);
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(expect, result);
 		
@@ -206,7 +206,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		expect.setTuplesInProv(MarkerParser.getInstance().parseSet(
 				"{T(person,1),T(address,1)}"));
 		result = pGen.computePIAndMapProv(error);
-		log.debug(result);
+		if (log.isDebugEnabled()) {log.debug(result);};
 		
 		assertEquals(expect, result);
 	}
@@ -248,7 +248,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		
 		resultQuery = altGen.getSideEffectQuery
 				("employee", sourceRels, sourceErr).trim();
-		log.debug(resultQuery);
+		if (log.isDebugEnabled()) {log.debug(resultQuery);};
 		
 		compareQuery(q, param, resultQuery);
 	}
@@ -294,7 +294,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 		
 		resultQuery = attrGen.getSideEffectQuery
 				("employee", sourceRels, sourceErr).trim();
-		log.debug(resultQuery);
+		if (log.isDebugEnabled()) {log.debug(resultQuery);};
 		
 		compareQuery(q, param, resultQuery);	
 	}
@@ -312,7 +312,7 @@ public class TestProvAndSideEffect extends AbstractVagabondTest {
 				"{A(employee,4|2,city)}"); 
 		
 		targetSE = attrGen.computeTargetSideEffects(sourceSE, error);
-		log.debug("targetSE is:\n" + targetSE);
+		if (log.isDebugEnabled()) {log.debug("targetSE is:\n" + targetSE);};
 		
 		assertEquals(targetExpect, targetSE);
 	}

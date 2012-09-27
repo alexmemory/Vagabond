@@ -42,7 +42,7 @@ public class TestGraph {
 		g.addEdge("A", "C");
 		g.addEdge("C", "D");
 		
-		log.debug(g.toString());
+		if (log.isDebugEnabled()) {log.debug(g.toString());};
 		
 		assertTrue(g.hasEdge("A", "B"));
 		assertTrue(g.hasEdge("B", "A"));
@@ -85,7 +85,7 @@ public class TestGraph {
 		g.addEdge("A", "C");
 		g.addEdge("C", "D");
 		
-		log.debug(g.toString());
+		if (log.isDebugEnabled()) {log.debug(g.toString());};
 		
 		assertTrue(g.hasEdge("A", "B"));
 		assertFalse(g.hasEdge("B", "A"));
@@ -134,7 +134,7 @@ public class TestGraph {
 		g.addEdge("B", "D");
 		g.addEdge("C", "D");
 		
-		log.debug(g.toString());
+		if (log.isDebugEnabled()) {log.debug(g.toString());};
 		
 		List<String> sort = g.topologicalSort();
 		List<String> ex = CollectionUtils.makeList("A","B","C","D");

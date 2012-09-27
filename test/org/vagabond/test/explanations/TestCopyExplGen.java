@@ -57,7 +57,7 @@ public class TestCopyExplGen extends AbstractVagabondTest {
 		assertArrayEquals(expl.getRelNames().toArray(), new String[] {
 				"person","address"});
 		
-		log.debug(expl.getTuplesInProv().toString());
+		if (log.isDebugEnabled()) {log.debug(expl.getTuplesInProv().toString());};
 		assertEquals(expl.getTuplesInProv(), mSet);
 	}
 	

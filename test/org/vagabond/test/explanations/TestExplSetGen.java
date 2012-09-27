@@ -108,7 +108,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		expCol = ExplanationFactory.newExplanationCollection(set);
 		
 		col = gen.findExplanations(m);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		assertEquals(set, col.getExplSets().iterator().next());
 		assertEquals(expCol, col);
@@ -134,7 +134,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 				MarkerFactory.newAttrMarker("person", "1|1", "livesin")
 				);
 		
-		log.debug(m);
+		if (log.isDebugEnabled()) {log.debug(m);};
 		
 		e1 = new CopySourceError();
 		e1.setExplains(m.getElemList().get(0));
@@ -188,7 +188,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4,e5);
 
 		col = gen.findExplanations(m);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		col.resetIter();
 		assertEquals(set, col.getExplSets().iterator().next());
@@ -247,7 +247,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		expCol = ExplanationFactory.newExplanationCollection(set);
 		
 		col = gen.findExplanations(m);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		col.resetIter();
 		assertEquals(set, col.getExplSets().iterator().next());
@@ -380,7 +380,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		expCol.computeRealSEAndExplains();
 		
 		col = gen.findExplanations(errSet);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		col.resetIter();
 		
@@ -424,7 +424,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		expCol = ExplanationFactory.newExplanationCollection(set);
 		
 		col = gen.findExplanations(m);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		col.resetIter();
 		assertEquals(set, col.getExplSets().iterator().next());
@@ -493,7 +493,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		expCol.computeRealSEAndExplains();
 		
 		col = gen.findExplanations(errSet);
-		log.debug(col);
+		if (log.isDebugEnabled()) {log.debug(col);};
 		
 		col.resetIter();
 		
@@ -539,7 +539,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		// create
 		ExplanationCollection col1 = gen.findExplanations(MarkerFactory.newMarkerSet(a1));
 		
-		log.debug(col1);
+		if (log.isDebugEnabled()) {log.debug(col1);};
 		
 		assertEquals(ex, col1);
 	}

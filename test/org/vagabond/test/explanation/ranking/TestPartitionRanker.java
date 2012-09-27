@@ -93,7 +93,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		ExplPartition e = explGen.findExplanations(m);
 
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 
 		ranker = RankerFactory.createPartRanker("SideEffect", e);
 
@@ -152,7 +152,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 					s2.getSideEffectSize() >= s1.getSideEffectSize());
 		}
 
-		log.debug(ranker);
+		if (log.isDebugEnabled()) {log.debug(ranker);};
 	}
 
 	@Test
@@ -179,7 +179,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		ExplPartition e = explGen.findExplanations(m);
 
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 
 		ranker = RankerFactory.createPartRanker("ExplSize", e);
 
@@ -232,7 +232,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 					s2.size() >= s1.size());
 		}
 
-		log.debug(ranker);
+		if (log.isDebugEnabled()) {log.debug(ranker);};
 	}
 
 	@Test
@@ -259,7 +259,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		ExplPartition e = explGen.findExplanations(m);
 
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 
 		ranker = RankerFactory.createPartRanker("ExplSize", e);
 
@@ -291,7 +291,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 		// rank completely
 		assertTrue(ranker.hasNext());
 
-		log.debug(ranker);
+		if (log.isDebugEnabled()) {log.debug(ranker);};
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		ExplPartition e = explGen.findExplanations(m);
 
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 
 		PartitionRanker pr1 =
 				(PartitionRanker) RankerFactory.createPartRanker("ExplSize", e);
@@ -337,7 +337,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		assertTrue(res1.equals(res2));
 
-		log.debug(pr1 + "\n\n" + pr2);
+		if (log.isDebugEnabled()) {log.debug(pr1 + "\n\n" + pr2);};
 	}
 
 	@Test
@@ -351,7 +351,7 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		ExplPartition e = explGen.findExplanations(m);
 
-		log.debug(e);
+		if (log.isDebugEnabled()) {log.debug(e);};
 
 		ranker = RankerFactory.createPartRanker("SideEffect", e);
 
@@ -372,14 +372,14 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 		ArrayList<FullExplSummary> rankedExpl =
 				(ArrayList<FullExplSummary>) rankedExplField.get(ranker);
 
-		log.debug(rankedExpl);
+		if (log.isDebugEnabled()) {log.debug(rankedExpl);};
 
 		Field rankingField = PartitionRanker.class.getDeclaredField("ranking");
 		rankingField.setAccessible(true);
 		TreeSet<FullExplSummary> ranking =
 				(TreeSet<FullExplSummary>) rankingField.get(ranker);
 
-		log.debug(ranking);
+		if (log.isDebugEnabled()) {log.debug(ranking);};
 
 		for (FullExplSummary s : ranking) {
 			assertTrue("" + s, rankedExpl.contains(s));
@@ -391,14 +391,14 @@ public class TestPartitionRanker extends AbstractVagabondTest {
 
 		IExplanationSet e2 = ranker.getExplWithHigherScore(1);
 		assertEquals(sol.get(7), e2);
-		log.debug(sol);
+		if (log.isDebugEnabled()) {log.debug(sol);};
 
 		try {
 			IExplanationSet e3 = ranker.getExplWithHigherScore(2);
 			assertFalse(true);
 		}
 		catch (NoSuchElementException ex) {
-			log.debug(ex);
+			if (log.isDebugEnabled()) {log.debug(ex);};
 		}
 	}
 
