@@ -39,6 +39,9 @@ public class CollectionUtils {
 	public static <T> Set<T> makeSet (T ... elems) {
 		Set<T> result;
 		
+		if (elems == null)
+			return new HashSet<T> ();
+		
 		result = new HashSet<T> (elems.length);
 		
 		for(T elem: elems)
