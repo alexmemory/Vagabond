@@ -1,0 +1,8 @@
+0|Beierle1988|The Knowledge Representation Language LILOG|LILOG report 41,||1988|July||||IBM Deutschland GmbH, WT LILOG, (Stuttgart, FRG)|> DBDkb> DBDlang><LILOG||
+1|Cashing1991|A programmer's Guide to File Processing|PWS-Kent, 199 pp.||1991|||||Bonaventure College (NY)|> DBFintro><x||informal, mainly textual descriptions.
+2|Gosh1986:1|Data Base Organization for Data Management|Academic Press (New York NY).||1986||||||> DBDintro>||
+3|Grams1990|The Health Maintenance Facility|Journal of Medical Systems, Plenum Pub.||1990|April|59--70|14|12||> MIS>||preliminary requirements for space station medical services including literature search, problem identification, and micron gravity surgery
+4|Johnson1993:1|The Performance of Current B-Tree Algorithms|ACM Transactions on Database Systems.||1993|March||18|1||> DBFindex>||
+5|Knott1975|Procedures for Managing Extendible Array Files|rcvd.||1975|||||LSM, DCRT, NIH|> DBFimpl.9> DBFtechn.5><DBfile||
+6|Parimala1989|A query facility to a network DBMS|Computer J.; ACM Computing Reviews 8912-0900.||1989|February||32|1|CMC, India|> DBDquery>||
+7|Qian1993|Semantic Interoperation Via Intelligent Mediation|IEEE RIDE-International Workshop on Interoperability in Multidatabase Systems 93, Vienna.||1993|April|228--231|||SRI|> DBDdist> DBDkb> > I3||
