@@ -98,7 +98,6 @@
 			<Attr><Name>manID</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>title</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>org</Name><DataType>TEXT</DataType></Attr>
-			<Attr><Name>confloc</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>year</Name><DataType>INT</DataType></Attr>
 			<Attr><Name>month</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>pages</Name><DataType>TEXT</DataType></Attr>
