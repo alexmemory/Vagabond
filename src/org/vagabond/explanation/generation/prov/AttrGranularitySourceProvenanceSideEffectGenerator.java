@@ -62,11 +62,12 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 		if (log.isDebugEnabled()) {log.debug("partioned source SE: " + partionedSE);};
 		if (log.isDebugEnabled()) {log.debug("rels affected by source SE rels are: " + relsForAffTarget);};
 		if (log.isDebugEnabled()) {log.debug("create sourceSE attr map: " + sourceSEtidToAttrs);};
-		
+		//TODO self join problematic not talk about rels but atoms that are positional
+		//TODO change semantics
 		for(String targetRel: relsForAffTarget.keySet()) {
 			query = getSideEffectQuery(targetRel, 
-					relsForAffTarget.get(targetRel), 
-					partionedSE);
+							relsForAffTarget.get(targetRel), 
+							partionedSE);
 			
 			if (log.isDebugEnabled()) {log.debug("Compute side effects for target relation <"
 					+ targetRel + "> using query:\n" + query);};

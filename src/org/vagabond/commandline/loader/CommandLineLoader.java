@@ -14,6 +14,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.ValidationException;
+import org.vagabond.mapping.model.serialize.mapfile.MapFileSerializer;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LoggerUtil;
@@ -79,6 +80,20 @@ public class CommandLineLoader {
 		parser.printUsage(out);
 	}
 	
+	private void output () throws Exception {
+		switch(options.getOutForm())
+		{
+		case none:
+			break;
+		case map:
+			System.out.println(MapFileSerializer.getInstance().transformToMap(map.getScenario()));
+			break;
+		case xml:
+			System.out.println(map.getDocument().toString());
+			break;
+		}
+	}
+	
 	public boolean execute (String[] args) {
 		try {
 			setUpLogger();
@@ -89,7 +104,9 @@ public class CommandLineLoader {
 		
 		try {
 			parseOptionsAndLoadScenario(args);
-			executeOnDB();
+			if (!options.isOnlyValidate())
+				executeOnDB();
+			output();
 		} catch (CmdLineException e) {			
 			LoggerUtil.logException(e, log);
 			printUsage(System.err);

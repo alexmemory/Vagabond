@@ -60,7 +60,7 @@ public class InfluenceSourceExplanationGenerator
 				: prov.getAllProvAndMap()) {
 			String mapId = wlPlusMap.getValue().getId();
 			Set<Pair<Integer,String>> attrs = joinAttrMap.get(mapId);
-			
+			//TODO make combinations for each map in map prov
 			// for each potentially failed join attr add an explanation
 			for(Pair<Integer,String> attr: attrs) {
 				IMarkerSet sourceSE;

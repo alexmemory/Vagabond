@@ -59,6 +59,7 @@ public class TargetSkeletonMappingExplanationGenerator implements
 			}
 		}
 		
+		//TODO this should consider not only foreign key joins but any join by mappings in the target
 		Map<String, RelAttrMapSet> affRels = new HashMap<String, RelAttrMapSet>();
 		RelAttrMapSet relAttrMapSet;
 		

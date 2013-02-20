@@ -210,6 +210,7 @@ public class MappingGraph {
 								&& node != neighbor) {
 							joinAttrs.add(new Pair<Integer,String>
 									(neighbor.pos, curVar));
+							// if neighbor has not been visited add it to todo stack
 							if (!visited.contains(neighbor))
 								todo.push(neighbor);
 						}

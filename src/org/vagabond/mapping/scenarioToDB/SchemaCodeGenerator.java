@@ -400,9 +400,10 @@ public class SchemaCodeGenerator {
 		schemaName = getSchemaString(schemaName);
 		transes = scenario.getTransformations();
 		
-		for(TransformationType trans: transes.getTransformationArray()) {
-			getTransViewCode(trans, schemaName, result);
-		}
+		if (scenario.isSetTransformations())
+			for(TransformationType trans: transes.getTransformationArray()) {
+				getTransViewCode(trans, schemaName, result);
+			}
 	}
 	
 	/**

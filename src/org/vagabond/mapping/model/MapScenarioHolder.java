@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlObject;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.mapping.stats.StatsQueryExecutor;
 import org.vagabond.util.CollectionUtils;
@@ -17,9 +19,11 @@ import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
+import org.vagabond.xmlmodel.MapExprType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
+import org.vagabond.xmlmodel.SKFunction;
 import org.vagabond.xmlmodel.StringRefType;
 import org.vagabond.xmlmodel.TransformationType;
 
@@ -123,6 +127,28 @@ public class MapScenarioHolder {
 		return new ArrayList<RelationType> (result);
 	}
 	
+	/*
+	 * Return all arguments for an atom in a mapping. This is crumbersome, because arguments can be of different types 
+	 * and that is not well supported by XMLBeans.
+	 */
+	
+	public XmlObject[] getAtomArguments (RelAtomType atom) 
+			throws Exception {
+		int numElements = atom.sizeOfConstantArray() + atom.sizeOfFunctionArray() + 
+				atom.sizeOfSKFunctionArray() + atom.sizeOfVarArray();
+		XmlObject[] result = new XmlObject[numElements];
+		
+		XmlCursor c = atom.newCursor();
+		c.toChild(0);
+		for(int i = 0; i < numElements; i++) {
+			XmlObject o = (XmlObject) c.getObject();
+			result[i] = o;
+			c.toNextSibling();
+		}
+		
+		return result;
+	}
+	
 	public List<TransformationType> getTransCreatingRel (String relname) 
 			throws Exception {
 		List<TransformationType> result;
@@ -220,6 +246,24 @@ public class MapScenarioHolder {
 		return transToSource.get(t);
 	}
 	
+	public boolean hasRelForName (String relname, boolean target) {
+		RelationType[] rels;
+		
+		if (target)
+			rels = doc.getMappingScenario().getSchemas().
+					getTargetSchema().getRelationArray();
+		else
+			rels = doc.getMappingScenario().getSchemas().
+					getSourceSchema().getRelationArray();
+		
+		for (RelationType rel: rels) {
+			if (rel.getName().equals(relname))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public RelationType getRelForName (String relname, boolean target) throws Exception {
 		RelationType[] rels;
 		
@@ -252,6 +296,16 @@ public class MapScenarioHolder {
 		return result;
 	}
 	
+	public boolean hasMapping (String name) {
+		for(MappingType map: doc.getMappingScenario().getMappings()
+				.getMappingArray()) {
+			if (map.getId().equals(name))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public MappingType getMapping (String name) throws Exception {
 		for(MappingType map: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
@@ -272,6 +326,17 @@ public class MapScenarioHolder {
 	
 	public MappingGraph getGraphForMapping (String name) throws Exception {
 		return getGraphForMapping(getMapping(name));
+	}
+	
+	public boolean hasCorr (String name) {
+		for (CorrespondenceType corr: doc.getMappingScenario()
+				.getCorrespondences().getCorrespondenceArray()) {
+			if (corr.getId().toUpperCase().equals(name) 
+					|| corr.getId().toLowerCase().equals(name))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	public CorrespondenceType getCorr (String name) throws Exception {

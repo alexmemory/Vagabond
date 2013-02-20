@@ -98,7 +98,8 @@ public class SourceSkeletonMappingExplanationGenerator implements
 			}
 			
 			//TODO check that we actually have more than one source atom, otherwise there is no such explanation
-			
+			// and that at least one of the atoms which contain "varName" are actually joined with this atom
+			//TODO all mappings generating attribute value should have a join error, otherwise mapping not correct
 			// 3rd step: find the attributes in the target that appear in the list
 			// found in the 2nd step.
 			for (RelAtomType targetRel: targetRels) {

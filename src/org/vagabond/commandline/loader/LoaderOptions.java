@@ -8,6 +8,12 @@ import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
 public class LoaderOptions {
 
+	public enum OutputFormat {
+		none,
+		xml,
+		map
+	}
+	
 	@Option(name="-f", usage="xml mapping scenario document")
 	private File xmlDoc;
 	
@@ -28,6 +34,12 @@ public class LoaderOptions {
 	
 	@Option(name="--no-data", usage="don't create instance data")
 	private boolean noData = false;
+	
+	@Option(name="--validate-only", usage="only validate mapping XML file")
+	private boolean onlyValidate = false;
+	
+	@Option(name="--output", usage="output mapping in format (xml = Tramp XML mapping file, map = .map file)")
+	private OutputFormat outForm = OutputFormat.none;
 	
 	private boolean[] dbOptionsSet = { false, false, false, false };
 	
@@ -100,6 +112,22 @@ public class LoaderOptions {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public boolean isOnlyValidate() {
+		return onlyValidate;
+	}
+
+	public void setOnlyValidate(boolean onlyValidate) {
+		this.onlyValidate = onlyValidate;
+	}
+
+	public OutputFormat getOutForm() {
+		return outForm;
+	}
+
+	public void setOutForm(OutputFormat outForm) {
+		this.outForm = outForm;
 	}
 	
 	
