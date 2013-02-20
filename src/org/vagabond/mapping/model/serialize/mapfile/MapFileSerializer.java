@@ -97,15 +97,17 @@ public class MapFileSerializer {
 
 	private void outputPKConstraints(SchemaType schema, StringBuilder result) {
 		for(RelationType r: schema.getRelationArray()) {
-			result.append("# " + r.getName() + "(");
-			
-			for(String a: r.getPrimaryKey().getAttrArray()) {
-				result.append(a);
-				result.append(", ");
+			if (r.isSetPrimaryKey()) {
+				result.append("# " + r.getName() + "(");
+				
+				for(String a: r.getPrimaryKey().getAttrArray()) {
+					result.append(a);
+					result.append(", ");
+				}
+				
+				result.delete(result.length() - 2, result.length());
+				result.append(")\n");
 			}
-			
-			result.delete(result.length() - 2, result.length());
-			result.append(")\n");
 		}		
 	}
 
