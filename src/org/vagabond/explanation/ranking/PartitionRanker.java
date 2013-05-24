@@ -12,12 +12,8 @@ import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
-import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.LogProviderHolder;
-import org.vagabond.util.ewah.JavaUtilBitSet;
 import org.vagabond.util.ewah.IBitSet.BitsetType;
-
-import com.skjegstad.utils.BloomFilter;
 
 public class PartitionRanker implements IPartitionRanker {
 

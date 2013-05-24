@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.MappingGraph;

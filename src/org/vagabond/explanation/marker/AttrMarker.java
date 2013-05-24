@@ -1,9 +1,8 @@
 package org.vagabond.explanation.marker;
 
-import static org.vagabond.util.HashFNV.*;
+import static org.vagabond.util.HashFNV.fnv;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.util.LoggerUtil;
 
 public class AttrMarker implements ISchemaMarker {

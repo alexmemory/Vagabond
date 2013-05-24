@@ -17,10 +17,10 @@ import org.vagabond.util.BitMatrix;
 import org.vagabond.util.DynamicBitMatrix;
 import org.vagabond.util.ewah.Bitmap;
 import org.vagabond.util.ewah.BitsetView;
-import org.vagabond.util.ewah.NewEWAHBitmap;
 import org.vagabond.util.ewah.IBitSet;
 import org.vagabond.util.ewah.IntIterator;
 import org.vagabond.util.ewah.JavaUtilBitSet;
+import org.vagabond.util.ewah.NewEWAHBitmap;
 import org.vagabond.util.ewah.RunningLengthWord;
 
 public class TestNewBitMatrixAndBitset {
@@ -339,7 +339,6 @@ public class TestNewBitMatrixAndBitset {
 	public void testSetMethodBranches() throws SecurityException,
 			IllegalArgumentException, NoSuchFieldException,
 			IllegalAccessException {
-		NewEWAHBitmap b;
 		changeMaxLiteralAndRunLength(5, 5);
 		// TODO how to create full headers without running into mem problems?
 		// modify the max number of literals?
@@ -526,7 +525,7 @@ public class TestNewBitMatrixAndBitset {
 		}
 	}
 
-	private Field getUnfinalizedField(Class clazz, String fieldName)
+	private Field getUnfinalizedField(Class<RunningLengthWord> clazz, String fieldName)
 			throws IllegalArgumentException, IllegalAccessException,
 			SecurityException, NoSuchFieldException {
 		Field modifiersField = Field.class.getDeclaredField("modifiers");

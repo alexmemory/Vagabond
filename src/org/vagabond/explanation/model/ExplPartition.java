@@ -1,11 +1,8 @@
 package org.vagabond.explanation.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.PartitionedMarkerSet;
 import org.vagabond.explanation.ranking.IPartitionRanker;

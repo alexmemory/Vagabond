@@ -1,6 +1,8 @@
 package org.vagabond.test.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -9,18 +11,16 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.util.BitMatrix;
 import org.vagabond.util.DynamicBitMatrix;
 import org.vagabond.util.ewah.Bitmap;
-import org.vagabond.util.ewah.EWAHCompressedBitmap;
 import org.vagabond.util.ewah.BitsetView;
+import org.vagabond.util.ewah.EWAHCompressedBitmap;
 import org.vagabond.util.ewah.IBitSet;
 import org.vagabond.util.ewah.IntIterator;
 import org.vagabond.util.ewah.JavaUtilBitSet;
-import org.vagabond.util.ewah.NewEWAHBitmap;
 import org.vagabond.util.ewah.RunningLengthWord;
 
 public class TestBitMatrixAndBitset {

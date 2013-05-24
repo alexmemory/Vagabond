@@ -13,17 +13,14 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.mapping.stats.StatsQueryExecutor;
-import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.GlobalResetter;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingScenarioDocument;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
-import org.vagabond.xmlmodel.MapExprType;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
-import org.vagabond.xmlmodel.SKFunction;
 import org.vagabond.xmlmodel.StringRefType;
 import org.vagabond.xmlmodel.TransformationType;
 

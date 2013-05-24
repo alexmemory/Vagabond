@@ -65,8 +65,6 @@ public class TestSuperMapExplGen extends AbstractVagabondTest {
 		IAttributeValueMarker error;
 		SuperflousMappingError expl;
 		Set<MappingType> m1;
-		IMarkerSet exp;
-		
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 
 		error = (IAttributeValueMarker) MarkerParser.getInstance()

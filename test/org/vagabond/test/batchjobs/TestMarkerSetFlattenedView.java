@@ -1,41 +1,25 @@
 package org.vagabond.test.batchjobs;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import java.sql.ResultSet;
-import java.util.Set;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.vagabond.explanation.generation.CopySourceExplanationGenerator;
-import org.vagabond.explanation.generation.prov.SourceProvParser;
 import org.vagabond.explanation.marker.AttrValueMarker;
-import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.MarkerQueryBatch;
 import org.vagabond.explanation.marker.MarkerSet;
 import org.vagabond.explanation.marker.MarkerSetFlattenedView;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.TupleMarker;
-import org.vagabond.explanation.model.ExplanationFactory;
-import org.vagabond.explanation.model.IExplanationSet;
-import org.vagabond.explanation.model.basic.CopySourceError;
-import org.vagabond.explanation.model.prov.ProvWLRepresentation;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.test.TestOptions;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.util.PropertyWrapper;
 
 
 public class TestMarkerSetFlattenedView extends AbstractVagabondTest {

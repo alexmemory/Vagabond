@@ -1,8 +1,8 @@
 package org.vagabond.explanation.model.basic;
 
+import static org.vagabond.util.HashFNV.fnv;
 import static org.vagabond.util.LoggerUtil.ObjectColToStringWithMethod;
 import static org.vagabond.util.LoggerUtil.logException;
-import static org.vagabond.util.HashFNV.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,7 +13,6 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;

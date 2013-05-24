@@ -2,7 +2,6 @@ package org.vagabond.explanation.marker;
 
 import java.util.Comparator;
 
-import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.util.CollectionUtils;
 
 public interface MarkerComparators {

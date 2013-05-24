@@ -12,7 +12,6 @@ import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
 import org.vagabond.explanation.model.basic.TargetSkeletonMappingError;
 import org.vagabond.util.LogProviderHolder;
-import org.vagabond.xmlmodel.CorrespondenceType;
 
 public class ExplanationFactory {
 

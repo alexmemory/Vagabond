@@ -3,14 +3,12 @@ package org.vagabond.explanation.marker;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.IdMap;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
 import org.vagabond.xmlmodel.AttrDefType;
@@ -19,7 +17,6 @@ import org.vagabond.xmlmodel.MappingsType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
 import org.vagabond.xmlmodel.SchemaType;
-import org.vagabond.util.IdMap;
 
 public class ScenarioDictionary {
 

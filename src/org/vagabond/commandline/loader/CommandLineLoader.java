@@ -1,19 +1,15 @@
 package org.vagabond.commandline.loader;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.xmlbeans.XmlException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
-import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.mapping.model.serialize.mapfile.MapFileSerializer;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.util.ConnectionManager;

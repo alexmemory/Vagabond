@@ -1,19 +1,17 @@
 package org.vagabond.test.explanations.model;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Comparator;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
@@ -21,7 +19,6 @@ import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;

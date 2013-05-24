@@ -14,14 +14,13 @@ import org.junit.Test;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph.ErrorGraphNodeType;
 import org.vagabond.explanation.generation.partition.ErrorPartitionGraph.ErrorNode;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.BitMatrix;
 import org.vagabond.util.CollectionUtils;
-import org.vagabond.util.ewah.EWAHCompressedBitmap;
 import org.vagabond.util.ewah.BitsetView;
+import org.vagabond.util.ewah.EWAHCompressedBitmap;
 
 public class TestErrorPartitionGraph extends AbstractVagabondTest {
 

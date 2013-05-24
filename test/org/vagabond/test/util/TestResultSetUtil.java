@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.test.TestOptions;

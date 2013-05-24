@@ -1,9 +1,8 @@
 package org.vagabond.test.explanations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.log4j.Logger;
-
 import org.junit.Test;
 import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.generation.PartitionExplanationGenerator;

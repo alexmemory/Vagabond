@@ -1,32 +1,28 @@
 package org.vagabond.test.explanations.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.CorrespondenceError;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
-import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.explanation.ranking.AStarExplanationRanker;
+import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.mapping.model.MapScenarioHolder;
-import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
-import org.vagabond.util.IdMap;
 import org.vagabond.xmlmodel.CorrespondenceType;
 import org.vagabond.xmlmodel.MappingType;
 
@@ -702,7 +698,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
 		col.resetIter();
 		
-		IExplanationSet s1,s2,s3,e1,e2,e3;
+		IExplanationSet s1,s2,e1,e2;
 		
 		assertTrue(col.getRanker().hasAtLeast(2));
 		assertFalse(col.getRanker().hasAtLeast(3));
@@ -716,7 +712,6 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		assertTrue (col.hasNext());
 		s2 = col.next();
 		e2 = ExplanationFactory.newExplanationSet(e11,e31);
-		e3 = ExplanationFactory.newExplanationSet(e11,e31);
 		assertTrue ("2b:\n\n" + e2 + s2, 
 				ExplanationComparators.setSameElemComp.compare(e2, s2) == 0);
 		

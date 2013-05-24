@@ -3,7 +3,6 @@ package org.vagabond.explanation.ranking.scoring;
 import java.util.Comparator;
 
 import org.vagabond.explanation.model.IExplanationSet;
-import org.vagabond.explanation.model.basic.IBasicExplanation;
 
 public class ScoreExplSetComparator implements Comparator<IExplanationSet> {
 

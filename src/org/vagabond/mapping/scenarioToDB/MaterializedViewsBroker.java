@@ -1,19 +1,10 @@
 package org.vagabond.mapping.scenarioToDB;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.marker.MarkerSetFlattenedView;
-import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.LogProviderHolder;
-import org.vagabond.xmlmodel.DataType;
-import org.vagabond.xmlmodel.RelInstanceFileType;
-import org.vagabond.xmlmodel.RelInstanceType;
-import org.vagabond.xmlmodel.RelInstanceType.Row;
 
 public class MaterializedViewsBroker {
 

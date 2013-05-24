@@ -1,37 +1,30 @@
 package org.vagabond.test.explanation.ranking;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.vagabond.explanation.generation.ExplanationSetGenerator;
-import org.vagabond.explanation.generation.PartitionExplanationGenerator;
-import org.vagabond.explanation.generation.partition.ErrorPartitionGraph;
-import org.vagabond.explanation.generation.partition.ErrorPartitioner;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
-import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.PartitionedMarkerSet;
-import org.vagabond.explanation.marker.ScenarioDictionary;
-import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.CopySourceError;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.ranking.AStarExplanationRanker;
 import org.vagabond.explanation.ranking.AStarExplanationRanker.RankedListElement;
 import org.vagabond.explanation.ranking.IExplanationRanker;
-import org.vagabond.explanation.ranking.IPartitionRanker;
-import org.vagabond.explanation.ranking.AStarExplanationRanker;
 import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.explanation.ranking.scoring.ExplanationSizeScore;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.explanation.ranking.scoring.ScoreExplSetComparator;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
-import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.test.AbstractVagabondTest;
 
 

@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.BitSet;
 import java.util.Collection;
 
 import org.vagabond.util.ewah.EWAHCompressedBitmap;

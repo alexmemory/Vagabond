@@ -1,6 +1,5 @@
 package org.vagabond.util.ewah;
 
-import java.util.NoSuchElementException;
 
 public class TranslatedBitsetView extends BitsetView {
 

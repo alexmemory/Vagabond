@@ -1,6 +1,8 @@
 package org.vagabond.test.explanation.ranking;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,11 +25,11 @@ import org.vagabond.explanation.marker.PartitionedMarkerSet;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
-import org.vagabond.explanation.ranking.IPartitionRanker;
-import org.vagabond.explanation.ranking.PartitionRanker.FullExplSummary;
-import org.vagabond.explanation.ranking.PartitionRanker;
-import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.explanation.ranking.AStarExplanationRanker;
+import org.vagabond.explanation.ranking.IPartitionRanker;
+import org.vagabond.explanation.ranking.PartitionRanker;
+import org.vagabond.explanation.ranking.PartitionRanker.FullExplSummary;
+import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.test.AbstractVagabondTest;
 

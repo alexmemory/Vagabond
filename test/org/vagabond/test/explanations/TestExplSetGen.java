@@ -12,8 +12,6 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerParser;
-import org.vagabond.explanation.marker.PartitionedMarkerSet;
-import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;

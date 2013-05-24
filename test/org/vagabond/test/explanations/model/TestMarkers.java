@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
 import org.vagabond.explanation.marker.AttrMarker;
@@ -28,10 +26,8 @@ import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.PartitionedMarkerSet;
 import org.vagabond.explanation.marker.ScenarioDictionary;
-import org.vagabond.mapping.model.ValidationException;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.util.CollectionUtils;
-import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.Pair;
 
 public class TestMarkers extends AbstractVagabondTest {

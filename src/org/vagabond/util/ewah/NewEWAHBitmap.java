@@ -1,11 +1,6 @@
 package org.vagabond.util.ewah;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
-import org.vagabond.util.LoggerUtil;
 
 public class NewEWAHBitmap extends EWAHCompressedBitmap {
 

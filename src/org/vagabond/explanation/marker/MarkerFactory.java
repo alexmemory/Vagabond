@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.postgresql.ssl.MakeSSL;
 import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;

@@ -1,12 +1,12 @@
 package org.vagabond.test.util;
 
+import static org.vagabond.util.HashFNV.fnv;
+
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.vagabond.test.AbstractVagabondTest;
-
-import static org.vagabond.util.HashFNV.*;
 
 public class TestFNVHash extends AbstractVagabondTest {
 

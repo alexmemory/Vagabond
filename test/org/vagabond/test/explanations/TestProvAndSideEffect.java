@@ -2,7 +2,6 @@ package org.vagabond.test.explanations;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,9 +12,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.generation.prov.AlterSourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.generation.prov.AttrGranularitySourceProvenanceSideEffectGenerator;
 import org.vagabond.explanation.generation.prov.ProvenanceGenerator;

@@ -1,20 +1,19 @@
 package org.vagabond.test.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.ranking.PartitionRanker;
 import org.vagabond.explanation.ranking.PartitionRanker.FullExplSummary;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.test.AbstractVagabondTest;
+import org.vagabond.util.ewah.IBitSet.BitsetType;
 
 import com.skjegstad.utils.BloomFilter;
-import org.vagabond.util.ewah.IBitSet.BitsetType;
 
 public class TestBloomFilter extends AbstractVagabondTest {
 

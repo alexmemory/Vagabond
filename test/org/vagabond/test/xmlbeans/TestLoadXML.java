@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;

@@ -1,9 +1,6 @@
 package org.vagabond.explanation.marker;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,18 +11,10 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.generation.QueryHolder;
-import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
-import org.vagabond.mapping.scenarioToDB.SchemaCodeGenerator;
-import org.vagabond.util.CollectionUtils;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
-import org.vagabond.xmlmodel.DataType;
-import org.vagabond.xmlmodel.RelInstanceFileType;
-import org.vagabond.xmlmodel.RelInstanceType;
-import org.vagabond.xmlmodel.RelInstanceType.Row;
 
 public class MarkerSetFlattenedView extends MarkerSet {
 

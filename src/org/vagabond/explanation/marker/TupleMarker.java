@@ -1,9 +1,8 @@
 package org.vagabond.explanation.marker;
 
-import static org.vagabond.util.HashFNV.*;
+import static org.vagabond.util.HashFNV.fnv;
 
 import org.apache.log4j.Logger;
-import org.vagabond.util.HashFNV;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
 

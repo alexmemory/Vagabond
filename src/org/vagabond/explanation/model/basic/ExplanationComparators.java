@@ -1,10 +1,6 @@
 package org.vagabond.explanation.model.basic;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
 
 import org.vagabond.explanation.marker.MarkerComparators;
 import org.vagabond.explanation.model.IExplanationSet;

@@ -2,7 +2,6 @@ package org.vagabond.util.xmlbeans;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,8 +19,6 @@ import org.vagabond.explanation.model.basic.AbstractBasicExplanation;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ValidationException;
-import org.vagabond.xmlmodel.MappingScenarioDocument;
-import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.explanderror.AttributeMarkerType;
 import org.vagabond.xmlmodel.explanderror.ExplanationAndErrorsDocument;
 import org.vagabond.xmlmodel.explanderror.ExplanationType;

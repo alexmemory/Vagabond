@@ -1,15 +1,9 @@
 package org.vagabond.commandline.explgen;
 
 import java.io.File;
-import java.util.List;
 
-import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.OptionDef;
-import org.kohsuke.args4j.spi.OptionHandler;
-import org.kohsuke.args4j.spi.Parameters;
-import org.kohsuke.args4j.spi.Setter;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.xmlmodel.ConnectionInfoType;

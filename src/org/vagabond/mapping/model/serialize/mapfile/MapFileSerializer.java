@@ -1,14 +1,11 @@
 package org.vagabond.mapping.model.serialize.mapfile;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.xmlmodel.AttrDefType;
-import org.vagabond.xmlmodel.AttrListType;
 import org.vagabond.xmlmodel.AttrRefType;
 import org.vagabond.xmlmodel.ForeignKeyType;
 import org.vagabond.xmlmodel.FunctionType;

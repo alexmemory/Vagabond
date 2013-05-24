@@ -3,7 +3,6 @@ package org.vagabond.explanation.ranking;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.vagabond.explanation.model.ExplPartition;
@@ -16,7 +15,6 @@ import org.vagabond.explanation.ranking.scoring.ScoreBasedTotalOrderComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreBasicComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreExplSetComparator;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
-import org.vagabond.util.Pair;
 
 public class RankerFactory {
 

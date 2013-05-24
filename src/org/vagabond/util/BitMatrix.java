@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.vagabond.util.ewah.Bitmap;
 import org.vagabond.util.ewah.BitsetFactory;
-import org.vagabond.util.ewah.EWAHCompressedBitmap;
 import org.vagabond.util.ewah.BitsetView;
 import org.vagabond.util.ewah.IBitSet;
 import org.vagabond.util.ewah.IBitSet.BitsetType;

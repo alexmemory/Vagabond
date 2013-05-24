@@ -13,7 +13,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.test.TestOptions;
 import org.vagabond.util.ConnectionManager;
-import org.vagabond.util.ResultSetUtil;
 
 public class TestCopyCSBatch {
 
