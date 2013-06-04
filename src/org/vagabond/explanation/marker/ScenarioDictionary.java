@@ -374,6 +374,10 @@ public class ScenarioDictionary {
 		return getOffsetForRelAttr(relId, attrId) + getTidInt(tid, relId);
 	}
 	
+	public int getOffset (int relId, int attrId, int tidId) {
+		return getOffsetForRelAttr(relId, attrId) + tidId;
+	}
+	
 	public int getOffsetForRelAttr (String relName, String attrName) throws Exception { 
 		return getOffsetForRelAttr (getRelId(relName), getAttrId(relName, attrName));
 	}

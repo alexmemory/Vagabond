@@ -324,4 +324,13 @@ public class TestBitMarkerSet extends AbstractVagabondDBTest {
 		assertEquals(7, set1.getNumElem());
 	}
 	
+	@Test
+	public void testAddValues () throws Exception {
+		initialize();
+		set1.add(0,0,0);
+		set1.add(1,0,1);
+		
+		assertEquals(setTwoElement, set1);
+	}
+	
 }

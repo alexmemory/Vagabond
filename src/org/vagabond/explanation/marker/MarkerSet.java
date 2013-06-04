@@ -237,5 +237,10 @@ public class MarkerSet implements IMarkerSet {
 			this.sum = MarkerFactory.newMarkerSummary(this); //TODO check methods 
 		return sum;
 	}
+
+	@Override
+	public boolean add(int relId, int attrId, int tidId) {
+		return add(MarkerFactory.newAttrMarker(relId, tidId, attrId));
+	}
 	
 }

@@ -13,6 +13,7 @@ public interface IMarkerSet extends Set<ISingleMarker> {
 	public IMarkerSet intersect (IMarkerSet other);
 	public IMarkerSet diff (IMarkerSet other);
 	public boolean add (ISingleMarker marker);
+	public boolean add (int relId, int attrId, int tidId);
 	public boolean contains (String relName, String tid) throws Exception;
 	public String toUserString();
 	public IMarkerSet cloneSet ();

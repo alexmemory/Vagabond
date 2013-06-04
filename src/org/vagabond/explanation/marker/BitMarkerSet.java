@@ -537,4 +537,14 @@ public class BitMarkerSet implements IMarkerSet {
 		return false;
 	}
 
+	@Override
+	public boolean add(int relId, int attrId, int tidId) {
+		int bitPos = ScenarioDictionary.getInstance().getOffset(relId, attrId, tidId);
+		
+		if (markers.get(bitPos))
+			return false;
+		markers.set(bitPos);
+		return true;
+	}
+
 }
