@@ -26,12 +26,18 @@ import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.ewah.IntIterator;
 
 /**
- * A*-search based ranking of explanations. We sort the markers  
+ * Incremental A*-search based ranking of explanations. We sort the markers  
  * for which we have to create full explanations (which ordering is used is unimportant for correctness).
  * Starting from all possible explanations for the first marker in order (say e1) we iteratively extend
  * these partial solutions with possible explanations for the next marker in order. Partial solutions are
- * stored in a min-heap based 
- * 
+ * stored in a priority queue. We keep a pointer {@code lastDoneElem} into the queue that stores the position of the currently 
+ * last fully ranked explanation. In each step we consider the direct successor
+ * of {@code lastDoneElem}.  If it is a paritial solution, lets say for errors 
+ * up to ei, then we exend this explanations set with all explanations for ei+1
+ * and insert each of these (partitial) solutions into the queue. If the 
+ * direct succcessor of {@code lastDoneElem} is a full solution then we have 
+ * found the next ranking result and increase {@code lastDoneElem}. 
+ *   
  * @author lord_pretzel
  *
  */
