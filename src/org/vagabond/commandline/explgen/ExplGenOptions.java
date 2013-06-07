@@ -9,7 +9,12 @@ import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.xmlmodel.ConnectionInfoType;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
+/**
+ * @author lord_pretzel
+ *
+ */
 public class ExplGenOptions {
+
 
 	@Option(name = "-u", usage = "user name for connecting to the database")
 	private String dbUser = "postgres";
