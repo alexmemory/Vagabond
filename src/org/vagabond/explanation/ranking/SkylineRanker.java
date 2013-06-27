@@ -20,6 +20,14 @@ import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
 
+/**
+ * An incremental skyline ranker for explanation sets. Given a set of scoring 
+ * functions and incremental rankers for each scoring function, this class
+ * computes the skyline.
+ * 
+ * @author lord_pretzel
+ *
+ */
 public class SkylineRanker implements IPartitionRanker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(SkylineRanker.class);
