@@ -32,7 +32,7 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 		
 	/**
 	 * @throws Exception
-	 */
+	 
 	@Test
 	public void testUsingSimpleQuery () throws Exception {
 		IMarkerSet expected = MarkerParser.getInstance().parseSet("{(0,1,0)}");
@@ -42,5 +42,18 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 		
 		assertEquals(expected, actual);
 	}
+	*/
+	@Test
+	public void testMarkerSetGeneration() throws Exception
+	{
+		QueryMarkerSetGenerator  a = new QueryMarkerSetGenerator();
+		IMarkerSet actual = a.genMSetFromQuery("SELECT 'person' AS rel, age AS attr, tableoid as tid FROM person WHERE age < 120;");
+		MarkerSet test = new MarkerSet();
+		test.add(1, 27, 36097);
+		IMarkerSet expected = test;
+		assertEquals(expected, actual);
+		
+	}
+	
 	
 }
