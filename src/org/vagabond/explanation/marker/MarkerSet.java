@@ -242,5 +242,14 @@ public class MarkerSet implements IMarkerSet {
 	public boolean add(int relId, int attrId, int tidId) {
 		return add(MarkerFactory.newAttrMarker(relId, tidId, attrId));
 	}
+
+	@Override
+	public boolean add(String relName, String attrName, int tidId) throws Exception 
+	{
+		int relid = ScenarioDictionary.getInstance().getRelId(relName);
+		int attrid = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
+		add(relid,attrid,tidId);
+		return false;
+	}
 	
 }

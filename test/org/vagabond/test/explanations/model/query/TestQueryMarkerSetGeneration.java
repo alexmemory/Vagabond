@@ -28,6 +28,7 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	@Before
 	public void setUp () throws Exception {
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
+		loadToDB("resource/test/simpleTest.xml");
 	}
 		
 	/**
@@ -47,9 +48,12 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	public void testMarkerSetGeneration() throws Exception
 	{
 		QueryMarkerSetGenerator  a = new QueryMarkerSetGenerator();
-		IMarkerSet actual = a.genMSetFromQuery("SELECT 'person' AS rel, age AS attr, tableoid as tid FROM person WHERE age < 120;");
+		IMarkerSet actual = a.genMSetFromQuery("SELECT 'person' AS rel, 'address' AS attr, tid FROM source.person ;");
 		MarkerSet test = new MarkerSet();
-		test.add(1, 27, 36097);
+		test.add("person", "address", 1);
+		test.add("person", "address", 2);
+		test.add("person", "address", 3);
+		test.add("person", "address", 4);
 		IMarkerSet expected = test;
 		assertEquals(expected, actual);
 		

@@ -547,4 +547,13 @@ public class BitMarkerSet implements IMarkerSet {
 		return true;
 	}
 
+	@Override
+	public boolean add(String relName, String attrName, int tidId) throws Exception {
+		// TODO Auto-generated method stub
+		int relid = ScenarioDictionary.getInstance().getRelId(relName);
+		int attrid = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
+		add(relid,attrid,tidId);
+		return false;
+	}
+
 }
