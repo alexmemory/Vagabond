@@ -6,8 +6,11 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.vagabond.explanation.marker.AttrValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerParser;
+import org.vagabond.explanation.marker.MarkerQueryBatch;
 import org.vagabond.explanation.marker.MarkerSet;
 import org.vagabond.explanation.marker.query.QueryMarkerSetGenerator;
 import org.vagabond.test.AbstractVagabondTest;
@@ -21,7 +24,8 @@ import org.vagabond.test.explanations.model.TestBasicAndExplanationSets;
 public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	
 	static Logger log = Logger.getLogger(AbstractVagabondTest.class);
-	
+	private static MarkerSet markers = new MarkerSet();
+	private static MarkerQueryBatch mq;
 	/**
 	 * @throws Exception
 	 */
@@ -29,6 +33,7 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	public void setUp () throws Exception {
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
 		loadToDB("resource/test/simpleTest.xml");
+
 	}
 		
 	/**
@@ -58,6 +63,33 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 		assertEquals(expected, actual);
 		
 	}
+	
+	@Test
+	public void testMarkerQueryBatchSetName () throws Exception {
+		String relName = 
+			"SELECT 'person'::text AS rel, person.tid, B'110'::bit varying AS att " +
+			"FROM source.person where person.tid=1" +
+			" " + 
+			"UNION " + 
+			"SELECT 'person'::text AS rel, person.tid, B'001'::bit varying AS att " + 
+			"FROM source.person where person.tid=2" + 
+			"";
+//		String relName = "errm";
+		String predicate = "att & 'B110'::varbit != 'B000'::varbit OR att & 'B001'::varbit != 'B000'::varbit";
+		
+		mq = new MarkerQueryBatch(relName, predicate);
+		ISingleMarker m0 = new AttrValueMarker("person", "1", "name");
+		ISingleMarker m2 = new AttrValueMarker("person", "1", "address");
+		ISingleMarker m4 = new AttrValueMarker("person", "2", "petname");
+		markers.add(m0);
+		markers.add(m2);
+		markers.add(m4);
+		
+		
+		assertTrue(mq.equals(markers));
+		
+	}
+	
 	
 	
 }
