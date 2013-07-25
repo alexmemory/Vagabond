@@ -5,6 +5,7 @@
 		<Relation name="person">
 			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>address</Name><DataType>INT8</DataType></Attr>
+			<Attr><Name>petname</Name><DataType>TEXT</DataType></Attr>
 			<PrimaryKey><Attr>name</Attr></PrimaryKey>
 		</Relation>
 		<Relation name="address">
@@ -41,7 +42,7 @@
 			<Correspondence ref="c1" />
 		</Uses>
 		<Foreach>
-			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
 		</Foreach>
 		<Exists>
 			<Atom tableref="employee"><Var>a</Var><Var>c</Var></Atom>
@@ -52,7 +53,7 @@
 			<Correspondence ref="c1" /><Correspondence ref="c2" />
 		</Uses>
 		<Foreach>
-			<Atom tableref="person"><Var>a</Var><Var>b</Var></Atom>
+			<Atom tableref="person"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
 			<Atom tableref="address"><Var>b</Var><Var>c</Var></Atom>
 		</Foreach>
 		<Exists>
@@ -80,10 +81,10 @@ FROM
 </ConnectionInfo>
 <Data>
 	<Instance name="person">
-		<Row><Value>1</Value><Value>Peter</Value><Value>1</Value></Row>
-		<Row><Value>2</Value><Value>Heinz</Value><Value>2</Value></Row>
-		<Row><Value>3</Value><Value>Gert</Value><Value>NULL</Value></Row>
-		<Row><Value>4</Value><Value>Gertrud</Value><Value>2</Value></Row>
+		<Row><Value>1</Value><Value>Peter</Value><Value>1</Value><Value>Petera</Value></Row>
+		<Row><Value>2</Value><Value>Heinz</Value><Value>2</Value><Value>Heinza</Value></Row>
+		<Row><Value>3</Value><Value>Gert</Value><Value>NULL</Value><Value>Gerta</Value></Row>
+		<Row><Value>4</Value><Value>Gertrud</Value><Value>2</Value><Value>Gertruda</Value></Row>
 	</Instance>
 	<Instance name="address">
 		<Row><Value>1</Value><Value>1</Value><Value>Toronto</Value></Row>
