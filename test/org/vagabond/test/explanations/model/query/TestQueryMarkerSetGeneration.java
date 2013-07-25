@@ -32,7 +32,7 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	@Before
 	public void setUp () throws Exception {
 		loadToDB("resource/exampleScenarios/homelessDebugged.xml");
-		loadToDB("resource/test/simpleTest.xml");
+		loadToDB("resource/test/simpleTest2.xml");
 
 	}
 		
