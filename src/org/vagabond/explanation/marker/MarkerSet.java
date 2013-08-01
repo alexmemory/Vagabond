@@ -248,8 +248,16 @@ public class MarkerSet implements IMarkerSet {
 	{
 		int relid = ScenarioDictionary.getInstance().getRelId(relName);
 		int attrid = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
-		add(relid,attrid,tidId);
-		return false;
+		return add(relid,attrid,tidId);
+	}
+	
+	@Override
+	public boolean add(String relName, String attrName, String tid) throws Exception 
+	{
+		int relid = ScenarioDictionary.getInstance().getRelId(relName);
+		int attrid = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
+		int tidid = ScenarioDictionary.getInstance().getTidInt(tid, relid);
+		return add(relid,attrid,tidid);
 	}
 	
 }
