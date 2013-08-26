@@ -559,7 +559,7 @@ public class BitMarkerSet implements IMarkerSet {
 		int relid = ScenarioDictionary.getInstance().getRelId(relName);
 		int attrid = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
 		int tidid = ScenarioDictionary.getInstance().getTidInt(tid, relid);
-		return add(relid,attrid,tidid);
+		return add(relid,attrid	,tidid);
 	}
 
 	
