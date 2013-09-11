@@ -65,6 +65,7 @@ public class CommandLineExplGen {
 		if (options.isLoadScen())
 			loadScenarioOnDB();
 		ScenarioDictionary.getInstance().initFromScenario();
+
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
@@ -156,7 +157,6 @@ public class CommandLineExplGen {
 
 	private void parseOptions(String[] args) throws CmdLineException {
 		CmdLineParser parser;
-
 		if (log.isDebugEnabled()) {log.debug("Command line args are: <" + LoggerUtil.arrayToString(args)
 				+ ">");};
 		parser = new CmdLineParser(options);

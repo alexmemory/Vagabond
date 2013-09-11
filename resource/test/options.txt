@@ -1,6 +1,6 @@
 Host=127.0.0.1
 DB=tramptest
-User=postgres
+User=zhen
 Password=
 Schema=source
 Port=5432

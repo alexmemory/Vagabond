@@ -52,6 +52,12 @@ public class ExplGenOptions {
 	
 	@Option(name = "-rankExpls", usage = "Rank the generated explanations")
 	private boolean useRanker = false;
+
+	@Option(name = "-funcweights", usage = "list of weight of scoring functions")
+	private double[] funcweights = null;
+	
+	@Option(name = "-funcnames", usage = "list of scoring functions")
+	private String[] funcnames = null;
 	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
@@ -133,6 +139,14 @@ public class ExplGenOptions {
 		this.loadScen = loadScen;
 	}
 
+	public void setScoreFuncWeights(double[] scorefuncweights){
+		this.funcweights = scorefuncweights;
+	}
+
+	public void setScoreFunctions(String[] scorefuncnames){
+		this.funcnames = scorefuncnames;
+	}
+	
 	public boolean isLoadScen() {
 		return loadScen;
 	}
@@ -167,7 +181,15 @@ public class ExplGenOptions {
 	public String[] getSkylineRankers() {
 		return skylineRankers;
 	}
+	
+	public String[] getScoreFuncNames() {
+		return funcnames;
+	}
 
+	public double[] getScoreFuncWeights() {
+		return funcweights;
+	}
+	
 	public void setSkylineRankers(String[] skylineRankers) {
 		this.skylineRankers = skylineRankers;
 	}

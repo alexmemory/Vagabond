@@ -15,6 +15,7 @@ import org.vagabond.explanation.ranking.scoring.ScoreBasedTotalOrderComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreBasicComparator;
 import org.vagabond.explanation.ranking.scoring.ScoreExplSetComparator;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
+import org.vagabond.explanation.ranking.scoring.WeightedCombinedWMScoring;
 
 public class RankerFactory {
 
@@ -24,14 +25,18 @@ public class RankerFactory {
 	private class RankScheme {
 		public Class singleRanker;
 		public Class partRanker;
+		public IScoringFunction[] listScoreFunction;
 		public IScoringFunction scoreFunction;
+		public double[] weightScoreFunction;
 		public Comparator<IExplanationSet> comp;
 		public Comparator<IBasicExplanation> bComp;
 		
-		public RankScheme (Class singleRanker, Class partRanker, IScoringFunction scoreFunction) {
+		public RankScheme (Class singleRanker, Class partRanker, IScoringFunction[] listScoreFunction, IScoringFunction scoreFunction, double[] weightScoreFunction) {
 			this.singleRanker = singleRanker;
 			this.partRanker = partRanker;
 			this.scoreFunction = scoreFunction;
+			this.listScoreFunction = listScoreFunction;
+			this.weightScoreFunction = weightScoreFunction;
 			this.comp =  new ScoreExplSetComparator (this.scoreFunction);
 			this.bComp = new ScoreBasicComparator(this.scoreFunction);
 		}
@@ -44,16 +49,30 @@ public class RankerFactory {
 		inst.rankerSchemes.put("Dummy", inst.new RankScheme (
 				DummyRanker.class, 
 				null,
+				null,
+				null,
 				null));
 		
 		inst.rankerSchemes.put("SideEffect", inst.new RankScheme (
 				AStarExplanationRanker.class, 
 				PartitionRanker.class,
-				SideEffectSizeScore.inst));
+				null,
+				SideEffectSizeScore.inst,
+				null));
+		
 		inst.rankerSchemes.put("ExplSize", inst.new RankScheme (
 				AStarExplanationRanker.class,
 				PartitionRanker.class,
-				ExplanationSizeScore.inst));
+				null,
+				ExplanationSizeScore.inst,
+				null));
+		
+		inst.rankerSchemes.put("WeightedCombinedScoring", inst.new RankScheme (
+				WeightedAStarExplanationRanker.class, 
+				PartitionRanker.class,
+				WeightedCombinedWMScoring.funcnames,
+				null,
+				WeightedCombinedWMScoring.funcweights));
 	}
 	
 	public static IExplanationRanker createRanker (String rankScheme) {

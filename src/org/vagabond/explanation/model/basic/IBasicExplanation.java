@@ -10,7 +10,7 @@ import org.vagabond.xmlmodel.TransformationType;
 
 public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 
-	enum ExplanationType {
+	public enum ExplanationType {
 		CopySourceError,
 		InfluenceSourceError,
 		CorrespondenceError,
