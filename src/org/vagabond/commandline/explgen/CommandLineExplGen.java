@@ -88,9 +88,10 @@ public class CommandLineExplGen {
 			}
 			else {
 				IPartitionRanker rank;
-
+				
 				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
 						+ options.getRankerScheme());};
+
 				rank = RankerFactory.createPartRanker(
 								options.getRankerScheme(), p);
 				iter = rank;

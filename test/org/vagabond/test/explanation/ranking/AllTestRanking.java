@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
 	TestPartitionRanker.class,
 	TestAStarRanker.class,
 	TestScoringFunctions.class,
-	TestSkylineRanker.class
+	TestSkylineRanker.class,
+	TestWeightedCombinedScoringFunctions.class
         })
 public class AllTestRanking {
 }

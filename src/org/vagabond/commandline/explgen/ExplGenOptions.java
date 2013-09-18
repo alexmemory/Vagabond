@@ -6,6 +6,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.vagabond.explanation.ranking.RankerFactory;
+import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.xmlmodel.ConnectionInfoType;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 
@@ -54,10 +55,10 @@ public class ExplGenOptions {
 	private boolean useRanker = false;
 
 	@Option(name = "-funcweights", usage = "list of weight of scoring functions")
-	private double[] funcweights = null;
+	private String funcweights = null;
 	
 	@Option(name = "-funcnames", usage = "list of scoring functions")
-	private String[] funcnames = null;
+	private String funcnames = null;
 	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
@@ -139,11 +140,11 @@ public class ExplGenOptions {
 		this.loadScen = loadScen;
 	}
 
-	public void setScoreFuncWeights(double[] scorefuncweights){
+	public void setScoreFuncWeights(String scorefuncweights){
 		this.funcweights = scorefuncweights;
 	}
 
-	public void setScoreFunctions(String[] scorefuncnames){
+	public void setScoreFunctions(String scorefuncnames){
 		this.funcnames = scorefuncnames;
 	}
 	
@@ -152,7 +153,14 @@ public class ExplGenOptions {
 	}
 
 	public String getRankerScheme() {
-		return rankerScheme;
+		if (this.getScoreFuncNames().length != 0 
+				&& this.getScoreFuncWeights().length == this.getScoreFuncNames().length)
+		{
+			rankerScheme = RankerFactory.createRankerScheme(this.getScoreFuncNames(), this.getScoreFuncWeights());
+			return rankerScheme;
+		}
+		else
+				return rankerScheme;
 	}
 
 	public void setRankerScheme(String rankerScheme) throws Exception {
@@ -183,11 +191,18 @@ public class ExplGenOptions {
 	}
 	
 	public String[] getScoreFuncNames() {
-		return funcnames;
+		String[] mFuncNames;
+		mFuncNames = funcnames.split(",");
+		return mFuncNames;
 	}
 
 	public double[] getScoreFuncWeights() {
-		return funcweights;
+		double[] mFuncWeights = new double[funcweights.split(",").length];
+		for (int i = 0; i < mFuncWeights.length; i++)
+		{
+			mFuncWeights[i] = Double.parseDouble(funcweights.split(",")[i]);	
+		}
+		return mFuncWeights;
 	}
 	
 	public void setSkylineRankers(String[] skylineRankers) {

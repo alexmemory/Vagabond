@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.vagabond.commandline.explgen.ExplGenOptions;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -25,18 +26,14 @@ public class RankerFactory {
 	private class RankScheme {
 		public Class singleRanker;
 		public Class partRanker;
-		public IScoringFunction[] listScoreFunction;
 		public IScoringFunction scoreFunction;
-		public double[] weightScoreFunction;
 		public Comparator<IExplanationSet> comp;
 		public Comparator<IBasicExplanation> bComp;
 		
-		public RankScheme (Class singleRanker, Class partRanker, IScoringFunction[] listScoreFunction, IScoringFunction scoreFunction, double[] weightScoreFunction) {
+		public RankScheme (Class singleRanker, Class partRanker,IScoringFunction scoreFunction) {
 			this.singleRanker = singleRanker;
 			this.partRanker = partRanker;
 			this.scoreFunction = scoreFunction;
-			this.listScoreFunction = listScoreFunction;
-			this.weightScoreFunction = weightScoreFunction;
 			this.comp =  new ScoreExplSetComparator (this.scoreFunction);
 			this.bComp = new ScoreBasicComparator(this.scoreFunction);
 		}
@@ -49,30 +46,49 @@ public class RankerFactory {
 		inst.rankerSchemes.put("Dummy", inst.new RankScheme (
 				DummyRanker.class, 
 				null,
-				null,
-				null,
 				null));
 		
 		inst.rankerSchemes.put("SideEffect", inst.new RankScheme (
 				AStarExplanationRanker.class, 
 				PartitionRanker.class,
-				null,
-				SideEffectSizeScore.inst,
-				null));
+				SideEffectSizeScore.inst));
 		
 		inst.rankerSchemes.put("ExplSize", inst.new RankScheme (
 				AStarExplanationRanker.class,
 				PartitionRanker.class,
-				null,
-				ExplanationSizeScore.inst,
-				null));
-		
-		inst.rankerSchemes.put("WeightedCombinedScoring", inst.new RankScheme (
+				ExplanationSizeScore.inst));
+	}
+	
+
+	public static String createRankerScheme(String[] funcnames, double[] funcweights){
+	    String[] mFuncNames = funcnames;
+	    double[] mFuncWeights = funcweights;
+	    
+	    String mNewRankerName = "WeightedCombined[";
+	    
+	    for (int i = 0; i < mFuncNames.length; i++){
+		    mNewRankerName += mFuncNames[i];
+		    mNewRankerName += ",";
+	    }
+	    mNewRankerName += "][";
+	    
+	    for (int j = 0; j<mFuncWeights.length; j++){
+		    mNewRankerName += mFuncWeights[j];
+		    mNewRankerName += ",";
+	    }
+	    mNewRankerName += "]";
+	    
+	    IScoringFunction[] mScoreFuncs = new IScoringFunction[mFuncNames.length];
+	    for (int k = 0; k<mFuncNames.length; k++){
+	    	mScoreFuncs[k] = inst.getScoreFunction(mFuncNames[k]);
+	    }
+
+		inst.rankerSchemes.put(mNewRankerName, inst.new RankScheme (
 				WeightedAStarExplanationRanker.class, 
 				PartitionRanker.class,
-				WeightedCombinedWMScoring.funcnames,
-				null,
-				WeightedCombinedWMScoring.funcweights));
+				new WeightedCombinedWMScoring(mScoreFuncs, mFuncWeights)));
+		
+		return mNewRankerName;
 	}
 	
 	public static IExplanationRanker createRanker (String rankScheme) {

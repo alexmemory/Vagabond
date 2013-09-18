@@ -15,12 +15,12 @@ import org.vagabond.explanation.model.basic.IBasicExplanation;
  * @author lord_pretzel
  *
  */
-public class WeightedCombinedWMScoring implements IScoringFunction {
+public class WeightedCombinedWMScoring implements IScoringFunction {	
 	public static IScoringFunction[] funcnames;
 	public static double[] funcweights;
 	public WeightedCombinedWMScoring (IScoringFunction[] f, double[] weights) {
-	this.funcnames = funcnames;
-	this.funcweights = funcweights;
+	this.funcnames = f;
+	this.funcweights = weights;
 }
 	/* (non-Javadoc)
 	* @see org.vagabond.explanation.ranking.scoring.IScoringFunction#getScore(org.vagabond.explanation.model.basic.IBasicExplanation)
