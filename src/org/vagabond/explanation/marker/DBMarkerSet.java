@@ -1,5 +1,6 @@
 package org.vagabond.explanation.marker;
 
+import java.io.Console;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,27 +14,103 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.Enums.Marker_Type;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.util.LoggerUtil;
+import org.vagabond.explanation.marker.IMarkerSet;;;
 
-public class MarkerSetFlattenedView extends MarkerSet {
+public class DBMarkerSet extends MarkerSet {
 
-	static Logger log = LogProviderHolder.getInstance().getLogger(MarkerSetFlattenedView.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(DBMarkerSet.class);
 	
 	private MarkerSummary sum;
 	private String query;
 	private String relName;  // NULL if not materialized
+	boolean materialised;
+	private Set<ISingleMarker> javaObj;
+	
 	private int size = -1;
 	private int numElem = -1;
 	
-	public MarkerSetFlattenedView (String q) {
+	
+	//Indicates the physical representation currently being used. this may be one of the
+	//     enum types Marker_Type
+	boolean[] current_types=new boolean[3];
+	
+	public void GenerateRep(Marker_Type new_type)
+	{
+	  if(current_types[new_type.ordinal()])
+	  {
+		  //the destination type is already set
+		  return;
+	  }
+	  
+	  //Case A : TABLE type destination
+	  if(new_type == Marker_Type.TABLE_REP)
+	  {
+		  //Create a new table and drop the old one if any
+		  
+		  
+		  //Case 1 : convert query to table
+		  if(current_types[Marker_Type.QUERY_REP.ordinal()])
+		  {
+			  materialize(true);
+			  //Insert into the table the query results
+			  
+		  }
+		  //Case 2 : convert java objects to table
+		  else if(current_types[Marker_Type.JAVA_REP.ordinal()])
+		  {
+			  //Delete the existing table and create a new table
+			  materialize(false);
+			  
+			  //use the objects in MarkerSet field of this class to insert data into the table
+			  for(ISingleMarker marker_temp : getJavaObj())
+			  {
+				  insertSingleMarker(marker_temp);
+			  }
+			  current_types[Marker_Type.TABLE_REP.ordinal()] = Boolean.TRUE;
+		  }
+		  
+	  }
+	  
+	  //Case B : QUERY type destination
+	  else if(new_type == Marker_Type.QUERY_REP)
+	  {
+		  //Case 1 : convert table to query
+		  
+		  //Case 2 : convert java objects to query
+	  }
+	  
+	  //Case C : JAVAOBJ type destination
+	  else if(new_type == Marker_Type.JAVA_REP)
+	  {
+		  //Case 1 : convert table to java objects
+		  
+		  //Case 2 : convert  query to java objects
+	  }
+	}
+	
+	public DBMarkerSet (String q) {
 		query = q;
 		relName = null;
 	}
 	
-	public MarkerSetFlattenedView (String q, boolean materialize) {
+	public DBMarkerSet (String q, boolean materialize) {
 		query = q;
 		relName = null;
+		current_types[Marker_Type.QUERY_REP.ordinal()] = Boolean.TRUE;
+		
+		if (materialize) {
+			materialize();
+		}
+	}
+	
+	public DBMarkerSet (Set<ISingleMarker> obj, boolean materialize) {
+		javaObj = obj;
+		relName = null;
+		current_types[Marker_Type.JAVA_REP.ordinal()] = Boolean.TRUE;
+		
 		if (materialize) {
 			materialize();
 		}
@@ -53,19 +130,32 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	
 	public void materialize() {
 		MaterializedViewsBroker instance = MaterializedViewsBroker.getInstance();
-		compose(instance.getViewHandler(this));
+		
+		compose(instance.getViewHandler(this),true);
 	}
 	
-	public void compose(int viewId) {
+	public void materialize(boolean populate) {
+		MaterializedViewsBroker instance = MaterializedViewsBroker.getInstance();
+		
+		compose(instance.getViewHandler(this),populate);
+	}
+	
+	public void compose(int viewId,boolean populate) {
 		relName = "errmarkers" + viewId;
 		String qDrop = "DROP TABLE IF EXISTS " + relName;
-		String qCreate = "CREATE TABLE " + relName + " AS " + query;
+		String qCreate ;
+		
+		if(populate)
+			qCreate	= "CREATE TABLE " + relName + " AS " + query;
+		else
+			qCreate = "CREATE TABLE " + relName + " (relation text, tid text, attribute text)";
 		
 		try {
 			ConnectionManager.getInstance().execUpdate(qDrop);
 			ConnectionManager.getInstance().execUpdate(qCreate);
-		} catch (Exception e) {
-			;
+		} catch (Exception e) 
+		{
+		System.out.println(e.toString())	;
 		}
 
 		// Update size and numElem
@@ -97,8 +187,8 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		if (! (other instanceof IMarkerSet))
 			return false;
 		
-		if (other instanceof MarkerSetFlattenedView) {
-			MarkerSetFlattenedView ov =(MarkerSetFlattenedView)other;
+		if (other instanceof DBMarkerSet) {
+			DBMarkerSet ov =(DBMarkerSet)other;
 			if (query.toUpperCase().equals(ov.getQuery().toUpperCase()))
 				return true;
 				
@@ -269,7 +359,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 
 			ConnectionManager.getInstance().closeRs(rs);
 		} catch (Exception e) {
-			;
+			 System.out.println(e.toString());
 		}
 		
 		return markers;
@@ -283,9 +373,9 @@ public class MarkerSetFlattenedView extends MarkerSet {
 
 	@Override
 	public IMarkerSet union(IMarkerSet other) {
-		if (other instanceof MarkerSetFlattenedView) {
-			MarkerSetFlattenedView ov = (MarkerSetFlattenedView)other;
-			return new MarkerSetFlattenedView(query + " UNION " + ov.query);
+		if (other instanceof DBMarkerSet) {
+			DBMarkerSet ov = (DBMarkerSet)other;
+			return new DBMarkerSet(query + " UNION " + ov.query);
 		}
 		
 		String newQuery = query + " UNION VALUES ";
@@ -293,7 +383,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 			newQuery +=  addSingleMarkerQueryString(marker)+",";
 		}
 		newQuery = removeLastComma(newQuery); // remove the last comma
-		return new MarkerSetFlattenedView(newQuery);
+		return new DBMarkerSet(newQuery);
 	}
 	
 	private String addSingleMarkerQueryString(ISingleMarker marker) {
@@ -484,8 +574,8 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	public boolean containsAll(Collection<?> arg0) {
 //		Set<ISingleMarker> markers = getElems(); // TODO: 2 cases: markerset and view
 //		return markers.containsAll(arg0);
-		if (arg0 instanceof MarkerSetFlattenedView) {
-			String q = ((MarkerSetFlattenedView)arg0).query + " EXCEPT ( " + this.query + " ) ";
+		if (arg0 instanceof DBMarkerSet) {
+			String q = ((DBMarkerSet)arg0).query + " EXCEPT ( " + this.query + " ) ";
 			return querySize(q) == 0;
 		}
 		
@@ -578,8 +668,8 @@ public class MarkerSetFlattenedView extends MarkerSet {
 		boolean changed = false;
 		sum = null;
 
-		if (arg0 instanceof MarkerSetFlattenedView) {
-			MarkerSetFlattenedView msv = (MarkerSetFlattenedView)arg0;
+		if (arg0 instanceof DBMarkerSet) {
+			DBMarkerSet msv = (DBMarkerSet)arg0;
 			query += " EXCEPT ( " + msv.query + " )";
 			if (isMaterialized()) changed = deleteFromQuery(msv.query);
 		} else if (arg0 instanceof IMarkerSet) {
@@ -637,8 +727,8 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	public boolean retainAll(Collection<?> arg0) {
 		int tempSize = getSize();
 		boolean changed = false;
-		if (arg0 instanceof MarkerSetFlattenedView) {
-			MarkerSetFlattenedView msv = (MarkerSetFlattenedView)arg0;
+		if (arg0 instanceof DBMarkerSet) {
+			DBMarkerSet msv = (DBMarkerSet)arg0;
 			query = "( " + query + " ) INTERSECT ( " + msv.query + " )";
 			changed = (tempSize != getSize());
 			if (isMaterialized()) changed = keepQuery(msv.query);
@@ -721,7 +811,7 @@ public class MarkerSetFlattenedView extends MarkerSet {
 	
 	@Override
 	public IMarkerSet cloneSet() {
-		MarkerSetFlattenedView clone = new MarkerSetFlattenedView(query);
+		DBMarkerSet clone = new DBMarkerSet(query);
 		
 		if (sum != null)
 			clone.sum = sum;
@@ -791,5 +881,14 @@ public class MarkerSetFlattenedView extends MarkerSet {
 				result.add(MarkerFactory.newSchemaMarker(relId, i));
 		
 		return result;
+	}
+
+	private Set<ISingleMarker> getJavaObj() {
+		return javaObj;
+	}
+
+	private void setJavaObj(Set<ISingleMarker> javaObj) {
+		this.javaObj = javaObj;
+		current_types[Marker_Type.JAVA_REP.ordinal()] = true;
 	}
 }

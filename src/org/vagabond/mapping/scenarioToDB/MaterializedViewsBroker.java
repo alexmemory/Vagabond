@@ -3,7 +3,7 @@ package org.vagabond.mapping.scenarioToDB;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.marker.MarkerSetFlattenedView;
+import org.vagabond.explanation.marker.DBMarkerSet;
 import org.vagabond.util.LogProviderHolder;
 
 public class MaterializedViewsBroker {
@@ -13,7 +13,7 @@ public class MaterializedViewsBroker {
 	private static MaterializedViewsBroker instance;
 	private static int maxViewId = 0;
 		
-	private HashMap<MarkerSetFlattenedView, Integer> vm = new HashMap<MarkerSetFlattenedView, Integer>();
+	private HashMap<DBMarkerSet, Integer> vm = new HashMap<DBMarkerSet, Integer>();
 	
 	private MaterializedViewsBroker () {
 	}
@@ -30,7 +30,9 @@ public class MaterializedViewsBroker {
 		throw new CloneNotSupportedException();
 	}
 	
-	public synchronized int getViewHandler(MarkerSetFlattenedView markers) {
+	public synchronized int getViewHandler(DBMarkerSet markers) {
+		//if markers is materialized then its there in the vm hash map else this would be infinite loop if called from DBMarkerSet.equals
+		//if(markers.isMaterialized())
 		if (vm.containsKey(markers))
 			return vm.get(markers);
 
@@ -44,7 +46,7 @@ public class MaterializedViewsBroker {
 	}
 	
 	public void decompose() {
-		for (MarkerSetFlattenedView o : vm.keySet()) {
+		for (DBMarkerSet o : vm.keySet()) {
 			o.decompose();
 		}
 		vm.clear();

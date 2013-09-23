@@ -1,6 +1,6 @@
 Host=127.0.0.1
-DB=tramptest
-User=postgres
+DB=testdb
+User=iypearun001
 Password=
 Schema=source
 Port=5432
