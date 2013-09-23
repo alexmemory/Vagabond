@@ -26,6 +26,7 @@ public class DBMarkerSet extends MarkerSet {
 	private MarkerSummary sum;
 	private String query;
 	private String relName;  // NULL if not materialized
+	boolean materialised;
 	private Set<ISingleMarker> javaObj;
 	
 	private int size = -1;

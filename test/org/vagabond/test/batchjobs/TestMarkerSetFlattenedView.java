@@ -13,7 +13,7 @@ import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.marker.MarkerSet;
-import org.vagabond.explanation.marker.MarkerSetFlattenedView;
+import org.vagabond.explanation.marker.DBMarkerSet;
 import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.TupleMarker;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
@@ -27,7 +27,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 	static Logger log = Logger.getLogger(TestMarkerSetFlattenedView.class);
 	
 	private static MarkerSet markers;
-	private static MarkerSetFlattenedView mv;
+	private static DBMarkerSet mv;
 	private static String query;
 	
 	@Before
@@ -41,7 +41,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'01'::bit varying AS att " + 
 			"FROM target.person " + 
 			"WHERE person.livesin IS NOT NULL";
-		mv = new MarkerSetFlattenedView(query);
+		mv = new DBMarkerSet(query);
 		markers = new MarkerSet();
 	}
 	
@@ -86,7 +86,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		
 		assertFalse(mv.equals(mv1));
 	}
@@ -103,7 +103,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"WHERE person.livesin IS NULL and tid<>'1M' " +
 			"UNION " +
 			"SELECT 'person', '4M', B'10'::bit varying";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		
 		assertFalse(mv.equals(mv1));
 	}
@@ -118,7 +118,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL ";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		
 		assertTrue(mv.equals(mv1));
 	}
@@ -161,7 +161,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		
 		assertTrue(mv.containsAll(mv1));
 	}
@@ -226,7 +226,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		assertTrue(mv.removeAll(mv1));
 		assertTrue(mv.getSize() == 3);
 	}
@@ -248,7 +248,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		assertFalse(mv.retainAll(mv1));
 		assertTrue(mv.getSize() == 2);
 	}
@@ -259,7 +259,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 			"SELECT 'person'::text AS rel, person.tid, B'10'::bit varying AS att " +
 			"FROM target.person " +
 			"WHERE person.livesin IS NULL";
-		MarkerSetFlattenedView mv1 = new MarkerSetFlattenedView(query1);
+		DBMarkerSet mv1 = new DBMarkerSet(query1);
 		assertTrue(mv.intersect(mv1).getSize() == 3);
 	}
 	
@@ -276,7 +276,7 @@ public class TestMarkerSetFlattenedView extends AbstractVagabondTest {
 	
 	@Test
 	public void testMarkerSetViewGetSummary () throws Exception {
-		MarkerSetFlattenedView fl = new MarkerSetFlattenedView("SELECT * FROM " +
+		DBMarkerSet fl = new DBMarkerSet("SELECT * FROM " +
 				"(VALUES ('person','1M','B01'::bit varying), ('person','2M','B01'::bit varying)) AS m(rel,tid,att)");
 		mv.materialize();
 		MarkerSummary ms = mv.getSummary();

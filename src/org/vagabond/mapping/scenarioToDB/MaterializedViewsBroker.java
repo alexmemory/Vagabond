@@ -31,6 +31,8 @@ public class MaterializedViewsBroker {
 	}
 	
 	public synchronized int getViewHandler(DBMarkerSet markers) {
+		//if markers is materialized then its there in the vm hash map else this would be infinite loop if called from DBMarkerSet.equals
+		//if(markers.isMaterialized())
 		if (vm.containsKey(markers))
 			return vm.get(markers);
 
