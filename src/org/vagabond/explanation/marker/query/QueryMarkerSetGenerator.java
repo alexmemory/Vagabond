@@ -22,6 +22,7 @@ import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.test.AbstractVagabondTest;
 import org.vagabond.test.TestOptions;
 import org.vagabond.util.ConnectionManager;
+import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.ResultSetUtil;
 
 public class QueryMarkerSetGenerator extends AbstractVagabondTest{
@@ -39,28 +40,19 @@ public class QueryMarkerSetGenerator extends AbstractVagabondTest{
 	}
 	
 	
-
 	public IMarkerSet genMSetFromQuery (String query) throws Exception {
-	 try {
-		 
-		 ConnectionManager con = ConnectionManager.getInstance();
-				 
+		ConnectionManager con = ConnectionManager.getInstance();
+
 		ResultSet test=  con.execQuery(query);
-		MarkerSet a = new MarkerSet();
+		MarkerSet markers = new MarkerSet();
 		while(test.next())
 		{
 			String rel = test.getString(1);
 			String attr = test.getString(2);
-			int tid = test.getInt(3);
-			a.add(rel, attr, tid);
+			String tid = test.getString(3);
+			markers.add(rel, attr, tid);
 		};
-		return a;
-	} catch (SQLException e) {
-		e.printStackTrace();
-	} catch (ClassNotFoundException e) {
-		e.printStackTrace();
-	}
-		return null;
+		return markers;
 	}
 	
 	public IMarkerSet MarkerQueryBatch(String relName, String predicate) throws Exception {
