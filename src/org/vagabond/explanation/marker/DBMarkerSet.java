@@ -94,6 +94,7 @@ public class DBMarkerSet extends MarkerSet {
 	public DBMarkerSet (String q) {
 		query = q;
 		relName = null;
+		current_types[Marker_Type.QUERY_REP.ordinal()] = Boolean.TRUE;
 	}
 	
 	public DBMarkerSet (String q, boolean materialize) {
@@ -195,11 +196,16 @@ public class DBMarkerSet extends MarkerSet {
 			if (this.getSize() != ov.getSize())
 				return false;
 			
-			if (!isMaterialized()) materialize();
+			//if (!isMaterialized()) materialize();
 
-			if (!ov.isMaterialized()) ov.materialize();
-
-			return markerSetsEqualOnDBSide(relName, ov.getRelName());
+			//if (!ov.isMaterialized()) ov.materialize();
+			if (!isMaterialized() && ov.isMaterialized())
+			   return markerSetsEqualOnDBSide(relName, ov.getRelName());
+			else
+			{
+			   //generate the elements for both and compare 
+				return getElems().equals(ov.getElems());
+			}
 			
 		}
 		
@@ -329,38 +335,55 @@ public class DBMarkerSet extends MarkerSet {
 	}
 
 	@Override
-	public Set<ISingleMarker> getElems() {
+	public Set<ISingleMarker> getElems() 
+	{
 		Set<ISingleMarker> markers = new HashSet<ISingleMarker> ();
 		ResultSet rs;
 		
 		if (log.isDebugEnabled()) {log.debug("Compute markers for query:\n" + query);};
 
-		try {
-			String q = query;
-			if (isMaterialized()) {
-				q = "SELECT * FROM " + relName;
-			}
-			rs = ConnectionManager.getInstance().execQuery(q);
-
-			while(rs.next()) {
-				String rel = rs.getString(1);
-				String tid = rs.getString(2);
-				String attBits = rs.getString(3);
-
-				for (int i=0; i < attBits.length(); i++) {
-					if (attBits.charAt(i) == '1') {
-						String attName = ScenarioDictionary.getInstance().getAttrName(rel, i);
-						ISingleMarker m = new AttrValueMarker(rel, tid, attName);
-						markers.add(m);
-					}
+		if (current_types[Marker_Type.JAVA_REP.ordinal()])
+		{
+			return javaObj;
+		}
+		else if(current_types[Marker_Type.QUERY_REP.ordinal()] || current_types[Marker_Type.TABLE_REP.ordinal()])
+		{
+			try {
+				String q = query;
+				if (isMaterialized()) {
+					q = "SELECT * FROM " + relName;
+				}
+				else
+				{
+					q = query;
 				}
 
-			}
+				rs = ConnectionManager.getInstance().execQuery(q);
 
-			ConnectionManager.getInstance().closeRs(rs);
-		} catch (Exception e) {
-			 System.out.println(e.toString());
+				while(rs.next()) {
+					String rel = rs.getString(1);
+					String tid = rs.getString(2);
+					String attBits = rs.getString(3);
+
+					for (int i=0; i < attBits.length(); i++) {
+						if (attBits.charAt(i) == '1') {
+							String attName = ScenarioDictionary.getInstance().getAttrName(rel, i);
+							ISingleMarker m = new AttrValueMarker(rel, tid, attName);
+							markers.add(m);
+						}
+					}
+
+				}
+
+				ConnectionManager.getInstance().closeRs(rs);
+			} catch (Exception e) {
+				 System.out.println(e.toString());
+			}
+			
+			return markers;
 		}
+		
+		
 		
 		return markers;
 	}
