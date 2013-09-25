@@ -24,32 +24,33 @@ import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
  *
  */
 public class ErrorTypeScore implements IScoringFunction {	
-	public static final IScoringFunction inst = new ErrorTypeScore();
-	
-
+	public double[] errweights;
+	public ErrorTypeScore (double[] weights) {
+	this.errweights = weights;
+}
 	public double getErrorWeight(ExplanationType errortype){
 		double retV = 0;
 		switch (errortype){
 		case CopySourceError:
-			 retV = 0.1;
+			 retV = this.errweights[0];
 		     break;
 		case InfluenceSourceError:
-			 retV = 0.1;
+			 retV = this.errweights[1];
 	         break;
 		case CorrespondenceError:
-			 retV = 0.1;
+			 retV = this.errweights[2];
 	         break;
 		case SuperflousMappingError:
-			 retV = 0.1;
+			 retV = this.errweights[3];
 		     break;
 		case SourceSkeletonMappingError:
-			 retV = 0.1;
+			 retV = this.errweights[4];
 	         break;
 		case TargetSkeletonMappingError:
-			 retV = 0.1;
+			 retV = this.errweights[5];
 		     break;
 		default: 
-			retV = 0;   
+			retV = 1;   
 		}
 		return retV;
 	}
@@ -58,8 +59,7 @@ public class ErrorTypeScore implements IScoringFunction {
 	public int getScore(IBasicExplanation expl) {
 		ExplanationType errType = expl.getType();
 		double typeWeight = this.getErrorWeight(errType);
-		int sizeScore  = expl.getSourceSideEffectSize();
-		return (int) (typeWeight * sizeScore);
+		return (int) (typeWeight);
 	}
 
 	@Override
@@ -69,8 +69,10 @@ public class ErrorTypeScore implements IScoringFunction {
 		Iterator<IBasicExplanation> iter = listExpl.iterator();
 		
 		while (iter.hasNext()){
-			retScore += iter.next().getSourceSideEffectSize()  * this.getErrorWeight(iter.next().getType());
+			retScore += this.getErrorWeight(iter.next().getType());
 		}
+		retScore /= set.getSize();
+		
 		return retScore;
 	}
 
@@ -81,17 +83,16 @@ public class ErrorTypeScore implements IScoringFunction {
 
 	@Override
 	public int getScore(Collection<IBasicExplanation> expls) {
-		
+		// TODO:
+		// remove duplicate elements in collection
+		// copy input then modify, compute
 		int retScore = 0;
 		
 		for(IBasicExplanation expl: expls)
-			retScore += expl.getSourceSideEffectSize()  * this.getErrorWeight(expl.getType());
+			retScore += this.getErrorWeight(expl.getType());
 		
+		retScore /= expls.size();
 		return retScore;
 	}
-
-
-
-
 
 }

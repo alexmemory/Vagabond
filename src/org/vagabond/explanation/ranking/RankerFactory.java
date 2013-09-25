@@ -10,6 +10,8 @@ import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.ranking.scoring.AvgErrTypeWeightScore;
+import org.vagabond.explanation.ranking.scoring.ErrorTypeScore;
 import org.vagabond.explanation.ranking.scoring.ExplanationSizeScore;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.explanation.ranking.scoring.ScoreBasedTotalOrderComparator;
@@ -57,10 +59,119 @@ public class RankerFactory {
 				AStarExplanationRanker.class,
 				PartitionRanker.class,
 				ExplanationSizeScore.inst));
+
 	}
 	
 
-	public static String createRankerScheme(String[] funcnames, double[] funcweights){
+	public static void putRankerScheme(String name, Class singleRanker, Class partRanker, IScoringFunction f) {
+		inst.rankerSchemes.put(name, inst.new RankScheme(singleRanker, partRanker, f));
+	}
+	
+	public static String RankerSchemeConstructor(int rankertype, String[] funcnames, double[] funcweights, double[] errweights){		
+		
+		String mNewRankerName = "";
+		
+		switch (rankertype){
+			case 1:
+				{
+					if (errweights.length == 6)
+					
+					{
+						mNewRankerName = "AvgTypeWeight[";
+					    
+					    for (int j = 0; j<errweights.length; j++){
+						    mNewRankerName += errweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+					    
+					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
+						RankerFactory.putRankerScheme(mNewRankerName,
+			                                          AStarExplanationRanker.class,
+			                                          PartitionRanker.class,
+	                                                  f);
+					}
+				}
+				break;
+			case 2:
+				{
+					if (funcnames.length != 0 
+							&& funcweights.length == funcnames.length)
+					{
+						mNewRankerName = "WeightedCombined[";
+					    
+					    for (int i = 0; i < funcnames.length; i++){
+						    mNewRankerName += funcnames[i];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "][";
+					    
+					    for (int j = 0; j<funcweights.length; j++){
+						    mNewRankerName += funcweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+					    
+					    IScoringFunction[] mScoreFuncs = new IScoringFunction[funcnames.length];
+					    for (int k = 0; k<funcnames.length; k++){
+					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
+					    }
+						RankerFactory.putRankerScheme(mNewRankerName,
+								WeightedAStarExplanationRanker.class, 
+								PartitionRanker.class,
+								new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
+						//mNewRankerName = RankerFactory.createWeightedCombined(funcnames, funcweights);
+					}
+				}
+				break;
+			case 3:
+				{
+					if (errweights.length == 6)
+					{
+						mNewRankerName = "ErrorType[";
+					    
+					    for (int j = 0; j<errweights.length; j++){
+						    mNewRankerName += errweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+						IScoringFunction f = new ErrorTypeScore(errweights);
+						RankerFactory.putRankerScheme(mNewRankerName,
+								                      AStarExplanationRanker.class,
+								                      PartitionRanker.class,
+		                                              f);
+					}}
+				
+				break;
+
+			default:
+				break;
+				
+		}
+		return mNewRankerName;
+		
+	}
+	
+	public static String createAverageTypeWeight(double[] errweights){
+	    double[] mErrWeights = errweights;
+	    
+	    String mNewRankerName = "AvgTypeWeight[";
+	    
+	    for (int j = 0; j<mErrWeights.length; j++){
+		    mNewRankerName += mErrWeights[j];
+		    mNewRankerName += ",";
+	    }
+	    mNewRankerName += "]";
+	    
+		inst.rankerSchemes.put(mNewRankerName, inst.new RankScheme (
+				AStarExplanationRanker.class,
+				PartitionRanker.class,
+				new AvgErrTypeWeightScore(mErrWeights)));
+		
+		return mNewRankerName;
+	}
+	
+	public static String createWeightedCombined(String[] funcnames, double[] funcweights){
 	    String[] mFuncNames = funcnames;
 	    double[] mFuncWeights = funcweights;
 	    
@@ -83,6 +194,7 @@ public class RankerFactory {
 	    	mScoreFuncs[k] = inst.getScoreFunction(mFuncNames[k]);
 	    }
 
+	    
 		inst.rankerSchemes.put(mNewRankerName, inst.new RankScheme (
 				WeightedAStarExplanationRanker.class, 
 				PartitionRanker.class,

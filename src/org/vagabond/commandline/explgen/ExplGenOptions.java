@@ -56,9 +56,15 @@ public class ExplGenOptions {
 
 	@Option(name = "-funcweights", usage = "list of weight of scoring functions")
 	private String funcweights = null;
+
+	@Option(name = "-errweights", usage = "list of weight of error types")
+	private String errweights = null;
 	
 	@Option(name = "-funcnames", usage = "list of scoring functions")
 	private String funcnames = null;
+	
+	@Option(name = "-newranker", usage = "1: AverageTypeWeight; 2: WeightedCombined; 3: ErrorType")
+	private int newranker = 0;
 	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
@@ -148,19 +154,21 @@ public class ExplGenOptions {
 		this.funcnames = scorefuncnames;
 	}
 	
+	public void setErrWeights(String errorweights){
+		this.errweights = errorweights;
+	}
+	
 	public boolean isLoadScen() {
 		return loadScen;
 	}
 
 	public String getRankerScheme() {
-		if (this.getScoreFuncNames().length != 0 
-				&& this.getScoreFuncWeights().length == this.getScoreFuncNames().length)
+		if (this.newranker > 0 )
 		{
-			rankerScheme = RankerFactory.createRankerScheme(this.getScoreFuncNames(), this.getScoreFuncWeights());
-			return rankerScheme;
+			rankerScheme = RankerFactory.RankerSchemeConstructor(this.newranker, this.getScoreFuncNames(), this.getScoreFuncWeights(), this.getErrorWeights());
 		}
-		else
-				return rankerScheme;
+		
+        return rankerScheme;
 	}
 
 	public void setRankerScheme(String rankerScheme) throws Exception {
@@ -203,6 +211,15 @@ public class ExplGenOptions {
 			mFuncWeights[i] = Double.parseDouble(funcweights.split(",")[i]);	
 		}
 		return mFuncWeights;
+	}
+
+	public double[] getErrorWeights() {
+		double[] mErrWeights = new double[funcweights.split(",").length];
+		for (int i = 0; i < mErrWeights.length; i++)
+		{
+			mErrWeights[i] = Double.parseDouble(funcweights.split(",")[i]);	
+		}
+		return mErrWeights;
 	}
 	
 	public void setSkylineRankers(String[] skylineRankers) {
