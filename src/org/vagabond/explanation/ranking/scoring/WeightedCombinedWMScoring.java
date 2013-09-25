@@ -27,10 +27,12 @@ public class WeightedCombinedWMScoring implements IScoringFunction {
 	*/
 	@Override
 	public int getScore(IBasicExplanation expl) {
-	double score = 0.0;
-	for (int i = 0; i < funcnames.length; i++)
-	score += funcweights[i] * funcnames[i].getScore(expl);
-	return (int) score;
+		double score = 0.0;
+		for (int i = 0; i < funcnames.length; i++)
+		{	
+			score += funcweights[i] * funcnames[i].getScore(expl);
+		}
+		return (int) (score * 10000);
 	}
 
 	/* (non-Javadoc)
@@ -39,13 +41,11 @@ public class WeightedCombinedWMScoring implements IScoringFunction {
 	@Override
 	public int getScore(IExplanationSet set) {
 		double score = 0.0;
-		Iterator<IBasicExplanation> iter  = set.iterator();
-		while (iter.hasNext()){
-			IBasicExplanation expl = iter.next();
-			for (int i = 0; i < funcnames.length; i++)
-			score += funcweights[i] * funcnames[i].getScore(expl);
+		for (int i = 0; i < funcnames.length; i++)
+		{	
+			score += funcweights[i] * funcnames[i].getScore(set);
 		}
-		return (int) score;
+		return (int) (score  * 10000);
 	}
 
 	/* (non-Javadoc)
@@ -54,13 +54,11 @@ public class WeightedCombinedWMScoring implements IScoringFunction {
 	@Override
 	public int getScore(Collection<IBasicExplanation> expls) {
 		double score = 0.0;
-		Iterator<IBasicExplanation> iter  = expls.iterator();
-		while (iter.hasNext()){
-			IBasicExplanation expl = iter.next();
-			for (int i = 0; i < funcnames.length; i++)
-			score += funcweights[i] * funcnames[i].getScore(expl);
+		for (int i = 0; i < funcnames.length; i++)
+		{	
+			score += funcweights[i] * funcnames[i].getScore(expls);
 		}
-		return (int) score;
+		return (int) (score * 10000);
 	
 	}
 
