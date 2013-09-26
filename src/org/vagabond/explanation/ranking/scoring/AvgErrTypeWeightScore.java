@@ -93,8 +93,7 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 				}
 				else
 				{
-					IExplanationSet mNewExplanationSet = null;
-					mNewExplanationSet.add(mExpl);
+					IExplanationSet mNewExplanationSet = ExplanationFactory.newExplanationSet(mExpl);
 				    mSingleErrorMap.put(singleErr, mNewExplanationSet);
 				}
 			}
@@ -146,8 +145,7 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 				}
 				else
 				{
-					IExplanationSet mNewExplanationSet = null;
-					mNewExplanationSet.add(expl);
+					IExplanationSet mNewExplanationSet = ExplanationFactory.newExplanationSet(expl);
 				    mSingleErrorMap.put(singleErr, mNewExplanationSet);
 				}
 			}
