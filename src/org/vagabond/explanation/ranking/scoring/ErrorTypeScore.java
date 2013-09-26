@@ -59,12 +59,12 @@ public class ErrorTypeScore implements IScoringFunction {
 	public int getScore(IBasicExplanation expl) {
 		ExplanationType errType = expl.getType();
 		double typeWeight = this.getErrorWeight(errType);
-		return (int) (typeWeight);
+		return (int) (typeWeight * 10000);
 	}
 
 	@Override
 	public int getScore(IExplanationSet set) {
-		int retScore = 0;
+		double retScore = 0;
 		List<IBasicExplanation> listExpl = set.getExplanations();
 		Iterator<IBasicExplanation> iter = listExpl.iterator();
 		
@@ -73,7 +73,7 @@ public class ErrorTypeScore implements IScoringFunction {
 		}
 		retScore /= set.getSize();
 		
-		return retScore;
+		return (int) (retScore  * 10000 ) ;
 	}
 
 	@Override
@@ -86,13 +86,13 @@ public class ErrorTypeScore implements IScoringFunction {
 		// TODO:
 		// remove duplicate elements in collection
 		// copy input then modify, compute
-		int retScore = 0;
+		double retScore = 0;
 		
 		for(IBasicExplanation expl: expls)
 			retScore += this.getErrorWeight(expl.getType());
 		
 		retScore /= expls.size();
-		return retScore;
+		return (int) (retScore  * 10000);
 	}
 
 }

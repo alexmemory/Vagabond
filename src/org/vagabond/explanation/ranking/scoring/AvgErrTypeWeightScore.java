@@ -64,24 +64,25 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 		/*for single explanation, there is only one error type,
 		 * simply return the weight of the error type, no extra calculation
 		 */
+		double retScore = 0.0;
 		ExplanationType errType = expl.getType();
-		double typeWeight = this.getErrorWeight(errType) * expl.getTargetSideEffectSize();
-		return (int) (typeWeight);
+		retScore = this.getErrorWeight(errType) * expl.getTargetSideEffectSize();
+		return (int) (retScore * 10000);
 
 	}
 
 	@Override
 	public int getScore(IExplanationSet set) {
-
+		
 		/*initialize variables*/
-		int retScore = 0;
-
+		double retScore = 0.0;
+		
 		Map<ISingleMarker, IExplanationSet> mSingleErrorMap;
 		mSingleErrorMap = new HashMap<ISingleMarker, IExplanationSet> ();
 
 		List<IBasicExplanation> listExpl = set.getExplanations();
 		Iterator<IBasicExplanation> iter = listExpl.iterator();
-
+		
 		/*initialize map*/
 		while (iter.hasNext()){
 			IBasicExplanation mExpl = iter.next();
@@ -92,12 +93,12 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 				}
 				else
 				{
-					IExplanationSet mNewExplanationSet = ExplanationFactory
-							.newExplanationSet(mExpl);
-					mSingleErrorMap.put(singleErr, mNewExplanationSet);
+					IExplanationSet mNewExplanationSet = null;
+					mNewExplanationSet.add(mExpl);
+				    mSingleErrorMap.put(singleErr, mNewExplanationSet);
 				}
 			}
-
+			
 		}
 
 		/*loop through map to compute average weight*/
@@ -105,20 +106,21 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 		Iterator<ISingleMarker> iterSingleErr = mSingleErrorMap.keySet().iterator();
 		while (iterSingleErr.hasNext()){
 			ISingleMarker m = iterSingleErr.next();
-			mAvgWeight = 0.0;
-			for (IBasicExplanation expl: mSingleErrorMap.get(m)){
-				/*loop through set of explanations, sum up weight of error type*/
-				mAvgWeight += this.getErrorWeight(expl.getType());
-			}
-			/*divide sum of error weight by size of the set of explanations
-			 * the result is the average weight for this single error
-			 */
-			mAvgWeight /= mSingleErrorMap.get(m).getSize();
-			/*add single error weight into total score*/
+			mAvgWeight = 0;
+		    for (IBasicExplanation expl:mSingleErrorMap.get(m)){
+		    	/*loop through set of explanations, sum up weight of error type*/
+		    	mAvgWeight += this.getErrorWeight(expl.getType());
+		    }
+		    /*divide sum of error weight by size of the set of explanations
+		     * the result is the average weight for this single error
+		    */
+		    mAvgWeight /= mSingleErrorMap.get(m).getSize();
+		    /*add single error weight into total score*/
 			retScore += mAvgWeight;
 		}
-
-		return retScore;	
+		
+		
+		return (int) (retScore * 10000);
 	}
 
 	@Override
@@ -128,10 +130,10 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 
 	@Override
 	public int getScore(Collection<IBasicExplanation> expls) {
-
+		
 		/*initialize variables*/
-		int retScore = 0;
-
+		double retScore = 0.0;
+		
 		Map<ISingleMarker, IExplanationSet> mSingleErrorMap;
 		mSingleErrorMap = new HashMap<ISingleMarker, IExplanationSet> ();
 
@@ -146,30 +148,32 @@ public class AvgErrTypeWeightScore implements IScoringFunction {
 				{
 					IExplanationSet mNewExplanationSet = null;
 					mNewExplanationSet.add(expl);
-					mSingleErrorMap.put(singleErr, mNewExplanationSet);
+				    mSingleErrorMap.put(singleErr, mNewExplanationSet);
 				}
 			}
-
+			
 		}
 
 		/*loop through map to compute average weight*/
-		double mAvgWeight = 0;
+		double mAvgWeight;
 		Iterator<ISingleMarker> iterSingleErr = mSingleErrorMap.keySet().iterator();
 		while (iterSingleErr.hasNext()){
 			mAvgWeight = 0;
-			for (IBasicExplanation expl:mSingleErrorMap.get(iterSingleErr.next())){
-				/*loop through set of explanations, sum up weight of error type*/
-				mAvgWeight += this.getErrorWeight(expl.getType());
-			}
-			/*divide sum of error weight by size of the set of explanations
-			 * the result is the average weight for this single error
-			 */
-			mAvgWeight /= mSingleErrorMap.get(iterSingleErr.next()).getSize();
+			ISingleMarker m = iterSingleErr.next();
+		    for (IBasicExplanation expl:mSingleErrorMap.get(m)){
+		    	/*loop through set of explanations, sum up weight of error type*/
+		    	mAvgWeight += this.getErrorWeight(expl.getType());
+		    }
+		    /*divide sum of error weight by size of the set of explanations
+		     * the result is the average weight for this single error
+		    */
+		    mAvgWeight /= mSingleErrorMap.get(m).getSize();
+		    /*add single error weight into total score*/
+			retScore += mAvgWeight;
 		}
-		/*add single error weight into total score*/
-		retScore += mAvgWeight;
-
-		return retScore;
+		
+		
+		return (int) (retScore * 10000);
 	}
 
 }
