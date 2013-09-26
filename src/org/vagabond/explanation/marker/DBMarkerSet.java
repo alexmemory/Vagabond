@@ -37,6 +37,14 @@ public class DBMarkerSet extends MarkerSet {
 	//     enum types Marker_Type
 	boolean[] current_types=new boolean[3];
 	
+	public int ResetMarkerType(Marker_Type mtype)
+	{
+		//if(mtype==Marker_Type.QUERY_REP)
+			//return 0;
+		current_types[mtype.ordinal()]=false;
+		return 1;
+	}
+	
 	public void GenerateRep(Marker_Type new_type)
 	{
 	  if(current_types[new_type.ordinal()])
@@ -69,25 +77,36 @@ public class DBMarkerSet extends MarkerSet {
 			  {
 				  insertSingleMarker(marker_temp);
 			  }
-			  current_types[Marker_Type.TABLE_REP.ordinal()] = Boolean.TRUE;
+			  
 		  }
-		  
+		  current_types[Marker_Type.TABLE_REP.ordinal()] = Boolean.TRUE;
 	  }
 	  
 	  //Case B : QUERY type destination
 	  else if(new_type == Marker_Type.QUERY_REP)
 	  {
+		  String values = "VALUES ";
 		  //Case 1 : convert table to query
-		  
 		  //Case 2 : convert java objects to query
+		  //Getelems() handles both cases as it returns javaobjects 
+		  for (ISingleMarker marker : getElems()) 
+		  {
+			  values +=  addSingleMarkerQueryString(marker)+",";
+		  }
+
+		  values = removeLastComma(values);
+		  query = "select * from (" + values + " ) as foo(relation,tid,attribute)";
+		  current_types[Marker_Type.QUERY_REP.ordinal()]=true;
 	  }
 	  
 	  //Case C : JAVAOBJ type destination
 	  else if(new_type == Marker_Type.JAVA_REP)
 	  {
 		  //Case 1 : convert table to java objects
-		  
 		  //Case 2 : convert  query to java objects
+		  //Getelems() handles both cases as it returns javaobjects 
+		  javaObj= getElems();
+		  current_types[Marker_Type.JAVA_REP.ordinal()]=true;
 	  }
 	}
 	
@@ -190,8 +209,9 @@ public class DBMarkerSet extends MarkerSet {
 		
 		if (other instanceof DBMarkerSet) {
 			DBMarkerSet ov =(DBMarkerSet)other;
-			if (query.toUpperCase().equals(ov.getQuery().toUpperCase()))
-				return true;
+			if(query != null && ov.getQuery()!=null)
+			   if (query.toUpperCase().equals(ov.getQuery().toUpperCase()))
+				  return true;
 				
 			if (this.getSize() != ov.getSize())
 				return false;
