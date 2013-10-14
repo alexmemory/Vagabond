@@ -1,5 +1,8 @@
 package org.vagabond.test.explanations.model;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,10 +18,14 @@ import org.vagabond.explanation.marker.BitMarkerSet;
 import org.vagabond.explanation.marker.DBMarkerSet;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
+import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.ITupleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.MarkerSet;
+import org.vagabond.explanation.marker.MarkerSummary;
 import org.vagabond.explanation.marker.ScenarioDictionary;
+import org.vagabond.explanation.marker.TupleMarker;
 import org.vagabond.explanation.marker.query.QueryMarkerSetGenerator;
 import org.vagabond.mapping.scenarioToDB.MaterializedViewsBroker;
 import org.vagabond.test.AbstractVagabondDBTest;
@@ -37,8 +44,8 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 	}
 	private String query;
 	private String relName;  // NULL if not materialized
-
-	
+	private static MarkerSet markers;
+	private static DBMarkerSet mv;
 
 	public void initialize () throws Exception {
 		//loadToDB("resource/exampleScenarios/homeless.xml");
@@ -48,7 +55,30 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		
 	}
 	
-
+	@Test
+	public void testDBMarkerSetIntersectJavaJava () throws Exception {
+		initialize();
+		ISingleMarker m0 = new AttrValueMarker("employee", "1|1", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "2|2", "city");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		mv = new DBMarkerSet(markers,false);
+		//mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m2 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m3 = new AttrValueMarker("employee", "3|", "name");
+		MarkerSet markers2 = new MarkerSet();
+		markers2.add(m2);
+		markers2.add(m3);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers2,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2);
+		assertTrue(mv3.getSize() == 1);
+	}
+	
 	@Test public void testGenerateRepQueryToTable() throws Exception
 	{
 		initialize ();
@@ -232,6 +262,331 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		test.decompose();
 		
 	}
+	
+	
+	@Test
+	public void testDBMarkerSetQueryJavaMarkerUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+		IMarkerSet mv1 = mv.union(markers);
+		assertTrue(mv1.getSize() == 3);
+	}
+	
+	@Test
+	public void testDBMarkerSetQueryQueryUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,false);
+		
+		IMarkerSet mv3 = mv.union(mv2);
+		assertTrue(mv3.getSize() == 4);
+	}
+	
+	@Test
+	public void testDBMarkerSetQueryTableUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		IMarkerSet mv3 = mv.union(mv2);
+		assertTrue(mv3.getSize() == 4);
+	}
+	
+	@Test
+	public void testDBMarkerSetTableQueryUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		query = "SELECT 'employee':: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,true);
+	
+		
+		IMarkerSet mv3 = mv.union(mv2);
+		assertTrue(mv3.getSize() == 4);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetTableTableUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		assertTrue(mv3.getSize() == 4);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetTableJavaUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaJavaUnion () throws Exception {
+		initialize();
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "1|1", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+		mv = new DBMarkerSet(markers,true);
+		
+		
+		ISingleMarker m2 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m3 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m2);
+		markers.add(m3);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetQueryJavaUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+		DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaQueryUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+		DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaTableUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectQueryQueryView () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		//mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2','3|')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,false);
+	    
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 2);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectQueryTable () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		//
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2','3|')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 2);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectTableQuery () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		//
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2','3|')";
+		DBMarkerSet mv2 = new DBMarkerSet(query,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 2);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectTableTable () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2','3|')";
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(query,true);
+	    mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 2);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectTableJava () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 1);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectJavaTable () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2);
+		assertTrue(mv3.getSize() == 1);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectQueryJava () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		//mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2);
+		assertTrue(mv3.getSize() == 1);
+	}
+	
+	@Test
+	public void testDBMarkerSetIntersectJavaQuery () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		//mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		assertTrue(mv3.getSize() == 1);
+	}
+	
 	
 	
 	

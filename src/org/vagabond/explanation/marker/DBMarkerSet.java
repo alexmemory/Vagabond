@@ -123,6 +123,7 @@ public class DBMarkerSet extends MarkerSet {
 		
 		if (materialize) {
 			materialize();
+			current_types[Marker_Type.TABLE_REP.ordinal()] = Boolean.TRUE;
 		}
 	}
 	
@@ -166,9 +167,9 @@ public class DBMarkerSet extends MarkerSet {
 		String qCreate ;
 		
 		if(populate)
-			qCreate	= "CREATE TABLE " + relName + " AS " + query;
+			qCreate	= "CREATE TABLE " + relName + "(rel , tid , att ) AS " + query;
 		else
-			qCreate = "CREATE TABLE " + relName + " (relation text, tid text, attribute text)";
+			qCreate = "CREATE TABLE " + relName + " (rel text, tid text, att text)";
 		
 		try {
 			ConnectionManager.getInstance().execUpdate(qDrop);
@@ -294,6 +295,9 @@ public class DBMarkerSet extends MarkerSet {
 	
 	@Override
 	public int getSize() {
+		if(javaObj !=null)
+		   return javaObj.size();
+			
 		if (isMaterialized())
 			return size;
 		
@@ -416,8 +420,150 @@ public class DBMarkerSet extends MarkerSet {
 
 	@Override
 	public IMarkerSet union(IMarkerSet other) {
-		if (other instanceof DBMarkerSet) {
+		if (other instanceof DBMarkerSet) 
+		{
+			DBMarkerSet union_result ;
 			DBMarkerSet ov = (DBMarkerSet)other;
+			
+			//Assuming for now that both the sets are of one of the three types and not multiple
+			//CASE A : first argument in union is of type Query
+			if(this.current_types[Marker_Type.QUERY_REP.ordinal()])
+			{
+				//CASE 1: Query UNION Query
+				if(ov.current_types[Marker_Type.QUERY_REP.ordinal()])
+				{
+					return new DBMarkerSet(query + " UNION " + ov.query);
+				}
+				//CASE 2: Query UNION Java objects
+				else if(ov.current_types[Marker_Type.JAVA_REP.ordinal()])
+				{
+					//Generate both new query and new set of java objects
+					// Generate the new query
+					ov.GenerateRep(Marker_Type.QUERY_REP);
+					union_result = new DBMarkerSet(query + " UNION " + ov.query);
+
+					// Generate the new java objects
+					this.GenerateRep(Marker_Type.JAVA_REP);
+					
+					//Add the java objects to the return type
+					union_result.addAll(ov.getElems());
+					union_result.addAll(this.getElems());
+
+					return union_result;
+				}
+				//CASE 3: Query UNION Table
+				else if(ov.current_types[Marker_Type.TABLE_REP.ordinal()])
+				{
+
+					//Generate the new union marker set with query
+					union_result = new DBMarkerSet(this.query);
+					
+					//Get and the elements of ov. This should update the union_result.query also
+					union_result.addAll(ov.getElems());
+					
+					//Generate the table representation for union_result
+					union_result.GenerateRep(Marker_Type.TABLE_REP);
+					
+					//Return the new union structure
+					return union_result;
+				}
+			}
+			//CASE B : first argument in union of type Java objects
+			else if(this.current_types[Marker_Type.JAVA_REP.ordinal()])
+			{
+				//CASE 1: Java objects UNION Java objects
+				if(ov.current_types[Marker_Type.JAVA_REP.ordinal()])
+				{
+					//The resulting union output should be of type java objects only
+					union_result = new DBMarkerSet(this.getElems(), false);
+					union_result.addAll(ov.getElems());
+					return union_result;
+				}
+
+				
+				//CASE 2: Java objects UNION Query
+				else if(ov.current_types[Marker_Type.QUERY_REP.ordinal()])
+				{
+					//Generate both new query and new set of java objects
+					// Generate the new query
+					this.GenerateRep(Marker_Type.QUERY_REP);
+					union_result = new DBMarkerSet(query + " UNION " + ov.query);
+
+					// Generate the new java objects
+					ov.GenerateRep(Marker_Type.JAVA_REP);
+					
+					//Add the java objects to the return type
+					union_result.addAll(ov.getElems());
+					union_result.addAll(this.getElems());
+
+					return union_result;
+					
+				}
+				//CASE 3: Java objects UNION Table
+				else if(ov.current_types[Marker_Type.TABLE_REP.ordinal()])
+				{
+					//Generate the new union marker set with query
+					union_result = new DBMarkerSet(this.getElems(),false);
+					
+					//Get and the elements of ov. This should update the union_result.query also
+					union_result.addAll(ov.getElems());
+					
+					//Genearate the table representation for union_result
+					union_result.GenerateRep(Marker_Type.TABLE_REP);
+					
+					//Return the new union structure
+					return union_result;
+					
+				}
+			}
+			//CASE C : first argument in union of type Table
+			if(this.current_types[Marker_Type.TABLE_REP.ordinal()])
+			{
+				//CASE 1: Table UNION Table
+				if(ov.current_types[Marker_Type.TABLE_REP.ordinal()])
+				{
+				//Feed the contents of both the tables into the new union result
+				union_result = new DBMarkerSet("select * from " + this.relName + " UNION select * from " + ov.getRelName() , true);
+				
+				//disable the query representation for the result
+				union_result.current_types[Marker_Type.QUERY_REP.ordinal()] = false;
+				union_result.query = null;
+				
+				return union_result;
+				}
+				
+				//CASE 2: Table UNION Query
+				else if(ov.current_types[Marker_Type.QUERY_REP.ordinal()])
+				{
+					//Generate the new union marker set with query
+					union_result = new DBMarkerSet(ov.query);
+					
+					//Get and the elements of ov. This should update the union_result.query also
+					union_result.addAll(this.getElems());
+					
+					//Genearate the table representation for union_result
+					union_result.GenerateRep(Marker_Type.TABLE_REP);
+					
+					//Return the new union structure
+					return union_result;
+				}
+				//CASE 3: Table UNION Java objects
+				else if(ov.current_types[Marker_Type.JAVA_REP.ordinal()])
+				{
+					//Generate the new union marker set with query
+					union_result = new DBMarkerSet(ov.getElems(),false);
+					
+					//Get and the elements of ov. This should update the union_result.query also
+					union_result.addAll(this.getElems());
+					
+					//Genearate the table representation for union_result
+					union_result.GenerateRep(Marker_Type.TABLE_REP);
+					
+					//Return the new union structure
+					return union_result;
+				}
+			}
+
 			return new DBMarkerSet(query + " UNION " + ov.query);
 		}
 		
@@ -487,14 +633,28 @@ public class DBMarkerSet extends MarkerSet {
 		return attrValueMarkerSet;
 	}
 	
-	public String addSingleMarker(ISingleMarker marker) {
+	public String addSingleMarker(ISingleMarker marker) 
+	{
+		//check if the marker is already present. If yes then no need to add
 		if (this.contains(marker)) {
 			return query;
 		}
 		
-		query += " UNION VALUES " + addSingleMarkerQueryString(marker);
-		if (isMaterialized()) insertSingleMarker(marker);
+		//update the query if query exists
+		if(query!=null)
+		   query += " UNION VALUES " + addSingleMarkerQueryString(marker);
 		
+		//update table if table exists
+		if (isMaterialized()) 
+			insertSingleMarker(marker);
+		
+		//update java objects if they exist
+		if(this.current_types[Marker_Type.JAVA_REP.ordinal()] == true)
+		{
+			//add to java obj
+			javaObj.add(marker);
+			
+		}
 		return query;
 		
 	}
@@ -518,7 +678,10 @@ public class DBMarkerSet extends MarkerSet {
 		String tempQ = query;
 		addSingleMarker(marker);
 		
+		if(query!=null)
 		return !tempQ.equals(query);
+		else
+			return false;
 	}
 	
 	@Override
@@ -586,7 +749,16 @@ public class DBMarkerSet extends MarkerSet {
 		if (!(arg0 instanceof ISingleMarker))
 			return false;
 
+		
+		
 		ISingleMarker o = (ISingleMarker)arg0;
+		
+		
+		if(javaObj!=null)
+		{
+			return javaObj.contains(arg0);
+		}
+		
 		if (o instanceof ITupleMarker) {
 			q = "SELECT * FROM (" + query + ") AS q WHERE rel = '" 
 			+ o.getRel() + "' AND tid = '" + o.getTid() + "'";
@@ -617,20 +789,52 @@ public class DBMarkerSet extends MarkerSet {
 	public boolean containsAll(Collection<?> arg0) {
 //		Set<ISingleMarker> markers = getElems(); // TODO: 2 cases: markerset and view
 //		return markers.containsAll(arg0);
-		if (arg0 instanceof DBMarkerSet) {
-			String q = ((DBMarkerSet)arg0).query + " EXCEPT ( " + this.query + " ) ";
-			return querySize(q) == 0;
+		if (arg0 instanceof DBMarkerSet) 
+		{
+			DBMarkerSet temp = (DBMarkerSet)arg0;
+			if(temp.current_types[Marker_Type.JAVA_REP.ordinal()]==true)
+			{
+				return javaObj.containsAll(temp.getElems());
+			}
+			
+			if(temp.current_types[Marker_Type.QUERY_REP.ordinal()]==true)
+			{
+				String q = temp.query + " EXCEPT ( " + this.query + " ) ";
+				return querySize(q) == 0;
+			}
+			
+			if(temp.current_types[Marker_Type.TABLE_REP.ordinal()]==true)
+			{
+				String q = "select * from " + relName + " EXCEPT ( " + this.query + " ) ";
+				return querySize(q) == 0;
+			}
+				
 		}
 		
 		if (arg0 instanceof IMarkerSet) {
 			IMarkerSet ms = (IMarkerSet)arg0;
+			
+			if(javaObj !=null)
+			{
+				return javaObj.containsAll(ms);
+			}
+			
 			String q1 = "";
 			for (ISingleMarker marker : ms) {
 				q1 += singleMarkerQueryString(marker) + ",";
 			}
-			String q = this.query + " EXCEPT VALUES " + q1;
-			q = removeLastComma(q);
-			return getSize()-getQueryResultCount(q) == ms.getSize();
+			if(this.isMaterialized())
+			{
+				String q = "select * from " + relName + " EXCEPT VALUES " + q1;
+				q = removeLastComma(q);
+				return getSize()-getQueryResultCount(q) == ms.getSize();
+			}
+			else
+			{
+				String q = this.query + " EXCEPT VALUES " + q1;
+				q = removeLastComma(q);
+				return getSize()-getQueryResultCount(q) == ms.getSize();
+			}
 		}
 		
 		return false;
@@ -669,7 +873,7 @@ public class DBMarkerSet extends MarkerSet {
 		query += exceptStr;
 		
 		if (isMaterialized()) deleteSingleMarker((ISingleMarker)arg0); // TODO: run delete on the db side.
-		
+		if(this.current_types[Marker_Type.JAVA_REP.ordinal()]==true) javaObj.remove(arg0);
 		return true;
 	}
 	
@@ -711,11 +915,19 @@ public class DBMarkerSet extends MarkerSet {
 		boolean changed = false;
 		sum = null;
 
-		if (arg0 instanceof DBMarkerSet) {
+		if (arg0 instanceof DBMarkerSet) 
+		{
 			DBMarkerSet msv = (DBMarkerSet)arg0;
-			query += " EXCEPT ( " + msv.query + " )";
-			if (isMaterialized()) changed = deleteFromQuery(msv.query);
-		} else if (arg0 instanceof IMarkerSet) {
+			if(this.current_types[Marker_Type.QUERY_REP.ordinal()]==true) 
+				query += " EXCEPT ( " + msv.query + " )";
+			if (isMaterialized()) 
+				changed = deleteFromQuery(msv.query);
+			if(this.current_types[Marker_Type.JAVA_REP.ordinal()]==true) 
+				changed = javaObj.removeAll(msv.getElems());
+			 
+		} 
+		else if (arg0 instanceof IMarkerSet) 
+		{
 			IMarkerSet ms = (IMarkerSet)arg0;
 			String exceptStr = " EXCEPT VALUES ";
 			String values = "";
@@ -729,6 +941,9 @@ public class DBMarkerSet extends MarkerSet {
 			} catch (Exception e) {
 				;
 			}
+			if(this.current_types[Marker_Type.JAVA_REP.ordinal()]==true) 
+				changed = javaObj.removeAll(ms);
+			
 		}
 		
 		return changed;
@@ -770,12 +985,50 @@ public class DBMarkerSet extends MarkerSet {
 	public boolean retainAll(Collection<?> arg0) {
 		int tempSize = getSize();
 		boolean changed = false;
-		if (arg0 instanceof DBMarkerSet) {
+		if (arg0 instanceof DBMarkerSet) 
+		{
 			DBMarkerSet msv = (DBMarkerSet)arg0;
-			query = "( " + query + " ) INTERSECT ( " + msv.query + " )";
-			changed = (tempSize != getSize());
-			if (isMaterialized()) changed = keepQuery(msv.query);
-		} else if (arg0 instanceof IMarkerSet) { // INTERSECT VALUES()
+			//If there are query objects, we do intersect on them
+			if(this.current_types[Marker_Type.QUERY_REP.ordinal()]==true) 
+			{
+				if(msv.current_types[Marker_Type.QUERY_REP.ordinal()]==true) 
+				{
+					query = "( " + query + " ) INTERSECT ( " + msv.query + " )";
+					changed = (tempSize != getSize());
+				}
+				else 
+				{
+					msv.GenerateRep(Marker_Type.QUERY_REP);
+					query = "( " + query + " ) INTERSECT ( " + msv.query + " )";
+					changed = (tempSize != getSize());
+				}
+				
+			}
+			//If there are java objects, we do intersect on them
+			if(this.current_types[Marker_Type.JAVA_REP.ordinal()]==true) 
+				changed = javaObj.retainAll(msv.getElems());
+			
+			if(this.current_types[Marker_Type.TABLE_REP.ordinal()]==true) 
+			{
+				if(msv.current_types[Marker_Type.QUERY_REP.ordinal()]==true) 
+				{
+					changed = keepQuery(msv.query);
+				}
+				else 
+				{
+					msv.GenerateRep(Marker_Type.QUERY_REP);
+					changed = keepQuery(msv.query);
+				}
+				
+			}
+
+				
+			
+			
+			
+		} 
+		else if (arg0 instanceof IMarkerSet) 
+		{ // INTERSECT VALUES()
 			IMarkerSet ms = (IMarkerSet)arg0;
 			String values = "";
 			for (ISingleMarker marker : ms) {
@@ -783,7 +1036,12 @@ public class DBMarkerSet extends MarkerSet {
 			}
 			values = removeLastComma(values);
 			query = "( " + query + " ) INTERSECT ( VALUES " + values + " )";
-			if (isMaterialized()) changed = keepMultipleMarkers(values);
+			if (isMaterialized()) 
+				changed = keepMultipleMarkers(values);
+			
+			//If there are java objects, we do intersect on them
+			if(this.current_types[Marker_Type.JAVA_REP.ordinal()]==true) 
+				changed = javaObj.retainAll(ms.getElems());
 		}
 
 		return changed;
