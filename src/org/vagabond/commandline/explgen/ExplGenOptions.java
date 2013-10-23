@@ -58,6 +58,9 @@ public class ExplGenOptions {
 			metaVar = "[scheme 1] [scheme 2] ...")
 	private String[] skylineRankers = null;
 		
+	@Option(name = "-dbmstrat",  usage = "select str")
+	private String stratName;
+	
 	public ExplGenOptions() {
 		CmdLineParser.registerHandler(String[].class, StringArrayOptionHandler.class);
 	}
