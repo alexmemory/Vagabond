@@ -21,6 +21,6 @@ public interface IDBMarkerStrategy {
 	public Set<Marker_Type> getBinaryOperationOutput (Set<Marker_Type> leftTypes, Set<Marker_Type> rightTypes);
 	public void setBinaryOperationOutput(Set<Marker_Type> leftTypes, Set<Marker_Type> rightTypes, Set<Marker_Type> outTypes);
 	public CreateStrategy getCreateStrategy ();
-	public CreateStrategy setCreateStrategy (CreateStrategy strat);
+	public void setCreateStrategy (CreateStrategy strat);
 	
 }
