@@ -16,12 +16,14 @@ import java.util.Set;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.vagabond.explanation.marker.TupleMarker;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
-import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
+import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 
 /**
  * @author Zhen
@@ -60,95 +62,106 @@ public class EntropyScore implements IScoringFunction {
 		 *  EntropyScore(Lambda) = Sum(Entropy(ISingleMarker))
 		 *  
 		 *  Entropy(ISingleMarker) = 
+		 *  
+		 *  Map<TupleMarker, ExplanationSet>
+		 *  Map<TupleMarker, Double>
+		 *  Map<TupleMarker Integer>
 		 *  */
-
-		Map<IBasicExplanation, Double> mEntropyScores;
-		mEntropyScores = new HashMap<IBasicExplanation, Double> ();
 		
+		Map<TupleMarker, Set<IExplanationSet>>mTupleExplSetMap;
+		mTupleExplSetMap = new HashMap<TupleMarker, Set<IExplanationSet>> ();
 		
-		Map<IBasicExplanation, Integer> mExplTupleCount;
-		mExplTupleCount = new HashMap<IBasicExplanation, Integer> ();
+		Map<TupleMarker, Double>mTupleEntropyMap;
+		mTupleEntropyMap = new HashMap<TupleMarker, Double> ();
+				
+		Map<TupleMarker, Set<IBasicExplanation>>mTupleMarkerSetMap;
+		mTupleMarkerSetMap = new HashMap<TupleMarker, Set<IBasicExplanation>> ();
 		
 		for ( IBasicExplanation tmpBasicExpl: set.getExplanationsSet())
 		{
-			int explTupleCount = 0;
-			int explWeight = 0;
-			
-			int tmpTid;
-			
-			Map<IBasicExplanation, Set<Integer>> mTupleMap;
-			mTupleMap = new HashMap<IBasicExplanation, Set<Integer>> ();
-			
-			Map<Integer, Integer> mTupleCountMap;
-			mTupleCountMap = new HashMap<Integer, Integer> ();
 			
 			for (ISingleMarker tmpSingleMarker : tmpBasicExpl.getRealExplains())
 			{
-				// for each single error, retrieve tuple id
-				tmpTid = tmpSingleMarker.getTidId();
+				int tmpRId = tmpSingleMarker.getRelId();
+				int tmpTId = tmpSingleMarker.getTidId();
+				TupleMarker tmpTupleMarker = new TupleMarker(tmpRId, tmpTId);
 				
-				// update Explanation:TupleId map relation
-				if (mTupleMap.containsKey(tmpBasicExpl))
+				if (mTupleExplSetMap.containsKey(tmpTupleMarker))
 				{
-					mTupleMap.get(tmpBasicExpl).add(tmpTid);
+					mTupleExplSetMap.get(tmpTupleMarker).add(set);
 				}
 				else
 				{
-					Set<Integer> mNewTidSet = new HashSet<Integer>();
-					mNewTidSet.add(tmpTid);
-					mTupleMap.put(tmpBasicExpl, mNewTidSet);
+					Set<IExplanationSet> tmpSet = new HashSet<IExplanationSet> ();
+					tmpSet.add(set);
+					mTupleExplSetMap.put(tmpTupleMarker, tmpSet);
 				}
 				
-				// update TupleId:TupleIdCount map relation				
-				// increase counter if contains the Tuple id.
-				if (mTupleCountMap.containsKey(tmpTid))
+				if (mTupleMarkerSetMap.containsKey(tmpTupleMarker))
 				{
-					mTupleCountMap.put(tmpTid, mTupleCountMap.get(tmpTid) + 1);
+					mTupleMarkerSetMap.get(tmpTupleMarker).add(tmpBasicExpl);
 				}
 				else
 				{
-					// first time table id, initial the map value as 1.
-					mTupleCountMap.put(tmpTid, 1);
-				}		
-				
+					Set<IBasicExplanation> tmpSet = new HashSet<IBasicExplanation> ();
+					tmpSet.add(tmpBasicExpl);
+					mTupleMarkerSetMap.put(tmpTupleMarker, tmpSet);
+				}				
 			}
-			
-			// compute entropy for each explanation
-			double explentropy = 0.0;
-			
-			// compute total number of tuples counts
-
-			Iterator<Integer> iterTupleId = mTupleCountMap.keySet().iterator();
-			while (iterTupleId.hasNext())
-			{
-				int tempTupleId = iterTupleId.next();
-				explTupleCount = explTupleCount + mTupleCountMap.get(tempTupleId);
-			}
-			
-			
-			// compute total number of tuples counts
-			double tmpEntropy = 0;
-			iterTupleId = null;
-			iterTupleId = mTupleCountMap.keySet().iterator();
-			while (iterTupleId.hasNext())
-			{
-				int tempTupleId = iterTupleId.next();
-				double tmpWeight = mTupleCountMap.get(tempTupleId) / explTupleCount;
-				tmpEntropy = tmpEntropy -  tmpWeight * Math.log(tmpWeight) ;
-			}			
-			
-			mEntropyScores.put(tmpBasicExpl, tmpEntropy);
-			mExplTupleCount.put(tmpBasicExpl, explTupleCount);
-			
-			
 		}
 		
-		int TotalCount = 0;
-		for (IBasicExplanation tmpExpl : mExplTupleCount.keySet() )
+		//initialize entropy map
+		for (TupleMarker tmpTupleMarker : mTupleMarkerSetMap.keySet())
 		{
-			TotalCount += mExplTupleCount.get(tmpExpl);
+			mTupleEntropyMap.put(tmpTupleMarker, 0.0);
+		}
+		
+		//loop through Map<TupleMarker, ExplanationSet>
+		Map<ExplanationType, Double>mErrTypeCounterMap;
+		mErrTypeCounterMap = new HashMap<ExplanationType, Double> ();
+		mErrTypeCounterMap.put(ExplanationType.CopySourceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.InfluenceSourceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.CorrespondenceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.SuperflousMappingError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.SourceSkeletonMappingError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.TargetSkeletonMappingError, 0.0);
+	
+		int totalExplSetSize = 0;
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			int mSizeofExplSet   = mTupleExplSetMap.get(tmpTupleMarker).size();
+			totalExplSetSize = totalExplSetSize + mSizeofExplSet;       
 		}
 
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			int mCurrentExplSetSize = mTupleExplSetMap.get(tmpTupleMarker).size();
+			double currentExplSetWeight = mCurrentExplSetSize / totalExplSetSize;
+			double currentExplWeight;
+			int mCurrentExplSize;
+		    for (IBasicExplanation expl : mTupleMarkerSetMap.get(tmpTupleMarker))
+		    {
+		    	mErrTypeCounterMap.put(expl.getType(), mErrTypeCounterMap.get(expl.getType())+1);
+		    }
+		    
+		    for (IBasicExplanation expl : mTupleMarkerSetMap.get(tmpTupleMarker))
+		    {
+		    	mCurrentExplSize = expl.getRealExplains().getSize();
+		    	currentExplWeight = mCurrentExplSize/ mCurrentExplSetSize;
+			    double explScore = getPartialEntropy(mErrTypeCounterMap, mCurrentExplSize);	
+			    
+			    mTupleEntropyMap.put(tmpTupleMarker, 
+			    		mTupleEntropyMap.get(tmpTupleMarker) + currentExplWeight * explScore);
+			    
+		    }
+
+		    
+		}
+		
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			retScore = retScore + mTupleEntropyMap.get(tmpTupleMarker);
+		}
 		return (int) (retScore * 10000);
 	}
 
@@ -162,46 +175,127 @@ public class EntropyScore implements IScoringFunction {
 		
 		/*initialize variables*/
 		double retScore = 0.0;
-		
-		Map<ISingleMarker, IExplanationSet> mSingleErrorMap;
-		mSingleErrorMap = new HashMap<ISingleMarker, IExplanationSet> ();
 
-		/*initialize map*/
-		for (IBasicExplanation expl:expls){
-			for (ISingleMarker singleErr : expl.getRealExplains()){
-				if (mSingleErrorMap.containsKey(singleErr))
+		
+		Map<TupleMarker, Set<IBasicExplanation>>mTupleExplSetMap;
+		mTupleExplSetMap = new HashMap<TupleMarker, Set<IBasicExplanation>> ();
+		
+		Map<TupleMarker, Double>mTupleEntropyMap;
+		mTupleEntropyMap = new HashMap<TupleMarker, Double> ();
+				
+		Map<TupleMarker, Set<IBasicExplanation>>mTupleMarkerSetMap;
+		mTupleMarkerSetMap = new HashMap<TupleMarker, Set<IBasicExplanation>> ();
+		
+		for ( IBasicExplanation tmpBasicExpl: expls)
+		{
+			
+			for (ISingleMarker tmpSingleMarker : tmpBasicExpl.getRealExplains())
+			{
+				int tmpRId = tmpSingleMarker.getRelId();
+				int tmpTId = tmpSingleMarker.getTidId();
+				TupleMarker tmpTupleMarker = new TupleMarker(tmpRId, tmpTId);
+				
+				if (mTupleExplSetMap.containsKey(tmpTupleMarker))
 				{
-					mSingleErrorMap.get(singleErr).addExplanation(expl);
+					mTupleExplSetMap.get(tmpTupleMarker).add(tmpBasicExpl);
 				}
 				else
 				{
-					IExplanationSet mNewExplanationSet = ExplanationFactory.newExplanationSet(expl);
-				    mSingleErrorMap.put(singleErr, mNewExplanationSet);
+					Set<IBasicExplanation> tmpSet = new HashSet<IBasicExplanation> ();
+					tmpSet.add(tmpBasicExpl);
+					mTupleExplSetMap.put(tmpTupleMarker, tmpSet);
 				}
+				
+				if (mTupleMarkerSetMap.containsKey(tmpTupleMarker))
+				{
+					mTupleMarkerSetMap.get(tmpTupleMarker).add(tmpBasicExpl);
+				}
+				else
+				{
+					Set<IBasicExplanation> tmpSet = new HashSet<IBasicExplanation> ();
+					tmpSet.add(tmpBasicExpl);
+					mTupleMarkerSetMap.put(tmpTupleMarker, tmpSet);
+				}				
 			}
-			
+		}
+		
+		//initialize entropy map
+		for (TupleMarker tmpTupleMarker : mTupleMarkerSetMap.keySet())
+		{
+			mTupleEntropyMap.put(tmpTupleMarker, 0.0);
+		}
+		
+		//loop through Map<TupleMarker, ExplanationSet>
+		Map<ExplanationType, Double>mErrTypeCounterMap;
+		mErrTypeCounterMap = new HashMap<ExplanationType, Double> ();
+		mErrTypeCounterMap.put(ExplanationType.CopySourceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.InfluenceSourceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.CorrespondenceError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.SuperflousMappingError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.SourceSkeletonMappingError, 0.0);
+		mErrTypeCounterMap.put(ExplanationType.TargetSkeletonMappingError, 0.0);
+	
+		int totalExplSetSize = 0;
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			int mSizeofExplSet   = mTupleExplSetMap.get(tmpTupleMarker).size();
+			totalExplSetSize = totalExplSetSize + mSizeofExplSet;       
 		}
 
-		/*loop through map to compute average weight*/
-		double mAvgWeight;
-		Iterator<ISingleMarker> iterSingleErr = mSingleErrorMap.keySet().iterator();
-		while (iterSingleErr.hasNext()){
-			mAvgWeight = 0;
-			ISingleMarker m = iterSingleErr.next();
-		    for (IBasicExplanation expl:mSingleErrorMap.get(m)){
-		    	/*loop through set of explanations, sum up weight of error type*/
-		    	mAvgWeight += this.getErrorWeight(expl.getType());
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			int mCurrentExplSetSize = mTupleExplSetMap.get(tmpTupleMarker).size();
+			double currentExplSetWeight = mCurrentExplSetSize / totalExplSetSize;
+			double currentExplWeight;
+			int mCurrentExplSize;
+		    for (IBasicExplanation expl : mTupleMarkerSetMap.get(tmpTupleMarker))
+		    {
+		    	mErrTypeCounterMap.put(expl.getType(), mErrTypeCounterMap.get(expl.getType())+1);
 		    }
-		    /*divide sum of error weight by size of the set of explanations
-		     * the result is the average weight for this single error
-		    */
-		    mAvgWeight /= mSingleErrorMap.get(m).getSize();
-		    /*add single error weight into total score*/
-			retScore += mAvgWeight;
+		    
+		    for (IBasicExplanation expl : mTupleMarkerSetMap.get(tmpTupleMarker))
+		    {
+		    	mCurrentExplSize = expl.getRealExplains().getSize();
+		    	currentExplWeight = mCurrentExplSize/ mCurrentExplSetSize;
+			    double explScore = getPartialEntropy(mErrTypeCounterMap, mCurrentExplSize);	
+			    
+			    mTupleEntropyMap.put(tmpTupleMarker, 
+			    		mTupleEntropyMap.get(tmpTupleMarker) + currentExplWeight * explScore);
+			    
+		    }
+
+		    
 		}
 		
-		
+		for (TupleMarker tmpTupleMarker : mTupleExplSetMap.keySet())
+		{
+			retScore = retScore + mTupleEntropyMap.get(tmpTupleMarker);
+		}
 		return (int) (retScore * 10000);
 	}
+	
+	
+	private double getPartialEntropy(Map<ExplanationType, Double> ErrTypeCounter, int TotalSize)
+	{
+		double retScore = 0.0;
+		
+		for (ExplanationType ErrType : ErrTypeCounter.keySet())
+		{
+			double tmpRatio = ErrTypeCounter.get(ErrType) / TotalSize;
+			retScore = retScore - tmpRatio * Math.log(tmpRatio);
+		}
 
+		return retScore;
+	}
+
+	private void resetErrorCounter(Map<ExplanationType, Double> ErrTypeCounter)
+	{
+
+		for (ExplanationType ErrType : ErrTypeCounter.keySet())
+		{
+			ErrTypeCounter.put(ErrType, 0.0);
+		}
+
+	}
+	
 }
