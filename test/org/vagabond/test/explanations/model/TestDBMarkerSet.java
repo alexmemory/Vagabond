@@ -16,7 +16,9 @@ import org.junit.Test;
 import org.vagabond.explanation.marker.AttrValueMarker;
 import org.vagabond.explanation.marker.BitMarkerSet;
 import org.vagabond.explanation.marker.DBMarkerSet;
+import org.vagabond.explanation.marker.DBMarkerStrategy;
 import org.vagabond.explanation.marker.IAttributeValueMarker;
+import org.vagabond.explanation.marker.IDBMarkerStrategy.CreateStrategy;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
@@ -160,6 +162,7 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		test.decompose();
 	}
 	
+	/*
 	@Test 
 	public void testGenerateRepTableToQuery() throws Exception
 	{
@@ -199,7 +202,7 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 
 		test.decompose();
 	}
-	
+	*/
 	@Test
 	public void testGenerateRepJavaObjToTable() throws Exception
 	{
@@ -289,7 +292,18 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
 		DBMarkerSet mv2 = new DBMarkerSet(query,false);
 		
-		IMarkerSet mv3 = mv.union(mv2);
+        DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.QUERY_REP);
+		right.add(Marker_Type.QUERY_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 4);
 	}
 	
@@ -303,7 +317,18 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		DBMarkerSet mv2 = new DBMarkerSet(query,true);
 		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
-		IMarkerSet mv3 = mv.union(mv2);
+		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.TABLE_REP);
+		right.add(Marker_Type.QUERY_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 4);
 	}
 	
@@ -312,13 +337,23 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		initialize();
 		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in('1|1','2|2')";
 		mv = new DBMarkerSet(query,false);
-		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+
 		
 		query = "SELECT 'employee':: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','3|','4|2')";
 		DBMarkerSet mv2 = new DBMarkerSet(query,true);
-	
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
-		IMarkerSet mv3 = mv.union(mv2);
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.TABLE_REP);
+		right.add(Marker_Type.QUERY_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
 		assertTrue(mv3.getSize() == 4);
 		
 	}
@@ -335,6 +370,16 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.TABLE_REP);
+		right.add(Marker_Type.TABLE_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
 		assertTrue(mv3.getSize() == 4);
 		
 	}
@@ -356,6 +401,17 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.TABLE_REP);
+		right.add(Marker_Type.JAVA_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 3);
 		
 	}
@@ -383,6 +439,17 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.JAVA_REP);
+		right.add(Marker_Type.JAVA_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 3);
 		
 	}
@@ -402,6 +469,17 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv.union(mv2);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.QUERY_REP);
+		right.add(Marker_Type.JAVA_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 3);
 		
 	}
@@ -421,6 +499,47 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.JAVA_REP);
+		right.add(Marker_Type.QUERY_REP);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	public void testDBMarkerSetJavaQueryDestinationUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying FROM target.employee where tid in ('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+		DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		left.add(Marker_Type.JAVA_REP);
+		right.add(Marker_Type.QUERY_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 3);
 		
 	}
@@ -442,6 +561,128 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		
 		
 		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv);
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		
+		left.add(Marker_Type.JAVA_REP);
+		right.add(Marker_Type.TABLE_REP);
+		
+		out = strat.getBinaryOperationOutput(left, right);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaTableDestinationUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		
+		
+		Set<Marker_Type> left = new HashSet<Marker_Type>();
+		Set<Marker_Type> right = new HashSet<Marker_Type>();
+		Set<Marker_Type> out;
+		
+		left.add(Marker_Type.JAVA_REP);
+		right.add(Marker_Type.TABLE_REP);
+		
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.QUERY_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaTable_QueryDestinationUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,false);
+
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		mv2.GenerateRep(Marker_Type.TABLE_REP);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		
+		Set<Marker_Type> out;
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testDBMarkerSetJavaQuery_TableDestinationUnion () throws Exception {
+		initialize();
+		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		mv = new DBMarkerSet(query,true);
+		mv.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers = new MarkerSet();
+		markers.add(m0);
+		markers.add(m1);
+		
+	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
+		mv2.GenerateRep(Marker_Type.QUERY_REP);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.union(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));
+		
 		assertTrue(mv3.getSize() == 3);
 		
 	}
@@ -456,7 +697,21 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		query = "SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2','3|')";
 		DBMarkerSet mv2 = new DBMarkerSet(query,false);
 	    
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));		
+
 		assertTrue(mv3.getSize() == 2);
 	}
 	
@@ -471,7 +726,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		DBMarkerSet mv2 = new DBMarkerSet(query,true);
 		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 2);
 	}
 	
@@ -486,7 +754,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		DBMarkerSet mv2 = new DBMarkerSet(query,true);
 		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 2);
 	}
 	
@@ -503,7 +784,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 	    mv2.ResetMarkerType(Marker_Type.QUERY_REP);
 		
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+	    DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 2);
 	}
 	
@@ -523,7 +817,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+	    DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 1);
 	}
 	
@@ -543,7 +850,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2);
+	    DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 1);
 	}
 	
@@ -563,7 +883,20 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2);
+	    DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.intersect(mv2,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
 		assertTrue(mv3.getSize() == 1);
 	}
 	
@@ -582,12 +915,175 @@ public class TestDBMarkerSet extends AbstractVagabondDBTest {
 		
 	    DBMarkerSet mv2 = new DBMarkerSet(markers,false);
 		
+	    DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
 		
-		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv);
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv2.intersect(mv,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
+
+		assertTrue(mv3.getMarkerTypes().contains(Marker_Type.JAVA_REP));
 		assertTrue(mv3.getSize() == 1);
 	}
 	
 	
+	@Test
+	public void testMarkerSetQuery_SetRemoveAll () throws Exception {
+		initialize();
+		query = 
+				"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee";
+		mv = new DBMarkerSet(query);
+						
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers.add(m0);
+		markers.add(m1);
+		mv.materialize();
+
+		assertTrue(mv.removeAll(markers));
+		assertTrue(mv.diff_result.getSize() == 3);
+		
+		
+	}
 	
+	@Test
+	public void testMarkerSetQuery_JavaRemoveAll () throws Exception {
+		initialize();
+		query = 
+				"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee";
+		mv = new DBMarkerSet(query);
+						
+		ISingleMarker m0 = new AttrValueMarker("employee", "2|2", "city");
+		ISingleMarker m1 = new AttrValueMarker("employee", "3|", "name");
+		markers.add(m0);
+		markers.add(m1);
+		mv.materialize();
+
+		DBMarkerSet mv2 = new DBMarkerSet(markers, false);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv2.getMarkerTypes();
+		Set<Marker_Type> right = mv.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.diff(mv2,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
+
+		assertTrue(mv3.getSize() == 3);
+		
+	}
+	
+	@Test
+	public void testMarkerSetQuery_QueryRemoveAll () throws Exception {
+		initialize();
+		query = 
+				"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee";
+		mv = new DBMarkerSet(query);
+						
+		
+		String query1 = 
+			"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query1);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv.getMarkerTypes();
+		Set<Marker_Type> right = mv2.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.diff(mv2,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
+
+		assertTrue(mv3.getSize() == 2);
+
+	}
+	
+	@Test
+	public void testMarkerSetQueryJava_TableRemoveAll () throws Exception {
+		initialize();
+		query = 
+				"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee";
+		mv = new DBMarkerSet(query);
+		mv.GenerateRep(Marker_Type.JAVA_REP);
+						
+		
+		String query1 = 
+			"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query1,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv.getMarkerTypes();
+		Set<Marker_Type> right = mv2.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.diff(mv2,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
+
+		assertTrue(mv3.getSize() == 2);
+
+	}
+	
+	@Test
+	public void testMarkerSetQueryJava_TableJavaRemoveAll () throws Exception {
+		initialize();
+		query = 
+				"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee";
+		mv = new DBMarkerSet(query);
+		mv.GenerateRep(Marker_Type.JAVA_REP);
+						
+		
+		String query1 = 
+			"SELECT 'employee' :: text,  tid, '01' ::bit varying  FROM target.employee where tid in('1|1','2|2')";
+		DBMarkerSet mv2 = new DBMarkerSet(query1,true);
+		mv2.ResetMarkerType(Marker_Type.QUERY_REP);
+		mv2.GenerateRep(Marker_Type.JAVA_REP);
+		
+		DBMarkerStrategy strat = new DBMarkerStrategy();
+		Set<Marker_Type> left = mv.getMarkerTypes();
+		Set<Marker_Type> right = mv2.getMarkerTypes();
+		Set<Marker_Type> out;
+		
+
+		out = strat.getBinaryOperationOutput(left, right);
+		//out.add(Marker_Type.JAVA_REP);
+		strat.setCreateStrategy(CreateStrategy.CreateOnTarget);
+		//strat.setBinaryOperationOutput(left, right, out);
+		
+		DBMarkerSet mv3 = (DBMarkerSet)mv.diff(mv2,strat);
+		
+		assertTrue(mv3.getMarkerTypes().containsAll(out));	
+
+		assertTrue(mv3.getSize() == 2);
+
+	}
 	
 }

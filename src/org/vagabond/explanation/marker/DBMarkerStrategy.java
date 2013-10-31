@@ -9,7 +9,7 @@ import org.vagabond.util.Enums.Marker_Type;
 
 public class DBMarkerStrategy implements IDBMarkerStrategy 
 {
-	CreateStrategy currentStrategy = CreateStrategy.CreateOnTarget;
+	CreateStrategy currentStrategy = CreateStrategy.CreateOnSource;
 	
 int[][] output_Matrix = {
 		{1,3,3,5,1,3,3},

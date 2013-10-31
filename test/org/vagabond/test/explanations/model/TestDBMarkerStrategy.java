@@ -176,7 +176,7 @@ public class TestDBMarkerStrategy
 		
 		
 	}
-	
+	@Test
 	public  void testTableJava_JavaUnion()
 	{
 		Set<Marker_Type> left = new HashSet<Marker_Type>();
@@ -195,7 +195,7 @@ public class TestDBMarkerStrategy
 		assertTrue(out.size()==2);
 		
 	}
-	
+	@Test
 	public  void testTableJavaQuery_QueryTableJavaUnion()
 	{
 		Set<Marker_Type> left = new HashSet<Marker_Type>();
