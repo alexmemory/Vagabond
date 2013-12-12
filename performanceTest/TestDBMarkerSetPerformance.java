@@ -26,226 +26,190 @@ import org.vagabond.util.GlobalResetter;
 public class TestDBMarkerSetPerformance {
 	static Logger log = Logger.getLogger(TestBitMarkerPerformance.class);
 
-	public enum SetOps {
-		Union,
-		Intersect,
-		Diff,
-		Clone
+	public enum TestType {
+		TypeGeneration,
+		AddRecord,
+		Union
 	}
 
-	private static int[] sizesForSetTests = new int[] {100,1000, 2000, 4000, 5000, 10000};
+	private static int[] sizesForSetTests = new int[] {100,200};//1000, 2000, 4000, 5000, 10000};
 	private static int repeatCount = 2;
-
+	static int maxAttr = 15;
+	static int maxTid = 10000;
+	
+    private static DBMarkerSet[][] dbTestdata;
+	/*private DBMarkerSet[] dbTableType;
+    private DBMarkerSet[] dbJavaType;
+    private DBMarkerSet[] dbIndQueryType;
+    private DBMarkerSet[] dbNonIndQueryType;
+    */
+	
 	public static void main (String[] args) throws Exception {
-		
+
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
+		//Disable all extra logging for better clarity of test results
+		//Test results are printed to the console
 		Logger.getRootLogger().removeAllAppenders();
 
+		//Load the homeless3 xml database. This also requires the table10000_15.csv file to be 
+		//present in the resource/exampleScenarios/PerformanceTest folder
 		loadToDB("resource/exampleScenarios/homeless3.xml");
+
+		/*
+		dbTestdata = new DBMarkerSet[4][sizesForSetTests.length];
+		dbTestdata[0] = genSets(Marker_Type.TABLE_REP, "table10000_15",maxAttr, maxTid, "");
+		dbTestdata[1] = genSets(Marker_Type.JAVA_REP, "table10000_15",maxAttr, maxTid, "");
+		dbTestdata[2] = genSets(Marker_Type.QUERY_REP, "table10000_15",maxAttr, maxTid, "select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
+		dbTestdata[3] = genSets(Marker_Type.QUERY_REP, "table10000_15",maxAttr, maxTid, "select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
+		*/
 		
-		//Prints out the avg taken taken for converting one type to another
-		//generationTest();
-				
-		//SingleAdditionTest();
-		
+		//Run the DBMarkerSet type conversion performance test
+		generationTest();
+
+		//Run the DBMarkerSet single record addition performance test
+		singleAdditionTest();
+
+		//Run the DBMarkerSet union performance test
 		unionTest();
-		if (log.isDebugEnabled()) {log.debug("\t-- Generated --");};
+		
 	}
 
 	private static void unionTest() throws Exception {
-		int maxAttr = 15;
-		int maxTid = 10000;
-
-		//TABLE to JAVA REP
+		
+		System.out.print("\n\nUnion Performance Test --\n");
+		//Union TABLE 
 		System.out.print("\n\t--Union TABLE --");
-		int loop;
-		unionDBMarkerSet(maxAttr, maxTid, Marker_Type.TABLE_REP , Marker_Type.JAVA_REP,"");
-		
-		//JAVA to TABLE REP
-		System.out.print("\n\t--Union JAVA to TABLE REP--");
-		unionDBMarkerSet(maxAttr, maxTid, Marker_Type.JAVA_REP , Marker_Type.TABLE_REP,"");
-		
-		//INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--Union INDEXED QUERY --");
-		unionDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
-		
-		
-		//NON INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--Union NON INDEXED  QUERY--");
-		unionDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.TABLE_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
+		testDBMarkerSet(TestType.Union, Marker_Type.TABLE_REP , null,"");
+
+		//Union JAVA
+		System.out.print("\n\n\t--Union JAVA --");
+		testDBMarkerSet(TestType.Union, Marker_Type.JAVA_REP , null,"");
+
+		//Union INDEXED QUERY
+		System.out.print("\n\n\t--Union INDEXED QUERY --");
+		testDBMarkerSet(TestType.Union, Marker_Type.QUERY_REP , null,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
+
+
+		//Union NON INDEXED  QUERY
+		System.out.print("\n\n\t--Union NON INDEXED  QUERY--");
+		testDBMarkerSet(TestType.Union, Marker_Type.QUERY_REP , null,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
 	}
-
-
-
-	private static long[] unionDBMarkerSet(int maxAttr, int maxTid,Marker_Type source, Marker_Type dest, String query)
-			throws Exception {
-		int loop=0;
-		long[] times = new long[sizesForSetTests.length];
-		
-		for(int i=0;i<sizesForSetTests.length;i++)
-		{
-		  times[i]=0;
-		}
-		
-		//Repeat the following tests k times to get a good average time estimate. k =  repeatCount
-		while(loop<repeatCount)
-		{
-			DBMarkerSet[] testset = genSets(source, "table10000_15",maxAttr, maxTid, query);
-			DBMarkerSet[] testset2 = genSets(source, "table10000_15",maxAttr, maxTid, query);
-			for(int i=0;i<sizesForSetTests.length;i++)
-			{
-				DBMarkerSet temp =testset[i];
-				DBMarkerSet temp1 =testset[i];
-				long before = System.currentTimeMillis();
-				temp.union(temp1);
-				long after = System.currentTimeMillis();
-				times[i] += after - before; 
-				//if (log.isDebugEnabled()) {log.debug("\t-- Size :" + sizesForSetTests[i] + " Time : " + times[i]);};
-			}
-			loop++;
-		}
-		
-		
-		for(int i=0;i<sizesForSetTests.length;i++)
-		{
-		  times[i]/=repeatCount;
-		  System.out.print("\n\t-- Size :" + sizesForSetTests[i] + " Avg Time : " + times[i]);
-		}
-		return times;
-	}
-
 
 	private static void generationTest() throws Exception {
-		int maxAttr = 15;
-		int maxTid = 10000;
 
+		System.out.print("\n\nType generation Performance Test --");
+		
 		//TABLE to JAVA REP
-		System.out.print("\n\t--TABLE to JAVA REP--");
-		int loop;
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.TABLE_REP , Marker_Type.JAVA_REP,"");
-		
+		System.out.print("\n\n\t--TABLE to JAVA REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.TABLE_REP , Marker_Type.JAVA_REP,"");
+
 		//JAVA to TABLE REP
-		System.out.print("\n\t--JAVA to TABLE REP--");
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.JAVA_REP , Marker_Type.TABLE_REP,"");
-		
+		System.out.print("\n\n\t--JAVA to TABLE REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.JAVA_REP , Marker_Type.TABLE_REP,"");
+
 		//INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--INDEXED QUERY to JAVA REP--");
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
-		
+		System.out.print("\n\n\t--INDEXED QUERY to JAVA REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
+
 		//NON INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--NON INDEXED QUERY to JAVA REP--");
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
-		
+		System.out.print("\n\n\t--NON INDEXED QUERY to JAVA REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
+
 		//INDEXED QUERY to Table REP
-		System.out.print("\n\t--INDEXED  QUERY to TABLE REP--");
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.TABLE_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying from source.table10000_15 where col1<");
-		
-		//NON INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--NON INDEXED  QUERY to TABLE REP--");
-		convertDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.TABLE_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
+		System.out.print("\n\n\t--INDEXED  QUERY to TABLE REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.QUERY_REP , Marker_Type.TABLE_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying from source.table10000_15 where col1<");
+
+		//NON INDEXED QUERY to Table REP
+		System.out.print("\n\n\t--NON INDEXED  QUERY to TABLE REP--");
+		testDBMarkerSet(TestType.TypeGeneration, Marker_Type.QUERY_REP , Marker_Type.TABLE_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
 	}
 
+	private static void singleAdditionTest() throws Exception {
 
-
-	private static long[] convertDBMarkerSet(int maxAttr, int maxTid,Marker_Type source, Marker_Type dest, String query)
-			throws Exception {
-		int loop=0;
-		long[] times = new long[sizesForSetTests.length];
+		System.out.print("\n\nAdd Record Performance Test --");
 		
-		for(int i=0;i<sizesForSetTests.length;i++)
-		{
-		  times[i]=0;
-		}
-		
-		//Repeat the following tests k times to get a good average time estimate. k =  repeatCount
-		while(loop<repeatCount)
-		{
-			DBMarkerSet[] testset = genSets(source, "table10000_15",maxAttr, maxTid, query);
-			for(int i=0;i<sizesForSetTests.length;i++)
-			{
-				DBMarkerSet temp =testset[i];
-				
-				long before = System.currentTimeMillis();
-				temp.GenerateRep(dest);
-				long after = System.currentTimeMillis();
-				times[i] += after - before; 
-				//if (log.isDebugEnabled()) {log.debug("\t-- Size :" + sizesForSetTests[i] + " Time : " + times[i]);};
-			}
-			loop++;
-		}
-		
-		
-		for(int i=0;i<sizesForSetTests.length;i++)
-		{
-		  times[i]/=repeatCount;
-		  System.out.print("\n\t-- Size :" + sizesForSetTests[i] + " Avg Time : " + times[i]);
-		}
-		return times;
-	}
-
-
-	private static void SingleAdditionTest() throws Exception {
-		int maxAttr = 15;
-		int maxTid = 10000;
-
 		//TABLE
-		System.out.print("\n\t--Addition to TABLE DBMarkerSet--");
-		int loop;
-		addToDBMarkerSet(maxAttr, maxTid, Marker_Type.TABLE_REP , Marker_Type.JAVA_REP,"");
-		
+		System.out.print("\n\n\t--Addition to TABLE DBMarkerSet--");
+		testDBMarkerSet(TestType.AddRecord, Marker_Type.TABLE_REP , null,"");
+
 		//JAVA 
-		System.out.print("\n\t--Addition to JAVA  DBMarkerSet--");
-		addToDBMarkerSet(maxAttr, maxTid, Marker_Type.JAVA_REP , Marker_Type.TABLE_REP,"");
-		
+		System.out.print("\n\n\t--Addition to JAVA  DBMarkerSet--");
+		testDBMarkerSet(TestType.AddRecord, Marker_Type.JAVA_REP , null,"");
+
 		// INDEXED QUERY
-		System.out.print("\n\t--Addition to  INDEXED QUERY  DBMarkerSet--");
-		addToDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
-		
-		//NON INDEXED QUERY to JAVA REP
-		System.out.print("\n\t--Addition to NON INDEXED QUERY  DBMarkerSet--");
-		addToDBMarkerSet(maxAttr, maxTid, Marker_Type.QUERY_REP , Marker_Type.JAVA_REP,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
-		
-		
+		System.out.print("\n\n\t--Addition to  INDEXED QUERY  DBMarkerSet--");
+		testDBMarkerSet(TestType.AddRecord, Marker_Type.QUERY_REP , null,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where col1<");
+
+		//NON INDEXED QUERY 
+		System.out.print("\n\n\t--Addition to NON INDEXED QUERY  DBMarkerSet--");
+		testDBMarkerSet(TestType.AddRecord, Marker_Type.QUERY_REP , null,"select 'table10000_15' :: text,  tid, '0100000000000000' ::bit varying  from source.table10000_15 where tid<");
+
+
 	}
-	
-	private static long[] addToDBMarkerSet(int maxAttr, int maxTid,Marker_Type source, Marker_Type dest, String query)
+
+	private static long[] testDBMarkerSet(TestType ttype,Marker_Type source, Marker_Type dest, String query)
 			throws Exception {
 		int loop=0;
 		long[] times = new long[sizesForSetTests.length];
-		
+
 		for(int i=0;i<sizesForSetTests.length;i++)
 		{
-		  times[i]=0;
+			times[i]=0;
 		}
-		
+
 		//Repeat the following tests k times to get a good average time estimate. k =  repeatCount
 		while(loop<repeatCount)
 		{
+			//Generate the DBMarkerSet to be used for testing
 			DBMarkerSet[] testset = genSets(source, "table10000_15",maxAttr, maxTid, query);
+			DBMarkerSet[] testset2=null;
+			
+			//In case of union test, generate the second DBMarkerSet
+			if(ttype == TestType.Union)
+			 testset2 = genSets(source, "table10000_15",maxAttr, maxTid, query);
 			for(int i=0;i<sizesForSetTests.length;i++)
 			{
+				long before, after;
 				DBMarkerSet temp =testset[i];
-				IAttributeValueMarker marker = randMarker("table10000_15", maxTid, maxAttr, new Random(0));
-				long before = System.currentTimeMillis();
 				
-				temp.add(marker);
-				long after = System.currentTimeMillis();
+				//Union Test
+				if(ttype == TestType.Union)
+				{
+					DBMarkerSet temp1 = testset2[i];
+					before = System.currentTimeMillis();
+					temp.union(temp1);
+					after = System.currentTimeMillis();
+				}
+				
+				//Add record test
+				else if(ttype == TestType.AddRecord)
+				{
+					IAttributeValueMarker marker = randMarker("table10000_15", maxTid, maxAttr, new Random(0));
+					before = System.currentTimeMillis();
+					temp.add(marker);
+					after = System.currentTimeMillis();
+				}
+				//DBMarker type conversion
+				else 
+				{
+					before = System.currentTimeMillis();
+					temp.GenerateRep(dest);
+					after = System.currentTimeMillis();
+				}
 				times[i] += after - before; 
-				//if (log.isDebugEnabled()) {log.debug("\t-- Size :" + sizesForSetTests[i] + " Time : " + times[i]);};
 			}
 			loop++;
 		}
-		
-		
+
+        //Calculate the average times
 		for(int i=0;i<sizesForSetTests.length;i++)
 		{
-		  times[i]/=repeatCount;
-		  System.out.print("\n\t-- Size :" + sizesForSetTests[i] + " Avg Time : " + times[i]);
+			times[i]/=repeatCount;
+			System.out.print("\n\t-- Size :" + sizesForSetTests[i] + " Avg Time : " + times[i]);
 		}
 		return times;
 	}
-	
-	
+
 	private static DBMarkerSet[] genSets (Marker_Type type, String relName, int maxAttr, int maxTid, String query) throws Exception 
 	{
 		DBMarkerSet[] result = new DBMarkerSet[sizesForSetTests.length];
@@ -259,8 +223,8 @@ public class TestDBMarkerSetPerformance {
 			markers2.add(randMarker(relName, maxTid, maxAttr, number));
 			if(type!=Marker_Type.QUERY_REP)
 			{
-			    result[i] = new DBMarkerSet(markers2,false);
-			  //Reset other types
+				result[i] = new DBMarkerSet(markers2,false);
+				//Reset other types
 				if(type != Marker_Type.JAVA_REP)
 				{
 					result[i].GenerateRep(type);
@@ -276,9 +240,9 @@ public class TestDBMarkerSetPerformance {
 				result[i] = new DBMarkerSet(fullquery,false);
 			}
 
-			
 
-			
+
+
 		}
 
 		return result;
