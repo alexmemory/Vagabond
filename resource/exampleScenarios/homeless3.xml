@@ -38,6 +38,27 @@
 			<Attr><Name>col14</Name><DataType>TEXT</DataType></Attr>
 			<Attr><Name>col15</Name><DataType>TEXT</DataType></Attr>
 			<PrimaryKey><Attr>col1</Attr></PrimaryKey>
+		</Relation>		
+		<Relation name="table10000_10">
+			<Attr><Name>col1</Name><DataType>NUMERIC</DataType></Attr>
+			<Attr><Name>col2</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col3</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col4</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col5</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col6</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col7</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col8</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col9</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col10</Name><DataType>TEXT</DataType></Attr>
+		    <PrimaryKey><Attr>col1</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="table10000_5">
+			<Attr><Name>col1</Name><DataType>NUMERIC</DataType></Attr>
+			<Attr><Name>col2</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col3</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col4</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>col5</Name><DataType>TEXT</DataType></Attr>
+		    <PrimaryKey><Attr>col1</Attr></PrimaryKey>
 		</Relation>
 		<Relation name="table125_5">
 			<Attr><Name>col1</Name><DataType>TEXT</DataType></Attr>
@@ -153,6 +174,16 @@ WHERE s.worksfor = k.location
     <InstanceFile name="table10000_15">
 		<Path>resource/exampleScenarios/PerformanceTest</Path>
 		<FileName>table10000_15.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="table10000_10">
+		<Path>resource/exampleScenarios/PerformanceTest</Path>
+		<FileName>table10000_10.csv</FileName>
+		<ColumnDelim>,</ColumnDelim>
+	</InstanceFile>
+	<InstanceFile name="table10000_5">
+		<Path>resource/exampleScenarios/PerformanceTest</Path>
+		<FileName>table10000_5.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
 	<InstanceFile name="table125_5">
