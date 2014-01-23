@@ -16,6 +16,7 @@ import org.vagabond.explanation.model.basic.IBasicExplanation;
  *
  */
 public class WeightedCombinedWMScoring implements IScoringFunction {	
+	//public static final IScoringFunction inst = new WeightedCombinedWMScoring();
 	public IScoringFunction[] funcnames;
 	public double[] funcweights;
 	public WeightedCombinedWMScoring (IScoringFunction[] f, double[] weights) {
