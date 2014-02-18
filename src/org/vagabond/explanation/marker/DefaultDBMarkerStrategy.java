@@ -10,17 +10,17 @@ package org.vagabond.explanation.marker;
 public class DefaultDBMarkerStrategy {
 
 	private static DefaultDBMarkerStrategy inst = new DefaultDBMarkerStrategy(null);
-	private DBMarkerStrategy strat;
+	private IDBMarkerStrategy strat;
 	
-	private DefaultDBMarkerStrategy (DBMarkerStrategy strat) {
+	private DefaultDBMarkerStrategy (IDBMarkerStrategy strat) {
 		this.strat = strat;
 	}
 	
-	public static DBMarkerStrategy getStrat() {
+	public static IDBMarkerStrategy getStrat() {
 		return inst.strat;
 	}
 	
-	public static void setStratgey(DBMarkerStrategy strat) {
+	public static void setStratgey(IDBMarkerStrategy strat) {
 		inst.strat = strat;
 	}
 	
