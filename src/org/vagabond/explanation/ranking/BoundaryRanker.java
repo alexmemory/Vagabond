@@ -33,7 +33,7 @@ public class BoundaryRanker implements IExplanationRanker {
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			BoundaryRanker.class);
 
-	public IScoringFunction funcnames;
+	public IScoringFunction myfunc;
 	Boundary mybound;
 	
 	private int donePos;
@@ -45,12 +45,22 @@ public class BoundaryRanker implements IExplanationRanker {
 	ExplanationCollection explcoll;
 	ArrayList<IExplanationSet> RankedExplSets = new ArrayList<IExplanationSet>();
 	
+	public class OptimalElement
+	{
+		int size;
+		int[] ExplSetIndex;
+		IExplanationSet ExplSets;
+		int score;
+		OptimalElement prev;
+		OptimalElement next;
+	}
+	
 	private boolean doneRanking;
     
 	
 	public BoundaryRanker(ExplanationCollection coll, IScoringFunction f)
 	{
-		this.funcnames = f;
+		this.myfunc = f;
 		this.mybound = new Boundary(coll, f);
 		this.explcoll = coll;
 		explCollSize = coll.getDimensions().capacity();
@@ -91,6 +101,11 @@ public class BoundaryRanker implements IExplanationRanker {
 	}
 
 	private void generateUpTo(int upTo) {
+		// Issues: 
+		// 1) exponential amount of combination candidates
+		// 2) duplicate/common combinations
+		// 3) multiple optimal combination candidates at each size level
+		
 		while (RankedExplSets.size() < upTo)
 		{
 			//1. extend combination of explanation set by one
@@ -100,14 +115,25 @@ public class BoundaryRanker implements IExplanationRanker {
 			{
 				//build combination of explanation set
 				IExplanationSet currComb = buildExplSet(explSetArray[row], explcoll);
+				
 				int currUpBound = mybound.getUpBound(currComb, explSetArray[row], explcoll);
 				int currLowBound = mybound.getLowBound(currComb, explSetArray[row], explcoll);
+				
 				IExplanationSet expandedComb = expandExplSet(explSetArray[row], explcoll, optimal, thrown);
-				if (expandedComb.getScore() <= currLowBound)
+				
+				if (myfunc.getScore(expandedComb)<= currLowBound)
 				{
+					// throw branches with score lower or equal to low bound
+				}
+				else if (myfunc.getScore(expandedComb) >= currUpBound)
+				{
+					// add into optimal if reaches up bound
+				}
+				else
+				{
+					// for values between boundaries, cache?
 					
 				}
-				
 				
 			}
 			
