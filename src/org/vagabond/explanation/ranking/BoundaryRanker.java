@@ -19,6 +19,7 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.ExplanationComparators;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
+import org.vagabond.explanation.ranking.AStarExplanationRanker.OneErrorExplSet;
 import org.vagabond.explanation.ranking.AStarExplanationRanker.RankedListElement;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.util.BitMatrix;
@@ -28,151 +29,197 @@ import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.ewah.IntIterator;
 
 public class BoundaryRanker implements IExplanationRanker {
-
+	
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			BoundaryRanker.class);
-	
-	//public void initialize (ExplanationCollection coll);
-	//public boolean ready ();
-	// user confirmed 
-	//public void confirmExplanation (IBasicExplanation correctExpl);
-	
-	//public IExplanationSet getRankedExpl (int rank);
-	//public int getScore (int rank);
-	//public int getIterPos();
-	//public IExplanationSet previous();
-	//public boolean hasPrevious();
-	//public int getNumberOfExplSets ();
-	//public int getNumberPrefetched ();
-	//public void resetIter();
-	
-	//public boolean hasAtLeast (int numElem); // check that this ranker can produce at least this many explanation sets
-	//boolean isFullyRanked();
-	//public void rankFull();
-	
-	private int computeUpBound(int currentUpBound, RankedListElement elem, int BoundCode){
-		int retV = 0;
-		/*
-		 * 1. WeightedCombinedFunc: all weights equal to 1?
-		 * 2. Type-Weighted SideEffect Size: 
-		 *    current_max + largest weight err-type * additional size of side_effect
-		 * 3. Source Error Type Entropy: all new errs add to max-weighted err-type
-		 */
-		switch (BoundCode){
-		    case 1:
-		    	
-		    	break;
-		    	
-		    case 2:
-		    	elem.max = elem.max + max(errweights) * elem.size;
-		    	computeUpBound(elem.max, elem, 2);
-		    	break;
-		    	
-		    case 3:
-		    	// new data structure?
-		    	// need to store size of err-types and info of current expl-set
-				double probability = (ErrTypeCounter.get(ErrType) + new_size) / 
-							            ( TotalSize + new_size );
-				elem.max = elem.max - probability * Math.log(probability);
-		    	break;
-		    	
-		    default:
-		    	
-		    	break;
-		}				
-		return elem.max;
-	}
-	
-	private int computeLowBound(int currentLowBound, RankedListElement elem, int BoundCode){
-		/*
-		 * 1. WeightedCombinedFunc: all weights equal to 0?
-		 * 2. Type-Weighted SideEffect Size: 
-		 *    current_min + smallest weight err-type * additional size of side_effect 
-		 * 3. Source Error Type Entropy:
-		 *    1) increase size of err_type to 5 (or the size of type set)
-		 *    2) bin-pack, make the err_type bins equal
-		 */
-		int retV = 0;
-		
-		switch (BoundCode){
-	    case 1:
-	    	
-	    	break;
-	    	
-	    case 2:
-	    	elem.min = elem.min + min(errweights) * elem.size;
-	    	computeUpBound(elem.min, elem, 2);
-	    	break;
-	    	
-	    case 3:
-	    	// new data structure?
-	    	// need to store size of err-types and info of current expl-set
-	    	int size_diff = sizeof_typeset - sizeof_curr_typeset;
-	    	
-	    	int init_alloc = min(min(sizeof_curr_typeset), additional_size / size_diff);
-	    	
-	    	int remain_alloc = additional_size - init_alloc * size_diff;
-	    	
-	    	if ( remain_alloc >= (size_diff + 1) ){
-	    		remain_alloc = remain_alloc - (size_diff + 1);
-	    		//increase smallest k+1 bins by 1
-	    		
-	    	}
-	    	else{
-	    		//increase smallest bins by 1
-	    	}
-	    	
-	    	//recalculate entropy score
-			double retScore = 0.0;
-			
-			for (ExplanationType ErrType : ErrTypeCounter.keySet())
-			{
-				double probability = ErrTypeCounter.get(ErrType) / TotalSize;
-				retScore = retScore - probability * Math.log(probability);
-			}
 
-			elem.min =  retScore;
-			
-	    	break;
-	    	
-	    default:
-	    	
-	    	break;
-	}		
-		
-	    return elem.max;
+	public IScoringFunction funcnames;
+	Boundary mybound;
 	
+	private int donePos;
+	private int curPos;
+	private int explCollSize;
+	int[][] explSetArray;
+	int[] optimal;
+	int[] thrown;
+	ExplanationCollection explcoll;
+	ArrayList<IExplanationSet> RankedExplSets = new ArrayList<IExplanationSet>();
+	
+	private boolean doneRanking;
+    
+	
+	public BoundaryRanker(ExplanationCollection coll, IScoringFunction f)
+	{
+		this.funcnames = f;
+		this.mybound = new Boundary(coll, f);
+		this.explcoll = coll;
+		explCollSize = coll.getDimensions().capacity();
+		
+		explSetArray = new int[explCollSize][explCollSize];
+		
+		//initialize first explset
+		for (int i = 0; i< explCollSize; i++)
+		{
+		    Arrays.fill(explSetArray[i], 0);
+		    explSetArray[i][i] = 1;
+		}
+		
+		//initialize flag array
+		optimal = new int[explCollSize];
+		thrown  = new int[explCollSize];
+		Arrays.fill(optimal, 0);
+		Arrays.fill(thrown, 0);		
+		
+    }
+	
+	@Override
+	public void initialize(ExplanationCollection coll) {
+		doneRanking = false;
+		
 	}
-	
-	//private int getUpBound(RankedListElement elem){
-	//	return elem.max;
-	//}
-	
-	
-	private void computeScore (RankedListElement elem) {
-		//should elem.min and elem.max set to type double?
-		//more scoring functions may not have integer scores
-		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation> ();
+
+	@Override
+	public boolean hasNext() {
+		// if ranking is not done
+		// finish ranking first
+		if (!doneRanking)
+		{
+			generateUpTo(curPos + 1);
+		}
 		
-		elem.min = 0;
-		elem.max = 0;
-		for(int i = 0; i <  elem.elem.length; i++) {
-			if (elem.elem[i] > -1)
-				sets.add(errorExpl.get(i).get(elem.elem[i]));
-			else if (elem.elem[i] != -2){
-				elem.min = Math.max(combinedMin[i], elem.min);
-				elem.max += combinedMax[i];
+	    return curPos < donePos;
+	}
+
+	private void generateUpTo(int upTo) {
+		while (RankedExplSets.size() < upTo)
+		{
+			//1. extend combination of explanation set by one
+			//   only extend sets not in thrown?
+			//   add optimal if not in the current?
+			for (int row = 0; row< explCollSize; row++)
+			{
+				//build combination of explanation set
+				IExplanationSet currComb = buildExplSet(explSetArray[row], explcoll);
+				int currUpBound = mybound.getUpBound(currComb, explSetArray[row], explcoll);
+				int currLowBound = mybound.getLowBound(currComb, explSetArray[row], explcoll);
+				IExplanationSet expandedComb = expandExplSet(explSetArray[row], explcoll, optimal, thrown);
+				if (expandedComb.getScore() <= currLowBound)
+				{
+					
+				}
+				
+				
 			}
-		}
 			
-		elem.realScore = f.getScore(sets);
-		if (elem.isDone()) {
-			elem.min = elem.realScore;
-			elem.max = elem.realScore;
+			//2. for each combination: update low/up boundary
+			//                         compute score and compare
+			//                         -- throw the combination and mark flag
+			//                         -- return optimal
+			//                         -- update score
+			
+			//3. insert ranked_expl_set array list
 		}
-		else {
-			elem.min = Math.max(elem.realScore, elem.min);
-			elem.max = elem.realScore + elem.max;
-		}
+		
+	}
+
+	private IExplanationSet expandExplSet(int[] is, ExplanationCollection explcoll2,
+			int[] optimal2, int[] thrown2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private IExplanationSet buildExplSet(int[] is,
+			ExplanationCollection explcoll2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IExplanationSet next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean ready() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void confirmExplanation(IBasicExplanation correctExpl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IExplanationSet getRankedExpl(int rank) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getScore(int rank) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getIterPos() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public IExplanationSet previous() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasPrevious() {
+		return iterPos > 0;
+	}
+
+	@Override
+	public int getNumberOfExplSets() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getNumberPrefetched() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void resetIter() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean hasAtLeast(int numElem) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isFullyRanked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void rankFull() {
+		// TODO Auto-generated method stub
+		
 	}
 }
