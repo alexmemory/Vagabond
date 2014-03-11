@@ -39,13 +39,25 @@ public class BoundaryRanker implements IExplanationRanker {
 	RankingElement ele;
 	RankedElements rankedElements;
 	int collSize;
-
+	int cursorPos;
+	boolean rankingdone;
+	int coverQueueSize;
+	CoverExplQueue coverqueue;
+	
+	public class CoverExplQueue
+	{
+		IExplanationSet node[];
+		double Scores[];
+		
+	}
+	
 	public BoundaryRanker(ExplanationCollection coll, IScoringFunction f)
 	{
 	    this.explColl = coll;
 	    this.scoreFunc = f;
 		
     }
+	
 	
 	public class RankingElement
 	{
@@ -62,6 +74,14 @@ public class BoundaryRanker implements IExplanationRanker {
 	{
 		PriorityQueue<RankingElement> rankedQueue;
 		int explSetSize[];
+		
+		public void addExplSet(int ExplSetIndex, ExplanationCollection coll)
+		{
+			for (RankingElement e:rankedQueue)
+			{
+				e.explMatrix[ExplSetIndex] = 1;
+			}
+		}
 	}
 
 
@@ -93,32 +113,47 @@ public class BoundaryRanker implements IExplanationRanker {
 						//else compare score / boundary?
 						else
 						{
-							return explset2.lowBound - explset1.upBound;
+							return (int) (explset2.lowBound - explset1.upBound);
 							
 						}
+						return 0;
 					}
 				}
 		);
 		
 		// insert all candidate from explset1 to priority queue.
 		//rankedElements.rankedQueue.add(
-		
+		for (int explSetIndex = 0; explSetIndex < collSize; explSetIndex++)
+		{
+			// add explset element into queue sequentially
+			rankedElements.rankedQueue.addExplSet(explSetIndex, coll);
+			
+		}
 
 		
 		
 	}
 
 
+	private void generateUpTo(int OutputSize)
+	{
+		
+	}
+	
 	@Override
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
+		if (!rankingdone)
+		{
+			generateUpTo(cursorPos+1);
+			
+		}
+			return cursorPos < coverQueueSize;
 	}
 
 	@Override
 	public IExplanationSet next() {
 		// TODO Auto-generated method stub
-		return null;
+		return coverqueue.node[cursorPos+1];
 	}
 
 	@Override
