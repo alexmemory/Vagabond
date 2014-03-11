@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -32,132 +33,86 @@ public class BoundaryRanker implements IExplanationRanker {
 	
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			BoundaryRanker.class);
+	
+	ExplanationCollection explColl;
+	IScoringFunction scoreFunc;
+	RankingElement ele;
+	RankedElements rankedElements;
+	int collSize;
 
-	public IScoringFunction myfunc;
-	Boundary mybound;
-	
-	private int donePos;
-	private int curPos;
-	private int explCollSize;
-	int[][] explSetArray;
-	int[] optimal;
-	int[] thrown;
-	ExplanationCollection explcoll;
-	ArrayList<IExplanationSet> RankedExplSets = new ArrayList<IExplanationSet>();
-	
-	public class OptimalElement
-	{
-		int size;
-		int[] ExplSetIndex;
-		IExplanationSet ExplSets;
-		int score;
-		OptimalElement prev;
-		OptimalElement next;
-	}
-	
-	private boolean doneRanking;
-    
-	
 	public BoundaryRanker(ExplanationCollection coll, IScoringFunction f)
 	{
-		this.myfunc = f;
-		this.mybound = new Boundary(coll, f);
-		this.explcoll = coll;
-		explCollSize = coll.getDimensions().capacity();
-		
-		explSetArray = new int[explCollSize][explCollSize];
-		
-		//initialize first explset
-		for (int i = 0; i< explCollSize; i++)
-		{
-		    Arrays.fill(explSetArray[i], 0);
-		    explSetArray[i][i] = 1;
-		}
-		
-		//initialize flag array
-		optimal = new int[explCollSize];
-		thrown  = new int[explCollSize];
-		Arrays.fill(optimal, 0);
-		Arrays.fill(thrown, 0);		
+	    this.explColl = coll;
+	    this.scoreFunc = f;
 		
     }
 	
-	@Override
-	public void initialize(ExplanationCollection coll) {
-		doneRanking = false;
+	public class RankingElement
+	{
+		int explMatrix[];
+		double upBound;
+		double lowBound;
+		double rankingScore;
+		boolean FullCover;
+		int rankedSize;
 		
 	}
+	
+	public class RankedElements 
+	{
+		PriorityQueue<RankingElement> rankedQueue;
+		int explSetSize[];
+	}
+
+
+	@Override
+	public void initialize(ExplanationCollection coll) {
+		//load expl coll size (collsize <-- # of explset)
+		collSize = coll.getDimensions().capacity();
+		
+		int explsetSize = coll.getExplSets().size();
+		rankedElements.rankedQueue = new PriorityQueue<RankingElement>(explsetSize,
+				new Comparator<RankingElement>()
+				{
+					public int compare(RankingElement explset1, RankingElement explset2)
+					{
+						//if only one rank element is fully covered
+						if (explset1.FullCover ^ explset2.FullCover)
+						{
+							if (explset2.FullCover)
+							     return 1;
+							if (explset1.FullCover)
+							     return 0;
+						}
+						//none or both are fully covered
+						// if explset2 covers more error marker then we prefer explset2
+						else if (explset2.rankedSize > explset1.rankedSize )
+						{
+							return explset2.rankedSize - explset1.rankedSize ;
+						}
+						//else compare score / boundary?
+						else
+						{
+							return explset2.lowBound - explset1.upBound;
+							
+						}
+					}
+				}
+		);
+		
+		// insert all candidate from explset1 to priority queue.
+		//rankedElements.rankedQueue.add(
+		
+
+		
+		
+	}
+
 
 	@Override
 	public boolean hasNext() {
-		// if ranking is not done
-		// finish ranking first
-		if (!doneRanking)
-		{
-			generateUpTo(curPos + 1);
-		}
-		
-	    return curPos < donePos;
-	}
-
-	private void generateUpTo(int upTo) {
-		// Issues: 
-		// 1) exponential amount of combination candidates
-		// 2) duplicate/common combinations
-		// 3) multiple optimal combination candidates at each size level
-		
-		while (RankedExplSets.size() < upTo)
-		{
-			//1. extend combination of explanation set by one
-			//   only extend sets not in thrown?
-			//   add optimal if not in the current?
-			for (int row = 0; row< explCollSize; row++)
-			{
-				//build combination of explanation set
-				IExplanationSet currComb = buildExplSet(explSetArray[row], explcoll);
-				
-				int currUpBound = mybound.getUpBound(currComb, explSetArray[row], explcoll);
-				int currLowBound = mybound.getLowBound(currComb, explSetArray[row], explcoll);
-				
-				IExplanationSet expandedComb = expandExplSet(explSetArray[row], explcoll, optimal, thrown);
-				
-				if (myfunc.getScore(expandedComb)<= currLowBound)
-				{
-					// throw branches with score lower or equal to low bound
-				}
-				else if (myfunc.getScore(expandedComb) >= currUpBound)
-				{
-					// add into optimal if reaches up bound
-				}
-				else
-				{
-					// for values between boundaries, cache?
-					
-				}
-				
-			}
-			
-			//2. for each combination: update low/up boundary
-			//                         compute score and compare
-			//                         -- throw the combination and mark flag
-			//                         -- return optimal
-			//                         -- update score
-			
-			//3. insert ranked_expl_set array list
-		}
-		
-	}
-
-	private IExplanationSet expandExplSet(int[] is, ExplanationCollection explcoll2,
-			int[] optimal2, int[] thrown2) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private IExplanationSet buildExplSet(int[] is,
-			ExplanationCollection explcoll2) {
-		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
@@ -210,7 +165,8 @@ public class BoundaryRanker implements IExplanationRanker {
 
 	@Override
 	public boolean hasPrevious() {
-		return iterPos > 0;
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
@@ -248,4 +204,5 @@ public class BoundaryRanker implements IExplanationRanker {
 		// TODO Auto-generated method stub
 		
 	}
+	
 }
