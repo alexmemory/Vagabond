@@ -2,10 +2,14 @@ package org.vagabond.explanation.ranking;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -30,6 +34,25 @@ import org.vagabond.util.ewah.IntIterator;
 
 public class BoundaryRanker implements IExplanationRanker {
 	
+	/*
+	 * \item input: explanation set collection, score function
+\item step1: given the score function and the size/other property of the expl set collection, 
+             initialize up/low boundary
+\item step2: create ID map for error - expl set, error - expl
+\item step3: starting from error0, for every expl in the expl set that explains error0, compute score, update boundary, insert to priority-queue
+\item step4: for each element in the queue, expand the element until every error is explained.
+\item step5: if all errors are explained, move to CES set with scores.
+\item step6: continue step 4 for all candidates in the queue, then the CES set will be complete.
+
+
+boundary class (input: score func, expl coll; output: up boundary, low boundary)
+ID map (input: expl coll, err set; output: mapping err - expl sets, supports indexing)
+rank element (up bound, low bound, score, map vector)
+priority queue of elements (ranked by low bound first, then up bound)
+ces queue (expl set, score, index)
+a method to create expl set from id map and explset vector
+
+	 */
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			BoundaryRanker.class);
 
@@ -43,17 +66,96 @@ public class BoundaryRanker implements IExplanationRanker {
 	int[] optimal;
 	int[] thrown;
 	ExplanationCollection explcoll;
-	ArrayList<IExplanationSet> RankedExplSets = new ArrayList<IExplanationSet>();
+	int currentstep;
 	
-	public class OptimalElement
+	ISingleMarker[] allErrs;
+	
+	//priority queue of elements
+    PriorityQueue<FullCoverExplSet> RankedFullExplSets = new PriorityQueue<FullCoverExplSet>();
+    PriorityQueue<RankElement> PartialExplSets = new PriorityQueue<RankElement>();
+    
+    //ID-Map required
+    Map erridMap = new IdentityHashMap();
+    
+	//priority queue of elements
+	public class RankElement
 	{
-		int size;
-		int[] ExplSetIndex;
-		IExplanationSet ExplSets;
+		int[] ExplSetVec;
+		int upBound;
+		int lowBound;
 		int score;
-		OptimalElement prev;
-		OptimalElement next;
+		IScoringFunction func;
 	}
+	
+	public IExplanationSet generateExplSet(int[] ExplVector, Map IDMap)
+	{
+		// for each index in ExplVector, retrieve the expl from the non-zero indexed explset in explcoll
+		
+		IExplanationSet retExplSet = ExplanationFactory.newExplanationSet();
+		
+		for (int i = 0; i < ExplVector.length; i ++)
+		{
+		  
+			//erridMap.put(singleErr, currExplSet);
+			ISingleMarker e = (ISingleMarker) IDMap.keySet().toArray()[i];
+			IExplanationSet explSet = (IExplanationSet) IDMap.get(e);
+			int explIdx = ExplVector[i];
+			IBasicExplanation expl = (IBasicExplanation) explSet.toArray()[explIdx];
+			retExplSet.add(expl);
+		
+		}
+		return null;
+		
+	}
+	
+	class boundarycomp implements Comparator<RankElement> {
+		  public int compare(RankElement ele1, RankElement ele2) {			  
+		    if (ele1.lowBound > ele2.upBound) 
+		    {
+		      //low1 > up2 ==> 1
+		      return 1;
+		    } 
+		    
+		    
+		    else if (ele1.upBound < ele1.upBound) 
+		    {
+		      //low1 <= up2 && up1 < up2 ==> -1
+		      return -1;
+		    } 
+
+		    else if (ele1.upBound > ele1.upBound) 
+		    {
+		      //low1 <= up2 && up1 > up2 ==> -1
+		      return 1;
+		    } 
+		    
+		    else 
+		    {
+		      //low1 <= up2 && up1 = up2 ==> -1
+		      return 0;
+		    }
+		  }
+		}
+	
+	//Priority queue of CES
+	public class FullCoverExplSet
+	{
+		IExplanationSet fullexplset;
+		int rank;
+		int score;
+	}
+	
+	class comp implements Comparator<FullCoverExplSet> {
+		  public int compare(FullCoverExplSet explset1, FullCoverExplSet explset2) {
+		    if (explset1.score > explset2.score) {
+		      return 1;
+		    } else if (explset1.score < explset2.score) {
+		      return -1;
+		    } else {
+		      return 0;
+		    }
+		  }
+		}	
 	
 	private boolean doneRanking;
     
@@ -64,6 +166,7 @@ public class BoundaryRanker implements IExplanationRanker {
 		this.mybound = new Boundary(coll, f);
 		this.explcoll = coll;
 		explCollSize = coll.getDimensions().capacity();
+		
 		
 		explSetArray = new int[explCollSize][explCollSize];
 		
@@ -86,6 +189,25 @@ public class BoundaryRanker implements IExplanationRanker {
 	public void initialize(ExplanationCollection coll) {
 		doneRanking = false;
 		
+		//initialize ID Map
+		Collection<IExplanationSet> explsets = coll.getExplSets();
+		for (IExplanationSet ExplSet:explsets)
+		{
+			IMarkerSet a = ExplSet.getExplains();
+			List<IBasicExplanation> expls = ExplSet.getExplanations();
+
+			for (ISingleMarker singleErr:a)
+			{
+				IExplanationSet currExplSet = (IExplanationSet) erridMap.get(singleErr);
+				currExplSet.addAll(expls);
+			    erridMap.put(singleErr, currExplSet);
+			}
+		}
+		
+		//initialize error array
+		allErrs = (ISingleMarker[]) erridMap.keySet().toArray();
+		
+		
 	}
 
 	@Override
@@ -105,9 +227,22 @@ public class BoundaryRanker implements IExplanationRanker {
 		// 1) exponential amount of combination candidates
 		// 2) duplicate/common combinations
 		// 3) multiple optimal combination candidates at each size level
-		
-		while (RankedExplSets.size() < upTo)
+		if (upTo == -1)
 		{
+		 //rankFull	
+		}
+		
+		while (RankedFullExplSets.size() < upTo)
+		{
+			
+			/*
+			 * \
+			 * item step3: starting from error0, for every expl in the expl set that explains error0, compute score, update boundary, insert to priority-queue
+		\item step4: for each element in the queue, expand the element until every error is explained.
+		\item step5: if all errors are explained, move to CES set with scores.
+			 */
+			
+			
 			//1. extend combination of explanation set by one
 			//   only extend sets not in thrown?
 			//   add optimal if not in the current?
@@ -186,14 +321,43 @@ public class BoundaryRanker implements IExplanationRanker {
 
 	@Override
 	public IExplanationSet getRankedExpl(int rank) {
-		// TODO Auto-generated method stub
-		return null;
+		if (doneRanking)
+		{
+			if (rank > RankedFullExplSets.size())
+			    return null;
+			else
+			{
+				FullCoverExplSet[] explsets = (FullCoverExplSet[]) RankedFullExplSets.toArray();
+				return explsets[rank].fullexplset;
+			}
+				
+		}
+		else
+		{
+			generateUpTo(rank);
+			return getRankedExpl(rank);
+		}
 	}
 
 	@Override
 	public int getScore(int rank) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (doneRanking)
+		{
+			if (rank > RankedFullExplSets.size())
+			    return -1;
+			else
+			{
+				FullCoverExplSet[] explsets = (FullCoverExplSet[]) RankedFullExplSets.toArray();
+				return explsets[rank].score;
+			}
+				
+		}
+		else
+		{
+			generateUpTo(rank);
+			return getScore(rank);
+		}
+		
 	}
 
 	@Override
@@ -214,18 +378,6 @@ public class BoundaryRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getNumberOfExplSets() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getNumberPrefetched() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void resetIter() {
 		// TODO Auto-generated method stub
 		
@@ -233,19 +385,17 @@ public class BoundaryRanker implements IExplanationRanker {
 
 	@Override
 	public boolean hasAtLeast(int numElem) {
-		// TODO Auto-generated method stub
-		return false;
+		return RankedFullExplSets.size()>=numElem;
 	}
 
 	@Override
 	public boolean isFullyRanked() {
-		// TODO Auto-generated method stub
-		return false;
+		return doneRanking;
 	}
 
 	@Override
 	public void rankFull() {
-		// TODO Auto-generated method stub
+		generateUpTo(-1);
 		
 	}
 }

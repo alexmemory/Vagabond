@@ -13,6 +13,22 @@ import org.vagabond.explanation.ranking.scoring.WeightedCombinedWMScoring;
 
 class Boundary
 {
+	//boundary class (input: score func, expl coll; output: up boundary, low boundary)
+	/*
+	 * Boundaries:
+	-Size of explanantion: 
+	up: length(error_vector) + [ M -  length(error_vector)]
+	low: length(error_vector) + 1
+	
+	-Side effect size: 
+	up: func(expl_set) + sum (max(side-effect size))
+	low: max(func(expl_set), max [ min (side-effect size (new expl set))]
+	
+	-Entropy: 
+	up: reformat current error types ==> most concentrated distribution of error types
+	low: 1 - most even distribution of error types
+
+	 */
     public IScoringFunction scoref;
     public int[] arrayExplSet;
     int explcolSize;
