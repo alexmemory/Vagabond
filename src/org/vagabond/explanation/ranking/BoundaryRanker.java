@@ -67,7 +67,8 @@ a method to create expl set from id map and explset vector
 	int[] thrown;
 	ExplanationCollection explcoll;
 	int currentstep;
-	
+	int maxStep;
+	IMarkerSet allErrSets;
 	ISingleMarker[] allErrs;
 	
 	//priority queue of elements
@@ -81,6 +82,8 @@ a method to create expl set from id map and explset vector
 	public class RankElement
 	{
 		int[] ExplSetVec;
+		IMarkerSet coveredErrs;
+		IExplanationSet explSet;
 		int upBound;
 		int lowBound;
 		int score;
@@ -201,11 +204,14 @@ a method to create expl set from id map and explset vector
 				IExplanationSet currExplSet = (IExplanationSet) erridMap.get(singleErr);
 				currExplSet.addAll(expls);
 			    erridMap.put(singleErr, currExplSet);
+			    allErrSets.add(singleErr);
 			}
 		}
 		
 		//initialize error array
 		allErrs = (ISingleMarker[]) erridMap.keySet().toArray();
+		
+		maxStep = allErrs.length;
 		
 		
 	}
@@ -229,10 +235,82 @@ a method to create expl set from id map and explset vector
 		// 3) multiple optimal combination candidates at each size level
 		if (upTo == -1)
 		{
-		 //rankFull	
+		    //rankFull
+			//iterate by error index, incrementally set explanations
+			for (int errIdx = 0; errIdx< maxStep; errIdx++)
+			{
+				//1. if any element in queue, pop out and extend
+				RankElement topEle = PartialExplSets.poll();
+				IExplanationSet currStepExplSet = (IExplanationSet) erridMap.get(allErrs[errIdx]);
+				int branches = currStepExplSet.size();
+				if (topEle != null)
+				{					
+					for (int i = 0; i<branches; i++)
+					{
+						RankElement cpEle = topEle;
+						//extend explanation set
+						cpEle.explSet.add(currStepExplSet.getExplanations().get(i));
+						//update low and up boundary
+						cpEle.upBound = Math.max(cpEle.upBound, this.myfunc.getScore(cpEle.explSet));
+						cpEle.lowBound = Math.min(cpEle.lowBound, this.myfunc.getScore(cpEle.explSet));
+						
+						//compute score
+						cpEle.score = this.myfunc.getScore(cpEle.explSet);
+						
+						//if full covered, move to full explanation set queue?
+						if (cpEle.coveredErrs.diff(this.allErrSets) == null)
+						{
+							FullCoverExplSet newFullCS = new FullCoverExplSet();
+							newFullCS.fullexplset = cpEle.explSet;
+							newFullCS.score = cpEle.score;
+							RankedFullExplSets.add(newFullCS);
+						}
+						
+						//insert back to queue
+						else 
+						{
+							PartialExplSets.add(cpEle);
+						}
+					}
+					
+				}					
+				//2. create new element, compute score and then insert
+				else
+				{
+					
+					for (int i = 0; i<branches; i++)
+					{
+						RankElement newEle = new RankElement();
+						newEle.explSet.add(currStepExplSet.getExplanations().get(i));
+						//update low and up boundary
+						newEle.upBound = Math.max(newEle.upBound, this.myfunc.getScore(newEle.explSet));
+						newEle.lowBound = Math.min(newEle.lowBound, this.myfunc.getScore(newEle.explSet));
+						
+						//compute score
+						newEle.score = this.myfunc.getScore(newEle.explSet);
+						
+						//if full covered, move to full explanation set queue?
+						if (newEle.coveredErrs.diff(this.allErrSets) == null)
+						{
+							FullCoverExplSet newFullCS = new FullCoverExplSet();
+							newFullCS.fullexplset = newEle.explSet;
+							newFullCS.score = newEle.score;
+							RankedFullExplSets.add(newFullCS);
+						}
+						
+						//insert back to queue
+						else 
+						{
+							PartialExplSets.add(newEle);
+						}
+					
+					}
+				}
+			}
 		}
 		
-		while (RankedFullExplSets.size() < upTo)
+		//limited generate
+		else while (RankedFullExplSets.size() < upTo && !doneRanking)
 		{
 			
 			/*
@@ -241,6 +319,8 @@ a method to create expl set from id map and explset vector
 		\item step4: for each element in the queue, expand the element until every error is explained.
 		\item step5: if all errors are explained, move to CES set with scores.
 			 */
+			
+			
 			
 			
 			//1. extend combination of explanation set by one
@@ -280,6 +360,8 @@ a method to create expl set from id map and explset vector
 			
 			//3. insert ranked_expl_set array list
 		}
+	
+	
 		
 	}
 
