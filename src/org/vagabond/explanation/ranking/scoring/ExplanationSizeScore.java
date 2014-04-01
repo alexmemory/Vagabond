@@ -10,6 +10,12 @@ public class ExplanationSizeScore implements IScoringFunction {
 	public static final ExplanationSizeScore inst = new ExplanationSizeScore();
 	
 	@Override
+	public int getFTypeCode()
+	{
+		return Explanation_Size_Score;
+	}
+	
+	@Override
 	public int getScore(IBasicExplanation expl) {
 		return 1;
 	}

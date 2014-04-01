@@ -27,11 +27,17 @@ import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
  */
 public class AvgErrTypeWeightScore implements IScoringFunction {
 	public double[] errweights;
-
+    
 	public AvgErrTypeWeightScore (double[] weights) {
 		this.errweights = weights;
 	}
 
+	@Override
+	public int getFTypeCode()
+	{
+		return Avg_ErrTypeWeight_Score;
+	}
+	
 	public double getErrorWeight(ExplanationType errortype){
 		double retV = 0;
 		switch (errortype){

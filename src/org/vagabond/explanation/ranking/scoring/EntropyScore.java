@@ -46,6 +46,12 @@ public class EntropyScore implements IScoringFunction {
 		return 0;
 
 	}
+	
+	@Override
+	public int getFTypeCode()
+	{
+		return Entropy_Score;
+	}
 
 	@Override
 	public int getScore(IExplanationSet set) {

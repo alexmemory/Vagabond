@@ -94,5 +94,10 @@ public class ErrorTypeScore implements IScoringFunction {
 		retScore /= expls.size();
 		return (int) (retScore  * 10000);
 	}
+	@Override
+	public int getFTypeCode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

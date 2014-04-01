@@ -22,10 +22,18 @@ public class WeightedCombinedWMScoring implements IScoringFunction {
 	public WeightedCombinedWMScoring (IScoringFunction[] f, double[] weights) {
 	this.funcnames = f;
 	this.funcweights = weights;
+	
 }
 	/* (non-Javadoc)
 	* @see org.vagabond.explanation.ranking.scoring.IScoringFunction#getScore(org.vagabond.explanation.model.basic.IBasicExplanation)
 	*/
+	
+	@Override
+	public int getFTypeCode()
+	{
+		return Weighted_Combined_WMScoring;
+	}
+	
 	@Override
 	public int getScore(IBasicExplanation expl) {
 		double score = 0.0;
