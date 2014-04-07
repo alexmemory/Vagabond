@@ -68,7 +68,6 @@ public class RankerFactory {
 	}
 	
 	public static String RankerSchemeConstructor(int rankertype, String[] funcnames, double[] funcweights, double[] errweights){		
-		
 		String mNewRankerName = "";
 		
 		switch (rankertype){
@@ -140,10 +139,75 @@ public class RankerFactory {
 								                      AStarExplanationRanker.class,
 								                      PartitionRanker.class,
 		                                              f);
-					}}
+					}
+					}
 				
 				break;
 
+			case 4: //boundary ranker
+				{
+					if (errweights.length == 6)
+						
+					{
+						mNewRankerName = "AvgTypeWeight[";
+					    
+					    for (int j = 0; j<errweights.length; j++){
+						    mNewRankerName += errweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+					    
+					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
+						RankerFactory.putRankerScheme(mNewRankerName,
+								BoundRanker.class,
+			                                          PartitionRanker.class,
+	                                                  f);
+					}
+					else if (funcnames.length != 0 
+							&& funcweights.length == funcnames.length)
+					{
+						mNewRankerName = "WeightedCombined[";
+					    
+					    for (int i = 0; i < funcnames.length; i++){
+						    mNewRankerName += funcnames[i];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "][";
+					    
+					    for (int j = 0; j<funcweights.length; j++){
+						    mNewRankerName += funcweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+					    
+					    IScoringFunction[] mScoreFuncs = new IScoringFunction[funcnames.length];
+					    for (int k = 0; k<funcnames.length; k++){
+					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
+					    }
+						RankerFactory.putRankerScheme(mNewRankerName,
+								BoundRanker.class, 
+								PartitionRanker.class,
+								new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
+						//mNewRankerName = RankerFactory.createWeightedCombined(funcnames, funcweights);
+					}
+					else if (errweights.length == 6)
+					{
+						mNewRankerName = "ErrorType[";
+					    
+					    for (int j = 0; j<errweights.length; j++){
+						    mNewRankerName += errweights[j];
+						    mNewRankerName += ",";
+					    }
+					    mNewRankerName += "]";
+						IScoringFunction f = new ErrorTypeScore(errweights);
+						RankerFactory.putRankerScheme(mNewRankerName,
+								BoundRanker.class,
+								                      PartitionRanker.class,
+		                                              f);
+					}
+						
+				}
+				break;
 			default:
 				break;
 				

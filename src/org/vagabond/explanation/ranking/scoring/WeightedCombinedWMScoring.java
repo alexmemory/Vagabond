@@ -4,10 +4,6 @@
 package org.vagabond.explanation.ranking.scoring;
 
 import java.util.Collection;
-import java.util.Iterator;
-
-import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 

@@ -4,20 +4,11 @@
 package org.vagabond.explanation.ranking.scoring;
 
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
-import org.vagabond.explanation.ranking.DummyRanker;
-import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
 
 /**
  * @author lord_pretzel

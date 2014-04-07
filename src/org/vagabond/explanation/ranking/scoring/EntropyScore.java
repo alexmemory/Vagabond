@@ -4,29 +4,16 @@
 package org.vagabond.explanation.ranking.scoring;
 
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISchemaMarker;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
-import org.vagabond.explanation.marker.IAttributeValueMarker;
-import org.vagabond.explanation.marker.TupleMarker;
 import org.vagabond.explanation.model.ExplanationFactory;
-
-import static org.vagabond.explanation.model.ExplanationFactory.*;
 
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
-import org.vagabond.explanation.ranking.DummyRanker;
-import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
 import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 
 /**
@@ -40,8 +27,8 @@ public class EntropyScore implements IScoringFunction {
 	public int getScore(IBasicExplanation expl) {
 		/*for single error, entropy is always 0.
 		 */
-		IMarkerSet a = expl.getRealExplains();
-		int explsize = a.getSize();
+		//IMarkerSet a = expl.getRealExplains();
+		//int explsize = a.getSize();
 		
 		return 0;
 
