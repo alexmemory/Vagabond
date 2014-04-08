@@ -12,6 +12,12 @@ public class SideEffectSizeScore implements IScoringFunction {
 	public static final IScoringFunction inst = new SideEffectSizeScore();
 	
 	@Override
+	public int getFTypeCode()
+	{
+		return SideEffect_Size_Score;
+	}
+	
+	@Override
 	public int getScore(IBasicExplanation expl) {
 		return expl.getRealTargetSideEffectSize();
 	}

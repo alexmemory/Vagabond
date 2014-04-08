@@ -4,22 +4,16 @@
 package org.vagabond.explanation.ranking.scoring;
 
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
-import org.vagabond.explanation.ranking.DummyRanker;
-import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
 
 /**
  * @author Zhen
@@ -27,11 +21,17 @@ import org.vagabond.explanation.ranking.scoring.IScoringFunction.Monotonicity;
  */
 public class AvgErrTypeWeightScore implements IScoringFunction {
 	public double[] errweights;
-
+    
 	public AvgErrTypeWeightScore (double[] weights) {
 		this.errweights = weights;
 	}
 
+	@Override
+	public int getFTypeCode()
+	{
+		return Avg_ErrTypeWeight_Score;
+	}
+	
 	public double getErrorWeight(ExplanationType errortype){
 		double retV = 0;
 		switch (errortype){
