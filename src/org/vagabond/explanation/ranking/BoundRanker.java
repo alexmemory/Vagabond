@@ -80,7 +80,7 @@ public class BoundRanker implements IExplanationRanker {
     {
     	/*
 		 * each FullRankedQueue node:
-		 * Q1: <FullExplSet1, ExplIndexVec1:[0, -1, -1], score1, VecSize1>
+//		 * Q1: <FullExplSet1, ExplIndexVec1:[0, -1, -1], score1, VecSize1, actualSizeofExplSet>
 		 */
     	IExplanationSet fullExplSet;
     	int explIdxVec[];
