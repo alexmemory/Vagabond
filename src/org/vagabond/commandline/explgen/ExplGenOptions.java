@@ -63,8 +63,11 @@ public class ExplGenOptions {
 	@Option(name = "-funcnames", usage = "list of scoring functions")
 	private String funcnames = null;
 	
-	@Option(name = "-newranker", usage = "1: AverageTypeWeight; 2: WeightedCombined; 3: ErrorType")
-	private int newranker = 0;
+	@Option(name = "-newfunc", usage = "1: WeightedCombined; 2: ErrorType; 3: ExplanationHomogenity; 4: AveragedTypeWeight")
+	private int newfunc= 0;
+
+	@Option(name = "-boundranker", usage = "1: Use boundary ranker; 0: Use default ranker")
+	private int boundranker= 0;
 	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
@@ -163,9 +166,9 @@ public class ExplGenOptions {
 	}
 
 	public String getRankerScheme() {
-		if (this.newranker > 0 )
+		if (this.newfunc > 0 )
 		{
-			rankerScheme = RankerFactory.RankerSchemeConstructor(this.newranker, this.getScoreFuncNames(), this.getScoreFuncWeights(), this.getErrorWeights());
+			rankerScheme = RankerFactory.RankerSchemeConstructor(this.boundranker, this.newfunc, this.getScoreFuncNames(), this.getScoreFuncWeights(), this.getErrorWeights());
 		}
 		
         return rankerScheme;
