@@ -60,6 +60,16 @@ public class RankerFactory {
 				PartitionRanker.class,
 				ExplanationSizeScore.inst));
 
+		inst.rankerSchemes.put("SideEffectBound", inst.new RankScheme (
+				BoundRanker.class, 
+				PartitionRanker.class,
+				SideEffectSizeScore.inst));
+		
+		inst.rankerSchemes.put("ExplSizeBound", inst.new RankScheme (
+				BoundRanker.class,
+				PartitionRanker.class,
+				ExplanationSizeScore.inst));
+		
 	}
 	
 
@@ -67,32 +77,16 @@ public class RankerFactory {
 		inst.rankerSchemes.put(name, inst.new RankScheme(singleRanker, partRanker, f));
 	}
 	
-	public static String RankerSchemeConstructor(int rankertype, String[] funcnames, double[] funcweights, double[] errweights){		
+	public static String RankerSchemeConstructor(int rankertype, int functype, String[] funcnames, double[] funcweights, double[] errweights){		
 		String mNewRankerName = "";
-		
-		switch (rankertype){
+		//rankertype: 0: default rankers
+		//            1: boundary ranker
+		//functype: 1:WeightedCombined
+		//          2:ErrorType
+		//          3:ExplanationHomogenity
+		//          4:AveragedTypeWeight
+		switch (functype){
 			case 1:
-				{
-					if (errweights.length == 6)
-					
-					{
-						mNewRankerName = "AvgTypeWeight[";
-					    
-					    for (int j = 0; j<errweights.length; j++){
-						    mNewRankerName += errweights[j];
-						    mNewRankerName += ",";
-					    }
-					    mNewRankerName += "]";
-					    
-					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
-						RankerFactory.putRankerScheme(mNewRankerName,
-			                                          AStarExplanationRanker.class,
-			                                          PartitionRanker.class,
-	                                                  f);
-					}
-				}
-				break;
-			case 2:
 				{
 					if (funcnames.length != 0 
 							&& funcweights.length == funcnames.length)
@@ -115,15 +109,27 @@ public class RankerFactory {
 					    for (int k = 0; k<funcnames.length; k++){
 					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
 					    }
-						RankerFactory.putRankerScheme(mNewRankerName,
-								WeightedAStarExplanationRanker.class, 
-								PartitionRanker.class,
-								new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
+
+					    if (rankertype == 1)
+						{
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+			                                          BoundRanker.class,
+			                                          PartitionRanker.class,
+			                                          new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
+						}
+					    else
+					    {
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+									
+					    			WeightedAStarExplanationRanker.class,
+	                                PartitionRanker.class,
+	                                new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
+					    }
 						//mNewRankerName = RankerFactory.createWeightedCombined(funcnames, funcweights);
 					}
 				}
 				break;
-			case 3:
+			case 2:
 				{
 					if (errweights.length == 6)
 					{
@@ -135,19 +141,56 @@ public class RankerFactory {
 					    }
 					    mNewRankerName += "]";
 						IScoringFunction f = new ErrorTypeScore(errweights);
-						RankerFactory.putRankerScheme(mNewRankerName,
-								                      AStarExplanationRanker.class,
-								                      PartitionRanker.class,
-		                                              f);
+					    if (rankertype == 1)
+						{
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+			                                          BoundRanker.class,
+			                                          PartitionRanker.class,
+	                                                  f);
+						}
+					    else
+					    {
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+									
+	                                AStarExplanationRanker.class,
+	                                PartitionRanker.class,
+	                                f);
+					    }
+
 					}
 					}
 				
 				break;
+			case 3:
+				{
 
-			case 4: //boundary ranker
+						mNewRankerName = "EntropyScore";
+						IScoringFunction f = new ErrorTypeScore(errweights);
+					    
+					    if (rankertype == 1)
+						{
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+			                                          BoundRanker.class,
+			                                          PartitionRanker.class,
+	                                                  f);
+						}
+					    else
+					    {
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+									
+	                                AStarExplanationRanker.class,
+	                                PartitionRanker.class,
+	                                f);
+					    }
+
+					
+					}
+				
+				break;
+			case 4:
 				{
 					if (errweights.length == 6)
-						
+					
 					{
 						mNewRankerName = "AvgTypeWeight[";
 					    
@@ -158,54 +201,23 @@ public class RankerFactory {
 					    mNewRankerName += "]";
 					    
 					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
-						RankerFactory.putRankerScheme(mNewRankerName,
-								BoundRanker.class,
+					    
+					    if (rankertype == 1)
+						{
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+			                                          BoundRanker.class,
 			                                          PartitionRanker.class,
 	                                                  f);
+						}
+					    else
+					    {
+					    	RankerFactory.putRankerScheme(mNewRankerName,
+									
+	                                AStarExplanationRanker.class,
+	                                PartitionRanker.class,
+	                                f);
+					    }
 					}
-					else if (funcnames.length != 0 
-							&& funcweights.length == funcnames.length)
-					{
-						mNewRankerName = "WeightedCombined[";
-					    
-					    for (int i = 0; i < funcnames.length; i++){
-						    mNewRankerName += funcnames[i];
-						    mNewRankerName += ",";
-					    }
-					    mNewRankerName += "][";
-					    
-					    for (int j = 0; j<funcweights.length; j++){
-						    mNewRankerName += funcweights[j];
-						    mNewRankerName += ",";
-					    }
-					    mNewRankerName += "]";
-					    
-					    IScoringFunction[] mScoreFuncs = new IScoringFunction[funcnames.length];
-					    for (int k = 0; k<funcnames.length; k++){
-					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
-					    }
-						RankerFactory.putRankerScheme(mNewRankerName,
-								BoundRanker.class, 
-								PartitionRanker.class,
-								new WeightedCombinedWMScoring(mScoreFuncs, funcweights));
-						//mNewRankerName = RankerFactory.createWeightedCombined(funcnames, funcweights);
-					}
-					else if (errweights.length == 6)
-					{
-						mNewRankerName = "ErrorType[";
-					    
-					    for (int j = 0; j<errweights.length; j++){
-						    mNewRankerName += errweights[j];
-						    mNewRankerName += ",";
-					    }
-					    mNewRankerName += "]";
-						IScoringFunction f = new ErrorTypeScore(errweights);
-						RankerFactory.putRankerScheme(mNewRankerName,
-								BoundRanker.class,
-								                      PartitionRanker.class,
-		                                              f);
-					}
-						
 				}
 				break;
 			default:
