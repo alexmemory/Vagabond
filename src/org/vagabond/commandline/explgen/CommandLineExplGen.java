@@ -70,6 +70,8 @@ public class CommandLineExplGen {
 
 	private void createExpls(PrintStream out) throws Exception {
 		long startTime = System.nanoTime();
+		if (options.useBoundRanker())
+		{}
 		if (options.isUseRanker()) {
 			PartitionExplanationGenerator partGen =
 					new PartitionExplanationGenerator();
