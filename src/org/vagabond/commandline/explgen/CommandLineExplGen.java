@@ -69,6 +69,9 @@ public class CommandLineExplGen {
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
+		long startTime = System.nanoTime();
+		if (options.useBoundRanker())
+		{}
 		if (options.isUseRanker()) {
 			PartitionExplanationGenerator partGen =
 					new PartitionExplanationGenerator();
@@ -123,6 +126,8 @@ public class CommandLineExplGen {
 
 			col = gen.findExplanations(markers);
 			out.println(col);
+			long endTime = System.nanoTime();
+			out.println("Error Explanation Generation took " + (endTime - startTime) + " nanoseconds");
 		}
 	}
 

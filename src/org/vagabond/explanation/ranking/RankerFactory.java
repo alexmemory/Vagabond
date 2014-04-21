@@ -77,7 +77,7 @@ public class RankerFactory {
 		inst.rankerSchemes.put(name, inst.new RankScheme(singleRanker, partRanker, f));
 	}
 	
-	public static String RankerSchemeConstructor(int rankertype, int functype, String[] funcnames, double[] funcweights, double[] errweights){		
+	public static String RankerSchemeConstructor(boolean UseBoundRanker, int functype, String[] funcnames, double[] funcweights, double[] errweights){		
 		String mNewRankerName = "";
 		//rankertype: 0: default rankers
 		//            1: boundary ranker
@@ -110,7 +110,7 @@ public class RankerFactory {
 					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
 					    }
 
-					    if (rankertype == 1)
+					    if (UseBoundRanker)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -141,7 +141,7 @@ public class RankerFactory {
 					    }
 					    mNewRankerName += "]";
 						IScoringFunction f = new ErrorTypeScore(errweights);
-					    if (rankertype == 1)
+					    if (UseBoundRanker)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -167,7 +167,7 @@ public class RankerFactory {
 						mNewRankerName = "EntropyScore";
 						IScoringFunction f = new ErrorTypeScore(errweights);
 					    
-					    if (rankertype == 1)
+					    if (UseBoundRanker)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -202,7 +202,7 @@ public class RankerFactory {
 					    
 					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
 					    
-					    if (rankertype == 1)
+					    if (UseBoundRanker)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
