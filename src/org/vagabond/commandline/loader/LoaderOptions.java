@@ -38,6 +38,9 @@ public class LoaderOptions {
 	@Option(name="--validate-only", usage="only validate mapping XML file")
 	private boolean onlyValidate = false;
 	
+	@Option(name="--boundranker", usage="choose generic boundary ranker")
+	private boolean boundranker = false;
+	
 	@Option(name="--output", usage="output mapping in format (xml = Tramp XML mapping file, map = .map file)")
 	private OutputFormat outForm = OutputFormat.none;
 	
@@ -120,6 +123,14 @@ public class LoaderOptions {
 
 	public void setOnlyValidate(boolean onlyValidate) {
 		this.onlyValidate = onlyValidate;
+	}
+	
+	public boolean isBoundaryRanker() {
+		return boundranker;
+	}
+
+	public void setBoundaryRanker(boolean boundranker) {
+		this.boundranker = boundranker;
 	}
 
 	public OutputFormat getOutForm() {

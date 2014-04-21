@@ -195,6 +195,25 @@ public class BoundRanker implements IExplanationRanker {
 		{
 			PartialQNode topCandidate = PartialRankedQueue.poll();
 			
+            
+            if  (topCandidate.expandStep < SizeOfMarkerSet)
+            {
+
+          	  FullQNode newFullRankNode = new FullQNode();
+          	  newFullRankNode.fullExplSet = topCandidate.partialExplSet;
+          	  newFullRankNode.explIdxVec  = topCandidate.explIdxVec;
+          	  newFullRankNode.fullScore   = topCandidate.partialscore;
+          	  newFullRankNode.vecSize     = topCandidate.expandStep;
+          	  newFullRankNode.actualExplCount = topCandidate.actualExplCount;
+                FullRankedQueue.add(newFullRankNode);
+                ResultSize ++;
+                
+                generateUpTo(upTo);
+                
+            }
+            
+        
+		
 			 while (topCandidate.explIdxVec[topCandidate.expandStep] != EXPL_NOT_SET && topCandidate.expandStep < SizeOfMarkerSet)
 			 {
 				 topCandidate.expandStep++;
@@ -218,25 +237,10 @@ public class BoundRanker implements IExplanationRanker {
 		         copyQnode.partialExplSet.add(singleExpl);
 		                 
 		         copyQnode.partialscore = f.getScore(copyQnode.partialExplSet);
-		                  
-		                  if  (copyQnode.expandStep < SizeOfMarkerSet)
-		                  {
-		                      PartialRankedQueue.add(copyQnode);
-		                  }
-		                  else
-		                  {
-		                	  FullQNode newFullRankNode = new FullQNode();
-		                	  newFullRankNode.fullExplSet = copyQnode.partialExplSet;
-		                	  newFullRankNode.explIdxVec  = copyQnode.explIdxVec;
-		                	  newFullRankNode.fullScore   = copyQnode.partialscore;
-		                	  newFullRankNode.vecSize     = copyQnode.expandStep;
-		                	  newFullRankNode.actualExplCount = copyQnode.actualExplCount;
-		                      FullRankedQueue.add(newFullRankNode);
-		                      ResultSize ++;
-		                      
-		                  }
-		                  
-		              }
+		         
+		         PartialRankedQueue.add(copyQnode);
+
+		      }
 		         
 				// everything complete -> we are done with ranking
 				if (PartialRankedQueue == null) {
