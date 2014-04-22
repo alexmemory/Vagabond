@@ -112,12 +112,13 @@ public class ScenarioDictionary {
 		return "target." + rel.getName();
 	}
 	
+	//if the toLowerCase() is not included, the relation name compare will fail
+	//for error explanation generator?
 	public int getRelId (String relName) throws Exception {
-		RelationType rel;
-		
+		RelationType rel;		
 		for(int i=0; i < rels.size(); i++) {
 			rel = rels.get(i);
-			if (rel.getName().equals(relName))
+			if (rel.getName().toLowerCase().equals(relName.toLowerCase()))
 				return i;
 		}
 		
