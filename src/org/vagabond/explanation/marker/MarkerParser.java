@@ -143,7 +143,7 @@ public class MarkerParser {
 			result.add(parseMarker(elem));
 		}
 		
-		if (log.isDebugEnabled()) {log.debug("parsed marker set: <" + result + ">");};
+		if (log.isDebugEnabled()) {log.debug("parsed marker set: <" + result.toString() + ">");};
 		
 		return result;
 	}

@@ -210,6 +210,8 @@ public class AttrGranularitySourceProvenanceSideEffectGenerator extends
 				}
 			}
 		}
+		System.out.println("asdadads===conditions.length():"+conditions.length());
+		
 		conditions.delete(conditions.length() - 4, conditions.length() - 1);
 		conditions.append(")");
 		
