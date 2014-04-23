@@ -85,6 +85,7 @@ public class ResultSetUtil {
 		char[] chars;
 		StringBuffer temp;
 		
+	    System.out.println("splitProvAttrName --input name is:"+name+"\n");
 		result = new Vector<String> ();
 		temp = new StringBuffer ();
 		chars = name.toCharArray();
@@ -102,7 +103,7 @@ public class ResultSetUtil {
 			}
 		}
 		result.add(temp.toString());
-		
+		System.out.println("result.toArray(new String[] {}) is:"+result.toArray()+"\n");
 		return result.toArray(new String[] {});
 	}
 	
