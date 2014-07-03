@@ -44,7 +44,7 @@
 </Schemas>
 <Correspondences>
 	<Correspondence id="c1">
-		<From tableref="tramp"><Attr>nickname</Attr></From>
+		<From tableref="tramp"><Attr>name</Attr></From>
 		<To tableref="person"><Attr>name</Attr></To>
 	</Correspondence>
 	<Correspondence id="c2">
@@ -59,14 +59,13 @@
 <Mappings>
 	<Mapping id="M1">
 		<Uses>
-			<Correspondence>c1</Correspondence>
-			<Correspondence>c3</Correspondence>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c3" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
 			<Atom tableref="socialworker"><Var>d</Var><Var>e</Var><Var>f</Var></Atom>
-			<Atom tableref="soupkitchen"><Var>c</Var><Var>g</Var><Var>h</Var></Atom>
-			<Atom tableref="soupkitchen"><Var>f</Var><Var>i</Var><Var>j</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>f</Var><Var>g</Var><Var>h</Var></Atom>
 		</Foreach>
 		<Exists>
 			<Atom tableref="person"><Var>a</Var><Var>g</Var></Atom>
@@ -74,12 +73,10 @@
 	</Mapping>
 	<Mapping id="M2">
 		<Uses>
-			<Correspondence>c2</Correspondence>
-			<Correspondence>c3</Correspondence>
+			<Correspondence ref="c2" />
 		</Uses>
 		<Foreach>
 			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
-			<Atom tableref="soupkitchen"><Var>c</Var><Var>d</Var><Var>e</Var></Atom>
 		</Foreach>
 		<Exists>
 			<Atom tableref="person"><Var>b</Var><Var>d</Var></Atom>
@@ -88,42 +85,39 @@
 </Mappings>
 <Transformations>
 	<Transformation id="T1" creates="person">
-		<Implements><Mapping>M1</Mapping><Mapping>M2</Mapping></Implements>
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
 		<Code>
-SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k1.tid::text,'') || '|' || COALESCE(k2.tid::text,'') AS tid,
-	t.nickname AS name, k1.city AS livesin 
-FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
+SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid, 
+t.name, k.city AS livesin 
+FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k 
 WHERE t.caredforby = s.ssn 
-	AND t.firstseen = k1.location 
-	AND s.worksfor = k2.location 
-UNION ALL
-SELECT COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
-	s.name,	k.city AS livesin
-FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
-WHERE s.worksfor = k.location
+	AND s.worksfor = k.location 
+UNION 
+SELECT s.tid::text AS tid, s.name, NULL AS livesin
+FROM source.socialworker ANNOT('M2') s 
 		</Code>
 	</Transformation>
 </Transformations>
 <ConnectionInfo>
 	<Host>localhost</Host>
 	<DB>tramptest</DB>
-	<User>jiang</User>
+	<User>lordpretzel</User>
 	<Password/>
 	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<InstanceFile name="tramp">
-		<Path>resource/exampleScenarios</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>tramp.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
 	<InstanceFile name="socialworker">
-		<Path>resource/exampleScenarios</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>socialworker.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
 	<InstanceFile name="soupkitchen">
-		<Path>resource/exampleScenarios</Path>
+		<Path>/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/exampleScenarios</Path>
 		<FileName>soupkitchen.csv</FileName>
 		<ColumnDelim>,</ColumnDelim>
 	</InstanceFile>
