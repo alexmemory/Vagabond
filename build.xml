@@ -150,7 +150,17 @@
 	</target>
 
 	<target name="JarForSTBench" depends="Compile,GenerateXMLbindings">
-		<jar destfile="${basedir}/../STBenchmark/lib/trampexgen.jar" basedir="${binarydir}">
+		<jar destfile="${basedir}/../iBench/lib/trampexgen.jar" basedir="${binarydir}">
+			<manifest>
+				<attribute name="Main-Class" value="${loaderMainClass}" />
+				<attribute name="Created-By" value="University of Toronto" />
+				<attribute name="Class-Path" value="${fullJarClasspath}" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="JarForVagabondRCP" depends="Compile,GenerateXMLbindings">
+		<jar destfile="${basedir}/../iBench/lib/trampexgen.jar" basedir="${binarydir}">
 			<manifest>
 				<attribute name="Main-Class" value="${loaderMainClass}" />
 				<attribute name="Created-By" value="University of Toronto" />
