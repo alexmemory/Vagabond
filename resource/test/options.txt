@@ -1,6 +1,6 @@
 Host=127.0.0.1
-DB=tramptest
-User=zhen
+DB=test
+User=zwork
 Password=
 Schema=source
 Port=5432

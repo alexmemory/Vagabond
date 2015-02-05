@@ -63,11 +63,11 @@ public class ExplGenOptions {
 	@Option(name = "-funcnames", usage = "list of scoring functions")
 	private String funcnames = null;
 	
-	@Option(name = "-newfunc", usage = "1: WeightedCombined; 2: ErrorType; 3: ExplanationHomogenity; 4: AveragedTypeWeight")
+	@Option(name = "-newfunc", usage = "1: WeightedCombined; 2: ErrorType; 3: ExplanationHomogenity;")
 	private int newfunc= 0;
 
-	@Option(name = "-boundranker", usage = "Use boundary ranker")
-	private boolean boundranker = false;
+	@Option(name = "-boundranker", usage = "1:Use boundary ranker; 0: default ranker")
+	private int boundranker = 0;
 	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
@@ -166,11 +166,8 @@ public class ExplGenOptions {
 	}
 
 	public String getRankerScheme() {
-		if (this.newfunc > 0 )
-		{
-			rankerScheme = RankerFactory.RankerSchemeConstructor(this.useBoundRanker(), this.newfunc, this.getScoreFuncNames(), this.getScoreFuncWeights(), this.getErrorWeights());
-		}
-		
+			rankerScheme = RankerFactory.RankerSchemeConstructor(this.boundranker, this.newfunc, this.getScoreFuncNames(), this.getScoreFuncWeights(), this.getErrorWeights());
+			
         return rankerScheme;
 	}
 
@@ -201,12 +198,12 @@ public class ExplGenOptions {
 		return skylineRankers;
 	}
 	
-	public boolean useBoundRanker()
+	public int useBoundRanker()
 	{
 		return boundranker;
 	}
 	
-	public void setBoundRanker(boolean boundranker)
+	public void setBoundRanker(int boundranker)
 	{
 		this.boundranker = boundranker;
 	}
@@ -214,11 +211,15 @@ public class ExplGenOptions {
 	
 	public String[] getScoreFuncNames() {
 		String[] mFuncNames;
+		if (funcnames == null)
+			return null;
 		mFuncNames = funcnames.split(",");
 		return mFuncNames;
 	}
 
 	public double[] getScoreFuncWeights() {
+		if (funcweights == null)
+			return null;
 		double[] mFuncWeights = new double[funcweights.split(",").length];
 		for (int i = 0; i < mFuncWeights.length; i++)
 		{
@@ -228,6 +229,8 @@ public class ExplGenOptions {
 	}
 
 	public double[] getErrorWeights() {
+		if (funcweights == null)
+			return null;
 		double[] mErrWeights = new double[funcweights.split(",").length];
 		for (int i = 0; i < mErrWeights.length; i++)
 		{

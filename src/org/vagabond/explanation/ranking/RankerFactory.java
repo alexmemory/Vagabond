@@ -11,6 +11,7 @@ import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.scoring.AvgErrTypeWeightScore;
+import org.vagabond.explanation.ranking.scoring.EntropyScore;
 import org.vagabond.explanation.ranking.scoring.ErrorTypeScore;
 import org.vagabond.explanation.ranking.scoring.ExplanationSizeScore;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
@@ -77,14 +78,13 @@ public class RankerFactory {
 		inst.rankerSchemes.put(name, inst.new RankScheme(singleRanker, partRanker, f));
 	}
 	
-	public static String RankerSchemeConstructor(boolean UseBoundRanker, int functype, String[] funcnames, double[] funcweights, double[] errweights){		
+	public static String RankerSchemeConstructor(int UseBoundRanker, int functype, String[] funcnames, double[] funcweights, double[] errweights){		
 		String mNewRankerName = "";
 		//rankertype: 0: default rankers
 		//            1: boundary ranker
 		//functype: 1:WeightedCombined
 		//          2:ErrorType
 		//          3:ExplanationHomogenity
-		//          4:AveragedTypeWeight
 		switch (functype){
 			case 1:
 				{
@@ -110,7 +110,7 @@ public class RankerFactory {
 					    	mScoreFuncs[k] = inst.getScoreFunction(funcnames[k]);
 					    }
 
-					    if (UseBoundRanker)
+					    if (UseBoundRanker == 1)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -141,7 +141,7 @@ public class RankerFactory {
 					    }
 					    mNewRankerName += "]";
 						IScoringFunction f = new ErrorTypeScore(errweights);
-					    if (UseBoundRanker)
+					    if (UseBoundRanker == 1)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -165,9 +165,9 @@ public class RankerFactory {
 				{
 
 						mNewRankerName = "EntropyScore";
-						IScoringFunction f = new ErrorTypeScore(errweights);
+						IScoringFunction f = new EntropyScore();
 					    
-					    if (UseBoundRanker)
+					    if (UseBoundRanker == 1)
 						{
 					    	RankerFactory.putRankerScheme(mNewRankerName,
 			                                          BoundRanker.class,
@@ -177,7 +177,6 @@ public class RankerFactory {
 					    else
 					    {
 					    	RankerFactory.putRankerScheme(mNewRankerName,
-									
 	                                AStarExplanationRanker.class,
 	                                PartitionRanker.class,
 	                                f);
@@ -187,40 +186,8 @@ public class RankerFactory {
 					}
 				
 				break;
-			case 4:
-				{
-					if (errweights.length == 6)
-					
-					{
-						mNewRankerName = "AvgTypeWeight[";
-					    
-					    for (int j = 0; j<errweights.length; j++){
-						    mNewRankerName += errweights[j];
-						    mNewRankerName += ",";
-					    }
-					    mNewRankerName += "]";
-					    
-					    IScoringFunction f = new AvgErrTypeWeightScore(errweights);
-					    
-					    if (UseBoundRanker)
-						{
-					    	RankerFactory.putRankerScheme(mNewRankerName,
-			                                          BoundRanker.class,
-			                                          PartitionRanker.class,
-	                                                  f);
-						}
-					    else
-					    {
-					    	RankerFactory.putRankerScheme(mNewRankerName,
-									
-	                                AStarExplanationRanker.class,
-	                                PartitionRanker.class,
-	                                f);
-					    }
-					}
-				}
-				break;
 			default:
+				mNewRankerName = "Dummy";
 				break;
 				
 		}
