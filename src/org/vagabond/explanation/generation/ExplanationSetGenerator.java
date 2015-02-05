@@ -21,11 +21,11 @@ public class ExplanationSetGenerator {
 	public ExplanationSetGenerator () {
 		generators = new ArrayList<ISingleExplanationGenerator> ();
 		generators.add(new CopySourceExplanationGenerator());
-		generators.add(new CorrespondencExplanationGenerator());
-		generators.add(new InfluenceSourceExplanationGenerator());
+//		generators.add(new CorrespondencExplanationGenerator());
+//		generators.add(new InfluenceSourceExplanationGenerator());
 		generators.add(new SuperfluousMappingExplanationGenerator());
-		generators.add(new SourceSkeletonMappingExplanationGenerator());
-		generators.add(new TargetSkeletonMappingExplanationGenerator());
+//		generators.add(new SourceSkeletonMappingExplanationGenerator());
+//		generators.add(new TargetSkeletonMappingExplanationGenerator());
 	}
 	
 	public ExplanationCollection findExplanations (IMarkerSet errors) throws Exception {

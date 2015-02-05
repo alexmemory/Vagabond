@@ -14,6 +14,7 @@ import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
@@ -29,6 +30,14 @@ public class SuperfluousMappingExplanationGenerator
 	private IAttributeValueMarker error;
 	private SuperflousMappingError expl;
 	private Set<MappingType> maps;
+	private Map<Set<MappingType>,SuperflousMappingError> explsForMap;
+	private Map<MappingType,SuperflousMappingError> explForOneMap;
+	
+	public SuperfluousMappingExplanationGenerator () {
+		explsForMap = new HashMap<Set<MappingType>,SuperflousMappingError> ();
+		explForOneMap = new HashMap<MappingType,SuperflousMappingError> ();
+	}
+	
 	
 	@Override
 	public IExplanationSet findExplanations(ISingleMarker errorMarker)
