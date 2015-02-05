@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 public class LogProviderHolder implements LogProvider {
 
-	private static LogProviderHolder instance = new LogProviderHolder();
+	private static LogProviderHolder instance = null;
 	private LogProvider provider = null;
 	
 	private LogProviderHolder () {
@@ -12,6 +12,8 @@ public class LogProviderHolder implements LogProvider {
 	}
 	
 	public static LogProviderHolder getInstance () {
+		if (instance == null)
+			instance = new LogProviderHolder();
 		return instance;
 	}
 	
