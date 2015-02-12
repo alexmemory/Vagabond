@@ -57,10 +57,19 @@ public class SuperfluousMappingExplanationGenerator
 		Map<String, Set<String>> affRels;
 		Set<String> mapSet;
 		String relName;
+
+		//
+		if (explsForMap.containsKey(maps))
+		{
+			expl = explsForMap.get(maps);
+			result.addExplanation(expl);
+			return;
+		}
 		
 		expl = new SuperflousMappingError(error);
 		affRels = new HashMap<String, Set<String>> ();
-		
+		explsForMap.put(maps, expl);
+				
 		for(MappingType map: maps) {
 			expl.addMapSE(map);
 			
@@ -73,6 +82,8 @@ public class SuperfluousMappingExplanationGenerator
 				mapSet.add(map.getId());
 			}
 		}
+		
+
 		
 		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
 				affRels.keySet()));
