@@ -17,6 +17,7 @@ import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.SourceSkeletonMappingError;
+import org.vagabond.explanation.model.basic.SuperflousMappingError;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LogProviderHolder;
@@ -31,7 +32,12 @@ public class SourceSkeletonMappingExplanationGenerator implements
 	private IAttributeValueMarker error;
 	private SourceSkeletonMappingError expl;
 	private Set<MappingType> maps;
+	private Map<Set<MappingType>,SourceSkeletonMappingError> explsForMap;
 
+	public SourceSkeletonMappingExplanationGenerator () {
+		explsForMap = new HashMap<Set<MappingType>,SourceSkeletonMappingError> ();
+	}
+	
 	@Override
 	public IExplanationSet findExplanations(ISingleMarker errorMarker)
 			throws Exception {
@@ -59,81 +65,91 @@ public class SourceSkeletonMappingExplanationGenerator implements
 		
 		Map<String, RelAttrMapSet> affRels = new HashMap<String, RelAttrMapSet>();
 		RelAttrMapSet relAttrMapSet;
+
+		// Cashing Results 
+		if (explsForMap.containsKey(maps)) {
+			
+			expl = explsForMap.get(maps);
+			
+		} else {
 		
-		expl = new SourceSkeletonMappingError(error);
-		
-		String relName = error.getRel();
-		String attrName = error.getAttrName();
-		int errpos = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
-		String varName = null;
-		
-		for(MappingType map: maps) {
-			// mappings with a single source atom cannot join wrong.
-			if (map.getForeach().getAtomArray().length == 1)
-				continue;
+			expl = new SourceSkeletonMappingError(error);
 			
-			expl.addMap(map);
+			String relName = error.getRel();
+			String attrName = error.getAttrName();
+			int errpos = ScenarioDictionary.getInstance().getAttrId(relName, attrName);
+			String varName = null;
 			
-			// 1st step: find the var name for the error in the target
-			RelAtomType[] targetRels = map.getExists().getAtomArray();
-			for (RelAtomType targetRel: targetRels) {
-				if (targetRel.getTableref().equals(relName)) {
-					varName = targetRel.getVarArray(errpos);
-					break;
-				}
-			}
-			
-			// 2nd step: find all the relations that have the same var name in the source
-			// and store the attributes of these relations in a set.
-			HashSet<String> sideEffectAttrs = new HashSet<String>();
-			
-			for (RelAtomType sourceRel: map.getForeach().getAtomArray()) {
-				String[] varNames = sourceRel.getVarArray();
-				for (String v: varNames) {
-					if (v.equals(varName)) {
-						sideEffectAttrs.addAll(Arrays.asList(varNames));
+			for(MappingType map: maps) {
+				// mappings with a single source atom cannot join wrong.
+				if (map.getForeach().getAtomArray().length == 1)
+					continue;
+				
+				expl.addMap(map);
+				
+				// 1st step: find the var name for the error in the target
+				RelAtomType[] targetRels = map.getExists().getAtomArray();
+				for (RelAtomType targetRel: targetRels) {
+					if (targetRel.getTableref().equals(relName)) {
+						varName = targetRel.getVarArray(errpos);
 						break;
 					}
 				}
-			}
-			
-			//TODO check that we actually have more than one source atom, otherwise there is no such explanation
-			// and that at least one of the atoms which contain "varName" are actually joined with this atom
-			//TODO all mappings generating attribute value should have a join error, otherwise mapping not correct
-			// 3rd step: find the attributes in the target that appear in the list
-			// found in the 2nd step.
-			for (RelAtomType targetRel: targetRels) {
-				String targetRelName = targetRel.getTableref();
-				String[] varNames = targetRel.getVarArray();
-				int vpos = 0;
-				for (String v: varNames) {
-					if (sideEffectAttrs.contains(v)) {
-						if (!affRels.containsKey(targetRelName)) {
-							affRels.put(targetRelName, new RelAttrMapSet());
+				
+				// 2nd step: find all the relations that have the same var name in the source
+				// and store the attributes of these relations in a set.
+				HashSet<String> sideEffectAttrs = new HashSet<String>();
+				
+				for (RelAtomType sourceRel: map.getForeach().getAtomArray()) {
+					String[] varNames = sourceRel.getVarArray();
+					for (String v: varNames) {
+						if (v.equals(varName)) {
+							sideEffectAttrs.addAll(Arrays.asList(varNames));
+							break;
 						}
-						relAttrMapSet = affRels.get(targetRelName);
-						relAttrMapSet.mapSet.add(map.getId());
-						String targetAttrName = ScenarioDictionary.getInstance()
-												.getAttrName(targetRelName, vpos);
-						relAttrMapSet.attrSet.add(targetAttrName);
 					}
-					vpos++;
+				}
+				
+				//TODO check that we actually have more than one source atom, otherwise there is no such explanation
+				// and that at least one of the atoms which contain "varName" are actually joined with this atom
+				//TODO all mappings generating attribute value should have a join error, otherwise mapping not correct
+				// 3rd step: find the attributes in the target that appear in the list
+				// found in the 2nd step.
+				for (RelAtomType targetRel: targetRels) {
+					String targetRelName = targetRel.getTableref();
+					String[] varNames = targetRel.getVarArray();
+					int vpos = 0;
+					for (String v: varNames) {
+						if (sideEffectAttrs.contains(v)) {
+							if (!affRels.containsKey(targetRelName)) {
+								affRels.put(targetRelName, new RelAttrMapSet());
+							}
+							relAttrMapSet = affRels.get(targetRelName);
+							relAttrMapSet.mapSet.add(map.getId());
+							String targetAttrName = ScenarioDictionary.getInstance()
+													.getAttrName(targetRelName, vpos);
+							relAttrMapSet.attrSet.add(targetAttrName);
+						}
+						vpos++;
+					}
 				}
 			}
+			
+			expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+					affRels.keySet()));
+			
+			for (String affRel: affRels.keySet()) {
+				computeSideEffects(affRel, affRels.get(affRel).mapSet, 
+						affRels.get(affRel).attrSet);
+			}
+			expl.getTargetSideEffects().remove(error);
+	
+			// we found at least one mapping that may have joined incorrectly
+			if (expl.getMappingSideEffectSize() != 0)
+				result.addExplanation(expl);
+				explsForMap.put(maps, expl);
+			
 		}
-		
-		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
-				affRels.keySet()));
-		
-		for (String affRel: affRels.keySet()) {
-			computeSideEffects(affRel, affRels.get(affRel).mapSet, 
-					affRels.get(affRel).attrSet);
-		}
-		expl.getTargetSideEffects().remove(error);
-
-		// we found at least one mapping that may have joined incorrectly
-		if (expl.getMappingSideEffectSize() != 0)
-			result.addExplanation(expl);
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps, Set<String> attrs) throws Exception {
