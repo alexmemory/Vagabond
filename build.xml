@@ -70,6 +70,7 @@
 	<!-- targets -->
 
 	<target name="CopyResources" depends="Clean">
+		<mkdir dir="${binarydir}"/>
 		<copy todir="${binarydir}">
 			<fileset dir="${sourcedir}">
 				<exclude name="**/*.java" />
