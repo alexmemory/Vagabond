@@ -190,18 +190,25 @@ public class ErrorPartitionGraph {
 	}
 	
 	public List<MarkerSummary> paritionAttrs (MarkerSummary summary) throws Exception {
+		List<MarkerSummary> temp = new ArrayList<MarkerSummary> ();
 		List<MarkerSummary> result = new ArrayList<MarkerSummary> ();
 		
 		getComponents();
 		for(int i = 0; i < components.getRows(); i++) {
-			result.add(new MarkerSummary());
+			temp.add(new MarkerSummary());
 		}
 		
 		for(ISchemaMarker m: summary)
-			result.get(getPartitionForAttr(m)).add(m);
+			temp.get(getPartitionForAttr(m)).add(m);
 		
-		while(result.contains(null))
-			result.remove(null);
+		while(temp.contains(null))
+			temp.remove(null);
+		
+		
+		for(MarkerSummary m: temp) {
+			if (!m.isEmpty())
+				result.add(m);
+		}
 		
 		return result;
 	}

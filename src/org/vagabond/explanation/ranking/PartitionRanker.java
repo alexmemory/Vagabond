@@ -369,6 +369,7 @@ public class PartitionRanker implements IPartitionRanker {
 		
 		for(int i = 0; i < part.size(); i++) {
 			ExplanationCollection col = part.get(i);
+			log.debug("number of errors for part " + i + " is: " + col.getNumErrors());
 			rankers[i] = RankerFactory.createRanker(rankScheme);
 			rankers[i].initialize(col);
 		}
