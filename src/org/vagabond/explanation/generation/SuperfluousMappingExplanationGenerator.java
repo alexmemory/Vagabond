@@ -54,42 +54,42 @@ public class SuperfluousMappingExplanationGenerator
 		Set<String> mapSet;
 		String relName;
 
-		//
+		//Cashing Result
 		if (explsForMap.containsKey(maps))
 		{
 			expl = explsForMap.get(maps);
-			result.addExplanation(expl);
-			return;
-		}
-		
-		expl = new SuperflousMappingError(error);
-		affRels = new HashMap<String, Set<String>> ();
-		explsForMap.put(maps, expl);
-				
-		for(MappingType map: maps) {
-			expl.addMapSE(map);
 			
-			for(RelAtomType atom: map.getExists().getAtomArray()) {
-				relName = atom.getTableref();
-				if (!affRels.containsKey(relName)) {
-					affRels.put(relName, new HashSet<String> ());
-				}
-			}
+		} else {
+		
+			expl = new SuperflousMappingError(error);
+			affRels = new HashMap<String, Set<String>> ();
 					
-			expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
-					affRels.keySet()));
-			
-			for (String affRel: affRels.keySet()) {
-				computeSideEffects(affRel, affRels.get(affRel));
-			}
+			for(MappingType map: maps) {
+				expl.addMapSE(map);
 				
-			expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
-			
-			result.addExplanation(expl);
-			explsForMap.put(maps, expl);
-	
-		}
+				for(RelAtomType atom: map.getExists().getAtomArray()) {
+					relName = atom.getTableref();
+					if (!affRels.containsKey(relName)) {
+						affRels.put(relName, new HashSet<String> ());
+					}
+					mapSet = affRels.get(relName);
+					mapSet.add(map.getId());
+				}
+						
+				expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+						affRels.keySet()));
+				
+				for (String affRel: affRels.keySet()) {
+					computeSideEffects(affRel, affRels.get(affRel));
+				}
+					
+				expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
+				
+				result.addExplanation(expl);
+				explsForMap.put(maps, expl);
 		
+			}
+		}
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps) throws Exception {
