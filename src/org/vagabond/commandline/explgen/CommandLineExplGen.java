@@ -123,25 +123,54 @@ public class CommandLineExplGen {
 			int r = 0;
 			BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
-			while (cont && iter.hasNext()) {
-				String read;
-				IExplanationSet set = iter.next();
-				
-				System.out.println("\n\n*********************************\n*" +
-						"\t\t RANKED " 
-						+ ++r 
-						+ "\n*********************************\n");
-				System.out.println(set.toString());
-				System.out.println("\nContinue [y/n]?");
-				
-				while (!in.ready())
-					Thread.sleep(100);
-				read = in.readLine().trim();
-				
-				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
-				cont = !read.trim().startsWith("n");
+			// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
+			if (options.isRankNonInteractive()) {
+				int i = 1;
+				int max = options.getMaxRank();
+				while (iter.hasNext() && (max == -1 || i <= max)) {
+					long lStartTime = System.nanoTime();
+					
+					IExplanationSet set = iter.next();
+					
+					if (!options.isNoShowSets()) {
+						System.out.println("\n\n*********************************\n*" +
+								"\t\t RANKED " 
+								+ ++r 
+								+ "\n*********************************\n");
+						System.out.println(set.toString());
+					}
+										
+					long lEndTime = System.nanoTime();
+					long difference= (lEndTime - lStartTime);
+					double secs = ((double) difference) / 1000000000.0;
+					
+					System.out.println(String.format("%d: %.8f secs", i, secs));
+					i++;
+				}
 			}
-			
+			// use interactive ranking where the user is asked after each CES whether to continue or not
+			else {
+				while (cont && iter.hasNext()) {
+					String read;
+					IExplanationSet set = iter.next();
+					
+					if (!options.isNoShowSets()) {
+						System.out.println("\n\n*********************************\n*" +
+								"\t\t RANKED " 
+								+ ++r 
+								+ "\n*********************************\n");
+						System.out.println(set.toString());
+						System.out.println("\nContinue [y/n]?");
+					}
+					
+					while (!in.ready())
+						Thread.sleep(100);
+					read = in.readLine().trim();
+					
+					if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
+					cont = !read.trim().startsWith("n");
+				}
+			}
 		}
 		else {
 			ExplanationCollection col;
@@ -236,8 +265,8 @@ public class CommandLineExplGen {
 
 			long lEndTime = new Date().getTime();
 			long difference= (lEndTime - lStartTime);
-			
-			System.out.println(String.format("%.2f", Math.max(.18*(Math.toRadians(difference)/Math.PI),Math.pow(Math.E, Math.log(difference)-Math.log(1000)))) + " secs");
+			double secs = ((double) difference) / 1000.0;
+			System.out.printf("Total: %.2f secs\n", secs);
 		}
 		
 		System.exit(0);
