@@ -54,26 +54,25 @@ public class SuperfluousMappingExplanationGenerator
 		Set<String> mapSet;
 		String relName;
 
-		// Cashing Results 
-		if (explsForMap.containsKey(maps)) {
-			
+		//
+		if (explsForMap.containsKey(maps))
+		{
 			expl = explsForMap.get(maps);
+			result.addExplanation(expl);
+			return;
+		}
+		
+		expl = new SuperflousMappingError(error);
+		affRels = new HashMap<String, Set<String>> ();
+		explsForMap.put(maps, expl);
+				
+		for(MappingType map: maps) {
+			expl.addMapSE(map);
 			
-		} else {
-	
-			expl = new SuperflousMappingError(error);
-			affRels = new HashMap<String, Set<String>> ();
-	
-			for(MappingType map: maps) {
-				expl.addMapSE(map);
-						
-				for(RelAtomType atom: map.getExists().getAtomArray()) {
-					relName = atom.getTableref();
-					if (!affRels.containsKey(relName)) {
-						affRels.put(relName, new HashSet<String> ());
-					}
-					mapSet = affRels.get(relName);
-					mapSet.add(map.getId());
+			for(RelAtomType atom: map.getExists().getAtomArray()) {
+				relName = atom.getTableref();
+				if (!affRels.containsKey(relName)) {
+					affRels.put(relName, new HashSet<String> ());
 				}
 			}
 					
