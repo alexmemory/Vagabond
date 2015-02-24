@@ -53,6 +53,9 @@ public class ExplGenOptions {
 	@Option(name = "-rankExpls", usage = "Rank the generated explanations")
 	private boolean useRanker = false;
 	
+	@Option(name = "-noPart", usage = "Rank the generated explanations without partitioning")
+	private boolean nousePart = false;
+	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
 			metaVar = "[scheme 1] [scheme 2] ...")
@@ -158,6 +161,10 @@ public class ExplGenOptions {
 
 	public boolean isUseRanker() {
 		return useRanker;
+	}
+
+	public boolean noUsePart() {
+		return nousePart;
 	}
 
 	public void setUseRanker(boolean useRanker) {

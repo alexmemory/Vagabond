@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.ranking.IExplanationRanker;
 import org.vagabond.explanation.ranking.IPartitionRanker;
 import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.explanation.ranking.SkylineRanker;
@@ -43,7 +45,7 @@ public class CommandLineExplGen {
 		options = new ExplGenOptions();
 		gen = new ExplanationSetGenerator();
 	}
-
+	 	
 	public void setUpLogger() {
 		PropertyConfigurator.configure("resource/log4jproperties.txt");
 	}
@@ -68,33 +70,55 @@ public class CommandLineExplGen {
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
+		
 		if (options.isUseRanker()) {
-			PartitionExplanationGenerator partGen =
-					new PartitionExplanationGenerator();
-			Iterator<IExplanationSet> iter;
-			partGen.init();
+			Iterator<IExplanationSet> iter = null;
 
-			ExplPartition p = partGen.findExplanations(markers);
+			// No Partitioning
+			if (options.noUsePart()) {
 
-			if (options.getSkylineRankers() != null) {
-				SkylineRanker rank;
-				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
-						+ Arrays.toString(options.getSkylineRankers()));};
-				rank = RankerFactory.createSkylineRanker(
-								options.getSkylineRankers(),
-								options.getRankerScheme(), p);
-				iter = rank;
+				ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();			
+				ExplanationCollection col2 = noPartGen.findExplanations(markers);
+							
+				if (options.getRankerScheme() != null){
+					IExplanationRanker rank;
+
+					if (log.isDebugEnabled()) {
+						log.debug("Create ranker for scheme without partitioning " + options.getRankerScheme());
+					};
+					
+					rank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
+					iter = rank;
+					
+				}
 			}
 			else {
-				IPartitionRanker rank;
-
-				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
-						+ options.getRankerScheme());};
-				rank = RankerFactory.createPartRanker(
-								options.getRankerScheme(), p);
-				iter = rank;
+				
+				PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
+				partGen.init();
+	
+				ExplPartition p = partGen.findExplanations(markers);
+	
+				if (options.getSkylineRankers() != null) {
+					SkylineRanker rank;
+					if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
+							+ Arrays.toString(options.getSkylineRankers()));};
+					rank = RankerFactory.createSkylineRanker(
+									options.getSkylineRankers(),
+									options.getRankerScheme(), p);
+					iter = rank;
+				}
+				else {
+					IPartitionRanker rank;
+	
+					if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
+							+ options.getRankerScheme());};
+					rank = RankerFactory.createPartRanker(
+									options.getRankerScheme(), p);
+					iter = rank;
+				}
 			}
-
+			
 			boolean cont = true;
 			int r = 0;
 			BufferedReader in =
@@ -102,19 +126,22 @@ public class CommandLineExplGen {
 			while (cont && iter.hasNext()) {
 				String read;
 				IExplanationSet set = iter.next();
-
+				
 				System.out.println("\n\n*********************************\n*" +
 						"\t\t RANKED " 
 						+ ++r 
 						+ "\n*********************************\n");
 				System.out.println(set.toString());
 				System.out.println("\nContinue [y/n]?");
+				
 				while (!in.ready())
 					Thread.sleep(100);
 				read = in.readLine().trim();
+				
 				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
 				cont = !read.trim().startsWith("n");
 			}
+			
 		}
 		else {
 			ExplanationCollection col;
@@ -199,11 +226,21 @@ public class CommandLineExplGen {
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
+		
+		for (int i = 0; i < 1; i++) {
+			
+			long lStartTime = new Date().getTime();
+		
+			if (!inst.execute(args))
+				System.exit(1);
 
-		if (!inst.execute(args))
-			System.exit(1);
-
+			long lEndTime = new Date().getTime();
+			long difference= (lEndTime - lStartTime);
+			
+			System.out.println(String.format("%.2f", Math.max(.18*(Math.toRadians(difference)/Math.PI),Math.pow(Math.E, Math.log(difference)-Math.log(1000)))) + " secs");
+		}
+		
 		System.exit(0);
+		 
 	}
-
 }
