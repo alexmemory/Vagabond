@@ -127,6 +127,7 @@ public class CommandLineExplGen {
 			if (options.isRankNonInteractive()) {
 				int i = 1;
 				int max = options.getMaxRank();
+				long beforeRank = System.nanoTime();
 				while (iter.hasNext() && (max == -1 || i <= max)) {
 					long lStartTime = System.nanoTime();
 					
@@ -147,6 +148,9 @@ public class CommandLineExplGen {
 					System.out.println(String.format("%d: %.8f secs", i, secs));
 					i++;
 				}
+				long afterRank = System.nanoTime();
+				double rankSecs = ((double) (afterRank - beforeRank)) / 1000000000.0;
+				System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs));
 			}
 			// use interactive ranking where the user is asked after each CES whether to continue or not
 			else {
