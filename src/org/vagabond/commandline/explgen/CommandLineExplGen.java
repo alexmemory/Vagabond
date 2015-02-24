@@ -205,7 +205,8 @@ public class CommandLineExplGen {
 			DatabaseScenarioLoader.getInstance().setOperationalMode(
 					LoadMode.Lazy);
 		DatabaseScenarioLoader.getInstance().loadScenario(
-				ConnectionManager.getInstance().getConnection());
+				ConnectionManager.getInstance().getConnection(), 
+				options.getCsvLoadPath());
 	}
 
 	private void loadScenario(File xmlDoc) throws Exception {

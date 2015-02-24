@@ -43,6 +43,9 @@ public class ExplGenOptions {
 	@Option(name = "-loadScen", usage = "Load the scenario to the database")
 	private boolean loadScen = false;
 
+	@Option(name="-c", usage="data files (CSV) are load from this directory")
+	private File csvLoadPath = null;
+		
 	@Option(name = "-ranker", usage = "Select the type of ranker to use {SideEffect, Size}")
 	private String rankerScheme = "Dummy";
 
@@ -218,6 +221,14 @@ public class ExplGenOptions {
 
 	public void setNoShowSets(boolean showSets) {
 		this.noShowSets = showSets;
+	}
+
+	public File getCsvLoadPath() {
+		return csvLoadPath;
+	}
+
+	public void setCsvLoadPath(File csvLoadPath) {
+		this.csvLoadPath = csvLoadPath;
 	}
 	
 	
