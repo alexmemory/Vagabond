@@ -14,6 +14,7 @@ import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.SimpleExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.util.IdMap;
 import org.vagabond.util.LogProviderHolder;
 
@@ -293,6 +294,15 @@ public class DummyRanker implements IExplanationRanker {
 	@Override
 	public void rankFull() {
 		if (log.isDebugEnabled()) {log.debug("Dummy ranker cannot materialize");};
+	}
+
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
+	 */
+	@Override
+	public IScoringFunction getScoreF() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

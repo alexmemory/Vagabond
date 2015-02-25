@@ -221,12 +221,22 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		result = new StringBuffer();
 		
 		result.append(getType().toString());
-		result.append("<" + error.toString() + ">");
 
-		if (getTargetSideEffectSize() > 0)
-			result.append("\n\nwith target side-effect:\n<" 
-					+ getTargetSideEffects().toString() + ">");
-		
+		if (!this.getRealExplains().isEmpty()) {
+			if (getRealExplains().size() > 0)
+				result.append("\n\nexplains:\n<" 
+						+ getRealExplains().toString() + ">");
+			if (getRealTargetSideEffects().size() > 0)
+				result.append("\n\nwith target side-effect:\n<" 
+						+ getRealTargetSideEffects().toString() + ">");
+		}
+		else {
+			result.append("<" + error.toString() + ">");
+	
+			if (getTargetSideEffectSize() > 0)
+				result.append("\n\nwith target side-effect:\n<" 
+						+ getTargetSideEffects().toString() + ">");
+		}
 		if (getSourceSideEffectSize() > 0)
 			result.append("\n\nwith source side-effect:\n<" 
 					+ getSourceSideEffects().toString() + ">");

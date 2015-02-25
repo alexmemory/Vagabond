@@ -1090,7 +1090,6 @@ DInProceedings(pid, title, pages, booktitle, url, cdrom, month, year) & PubAutho
 			</Atom>
 		</Exists>
 	</Mapping>
-
 </Mappings>
 <ConnectionInfo>
 	<Host>localhost</Host>

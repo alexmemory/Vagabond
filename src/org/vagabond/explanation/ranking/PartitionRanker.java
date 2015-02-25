@@ -562,4 +562,17 @@ public class PartitionRanker implements IPartitionRanker {
 		resetIter();
 	}
 	
+	@Override
+	public int getScore(int rank) { //TODO improve perf by 
+		return scoreF.getScore(getRankedExpl(rank));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
+	 */
+	@Override
+	public IScoringFunction getScoreF() {
+		return this.scoreF;
+	}
+
 }

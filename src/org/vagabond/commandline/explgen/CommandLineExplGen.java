@@ -19,19 +19,23 @@ import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.ScenarioDictionary;
+import org.vagabond.explanation.metrics.RankingMetricPrecisionRecall;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.IExplanationRanker;
 import org.vagabond.explanation.ranking.IPartitionRanker;
 import org.vagabond.explanation.ranking.RankerFactory;
 import org.vagabond.explanation.ranking.SkylineRanker;
+import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader;
 import org.vagabond.mapping.scenarioToDB.DatabaseScenarioLoader.LoadMode;
 import org.vagabond.util.ConnectionManager;
 import org.vagabond.util.LoggerUtil;
+import org.vagabond.util.xmlbeans.ExplanationAndErrorXMLLoader;
 
 public class CommandLineExplGen {
 
@@ -70,73 +74,118 @@ public class CommandLineExplGen {
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
-		
+
+	
 		if (options.isUseRanker()) {
 			Iterator<IExplanationSet> iter = null;
-
+			IExplanationRanker explRank = null;
+			SkylineRanker skyRank  = null;
+			IPartitionRanker partRank = null;
+			IScoringFunction f = null;
+			
 			// No Partitioning
 			if (options.noUsePart()) {
-
 				ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();			
 				ExplanationCollection col2 = noPartGen.findExplanations(markers);
 							
 				if (options.getRankerScheme() != null){
-					IExplanationRanker rank;
 
 					if (log.isDebugEnabled()) {
 						log.debug("Create ranker for scheme without partitioning " + options.getRankerScheme());
 					};
 					
-					rank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
-					iter = rank;
-					
+					explRank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
+					iter = explRank;
+					f = explRank.getScoreF();
 				}
 			}
-			else {
-				
+			else {		
 				PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
 				partGen.init();
 	
 				ExplPartition p = partGen.findExplanations(markers);
 	
 				if (options.getSkylineRankers() != null) {
-					SkylineRanker rank;
 					if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
 							+ Arrays.toString(options.getSkylineRankers()));};
-					rank = RankerFactory.createSkylineRanker(
+					skyRank = RankerFactory.createSkylineRanker(
 									options.getSkylineRankers(),
 									options.getRankerScheme(), p);
-					iter = rank;
+					iter = skyRank;
 				}
 				else {
-					IPartitionRanker rank;
-	
 					if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
 							+ options.getRankerScheme());};
-					rank = RankerFactory.createPartRanker(
+					partRank = RankerFactory.createPartRanker(
 									options.getRankerScheme(), p);
-					iter = rank;
+					iter = partRank;
+					f = partRank.getScoreF();
 				}
 			}
 			
 			boolean cont = true;
 			int r = 0;
-			BufferedReader in =
-					new BufferedReader(new InputStreamReader(System.in));
-			// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
-			if (options.isRankNonInteractive()) {
-				int i = 1;
+			
+			// if a gold standard is given then we just compute precision and recall metrics
+			if (options.getGoldStandard() != null) {
 				int max = options.getMaxRank();
-				long beforeRank = System.nanoTime();
-				while (iter.hasNext() && (max == -1 || i <= max)) {
-					long lStartTime = System.nanoTime();
+				IExplanationSet gold = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(options.getGoldStandard());
+				RankingMetricPrecisionRecall metric;
+				double prec = 0.0, rec = 0.0;
+				
+				for(IBasicExplanation e: gold)
+					e.computeRealTargetSEAndExplains(markers);
+				metric = new RankingMetricPrecisionRecall(gold);
+				
+				for(int i = 0; i < max; i++) {
+					IExplanationSet set;
+					double score = 0.0;
 					
-					IExplanationSet set = iter.next();
+					if (options.noUsePart()) {
+						if (explRank.getNumberOfExplSets() <= i)
+							break;
+						prec = metric.computePrecision(explRank, i);
+						rec = metric.computeRecall(explRank, i);
+						set = explRank.getRankedExpl(i);
+						score = explRank.getScoreF().getScore(set);
+					}
+					else {
+						if (partRank.getNumberOfExplSets() <= i)
+							break;
+						prec = metric.computePrecision(partRank, i);
+						rec = metric.computeRecall(partRank, i);
+						set = partRank.getRankedExpl(i);
+						score = partRank.getScoreF().getScore(set);
+					}				
 					
 					if (!options.isNoShowSets()) {
 						System.out.println("\n\n*********************************\n*" +
 								"\t\t RANKED " 
-								+ ++r 
+								+ ++r + " with score " + score
+								+ "\n*********************************\n");
+						System.out.println(set.toString());
+					}
+					
+					System.out.printf("top: %d, prec: %f, rec: %f\n", i+1, prec, rec);
+				}
+			}
+			// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
+			else if (options.isRankNonInteractive()) {
+				int i = 1;
+				int max = options.getMaxRank();
+				long beforeRank = System.nanoTime();
+				while (iter.hasNext() && (max == -1 || i <= max)) {
+					long lStartTime = System.nanoTime();				
+					IExplanationSet set = iter.next();
+					double score = -1.0;
+
+					if (f != null)
+						score = f.getScore(set);
+					
+					if (!options.isNoShowSets()) {
+						System.out.println("\n\n*********************************\n*" +
+								"\t\t RANKED " 
+								+ ++r + " with score " + score
 								+ "\n*********************************\n");
 						System.out.println(set.toString());
 					}
@@ -154,14 +203,19 @@ public class CommandLineExplGen {
 			}
 			// use interactive ranking where the user is asked after each CES whether to continue or not
 			else {
+				BufferedReader in =
+						new BufferedReader(new InputStreamReader(System.in));
 				while (cont && iter.hasNext()) {
 					String read;
 					IExplanationSet set = iter.next();
+					double score = -1.0;
+					if (f != null)
+						score = f.getScore(set);
 					
 					if (!options.isNoShowSets()) {
 						System.out.println("\n\n*********************************\n*" +
 								"\t\t RANKED " 
-								+ ++r 
+								+ ++r + " with score " + score
 								+ "\n*********************************\n");
 						System.out.println(set.toString());
 						System.out.println("\nContinue [y/n]?");

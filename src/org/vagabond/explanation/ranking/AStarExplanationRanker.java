@@ -746,4 +746,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		resetIter();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
+	 */
+	@Override
+	public IScoringFunction getScoreF() {
+		return this.f;
+	}
+
 }

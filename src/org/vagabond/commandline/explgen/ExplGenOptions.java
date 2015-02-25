@@ -73,6 +73,9 @@ public class ExplGenOptions {
 	@Option(name = "-noShowCES", usage = "show ranking results")
 	private boolean noShowSets = false;
 	
+	@Option(name = "-goldStandard", usage = "loads expected explanations from this file and compared ranked explanatios to that")
+	private File goldStandard = null;
+	
 	public ExplGenOptions() {
 		CmdLineParser.registerHandler(String[].class, StringArrayOptionHandler.class);
 	}
@@ -229,6 +232,14 @@ public class ExplGenOptions {
 
 	public void setCsvLoadPath(File csvLoadPath) {
 		this.csvLoadPath = csvLoadPath;
+	}
+
+	public File getGoldStandard() {
+		return goldStandard;
+	}
+
+	public void setGoldStandard(File goldStandard) {
+		this.goldStandard = goldStandard;
 	}
 	
 	
