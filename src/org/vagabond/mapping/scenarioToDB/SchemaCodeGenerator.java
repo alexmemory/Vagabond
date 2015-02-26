@@ -554,11 +554,14 @@ public class SchemaCodeGenerator {
 	 * @throws Exception 
 	 */
 	
-	public String getCopy (String schemaName, RelInstanceFileType inst) throws Exception {
+	public String getCopy (String schemaName, RelInstanceFileType inst, File p) throws Exception {
 		StringBuffer result;
 		
 		result = new StringBuffer();
-		getCopy(schemaName, inst, result);
+		if (p == null)
+			getCopy(schemaName, inst, result);
+		else
+			getCopy(schemaName, inst, result, p);
 		
 		if (log.isDebugEnabled()) {log.debug("Created COPY command: " + result.toString());};
 		
@@ -585,6 +588,29 @@ public class SchemaCodeGenerator {
 				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
 	}
 
+	private void getCopy (String schemaName, 
+			RelInstanceFileType inst, StringBuffer result, File actualPath) throws Exception {
+		String delim;
+		String path;
+		
+		delim = inst.getColumnDelim();
+		path = getPath(inst, actualPath);
+		
+		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
+				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+	}
+	
+	private String getPath(RelInstanceFileType inst, File p) {
+		String path;
+		
+		path = p.getAbsolutePath();
+		if (!path.endsWith("/"))
+			path += "/";
+		path += inst.getFileName();
+		
+		return path;
+	}
+	
 	private String getPath(RelInstanceFileType inst) throws Exception {
 		String path;
 		

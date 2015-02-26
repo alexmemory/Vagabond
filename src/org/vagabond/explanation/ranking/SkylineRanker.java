@@ -579,5 +579,22 @@ public class SkylineRanker implements IPartitionRanker {
 		
 		generateUpTo((int) rankers[0].getNumberPrefetched() - 1);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScore(int)
+	 */
+	@Override
+	public int getScore(int rank) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
+	 */
+	@Override
+	public IScoringFunction getScoreF() {
+		return null;
+	}
 	
 }

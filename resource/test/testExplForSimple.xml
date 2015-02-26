@@ -37,21 +37,21 @@
 		<Explanation type="SourceCopy">
 			<Explains>
 				<Relation>employee</Relation>
-				<TupleID>1|1</TupleID>
-				<Attribute>name</Attribute>
+				<TupleID>4|2</TupleID>
+				<Attribute>city</Attribute>
 			</Explains>
 			<Coverage>
 				<AttrMarker>
 					<Relation>employee</Relation>
-					<TupleID>1|1</TupleID>
-					<Attribute>name</Attribute>
+					<TupleID>2|2</TupleID>
+					<Attribute>city</Attribute>
 				</AttrMarker>
 			</Coverage>
 			<SourceInstSE>
 				<AttrMarker>
-					<Relation>person</Relation>
-					<TupleID>1</TupleID>
-					<Attribute>name</Attribute>
+					<Relation>address</Relation>
+					<TupleID>2</TupleID>
+					<Attribute>city</Attribute>
 				</AttrMarker>
 			</SourceInstSE>
 		</Explanation>

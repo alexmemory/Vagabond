@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 
 
 
@@ -27,4 +28,5 @@ public interface IExplanationRanker extends Iterator<IExplanationSet> {
 	public boolean hasAtLeast (int numElem); // check that this ranker can produce at least this many explanation sets
 	boolean isFullyRanked();
 	public void rankFull();
+	public IScoringFunction getScoreF();
 }

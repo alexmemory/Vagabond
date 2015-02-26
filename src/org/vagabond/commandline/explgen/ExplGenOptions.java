@@ -44,7 +44,10 @@ public class ExplGenOptions {
 	@Option(name = "-loadScen", usage = "Load the scenario to the database")
 	private boolean loadScen = false;
 
-	@Option(name = "-ranker", usage = "Select the type of ranker to use {}")
+	@Option(name="-c", usage="data files (CSV) are load from this directory")
+	private File csvLoadPath = null;
+		
+	@Option(name = "-ranker", usage = "Select the type of ranker to use {SideEffect, Size}")
 	private String rankerScheme = "Dummy";
 
 	@Option(name = "-lazy", usage = "Use together with -loadScen. Check if " +
@@ -69,11 +72,26 @@ public class ExplGenOptions {
 	@Option(name = "-boundranker", usage = "1:Use boundary ranker; 0: default ranker")
 	private int boundranker = 0;
 	
+	@Option(name = "-noPart", usage = "Rank the generated explanations without partitioning")
+	private boolean nousePart = false;
+	
 	@Option(name = "-rankSkyline", 
 			usage = "Use Skyline ranker with this ranking schemes", 
 			metaVar = "[scheme 1] [scheme 2] ...")
 	private String[] skylineRankers = null;
-		
+
+	@Option(name = "-nonInteractive", usage = "rank explanations and output them without user interaction")
+	private boolean rankNonInteractive = false;
+	
+	@Option(name = "-maxRank", usage = "set maximum number of ranked CES to produce. The program terminates after generating this many explanations")
+	private int maxRank = -1;
+	
+	@Option(name = "-noShowCES", usage = "show ranking results")
+	private boolean noShowSets = false;
+	
+	@Option(name = "-goldStandard", usage = "loads expected explanations from this file and compared ranked explanatios to that")
+	private File goldStandard = null;
+	
 	public ExplGenOptions() {
 		CmdLineParser.registerHandler(String[].class, StringArrayOptionHandler.class);
 	}
@@ -190,6 +208,10 @@ public class ExplGenOptions {
 		return useRanker;
 	}
 
+	public boolean noUsePart() {
+		return nousePart;
+	}
+
 	public void setUseRanker(boolean useRanker) {
 		this.useRanker = useRanker;
 	}
@@ -249,6 +271,46 @@ public class ExplGenOptions {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public boolean isRankNonInteractive() {
+		return rankNonInteractive;
+	}
+
+	public void setRankNonInteractive(boolean rankNonInteractive) {
+		this.rankNonInteractive = rankNonInteractive;
+	}
+
+	public int getMaxRank() {
+		return maxRank;
+	}
+
+	public void setMaxRank(int maxRank) {
+		this.maxRank = maxRank;
+	}
+
+	public boolean isNoShowSets() {
+		return noShowSets;
+	}
+
+	public void setNoShowSets(boolean showSets) {
+		this.noShowSets = showSets;
+	}
+
+	public File getCsvLoadPath() {
+		return csvLoadPath;
+	}
+
+	public void setCsvLoadPath(File csvLoadPath) {
+		this.csvLoadPath = csvLoadPath;
+	}
+
+	public File getGoldStandard() {
+		return goldStandard;
+	}
+
+	public void setGoldStandard(File goldStandard) {
+		this.goldStandard = goldStandard;
 	}
 	
 	

@@ -369,6 +369,7 @@ public class PartitionRanker implements IPartitionRanker {
 		
 		for(int i = 0; i < part.size(); i++) {
 			ExplanationCollection col = part.get(i);
+			log.debug("number of errors for part " + i + " is: " + col.getNumErrors());
 			rankers[i] = RankerFactory.createRanker(rankScheme);
 			rankers[i].initialize(col);
 		}
@@ -561,4 +562,17 @@ public class PartitionRanker implements IPartitionRanker {
 		resetIter();
 	}
 	
+	@Override
+	public int getScore(int rank) { //TODO improve perf by 
+		return scoreF.getScore(getRankedExpl(rank));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
+	 */
+	@Override
+	public IScoringFunction getScoreF() {
+		return this.scoreF;
+	}
+
 }

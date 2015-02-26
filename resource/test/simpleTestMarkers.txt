@@ -1,0 +1,6 @@
+A(employee,1|1,name)
+A(employee,2|2,name)
+A(employee,3|,name)
+A(employee,4|2,name)
+A(employee,2|2,city)
+A(employee,4|2,city)

@@ -29,6 +29,11 @@ public class SuperfluousMappingExplanationGenerator
 	private IAttributeValueMarker error;
 	private SuperflousMappingError expl;
 	private Set<MappingType> maps;
+	private Map<Set<MappingType>,SuperflousMappingError> explsForMap;
+	
+	public SuperfluousMappingExplanationGenerator () {
+		explsForMap = new HashMap<Set<MappingType>,SuperflousMappingError> ();
+	}
 	
 	@Override
 	public IExplanationSet findExplanations(ISingleMarker errorMarker)
@@ -48,32 +53,43 @@ public class SuperfluousMappingExplanationGenerator
 		Map<String, Set<String>> affRels;
 		Set<String> mapSet;
 		String relName;
-		
-		expl = new SuperflousMappingError(error);
-		affRels = new HashMap<String, Set<String>> ();
-		
-		for(MappingType map: maps) {
-			expl.addMapSE(map);
+
+		//Cashing Result
+		if (explsForMap.containsKey(maps))
+		{
+			expl = explsForMap.get(maps);
 			
-			for(RelAtomType atom: map.getExists().getAtomArray()) {
-				relName = atom.getTableref();
-				if (!affRels.containsKey(relName)) {
-					affRels.put(relName, new HashSet<String> ());
+		} else {
+		
+			expl = new SuperflousMappingError(error);
+			affRels = new HashMap<String, Set<String>> ();
+					
+			for(MappingType map: maps) {
+				expl.addMapSE(map);
+				
+				for(RelAtomType atom: map.getExists().getAtomArray()) {
+					relName = atom.getTableref();
+					if (!affRels.containsKey(relName)) {
+						affRels.put(relName, new HashSet<String> ());
+					}
+					mapSet = affRels.get(relName);
+					mapSet.add(map.getId());
 				}
-				mapSet = affRels.get(relName);
-				mapSet.add(map.getId());
+						
+				expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
+						affRels.keySet()));
+				
+				for (String affRel: affRels.keySet()) {
+					computeSideEffects(affRel, affRels.get(affRel));
+				}
+					
+				expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
+				
+				result.addExplanation(expl);
+				explsForMap.put(maps, expl);
+		
 			}
 		}
-		
-		expl.setTransSE(MapScenarioHolder.getInstance().getTransForRels(
-				affRels.keySet()));
-		
-		for (String affRel: affRels.keySet()) {
-			computeSideEffects(affRel, affRels.get(affRel));
-		}
-		expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
-
-		result.addExplanation(expl);
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps) throws Exception {
@@ -100,8 +116,7 @@ public class SuperfluousMappingExplanationGenerator
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
 		while(rs.next())
-			sideEff.add(MarkerFactory.newTupleMarker(
-					rel, rs.getString(1)));
+			sideEff.add(MarkerFactory.newTupleMarker(rel, rs.getString(1)));
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		

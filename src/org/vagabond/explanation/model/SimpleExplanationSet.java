@@ -57,7 +57,10 @@ public class SimpleExplanationSet implements IExplanationSet {
 
 	@Override
 	public boolean addExplanation (IBasicExplanation expl) {
-		targetSideEffects.union(expl.getTargetSideEffects());
+		if (!expl.getRealExplains().isEmpty())
+			targetSideEffects.union(expl.getRealTargetSideEffects());
+		else
+			targetSideEffects.union(expl.getTargetSideEffects());
 		return expls.add(expl);
 	}
 

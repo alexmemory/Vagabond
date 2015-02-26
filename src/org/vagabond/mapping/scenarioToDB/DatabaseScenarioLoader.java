@@ -1,5 +1,6 @@
 package org.vagabond.mapping.scenarioToDB;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,8 +35,6 @@ public class DatabaseScenarioLoader {
 		return instance;
 	}
 	
-	
-	
 	public LoadMode getOperationalMode() {
 		return operationalMode;
 	}
@@ -48,22 +47,31 @@ public class DatabaseScenarioLoader {
 		loadScenario (dbCon, MapScenarioHolder.getInstance());
 	}
 	
+	public void loadScenario (Connection dbCon, File csvPath) throws Exception {
+		loadScenario (dbCon, MapScenarioHolder.getInstance(), csvPath);
+	}
+	
 	public void loadScenarioNoData (Connection dbCon) throws Exception {
 		loadScenarioNoData(dbCon, MapScenarioHolder.getInstance());
 	}
 	
 	public void loadScenarioNoData (Connection dbCon, MapScenarioHolder map) 
 			throws Exception {
-		loadScenario (dbCon, map, true);
+		loadScenario (dbCon, map, true, null);
 	}
 	
 	public void loadScenario (Connection dbCon, MapScenarioHolder map) 
 			throws Exception {
-		loadScenario (dbCon, map, false);
+		loadScenario (dbCon, map, false, null);
+	}
+	
+	public void loadScenario (Connection dbCon, MapScenarioHolder map, File csvPath) 
+			throws Exception {
+		loadScenario (dbCon, map, false, csvPath);
 	}
 	
 	private void loadScenario (Connection dbCon, MapScenarioHolder map, 
-			boolean noData) 
+			boolean noData, File csvPath) 
 			throws Exception {
 		String ddl;
 		
@@ -73,7 +81,7 @@ public class DatabaseScenarioLoader {
 			if (!dataLoaded(dbCon, map) && !noData) {
 				executeDDL(dbCon, SchemaCodeGenerator.getInstance()
 						.getInstanceDelCode(map.getScenario()));
-				loadData(dbCon, map.getScenario().getData());
+				loadData(dbCon, map.getScenario().getData(), csvPath);
 			}
 			return;
 		}
@@ -84,7 +92,7 @@ public class DatabaseScenarioLoader {
 		executeDDL(dbCon, ddl);
 		
 		if (map.hasData() && !noData)
-			loadData (dbCon, map.getScenario().getData());
+			loadData (dbCon, map.getScenario().getData(), csvPath);
 		
 		ddl = SchemaCodeGenerator.getInstance().getAllSourceForeignKeysCode
 				(map.getScenario().getSchemas().getSourceSchema(), "source");
@@ -133,9 +141,8 @@ public class DatabaseScenarioLoader {
 		st.close();
 	}
 	
-	private void loadData (Connection dbCon, DataType data) throws Exception {
+	private void loadData (Connection dbCon, DataType data, File csvPath) throws Exception {
 		Statement st;
-		
 		st = dbCon.createStatement();
 		
 		for (RelInstanceType inst: data.getInstanceArray()) {
@@ -146,8 +153,9 @@ public class DatabaseScenarioLoader {
 		}
 		
 		for (RelInstanceFileType inst: data.getInstanceFileArray()) {
+			
 			st.execute(SchemaCodeGenerator.getInstance().
-					getCopy("source", inst));
+					getCopy("source", inst, csvPath));
 		}
 		
 		st.close();

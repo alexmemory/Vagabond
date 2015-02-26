@@ -58,6 +58,7 @@ public class CommandLineLoader {
 	
 	public void executeOnDB () throws Exception {
 		Connection dbCon;
+		File csvPath = options.getCsvLoadPath();
 		
 		dbCon = ConnectionManager.getInstance().getConnection(
 				options.getDbURL(), options.getDbName(), options.getDbUser(),
@@ -65,7 +66,7 @@ public class CommandLineLoader {
 		if (options.isNoData())
 			DatabaseScenarioLoader.getInstance().loadScenarioNoData(dbCon, map);
 		else
-			DatabaseScenarioLoader.getInstance().loadScenario(dbCon, map);
+			DatabaseScenarioLoader.getInstance().loadScenario(dbCon, map, csvPath);
 		dbCon.close();
 	}
 	

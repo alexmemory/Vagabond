@@ -208,10 +208,19 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 			computeHash();
 	}
 	
+	public void recomputeHash() {
+		computeHash();
+	}
+	
 	protected void computeHash () {
-		hash = fnv(error.hashCode());
+		if (realExplains.isEmpty()) {
+			hash = fnv(error.hashCode());
+		}
+		else {
+			hash = fnv(realExplains);
+			hash = fnv(realTargetSE, hash);	
+		}
 		hash = fnv(getType(), hash);
-		hash = fnv(realTargetSE, hash);
 	}
 	
 	@Override
@@ -221,12 +230,22 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		result = new StringBuffer();
 		
 		result.append(getType().toString());
-		result.append("<" + error.toString() + ">");
 
-		if (getTargetSideEffectSize() > 0)
-			result.append("\n\nwith target side-effect:\n<" 
-					+ getTargetSideEffects().toString() + ">");
-		
+		if (!this.getRealExplains().isEmpty()) {
+			if (getRealExplains().size() > 0)
+				result.append("\n\nexplains:\n<" 
+						+ getRealExplains().toString() + ">");
+			if (getRealTargetSideEffects().size() > 0)
+				result.append("\n\nwith target side-effect:\n<" 
+						+ getRealTargetSideEffects().toString() + ">");
+		}
+		else {
+			result.append("<" + error.toString() + ">");
+	
+			if (getTargetSideEffectSize() > 0)
+				result.append("\n\nwith target side-effect:\n<" 
+						+ getTargetSideEffects().toString() + ">");
+		}
 		if (getSourceSideEffectSize() > 0)
 			result.append("\n\nwith source side-effect:\n<" 
 					+ getSourceSideEffects().toString() + ">");

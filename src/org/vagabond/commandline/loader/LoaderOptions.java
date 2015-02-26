@@ -44,6 +44,9 @@ public class LoaderOptions {
 	@Option(name="--output", usage="output mapping in format (xml = Tramp XML mapping file, map = .map file)")
 	private OutputFormat outForm = OutputFormat.none;
 	
+	@Option(name="-c", usage="data files (CSV) are load from this directory")
+	private File csvLoadPath = null;
+	
 	private boolean[] dbOptionsSet = { false, false, false, false };
 	
 	public LoaderOptions() {
@@ -139,6 +142,14 @@ public class LoaderOptions {
 
 	public void setOutForm(OutputFormat outForm) {
 		this.outForm = outForm;
+	}
+
+	public File getCsvLoadPath() {
+		return csvLoadPath;
+	}
+
+	public void setCsvLoadPath(File csvLoadPath) {
+		this.csvLoadPath = csvLoadPath;
 	}
 	
 	
