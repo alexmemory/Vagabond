@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>Superflous Mappings</comment>
+<comment>Superfluous Mappings</comment>
 
 <entry key="GetSideEffects">
+SELECT p.tid
+FROM   (SELECT MAPPROV *
+       FROM ${1}) p
+GROUP BY p.tid
+HAVING count(*) = sum(CASE WHEN p.trans_prov IN (VALUES ${2}) THEN 1 ELSE 0 END);
+</entry>
+
+<entry key="PrevGetSideEffects">
 SELECT prov.tid
 FROM
 (SELECT *
@@ -20,6 +28,15 @@ WHERE p.trans_prov IN (VALUES ${2})
 </entry>
 
 <entry key="GetSideEffectsAlternative">
+SELECT prov.tid, ${1}
+FROM (SELECT * FROM ${2}) AS prov
+WHERE prov.tid IN (SELECT p.tid
+					FROM   (SELECT MAPPROV * FROM ${2}) p
+					GROUP BY p.tid
+					HAVING count(*) = sum(CASE WHEN p.trans_prov IN (VALUES ${3}) THEN 1 ELSE 0 END))
+</entry>
+
+<entry key="PrevGetSideEffectsAlternative">
 SELECT prov.tid, ${1}
 FROM
 (SELECT *

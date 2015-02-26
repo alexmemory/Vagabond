@@ -3,11 +3,16 @@ package org.vagabond.commandline.explgen;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -45,7 +50,10 @@ public class CommandLineExplGen {
 	private ExplGenOptions options;
 	private IMarkerSet markers;
 	private ExplanationSetGenerator gen;
-
+	
+	static String rankSecs = "";
+	static String secsRank = "";
+	
 	public CommandLineExplGen() {
 		options = new ExplGenOptions();
 		gen = new ExplanationSetGenerator();
@@ -182,7 +190,11 @@ public class CommandLineExplGen {
 				int i = 1;
 				int max = options.getMaxRank();
 				long beforeRank = System.nanoTime();
-				while (iter.hasNext() && (max == -1 || i <= max)) {
+				//only 10mins running for ranking
+				long start = System.currentTimeMillis();
+				long end = start + 600*1000;
+				
+				while (iter.hasNext() && (max == -1 || i <= max) && System.currentTimeMillis() < end) {
 					long lStartTime = System.nanoTime();				
 					IExplanationSet set = iter.next();
 					double score = -1.0;
@@ -203,12 +215,14 @@ public class CommandLineExplGen {
 					double secs = ((double) difference) / 1000000000.0;
 					
 					System.out.println(String.format("%d: %.8f secs", i, secs));
+					secsRank = secsRank + String.format("%n%d: %.8f secs", i, secs);
 					System.out.flush();
 					i++;
 				}
 				long afterRank = System.nanoTime();
-				double rankSecs = ((double) (afterRank - beforeRank)) / 1000000000.0;
-				System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs));
+				double rankSecs1 = ((double) (afterRank - beforeRank)) / 1000000000.0;
+				System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs1));
+				rankSecs = String.format("Ranking(%d): %.8f secs", i-1, rankSecs1);
 			}
 			// use interactive ranking where the user is asked after each CES whether to continue or not
 			else {
@@ -324,18 +338,30 @@ public class CommandLineExplGen {
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
-		
+						
 		for (int i = 0; i < 1; i++) {
 			
 			long lStartTime = new Date().getTime();
-		
+						
 			if (!inst.execute(args))
-				System.exit(1);
-
+					System.exit(1);
+				
 			long lEndTime = new Date().getTime();
 			long difference= (lEndTime - lStartTime);
 			double secs = ((double) difference) / 1000.0;
 			System.out.printf("Total: %.2f secs\n", secs);
+			
+			try {
+				PrintStream out = new PrintStream(new FileOutputStream("./RTData-Ranking/HE100_50EM.txt", true));
+				if (!secsRank.equals(null)) out.println(secsRank);
+				if (!rankSecs.equals(null)) out.println(rankSecs);
+				out.printf("Total: %.2f secs\n", secs);
+				System.setOut(out);
+			    
+			} catch (FileNotFoundException e) {
+			      e.printStackTrace();
+		    }
+			
 		}
 		
 		System.exit(0);
