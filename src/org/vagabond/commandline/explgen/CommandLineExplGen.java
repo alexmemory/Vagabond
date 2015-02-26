@@ -22,6 +22,7 @@ import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.metrics.RankingMetricPrecisionRecall;
 import org.vagabond.explanation.model.ExplPartition;
 import org.vagabond.explanation.model.ExplanationCollection;
+import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.IExplanationRanker;
@@ -129,12 +130,18 @@ public class CommandLineExplGen {
 			// if a gold standard is given then we just compute precision and recall metrics
 			if (options.getGoldStandard() != null) {
 				int max = options.getMaxRank();
-				IExplanationSet gold = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(options.getGoldStandard());
+				IExplanationSet pre = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(options.getGoldStandard());
+				IExplanationSet gold = ExplanationFactory.newExplanationSet();
 				RankingMetricPrecisionRecall metric;
 				double prec = 0.0, rec = 0.0;
+				max = (max == -1) ? Integer.MAX_VALUE : max;
 				
-				for(IBasicExplanation e: gold)
+				// have to copy the set because computing real target SE changes the hash
+				for(IBasicExplanation e: pre) {
 					e.computeRealTargetSEAndExplains(markers);
+					gold.add(e);
+				}
+				
 				metric = new RankingMetricPrecisionRecall(gold);
 				
 				for(int i = 0; i < max; i++) {

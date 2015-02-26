@@ -208,10 +208,19 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 			computeHash();
 	}
 	
+	public void recomputeHash() {
+		computeHash();
+	}
+	
 	protected void computeHash () {
-		hash = fnv(error.hashCode());
+		if (realExplains.isEmpty()) {
+			hash = fnv(error.hashCode());
+		}
+		else {
+			hash = fnv(realExplains);
+			hash = fnv(realTargetSE, hash);	
+		}
 		hash = fnv(getType(), hash);
-		hash = fnv(realTargetSE, hash);
 	}
 	
 	@Override

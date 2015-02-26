@@ -47,5 +47,7 @@ public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 	public Collection<CorrespondenceType> getCorrespondenceSideEffects ();
 	
 	public int getTransformationSideEffectSize ();
-	public Collection<TransformationType> getTransformationSideEffects () ;
+	public Collection<TransformationType> getTransformationSideEffects ();
+	
+	public void recomputeHash();
 }
