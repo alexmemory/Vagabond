@@ -215,14 +215,12 @@ public class CommandLineExplGen {
 					double secs = ((double) difference) / 1000000000.0;
 					
 					System.out.println(String.format("%d: %.8f secs", i, secs));
-					secsRank = secsRank + String.format("%n%d: %.8f secs", i, secs);
 					System.out.flush();
 					i++;
 				}
 				long afterRank = System.nanoTime();
 				double rankSecs1 = ((double) (afterRank - beforeRank)) / 1000000000.0;
 				System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs1));
-				rankSecs = String.format("Ranking(%d): %.8f secs", i-1, rankSecs1);
 			}
 			// use interactive ranking where the user is asked after each CES whether to continue or not
 			else {
@@ -351,16 +349,16 @@ public class CommandLineExplGen {
 			double secs = ((double) difference) / 1000.0;
 			System.out.printf("Total: %.2f secs\n", secs);
 			
-			try {
-				PrintStream out = new PrintStream(new FileOutputStream("./RTData-Ranking/HE100_50EM.txt", true));
-				if (!secsRank.equals(null)) out.println(secsRank);
-				if (!rankSecs.equals(null)) out.println(rankSecs);
-				out.printf("Total: %.2f secs\n", secs);
-				System.setOut(out);
+//			try {
+//				PrintStream out = new PrintStream(new FileOutputStream("./RTData-Ranking/HE100_50EM.txt", true));
+//				if (!secsRank.equals(null)) System.out.println(secsRank);
+//				if (!rankSecs.equals(null)) System.out.println(rankSecs);
+//				System.out.printf("Total: %.2f secs\n", secs);
+//				System.setOut(out);
 			    
-			} catch (FileNotFoundException e) {
-			      e.printStackTrace();
-		    }
+//			} catch (FileNotFoundException e) {
+//			      e.printStackTrace();
+//		    }
 			
 		}
 		
