@@ -174,6 +174,7 @@ public class CommandLineExplGen {
 					}
 					
 					System.out.printf("top: %d, prec: %f, rec: %f\n", i+1, prec, rec);
+					System.out.flush();
 				}
 			}
 			// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
@@ -202,6 +203,7 @@ public class CommandLineExplGen {
 					double secs = ((double) difference) / 1000000000.0;
 					
 					System.out.println(String.format("%d: %.8f secs", i, secs));
+					System.out.flush();
 					i++;
 				}
 				long afterRank = System.nanoTime();
@@ -241,7 +243,8 @@ public class CommandLineExplGen {
 			ExplanationCollection col;
 
 			col = gen.findExplanations(markers);
-			out.println(col);
+			if (!options.isNoShowSets())
+				out.println(col);
 		}
 	}
 
