@@ -365,6 +365,16 @@ public class SchemaCodeGenerator {
 		}
 		result.deleteCharAt(result.length() - 1);
 		result.append(");\n");
+		
+		// create index
+		result.append("CREATE INDEX " +  "source_fkey_index_" + fkey.getId() + " ON ");
+		result.append(schemaName + fkey.getFrom().getTableref());
+		result.append("(");
+		for(String attr: fkey.getFrom().getAttrArray()) {
+			result.append(attr + delim);
+		}
+		result.deleteCharAt(result.length() - 1);
+		result.append(");\n");
 	}
 	
 	/**
