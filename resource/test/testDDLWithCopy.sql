@@ -33,3 +33,4 @@ INSERT INTO source.address VALUES ('3','3','Quebec');
 COPY source.person FROM '/Users/lord_pretzel/Documents/workspace/TrampExGen/resource/test/person.csv' WITH CSV DELIMITER '|' NULL AS 'NULL';
 
 ALTER TABLE source.person ADD FOREIGN KEY (address) REFERENCES source.address (id);
+CREATE INDEX source_fkey_index_person_addr ON source.person(address);

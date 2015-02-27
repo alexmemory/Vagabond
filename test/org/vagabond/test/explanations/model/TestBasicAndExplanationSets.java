@@ -140,6 +140,7 @@ public class TestBasicAndExplanationSets extends AbstractVagabondTest {
 		c4.computeRealTargetSEAndExplains(errors);
 		
 		assertEquals(c3,c4);
+		assertEquals(c3.hashCode(),c4.hashCode());
 		assertEquals(0, c3.getRealTargetSideEffectSize());
 		assertEquals(0, c4.getRealTargetSideEffectSize());
 	}

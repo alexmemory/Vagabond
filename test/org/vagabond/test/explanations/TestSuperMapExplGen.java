@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vagabond.explanation.generation.SuperfluousMappingExplanationGenerator;
@@ -30,6 +31,11 @@ public class TestSuperMapExplGen extends AbstractVagabondTest {
 	
 	@BeforeClass
 	public static void load () throws Exception {
+		
+	}
+	
+	@Before
+	public void createGen () {
 		gen = new SuperfluousMappingExplanationGenerator();
 	}
 	
@@ -47,8 +53,11 @@ public class TestSuperMapExplGen extends AbstractVagabondTest {
 		m1.add(MapScenarioHolder.getInstance().getMapping("M2"));
 		
 		exp = MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "1|1"),
-				MarkerFactory.newTupleMarker("employee", "4|2")
+				MarkerFactory.newAttrMarker("employee", "1|1", "name"),
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "4|2", "name"),
+				MarkerFactory.newAttrMarker("employee", "4|2", "city"),
+				MarkerFactory.newAttrMarker("employee", "2|2", "name")
 				);
 		
 		result = gen.findExplanations(err);

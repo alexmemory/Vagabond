@@ -32,26 +32,37 @@ public class CorrespondencExplanationGenerator implements
 	
 	private CorrespondenceError expl;
 	private IAttributeValueMarker error;
+	private Map<Set<CorrespondenceType>,CorrespondenceError> explForCorr;
 	
 	public CorrespondencExplanationGenerator () {
-		
+		explForCorr = new HashMap<Set<CorrespondenceType>,CorrespondenceError> ();
 	}
 	
 	@Override
 	public IExplanationSet findExplanations(ISingleMarker errorMarker)
 			throws Exception {
 		IExplanationSet result;
+		Set<CorrespondenceType> corrs;
 		
 		this.error = (IAttributeValueMarker) errorMarker;
 		result = ExplanationFactory.newExplanationSet();
-		expl = new CorrespondenceError(errorMarker);
 		
-		findCorrespondences();
-		// did not find correspondence?
-		if (expl.getCorrSideEffectSize() == 0)
-			return result;
+		corrs = findCorrespondences();
 		
-		computeSideEffects();
+		if (explForCorr.containsKey(corrs)) {
+			expl = explForCorr.get(corrs);
+		}
+		else {	
+			
+			expl = new CorrespondenceError(errorMarker);
+			expl.setCorrSE(corrs);
+			// did not find correspondence?
+			if (expl.getCorrSideEffectSize() == 0)
+				return result;
+			
+			computeSideEffects();
+			explForCorr.put(corrs, expl);
+		}
 		
 		result.addExplanation(expl);
 		
@@ -148,13 +159,12 @@ public class CorrespondencExplanationGenerator implements
 		return mapsPerTarget;
 	}
 
-	private void findCorrespondences () throws Exception {
+	private Set<CorrespondenceType> findCorrespondences () throws Exception {
 		Vector<String> mappings;
 		Set<CorrespondenceType> corrCandi;
 		MappingType map;
 		
-		corrCandi = (Set<CorrespondenceType>) 
-				expl.getCorrespondenceSideEffects();
+		corrCandi = new HashSet<CorrespondenceType> ();
 		mappings = ProvenanceGenerator.getInstance().computeMapProvAsStrings(error);
 		
 		// get candidate correspondences
@@ -168,7 +178,7 @@ public class CorrespondencExplanationGenerator implements
 		}
 		
 		if (log.isDebugEnabled()) {log.debug("Correpsondence candidates are " + corrCandi.toString());};
-		
+		return corrCandi;
 	}
 	
 	private boolean corrMapsOnError (CorrespondenceType corr) {

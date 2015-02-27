@@ -67,9 +67,11 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	public void computeRealSEAndExplains () {
 		IMarkerSet errorSet = MarkerFactory.newMarkerSet(errorIds.values());
 		// remove errors from side effects and add them to explains
-		for(IExplanationSet set: explMap.values())
-			for(IBasicExplanation e: set)
+		for(IExplanationSet set: explMap.values()) {
+			for(IBasicExplanation e: set) {
 				e.computeRealTargetSEAndExplains(errorSet);
+			}
+		}
 	}
 	
 	public void createRanker (IExplanationRanker ranker) {

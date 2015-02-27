@@ -35,7 +35,7 @@ public class TestQueryMarkerSetGeneration extends AbstractVagabondTest {
 	 */
 	@Test
 	public void testUsingSimpleQuery () throws Exception {
-		IMarkerSet expected = MarkerParser.getInstance().parseSet("{A(0,1,0)}");
+		IMarkerSet expected = MarkerParser.getInstance().parseSet("{A(person,1,name)}");
 		String query = "SELECT 'person' AS rel,'name' AS attr, tid" +
 						"FROM target.person WHERE livesIn = 'Toronto'";
 		IMarkerSet actual = QueryMarkerSetGenerator.getInstance().genMSetFromQuery (query);

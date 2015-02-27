@@ -85,8 +85,12 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setMapSE(maps);
 		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerFactory.newMarkerSet(
-				MarkerFactory.newTupleMarker("employee", "4|2"),
-				MarkerFactory.newTupleMarker("employee", "1|1")
+				MarkerFactory.newAttrMarker("employee", "1|1", "name"),
+				MarkerFactory.newAttrMarker("employee", "1|1", "city"),
+				MarkerFactory.newAttrMarker("employee", "2|2", "name"),
+				MarkerFactory.newAttrMarker("employee", "4|2", "name"),
+				MarkerFactory.newAttrMarker("employee", "4|2", "city")
+				
 		));
 		
 		e4 = new InfluenceSourceError();
@@ -104,6 +108,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3,e4,e5);
 		expCol = ExplanationFactory.newExplanationCollection(set);
+		expCol.computeRealSEAndExplains();
 		
 		col = gen.findExplanations(m);
 		if (log.isDebugEnabled()) {log.debug(col);};
@@ -167,7 +172,9 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setMapSE(maps);
 		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,2|1),T(person,3|2)}"));
+				"{A(person,2|1,name),A(person,2|1,livesin),"
+				+ "A(person,3|2,name),A(person,3|2,livesin),"
+				+ "A(person,1|1,name)}"));
 		
 		e4 = new InfluenceSourceError();
 		e4.setExplains(m.getElemList().get(0));
@@ -239,7 +246,9 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setMapSE(maps);
 		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,3),T(person,2)}"));
+				"{A(person,3,name),A(person,3,livesin),"
+				+ "A(person,2,name),A(person,2,livesin),"
+				+ "A(person,1,livesin)}"));
 
 		set = ExplanationFactory.newExplanationSet(e1,e2,e3);
 		expCol = ExplanationFactory.newExplanationCollection(set);
@@ -310,7 +319,9 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		sm1.setMapSE(maps);
 		sm1.setTransSE(trans);
 		sm1.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,3),T(person,2)}"));
+				"{A(person,3,name),A(person,3,livesin),"
+				+ "A(person,2,name),A(person,2,livesin),"
+				+ "A(person,1,livesin)}"));
 		
 		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1);
 		
@@ -345,7 +356,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		sm2.setMapSE(maps);
 		sm2.setTransSE(trans);
 		sm2.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,1|3|2)}"));
+				"{A(person,1|3|2,name),A(person,1|3|2,livesin),"
+				+ "A(person,2|1|1,name)}"));
 		
 		i2a = new InfluenceSourceError(e2);
 		i2a.setSourceSE(MarkerParser.getInstance()
@@ -416,7 +428,10 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		e3.setMapSE(maps);
 		e3.setTransSE(trans);
 		e3.setTargetSE(MarkerParser.getInstance().parseSet(
-				"{T(person,3),T(person,2)}"));
+				"{A(person,3,name),A(person,3,livesin),"
+				+ "A(person,2,name),A(person,2,livesin),"
+				+ "A(person,1,name)}"));
+		
 
 		set = ExplanationFactory.newExplanationSet(e3);
 		expCol = ExplanationFactory.newExplanationCollection(set);
@@ -482,8 +497,11 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		trans.add(MapScenarioHolder.getInstance().getTransformation("T2"));
 		sm1.setTransSE(trans);
 		sm1.setTargetSE(MarkerParser.getInstance()
-				.parseSet("{T(person,2),T(person,3),T(person,4)," +
-						"T(address,1),T(address,2),T(address,3),T(address,4)}"));
+				.parseSet("{A(person,2,name),A(person,3,name),A(person,4,name)," +
+						"A(person,1,address),A(person,2,address),A(person,3,address),A(person,4,address)," +
+						"A(address,1,city),A(address,2,city),A(address,3,city),A(address,4,city)," +
+						"A(address,1,id),A(address,2,id),A(address,3,id),A(address,4,id)"
+						+ "}"));
 		
 		// complete collection
 		set1 = ExplanationFactory.newExplanationSet(c1,r1,sm1);
@@ -526,7 +544,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		SuperflousMappingError e3 = new SuperflousMappingError(a1);
 		e3.setMapSE(Collections.singleton(m2));
 		e3.setTransSE(Collections.singleton(t2));
-		e3.setTargetSE(MarkerParser.getInstance().parseSet("{T(v,2)}"));
+		e3.setTargetSE(MarkerParser.getInstance().parseSet("{A(v,2,v1)}"));
 		
 		IExplanationSet expl = ExplanationFactory.newExplanationSet(e1, e2, e3);
 		

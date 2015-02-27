@@ -469,8 +469,9 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			for(int j = 0; j < overlaps.size(); j++)
 				explainsMatrix[pos][i][j] = overlaps.get(j);
 			
-			LoggerUtil.logArray(log, explainsMatrix[pos][i], 
-					"[" + pos + "," + i + "] is ");
+			if (log.isDebugEnabled())
+				LoggerUtil.logArray(log, explainsMatrix[pos][i], 
+						"[" + pos + "," + i + "] is ");
 		}
 	}
 	

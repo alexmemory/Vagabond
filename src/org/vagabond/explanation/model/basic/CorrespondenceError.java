@@ -107,7 +107,7 @@ public class CorrespondenceError extends AbstractBasicExplanation
 	protected void computeHash () {
 		super.computeHash();
 		hash = fnv(correspondences, hash);
-		hash = fnv(mapSE, hash);
-		hash = fnv(transSE, hash);
+//		hash = fnv(mapSE, hash); -- CORREPSONDENCES ARE ALREADY UNIQUE
+//		hash = fnv(transSE, hash);
 	}
 }

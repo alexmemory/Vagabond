@@ -36,3 +36,4 @@ INSERT INTO source.address VALUES ('3','3','Quebec');
 
 
 ALTER TABLE source.person ADD FOREIGN KEY (address) REFERENCES source.address (id);
+CREATE INDEX source_fkey_index_person_addr ON source.person(address);
