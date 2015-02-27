@@ -76,6 +76,9 @@ public class ExplGenOptions {
 	@Option(name = "-goldStandard", usage = "loads expected explanations from this file and compared ranked explanatios to that")
 	private File goldStandard = null;
 	
+	@Option(name = "-timeLimit", usage = "stops ranking after time limit (in sec) is reached")
+	private int timeLimit = -1;
+	
 	public ExplGenOptions() {
 		CmdLineParser.registerHandler(String[].class, StringArrayOptionHandler.class);
 	}
@@ -240,6 +243,14 @@ public class ExplGenOptions {
 
 	public void setGoldStandard(File goldStandard) {
 		this.goldStandard = goldStandard;
+	}
+
+	public int getTimeLimit() {
+		return timeLimit;
+	}
+
+	public void setTimeLimit(int timeLimit) {
+		this.timeLimit = timeLimit;
 	}
 	
 	

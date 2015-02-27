@@ -12,6 +12,7 @@ import org.vagabond.explanation.marker.IAttributeValueMarker;
 import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerFactory;
+import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.SuperflousMappingError;
@@ -58,9 +59,8 @@ public class SuperfluousMappingExplanationGenerator
 		if (explsForMap.containsKey(maps))
 		{
 			expl = explsForMap.get(maps);
-			
+			result.addExplanation(expl);
 		} else {
-		
 			expl = new SuperflousMappingError(error);
 			affRels = new HashMap<String, Set<String>> ();
 					
@@ -83,7 +83,7 @@ public class SuperfluousMappingExplanationGenerator
 					computeSideEffects(affRel, affRels.get(affRel));
 				}
 					
-				expl.getTargetSideEffects().remove(MarkerFactory.newTupleMarker(error));
+				expl.getTargetSideEffects().remove(error);
 				
 				result.addExplanation(expl);
 				explsForMap.put(maps, expl);
@@ -93,7 +93,6 @@ public class SuperfluousMappingExplanationGenerator
 	}
 
 	private IMarkerSet computeSideEffects(String rel, Set<String> maps) throws Exception {
-		IMarkerSet result;
 		String query;
 		ResultSet rs;
 		IMarkerSet sideEff = expl.getTargetSideEffects();
@@ -106,8 +105,6 @@ public class SuperfluousMappingExplanationGenerator
 		}
 		mapList.deleteCharAt(mapList.length() - 1);
 
-		result = MarkerFactory.newMarkerSet();
-		
 		query = QueryHolder.getQuery("SuperMap.GetSideEffects")
 				.parameterize("target." + rel, mapList.toString());
 		if (log.isDebugEnabled()) {log.debug("Run side effect query for <" + rel + "> with query <\n" 
@@ -115,12 +112,15 @@ public class SuperfluousMappingExplanationGenerator
 		
 		rs = ConnectionManager.getInstance().execQuery(query);
 		
+		int relId = ScenarioDictionary.getInstance().getRelId(rel);
+		int numAtt = ScenarioDictionary.getInstance().getAttrCount(relId);
 		while(rs.next())
-			sideEff.add(MarkerFactory.newTupleMarker(rel, rs.getString(1)));
+			for(int attr = 0; attr < numAtt; attr++)
+				sideEff.add(MarkerFactory.newAttrMarker(rel, rs.getString(1), attr));
 		
 		ConnectionManager.getInstance().closeRs(rs);
 		
-		return result;
+		return sideEff;
 	}
 
 }

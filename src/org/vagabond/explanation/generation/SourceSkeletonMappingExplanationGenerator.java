@@ -68,9 +68,10 @@ public class SourceSkeletonMappingExplanationGenerator implements
 
 		// Cashing Results 
 		if (explsForMap.containsKey(maps)) {
-			
 			expl = explsForMap.get(maps);
-			
+			if (expl.getMappingSideEffectSize() != 0) {
+				result.addExplanation(expl);
+			}			
 		} else {
 		
 			expl = new SourceSkeletonMappingError(error);
@@ -145,10 +146,10 @@ public class SourceSkeletonMappingExplanationGenerator implements
 			expl.getTargetSideEffects().remove(error);
 	
 			// we found at least one mapping that may have joined incorrectly
-			if (expl.getMappingSideEffectSize() != 0)
+			if (expl.getMappingSideEffectSize() != 0) {
 				result.addExplanation(expl);
-				explsForMap.put(maps, expl);
-			
+			}
+			explsForMap.put(maps, expl);
 		}
 	}
 

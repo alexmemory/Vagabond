@@ -250,6 +250,10 @@ public class ScenarioDictionary {
 		return getAttrCount(targetSchema.getRelationArray());
 	}
 	
+	public int getAttrCount(int relId) {
+		return rels.get(relId).sizeOfAttrArray();
+	}
+	
 	private int getAttrCount (List<RelationType> rels) {
 		int attrCount = 0;
 		

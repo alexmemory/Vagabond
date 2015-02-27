@@ -7,9 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -143,7 +145,7 @@ public class CommandLineExplGen {
 				RankingMetricPrecisionRecall metric;
 				double prec = 0.0, rec = 0.0;
 				max = (max == -1) ? Integer.MAX_VALUE : max;
-				
+				int real = 0;
 				// have to copy the set because computing real target SE changes the hash
 				for(IBasicExplanation e: pre) {
 					e.computeRealTargetSEAndExplains(markers);
@@ -152,21 +154,23 @@ public class CommandLineExplGen {
 				
 				metric = new RankingMetricPrecisionRecall(gold);
 				
-				for(int i = 0; i < max; i++) {
+				// gather solutions
+				while(iter.hasNext() && real < max) {
+					iter.next();
+					real++;
+				}
+				
+				for(int i = 0; i < real; i++) {
 					IExplanationSet set;
 					double score = 0.0;
 					
 					if (options.noUsePart()) {
-						if (explRank.getNumberOfExplSets() <= i)
-							break;
 						prec = metric.computePrecision(explRank, i);
 						rec = metric.computeRecall(explRank, i);
 						set = explRank.getRankedExpl(i);
 						score = explRank.getScoreF().getScore(set);
 					}
 					else {
-						if (partRank.getNumberOfExplSets() <= i)
-							break;
 						prec = metric.computePrecision(partRank, i);
 						rec = metric.computeRecall(partRank, i);
 						set = partRank.getRankedExpl(i);
@@ -192,9 +196,9 @@ public class CommandLineExplGen {
 				long beforeRank = System.nanoTime();
 				//only 10mins running for ranking
 				long start = System.currentTimeMillis();
-				long end = start + 600*1000;
+				long end = options.getTimeLimit() == -1 ? -1 :  start + options.getTimeLimit()*1000;
 				
-				while (iter.hasNext() && (max == -1 || i <= max) && System.currentTimeMillis() < end) {
+				while (iter.hasNext() && (max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
 					long lStartTime = System.nanoTime();				
 					IExplanationSet set = iter.next();
 					double score = -1.0;
@@ -348,18 +352,6 @@ public class CommandLineExplGen {
 			long difference= (lEndTime - lStartTime);
 			double secs = ((double) difference) / 1000.0;
 			System.out.printf("Total: %.2f secs\n", secs);
-			
-//			try {
-//				PrintStream out = new PrintStream(new FileOutputStream("./RTData-Ranking/HE100_50EM.txt", true));
-//				if (!secsRank.equals(null)) System.out.println(secsRank);
-//				if (!rankSecs.equals(null)) System.out.println(rankSecs);
-//				System.out.printf("Total: %.2f secs\n", secs);
-//				System.setOut(out);
-			    
-//			} catch (FileNotFoundException e) {
-//			      e.printStackTrace();
-//		    }
-			
 		}
 		
 		System.exit(0);
