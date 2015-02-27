@@ -95,7 +95,7 @@ public class SimpleExplanationSet implements IExplanationSet {
 	public String toString () {
 		StringBuffer result = new StringBuffer();
 		
-		result.append("ExplanationSet:\n\nStats:\n" + getStats());
+		result.append("ExplanationSet(" + System.identityHashCode(this) + "," +  hashCode() + "):\n\nStats:\n" + getStats());
 		result.append("\nExpls:\n\n--");
 		for (IBasicExplanation expl: expls) {
 			result.append(expl.toString());

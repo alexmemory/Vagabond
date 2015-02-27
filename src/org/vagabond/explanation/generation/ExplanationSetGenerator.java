@@ -9,6 +9,8 @@ import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
+import org.vagabond.explanation.model.basic.IBasicExplanation;
+import org.vagabond.explanation.model.basic.IBasicExplanation.ExplanationType;
 import org.vagabond.explanation.ranking.DummyRanker;
 import org.vagabond.util.LogProviderHolder;
 
@@ -38,6 +40,34 @@ public class ExplanationSetGenerator {
 		}
 		
 		result.createRanker (new DummyRanker());
+		
+		if (log.isInfoEnabled()) {
+			boolean error = false;
+			for(IExplanationSet outSet: result.getExplSets()) {
+				for(IBasicExplanation outE: outSet) {
+					if (outE.getType() == ExplanationType.SuperflousMappingError 
+							|| outE.getType() == ExplanationType.SourceSkeletonMappingError
+							|| outE.getType() == ExplanationType.CorrespondenceError) {
+						for(IExplanationSet inSet : result.getExplSets()) {
+							for(IBasicExplanation inE: inSet) {
+								if (inE.getType() == ExplanationType.SuperflousMappingError 
+										|| inE.getType() == ExplanationType.SourceSkeletonMappingError
+										|| inE.getType() == ExplanationType.CorrespondenceError) {
+									if (inE.equals(outE) && inE != outE) {
+										System.out.println("same explanation, but not same object");
+										System.out.println(inE.toString());
+										error = true;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if (error)
+				System.exit(1);
+		}
+		
 		
 		return result;
 	}

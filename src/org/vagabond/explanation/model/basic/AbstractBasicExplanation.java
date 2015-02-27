@@ -26,7 +26,8 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	private static  Collection<MappingType> mapSEDummy;
 	private static  Collection<CorrespondenceType> corrSEDummy;
 	private static  Collection<TransformationType> transSEDummy;
-	
+
+	private boolean haveComputedRealSE = false;
 	protected IAttributeValueMarker error;
 	protected IMarkerSet targetSE;
 	protected IMarkerSet realTargetSE;
@@ -213,14 +214,14 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	}
 	
 	protected void computeHash () {
-		if (realExplains.isEmpty()) {
-			hash = fnv(error.hashCode());
-		}
-		else {
-			hash = fnv(realExplains);
-			hash = fnv(realTargetSE, hash);	
-		}
-		hash = fnv(getType(), hash);
+//		if (realExplains.isEmpty()) {
+//			hash = fnv(error.hashCode());
+//		}
+//		else {
+//			hash = fnv(realExplains);
+//			hash = fnv(realTargetSE, hash);	
+//		}
+		hash = fnv(getType());
 	}
 	
 	@Override
@@ -296,10 +297,12 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	
 	@Override
 	public void computeRealTargetSEAndExplains (IMarkerSet errors) {
+		assert(!haveComputedRealSE);
 		realTargetSE = targetSE.cloneSet().diff(errors);
 		realExplains = MarkerFactory.newMarkerSet(error);
 		realExplains.union(targetSE.cloneSet().intersect(errors));
-		updateHash();
+//		updateHash();
+		haveComputedRealSE = true;
 	}
 	
 	public IMarkerSet getRealExplains() {

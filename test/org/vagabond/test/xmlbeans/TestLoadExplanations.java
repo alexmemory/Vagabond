@@ -34,9 +34,9 @@ public class TestLoadExplanations extends AbstractVagabondTest {
 		c.setTransSE(MapScenarioHolder.getInstance().getTransformations("T1"));
 		
 		CopySourceError cse = new CopySourceError();
-		cse.setExplains(MarkerParser.getInstance().parseMarker("A(employee,1|1,name)"));
-		cse.setSourceSE(MarkerParser.getInstance().parseSet("{A(person,1,name)}"));
-		cse.setTargetSE(MarkerParser.getInstance().parseSet("{}"));
+		cse.setExplains(MarkerParser.getInstance().parseMarker("A(employee,4|2,city)"));
+		cse.setSourceSE(MarkerParser.getInstance().parseSet("{A(address,2,city)}"));
+		cse.setTargetSE(MarkerParser.getInstance().parseSet("{A(employee,2|2,city)}"));
 		
 		IExplanationSet ex = ExplanationFactory.newExplanationSet(c,cse);
 		
