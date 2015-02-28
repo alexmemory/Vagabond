@@ -380,7 +380,7 @@ public class SchemaCodeGenerator {
 		int i = 0;
 		String newFkName = fkeyName;
 		while(fkeyNames.contains(newFkName))
-			newFkName = fkeyName + i;
+			newFkName = fkeyName + i++;
 		fkeyNames.add(newFkName);
 		
 		result.append("CREATE INDEX " +  "source_fkey_index_" + newFkName + " ON ");
