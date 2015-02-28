@@ -27,18 +27,22 @@ public class TestResultSetUtil extends AbstractVagabondTest {
 	public void testProvAttrSplitters () {
 		String[] names = {"prov_public_r_a", 
 						"prov_public_r_1_b", 
-						"prov_target_rel__with__underscore_name"};
+						"prov_target_rel__with__underscore_name",
+						"prov_source_joinme61nl0ce0_separate__me__61__nl0__ae0comp1__joi"};
 		assertEquals(ResultSetUtil.getAttrFromProvName(names[0]),"a");
 		assertEquals(ResultSetUtil.getAttrFromProvName(names[1]),"b");
 		assertEquals(ResultSetUtil.getAttrFromProvName(names[2]),"name");
+		assertEquals(ResultSetUtil.getAttrFromProvName(names[3]),"separate_me_61_nl0_ae0comp1_joi");
 		
 		assertEquals(ResultSetUtil.getRelFromProvName(names[0]),"r");
 		assertEquals(ResultSetUtil.getRelFromProvName(names[1]),"r");
 		assertEquals(ResultSetUtil.getRelFromProvName(names[2]),"rel_with_underscore");
+		assertEquals(ResultSetUtil.getRelFromProvName(names[3]),"joinme61nl0ce0");
 		
 		assertTrue(ResultSetUtil.isProvAttr(names[0]));
 		assertTrue(ResultSetUtil.isProvAttr(names[1]));
 		assertTrue(ResultSetUtil.isProvAttr(names[2]));
+		assertTrue(ResultSetUtil.isProvAttr(names[3]));
 	}
 	
 	@Test 

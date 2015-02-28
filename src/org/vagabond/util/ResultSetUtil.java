@@ -89,7 +89,7 @@ public class ResultSetUtil {
 		temp = new StringBuffer ();
 		chars = name.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
-			if (chars[i] == '_' && chars[i+1] == '_') {
+			if (i < chars.length - 1 && chars[i] == '_' && chars[i+1] == '_') {
 				i++;
 				temp.append('_');
 			}
