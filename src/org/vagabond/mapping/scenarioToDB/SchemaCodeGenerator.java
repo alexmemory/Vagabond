@@ -367,7 +367,14 @@ public class SchemaCodeGenerator {
 		result.append(");\n");
 		
 		// create index
-		result.append("CREATE INDEX " +  "source_fkey_index_" + fkey.getId() + " ON ");
+		String fkeyName = fkey.getId();
+		if (fkeyName == null) {
+			fkeyName = fkey.getFrom().getTableref();
+			for(String attr: fkey.getFrom().getAttrArray()) {
+				fkeyName += "_" + attr;
+			}
+		}
+		result.append("CREATE INDEX " +  "source_fkey_index_" + fkeyName + " ON ");
 		result.append(schemaName + fkey.getFrom().getTableref());
 		result.append("(");
 		for(String attr: fkey.getFrom().getAttrArray()) {
