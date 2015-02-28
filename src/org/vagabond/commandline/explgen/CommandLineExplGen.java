@@ -97,7 +97,19 @@ public class CommandLineExplGen {
 			// No Partitioning
 			if (options.noUsePart()) {
 				ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();			
-				ExplanationCollection col2 = noPartGen.findExplanations(markers);
+				ExplanationCollection col2;
+				{
+					long lStartTime = new Date().getTime();
+				
+					col2 = noPartGen.findExplanations(markers);
+	
+					long lEndTime = System.nanoTime();
+					long difference= (lEndTime - lStartTime);
+					double secs = ((double) difference) / 1000000000.0;
+					System.out.printf("ExplGen: %.2f secs\n", secs);
+				}
+	
+				
 							
 				if (options.getRankerScheme() != null){
 
@@ -113,9 +125,19 @@ public class CommandLineExplGen {
 			else {		
 				PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
 				partGen.init();
+				ExplPartition p;
+				
+				{
+					long lStartTime = System.nanoTime();
+				
+					p = partGen.findExplanations(markers);
 	
-				ExplPartition p = partGen.findExplanations(markers);
-	
+					long lEndTime = System.nanoTime();
+					long difference= (lEndTime - lStartTime);
+					double secs = ((double) difference) / 1000000000.0;
+					System.out.printf("ExplGen: %.2f secs\n", secs);
+				}
+				
 				if (options.getSkylineRankers() != null) {
 					if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
 							+ Arrays.toString(options.getSkylineRankers()));};
