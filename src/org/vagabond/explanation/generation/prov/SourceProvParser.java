@@ -91,8 +91,8 @@ public class SourceProvParser {
 	}
 	
 	private boolean isTidProvAttr (String name) {
-		return ResultSetUtil.getAttrFromProvName(name).equals("tid") 
-				&& ResultSetUtil.isProvAttr(name);
+		return ResultSetUtil.isProvAttr(name) 
+				&& ResultSetUtil.getAttrFromProvName(name).equals("tid");
 	}
 
 	public ProvWLRepresentation getAllProv() {
