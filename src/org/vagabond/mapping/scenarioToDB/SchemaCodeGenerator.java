@@ -1,7 +1,9 @@
 package org.vagabond.mapping.scenarioToDB;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.vagabond.explanation.generation.QueryHolder;
@@ -331,9 +333,10 @@ public class SchemaCodeGenerator {
 	
 	private void getAllSourceForeignKeysCode (SchemaType schema, 
 			String schemaName, StringBuffer result) {
+		Set<String> fkeyNames = new HashSet<String> ();
 		for(ForeignKeyType fkey: schema.getForeignKeyArray()) {
 			result.append("\n");
-			getForeignKeyCode(fkey, schemaName, result);
+			getForeignKeyCode(fkey, schemaName, result, fkeyNames);
 		}
 	}
 	
@@ -346,7 +349,7 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getForeignKeyCode (ForeignKeyType fkey, String schemaName, 
-			StringBuffer result) {
+			StringBuffer result, Set<String> fkeyNames) {
 		char delim = ',';
 		
 		schemaName = getSchemaString (schemaName);
@@ -374,7 +377,13 @@ public class SchemaCodeGenerator {
 				fkeyName += "_" + attr;
 			}
 		}
-		result.append("CREATE INDEX " +  "source_fkey_index_" + fkeyName + " ON ");
+		int i = 0;
+		String newFkName = fkeyName;
+		while(fkeyNames.contains(newFkName))
+			newFkName = fkeyName + i;
+		fkeyNames.add(newFkName);
+		
+		result.append("CREATE INDEX " +  "source_fkey_index_" + newFkName + " ON ");
 		result.append(schemaName + fkey.getFrom().getTableref());
 		result.append("(");
 		for(String attr: fkey.getFrom().getAttrArray()) {
