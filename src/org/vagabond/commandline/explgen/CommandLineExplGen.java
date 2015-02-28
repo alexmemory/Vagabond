@@ -99,7 +99,7 @@ public class CommandLineExplGen {
 				ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();			
 				ExplanationCollection col2;
 				{
-					long lStartTime = new Date().getTime();
+					long lStartTime = System.nanoTime();
 				
 					col2 = noPartGen.findExplanations(markers);
 	
@@ -220,11 +220,15 @@ public class CommandLineExplGen {
 				long start = System.currentTimeMillis();
 				long end = options.getTimeLimit() == -1 ? -1 :  start + options.getTimeLimit()*1000;
 				
-				while (iter.hasNext() && (max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
+				while ((max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
 					long lStartTime = System.nanoTime();				
 					IExplanationSet set = iter.next();
 					double score = -1.0;
 
+					// do check inside timing, because ranking cost may be hidden in this check
+					if (!iter.hasNext())
+						break;
+					
 					if (f != null)
 						score = f.getScore(set);
 					
