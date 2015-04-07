@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="employee">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>supervisor</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>worksat</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>livesat</Name><DataType>NUMERIC</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="firm">
+			<Attr><Name>fname</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>headq</Name><DataType>NUMERIC</DataType></Attr>
+			<Attr><Name>ceo</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>fname</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="address">
+			<Attr><Name>id</Name><DataType>NUMERIC</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>street</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>id</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="customer">
+			<Attr><Name>cname</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>address</Name><DataType>NUMERIC</DataType></Attr>
+			<Attr><Name>since</Name><DataType>NUMERIC</DataType></Attr>
+			<PrimaryKey><Attr>cname</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="suvervisor_emp">
+			<From tableref="employee"><Attr>supervisor</Attr></From>
+			<To tableref="employee"><Attr>name</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="ceo_emp">
+			<From tableref="firm"><Attr>ceo</Attr></From>
+			<To tableref="employee"><Attr>name</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="worksat_firm">
+			<From tableref="employee"><Attr>worksat</Attr></From>
+			<To tableref="firm"><Attr>fname</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="livesat_addr">
+			<From tableref="employee"><Attr>livesat</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="headq_addr">
+			<From tableref="firm"><Attr>headq</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="address_addr">
+			<From tableref="customer"><Attr>address</Attr></From>
+			<To tableref="address"><Attr>id</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="organigram">
+			<Attr><Name>boss</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>subordinate</Name><DataType>TEXT</DataType></Attr>
+		</Relation>
+		<Relation name="person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>homecity</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>age</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="subordinate_person">
+			<From tableref="organigram"><Attr>subordinate</Attr></From>
+			<To tableref="person"><Attr>name</Attr></To>
+		</ForeignKey>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="employee"><Attr>name</Attr></From>
+		<To tableref="organigram"><Attr>subordinate</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="firm"><Attr>fname</Attr></From>
+		<To tableref="organigram"><Attr>boss</Attr></To>
+	</Correspondence>
+	<Correspondence id="c3">
+		<From tableref="employee"><Attr>name</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c4">
+		<From tableref="address"><Attr>city</Attr></From>
+		<To tableref="person"><Attr>homecity</Attr></To>
+	</Correspondence>
+	<Correspondence id="c5">
+		<From tableref="customer"><Attr>cname</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence ref="c1" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="employee"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="organigram"><Var>e</Var><Var>a</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Uses>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c2" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="employee"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
+			<Atom tableref="firm"><Var>c</Var><Var>e</Var><Var>f</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="organigram"><Var>c</Var><Var>a</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M3">
+		<Uses>
+			<Correspondence ref="c3" />
+			<Correspondence ref="c4" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="employee"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
+			<Atom tableref="firm"><Var>c</Var><Var>e</Var><Var>f</Var></Atom>
+			<Atom tableref="address"><Var>e</Var><Var>g</Var><Var>h</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>a</Var><Var>g</Var><Var>i</Var></Atom>
+		</Exists>
+	</Mapping>	
+	<Mapping id="M4">
+		<Uses>
+			<Correspondence ref="c4" />
+			<Correspondence ref="c5" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="address"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
+			<Atom tableref="customer"><Var>d</Var><Var>a</Var><Var>e</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>d</Var><Var>b</Var><Var>f</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="organigram">
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
+		<Code>
+SELECT COALESCE(e.tid::text,'') AS tid, 'SK1(' || e.name || ')' AS boss, e.name AS subordinate
+FROM source.employee ANNOT('M1') e
+UNION ALL
+SELECT COALESCE(e.tid::text,'') || '|' || COALESCE(f.tid::text,'') AS tid, f.fname AS boss, e.name AS subordinate
+FROM source.employee ANNOT('M2') e, source.firm ANNOT('M2') f
+WHERE e.worksat = f.fname
+		</Code>
+	</Transformation>
+	<Transformation id="T2" creates="person">
+		<Implements><Mapping ref="M3" /><Mapping ref="M4" /></Implements>
+		<Code>
+SELECT COALESCE(e.tid::text,'') || '|' || COALESCE(f.tid::text,'') || '|' || COALESCE(a.tid::text,'') AS tid, e.name AS name, a.city AS homecity, 'SK1(' || e.name || ',' || a.city || ')' AS age
+FROM source.employee ANNOT('M3') e, source.firm ANNOT('M3') f, source.address ANNOT('M3') a
+WHERE e.worksat = f.fname AND f.headq = a.id
+UNION ALL
+SELECT COALESCE(c.tid::text,'') || '|' || COALESCE(a.tid::text,'') AS tid, c.cname AS name, a.city AS homecity, 'SK1(' || c.cname || ',' || a.city || ')' AS age
+FROM source.customer ANNOT('M4') c, source.address ANNOT('M4') a
+WHERE c.address = a.id 
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>vagabond</DB>
+	<User>shek21</User>
+	<Password/>
+	<Port>5432</Port>
+</ConnectionInfo>
+<Data>
+	<Instance name="employee">
+		<Row><Value>1</Value><Value>Fullbright</Value><Value>NULL</Value><Value>IBM</Value><Value>1</Value></Row>
+		<Row><Value>2</Value><Value>Welth</Value><Value>NULL</Value><Value>Oracle</Value><Value>2</Value></Row>
+		<Row><Value>3</Value><Value>Smith</Value><Value>Welth</Value><Value>Oracle</Value><Value>3</Value></Row>
+		<Row><Value>4</Value><Value>Johnson</Value><Value>Smith</Value><Value>Oracle</Value><Value>4</Value></Row>
+		<Row><Value>5</Value><Value>Miller</Value><Value>Fullbright</Value><Value>IBM</Value><Value>4</Value></Row>
+	</Instance>
+	<Instance name="firm">
+		<Row><Value>1</Value><Value>IBM</Value><Value>5</Value><Value>Fullbright</Value></Row>
+		<Row><Value>2</Value><Value>Oracle</Value><Value>2</Value><Value>Welth</Value></Row>
+	</Instance>
+	<Instance name="address">
+		<Row><Value>1</Value><Value>1</Value><Value>Los Angeles</Value><Value>15 Little Way</Value></Row>
+		<Row><Value>2</Value><Value>2</Value><Value>New York</Value><Value>3 Broadway Rd</Value></Row>
+		<Row><Value>3</Value><Value>3</Value><Value>Chicago</Value><Value>10 East Rd</Value></Row>
+		<Row><Value>4</Value><Value>4</Value><Value>Chicago</Value><Value>2200 W 31st Rd</Value></Row>
+		<Row><Value>5</Value><Value>5</Value><Value>Toronto</Value><Value>1 Bloor St</Value></Row>
+		<Row><Value>6</Value><Value>6</Value><Value>Orlando</Value><Value>15 Smith Way</Value></Row>
+		<Row><Value>7</Value><Value>7</Value><Value>Paris</Value><Value>7 Rue de Cue</Value></Row>
+	</Instance>
+	<Instance name="customer">
+		<Row><Value>1</Value><Value>Jessica Good</Value><Value>6</Value><Value>2005</Value></Row>
+		<Row><Value>2</Value><Value>Julia Good</Value><Value>6</Value><Value>2012</Value></Row>
+		<Row><Value>3</Value><Value>Heinz Schmidt</Value><Value>7</Value><Value>2007</Value></Row>
+	</Instance>
+</Data>
+</this:MappingScenario>
