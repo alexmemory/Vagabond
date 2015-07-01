@@ -662,16 +662,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * Suggestion: instead of only confirming an explanation, give the
-	 * opportunity to ignore an invalid explanation.
-	 * 
-	 * @param incorrectExpl
-	 */
-	public void ignoreExplanation(IBasicExplanation incorrectExpl) {
-
-	}
-
 	@Override
 	public int getNumberOfExplSets() {
 		return numSets;

@@ -277,7 +277,7 @@ public class CommandLineExplGen {
 					read = in.readLine().trim();
 					
 					if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
-					cont = !read.trim().startsWith("n");
+					cont = read.trim().startsWith("y") || read.trim().startsWith("v");
 				}
 			}
 		}
