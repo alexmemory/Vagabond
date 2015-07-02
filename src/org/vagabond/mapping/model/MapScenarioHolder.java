@@ -40,6 +40,11 @@ public class MapScenarioHolder {
 	private Map<MappingType, MappingGraph> graphsForMaps;
 	private Map<TransformationType, RelationType[]> transToSource;
 	private Map<TransformationType, RelationType> transToTarget;
+	private Map<String,MappingType> idToMap;
+	private Map<String,RelationType> idToSourceRel;
+	private Map<String,RelationType> idToTargetRel;
+	private Map<String,CorrespondenceType> idToCorrs;
+	
 	private ErrorPartitionGraph scenGraph;
 	
 	public static MapScenarioHolder getInstance() {
@@ -58,14 +63,18 @@ public class MapScenarioHolder {
 	 */
 	
 	public MapScenarioHolder (MappingScenarioDocument doc) {
-		setDocument (doc);
 		init();
+		setDocument (doc);
 	}
 	
 	protected void init() {
 		graphsForMaps = new HashMap<MappingType, MappingGraph> ();
 		transToSource = new HashMap<TransformationType, RelationType[]> ();
 		transToTarget = new HashMap<TransformationType, RelationType> ();
+		idToMap = new HashMap<String,MappingType> ();
+		idToSourceRel = new HashMap<String,RelationType> ();
+		idToTargetRel = new HashMap<String,RelationType> ();
+		idToCorrs = new HashMap<String,CorrespondenceType> (); 
 	}
 	
 	/**
@@ -77,6 +86,16 @@ public class MapScenarioHolder {
 	public void setDocument (MappingScenarioDocument doc) {
 		this.doc = doc;
 		GlobalResetter.getInstance().reset();
+		
+		// initialize map data structures
+		for(MappingType m: doc.getMappingScenario().getMappings().getMappingArray())
+			idToMap.put(m.getId(), m);
+		for(RelationType r: doc.getMappingScenario().getSchemas().getSourceSchema().getRelationArray())
+			idToSourceRel.put(r.getName(), r);
+		for(RelationType r: doc.getMappingScenario().getSchemas().getTargetSchema().getRelationArray())
+			idToTargetRel.put(r.getName(), r);
+		for(CorrespondenceType c: doc.getMappingScenario().getCorrespondences().getCorrespondenceArray())
+			idToCorrs.put(c.getId(), c);
 	}
 
 	/**
@@ -264,12 +283,18 @@ public class MapScenarioHolder {
 	public RelationType getRelForName (String relname, boolean target) throws Exception {
 		RelationType[] rels;
 		
-		if (target)
+		if (target) {
+			if (idToTargetRel.containsKey(relname))
+				return idToTargetRel.get(relname);
 			rels = doc.getMappingScenario().getSchemas().
 					getTargetSchema().getRelationArray();
-		else
+		}
+		else {
+			if (idToSourceRel.containsKey(relname))
+				return idToSourceRel.get(relname);
 			rels = doc.getMappingScenario().getSchemas().
 					getSourceSchema().getRelationArray();
+		}
 		
 		for (RelationType rel: rels) {
 			if (rel.getName().equals(relname))
@@ -293,7 +318,25 @@ public class MapScenarioHolder {
 		return result;
 	}
 	
+	public void indexMapping (MappingType m) {
+		idToMap.put(m.getId(), m);
+	}
+	
+	public void indexRel (RelationType r, boolean source) {
+		if (source)
+			idToSourceRel.put(r.getName(), r);
+		else
+			idToTargetRel.put(r.getName(), r);
+	}
+	
+	public void indexCorr (CorrespondenceType c) {
+		idToCorrs.put(c.getId(), c);
+	}
+	
 	public boolean hasMapping (String name) {
+		if (idToMap.containsKey(name))
+			return true;
+		
 		for(MappingType map: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
 			if (map.getId().equals(name))
@@ -304,6 +347,9 @@ public class MapScenarioHolder {
 	}
 	
 	public MappingType getMapping (String name) throws Exception {
+		if (idToMap.containsKey(name))
+			return idToMap.get(name);
+		
 		for(MappingType map: doc.getMappingScenario().getMappings()
 				.getMappingArray()) {
 			if (map.getId().equals(name))
