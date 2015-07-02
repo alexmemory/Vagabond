@@ -3,18 +3,11 @@ package org.vagabond.commandline.explgen;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -56,6 +49,12 @@ public class CommandLineExplGen {
 	static String rankSecs = "";
 	static String secsRank = "";
 	
+	private Iterator<IExplanationSet> iter;
+	private IExplanationRanker explRank;
+	private SkylineRanker skyRank;
+	private IPartitionRanker partRank;
+	private IScoringFunction scoringFunction;
+	
 	public CommandLineExplGen() {
 		options = new ExplGenOptions();
 		gen = new ExplanationSetGenerator();
@@ -85,8 +84,10 @@ public class CommandLineExplGen {
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
-		if (options.isUseRanker()) 
-			rankExplanations(out);
+		if (options.isUseRanker()){ 
+			rankExplanations();
+			printExplanations();
+		}
 		else {
 			ExplanationCollection col = gen.findExplanations(markers);
 			if (!options.isNoShowSets())
@@ -104,12 +105,7 @@ public class CommandLineExplGen {
 		System.out.printf(section + ": %.2f secs\n", getTimeDifference(startTime));
 	}
 	
-	private void rankExplanations(PrintStream out) throws Exception {
-		Iterator<IExplanationSet> iter = null;
-		IExplanationRanker explRank = null;
-		SkylineRanker skyRank  = null;
-		IPartitionRanker partRank = null;
-		IScoringFunction scoringFunction = null;
+	private void rankExplanations() throws Exception{
 		
 		// No Partitioning
 		if (options.noUsePart()) {
@@ -130,6 +126,7 @@ public class CommandLineExplGen {
 				scoringFunction = explRank.getScoreF();
 			}
 		}
+		// Using Partitioning
 		else {		
 			PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
 			partGen.init();
@@ -155,6 +152,9 @@ public class CommandLineExplGen {
 				scoringFunction = partRank.getScoreF();
 			}
 		}
+	}
+		
+	private void printExplanations() throws Exception{
 		
 		boolean cont = true;
 		int r = 0;
