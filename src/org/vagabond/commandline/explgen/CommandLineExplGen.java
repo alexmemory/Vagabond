@@ -108,9 +108,7 @@ public class CommandLineExplGen {
 					double secs = ((double) difference) / 1000000000.0;
 					System.out.printf("ExplGen: %.2f secs\n", secs);
 				}
-	
-				
-							
+		
 				if (options.getRankerScheme() != null){
 
 					if (log.isDebugEnabled()) {
@@ -277,7 +275,9 @@ public class CommandLineExplGen {
 					read = in.readLine().trim();
 					
 					if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
-					cont = read.trim().startsWith("y") || read.trim().startsWith("v");
+					
+					boolean verifier = read.trim().startsWith("v");
+					cont = read.trim().startsWith("y") || verifier;
 				}
 			}
 		}
@@ -380,7 +380,6 @@ public class CommandLineExplGen {
 			System.out.printf("Total: %.2f secs\n", secs);
 		}
 		
-		System.exit(0);
-		 
+		System.exit(0);		 
 	}
 }
