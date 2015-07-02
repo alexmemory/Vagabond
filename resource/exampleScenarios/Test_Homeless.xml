@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<this:MappingScenario xmlns:this="org/vagabond/xmlmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Schemas>
+	<SourceSchema>
+		<Relation name="tramp">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>nickname</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>firstseen</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>caredforby</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="socialworker">
+			<Attr><Name>ssn</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>worksfor</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>ssn</Attr></PrimaryKey>
+		</Relation>
+		<Relation name="soupkitchen">
+			<Attr><Name>location</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>city</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>budget</Name><DataType>NUMERIC</DataType></Attr>
+			<PrimaryKey><Attr>location</Attr></PrimaryKey>
+		</Relation>
+		<ForeignKey id="tramp_seen">
+			<From tableref="tramp"><Attr>firstseen</Attr></From>
+			<To tableref="soupkitchen"><Attr>location</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="tramp_caredfor">
+			<From tableref="tramp"><Attr>caredforby</Attr></From>
+			<To tableref="socialworker"><Attr>ssn</Attr></To>
+		</ForeignKey>
+		<ForeignKey id="sw_works_for">
+			<From tableref="socialworker"><Attr>worksfor</Attr></From>
+			<To tableref="soupkitchen"><Attr>location</Attr></To>
+		</ForeignKey>
+	</SourceSchema>
+	<TargetSchema>
+		<Relation name="person">
+			<Attr><Name>name</Name><DataType>TEXT</DataType></Attr>
+			<Attr><Name>livesin</Name><DataType>TEXT</DataType></Attr>
+			<PrimaryKey><Attr>name</Attr></PrimaryKey>
+		</Relation>
+	</TargetSchema>
+</Schemas>
+<Correspondences>
+	<Correspondence id="c1">
+		<From tableref="tramp"><Attr>nickname</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c2">
+		<From tableref="socialworker"><Attr>name</Attr></From>
+		<To tableref="person"><Attr>name</Attr></To>
+	</Correspondence>
+	<Correspondence id="c3">
+		<From tableref="soupkitchen"><Attr>city</Attr></From>
+		<To tableref="person"><Attr>livesin</Attr></To>
+	</Correspondence>
+</Correspondences>
+<Mappings>
+	<Mapping id="M1">
+		<Uses>
+			<Correspondence ref="c1" />
+			<Correspondence ref="c3" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>c</Var><Var>g</Var><Var>h</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>a</Var><Var>g</Var></Atom>
+		</Exists>
+	</Mapping>
+	<Mapping id="M2">
+		<Uses>
+			<Correspondence ref="c2" />
+			<Correspondence ref="c3" />
+		</Uses>
+		<Foreach>
+			<Atom tableref="socialworker"><Var>a</Var><Var>b</Var><Var>c</Var></Atom>
+			<Atom tableref="soupkitchen"><Var>c</Var><Var>d</Var><Var>e</Var></Atom>
+		</Foreach>
+		<Exists>
+			<Atom tableref="person"><Var>b</Var><Var>d</Var></Atom>
+		</Exists>
+	</Mapping>
+</Mappings>
+<Transformations>
+	<Transformation id="T1" creates="person">
+		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
+		<Code>
+SELECT '1|' || COALESCE(t.tid::text,'') || '|' || COALESCE(k1.tid::text,'') AS tid,
+	t.nickname AS name, k1.city AS livesin 
+FROM source.tramp ANNOT('M1') t, source.soupkitchen ANNOT('M1') k1 
+WHERE t.firstseen = k1.location 
+UNION ALL
+SELECT '2|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
+	s.name,	k.city AS livesin
+FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
+WHERE s.worksfor = k.location
+		</Code>
+	</Transformation>
+</Transformations>
+<ConnectionInfo>
+	<Host>localhost</Host>
+	<DB>vagabond</DB>
+	<User>shek21</User>
+	<Password/>
+	<Port>5432</Port>
+</ConnectionInfo>
+<Data>
+	<Instance name="tramp">
+		<Row><Value>1</Value><Value>Peter Fullbright</Value><Value>Stinky Pete</Value><Value>GreenPark</Value><Value>777</Value></Row>
+		<Row><Value>2</Value><Value>Harriot Welth</Value><Value>Cartwoman</Value><Value>Manhattan</Value><Value>123</Value></Row>
+		<Row><Value>3</Value><Value>Messi Rionel</Value><Value>messin</Value><Value>GreenPark</Value><Value>666</Value></Row>
+	</Instance>
+	<Instance name="socialworker">
+		<Row><Value>1</Value><Value>123</Value><Value>Jessica Good</Value><Value>GreenPark</Value></Row>
+		<Row><Value>2</Value><Value>666</Value><Value>Laurence Knopfler</Value><Value>GreenPark</Value></Row>
+		<Row><Value>3</Value><Value>777</Value><Value>Jule Hip</Value><Value>Manhattan</Value></Row>
+	</Instance>
+	<Instance name="soupkitchen">
+		<Row><Value>1</Value><Value>GreenPark</Value><Value>Toronto</Value><Value>10.000</Value></Row>
+		<Row><Value>2</Value><Value>Manhattan</Value><Value>New York</Value><Value>5.000</Value></Row>
+	</Instance>
+</Data>
+</this:MappingScenario>
