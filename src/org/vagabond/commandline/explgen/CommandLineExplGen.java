@@ -287,7 +287,7 @@ public class CommandLineExplGen {
 	}
 	
 	private void verifyExplanation(){
-		
+		System.out.println("The user pressed v");
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {

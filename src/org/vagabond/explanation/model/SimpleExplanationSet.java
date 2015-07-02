@@ -25,7 +25,6 @@ public class SimpleExplanationSet implements IExplanationSet {
 	private Set<IBasicExplanation> expls;
 	private ArrayList<IBasicExplanation> sorted = null;
 	private Comparator<IBasicExplanation> comp = null;
-	private int hashCode = -1;
 	
 	public SimpleExplanationSet (Comparator<IBasicExplanation> comp) {
 		init();
