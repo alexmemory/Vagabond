@@ -279,14 +279,15 @@ public class CommandLineExplGen {
 				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
 				
 				if(read.trim().startsWith("v"))
-					removeExplanation(set);
+					verifyExplanation();
+
 				cont = read.trim().startsWith("y");
 			}
 		}
 	}
 	
-	private void removeExplanation(IExplanationSet set){
-		System.out.println("Pressed v");
+	private void verifyExplanation(){
+		
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {

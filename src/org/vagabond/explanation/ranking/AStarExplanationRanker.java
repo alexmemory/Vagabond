@@ -34,10 +34,10 @@ import org.vagabond.util.ewah.IntIterator;
  * are stored in a priority queue. We keep a pointer {@code lastDoneElem} into
  * the queue that stores the position of the currently last fully ranked
  * explanation. In each step we consider the direct successor of
- * {@code lastDoneElem}. If it is a paritial solution, lets say for errors up to
- * ei, then we exend this explanations set with all explanations for ei+1 and
- * insert each of these (partitial) solutions into the queue. If the direct
- * succcessor of {@code lastDoneElem} is a full solution then we have found the
+ * {@code lastDoneElem}. If it is a partial solution, lets say for errors up to
+ * e_i, then we extend this explanations set with all explanations for e_i+1 and
+ * insert each of these (partial) solutions into the queue. If the direct
+ * successor of {@code lastDoneElem} is a full solution then we have found the
  * next ranking result and increase {@code lastDoneElem}.
  * 
  * @author lord_pretzel
@@ -612,7 +612,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return result;
 	}
 
-	// TODO memoize unioned side effects?
+	// TODO memorize united side effects?
 	private void computeScore(RankedListElement elem) {
 		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation>();
 
