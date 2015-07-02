@@ -7,8 +7,6 @@ import org.vagabond.explanation.model.IExplanationSet;
 import org.vagabond.explanation.model.basic.IBasicExplanation;
 import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 
-
-
 public interface IExplanationRanker extends Iterator<IExplanationSet> {
 
 	public void initialize (ExplanationCollection coll);

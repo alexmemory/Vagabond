@@ -26,18 +26,20 @@ import org.vagabond.util.LoggerUtil;
 import org.vagabond.util.ewah.IntIterator;
 
 /**
- * Incremental A*-search based ranking of explanations. We sort the markers  
- * for which we have to create full explanations (which ordering is used is unimportant for correctness).
- * Starting from all possible explanations for the first marker in order (say e1) we iteratively extend
- * these partial solutions with possible explanations for the next marker in order. Partial solutions are
- * stored in a priority queue. We keep a pointer {@code lastDoneElem} into the queue that stores the position of the currently 
- * last fully ranked explanation. In each step we consider the direct successor
- * of {@code lastDoneElem}.  If it is a paritial solution, lets say for errors 
- * up to ei, then we exend this explanations set with all explanations for ei+1
- * and insert each of these (partitial) solutions into the queue. If the 
- * direct succcessor of {@code lastDoneElem} is a full solution then we have 
- * found the next ranking result and increase {@code lastDoneElem}. 
- *   
+ * Incremental A*-search based ranking of explanations. We sort the markers for
+ * which we have to create full explanations (which ordering is used is
+ * unimportant for correctness). Starting from all possible explanations for the
+ * first marker in order (say e1) we iteratively extend these partial solutions
+ * with possible explanations for the next marker in order. Partial solutions
+ * are stored in a priority queue. We keep a pointer {@code lastDoneElem} into
+ * the queue that stores the position of the currently last fully ranked
+ * explanation. In each step we consider the direct successor of
+ * {@code lastDoneElem}. If it is a partial solution, lets say for errors up to
+ * e_i, then we extend this explanations set with all explanations for e_i+1 and
+ * insert each of these (partial) solutions into the queue. If the direct
+ * successor of {@code lastDoneElem} is a full solution then we have found the
+ * next ranking result and increase {@code lastDoneElem}.
+ * 
  * @author lord_pretzel
  *
  */
@@ -46,7 +48,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			AStarExplanationRanker.class);
-	
+
 	// represents a set of explanations
 	public class RankedListElement {
 		public int[] elem;
@@ -55,30 +57,30 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		public int realScore = 0;
 		public int countSet;
 		public int firstUnset;
-		
-		public RankedListElement (int[] elem)  {
+
+		public RankedListElement(int[] elem) {
 			this.elem = elem;
 			countSet = elem.length;
-			
+
 			updateFirstUnset();
-			
+
 			computeScore(this);
 		}
-		
-		public RankedListElement (int maxSize, int ... elems) {
+
+		public RankedListElement(int maxSize, int... elems) {
 			elem = new int[maxSize];
 			countSet = elems.length;
-			
+
 			// initialize unset elements with -1
-			for(int i = elems.length; i < maxSize; i++)
+			for (int i = elems.length; i < maxSize; i++)
 				elem[i] = -1;
-			
+
 			// set elements and implied elements
-			for(int i = 0; i < elems.length; i++) {
-				int newElem =  elems[i];
+			for (int i = 0; i < elems.length; i++) {
+				int newElem = elems[i];
 				elem[i] = newElem;
 
-				for(int j = 0; j < explainsMatrix[i][newElem].length; j++) {
+				for (int j = 0; j < explainsMatrix[i][newElem].length; j++) {
 					int pos = explainsMatrix[i][newElem][j];
 
 					if (this.elem[pos] == -1) {
@@ -87,13 +89,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 					}
 				}
 			}
-			
+
 			updateFirstUnset();
-							
+
 			computeScore(this);
 		}
-		
-		public RankedListElement (RankedListElement prefix, int newElem) {
+
+		public RankedListElement(RankedListElement prefix, int newElem) {
 			this.elem = Arrays.copyOf(prefix.elem, prefix.elem.length);
 			this.min = prefix.min;
 			this.max = prefix.max;
@@ -102,43 +104,46 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			this.firstUnset = prefix.firstUnset;
 			this.elem[prefix.firstUnset] = newElem;
 			countSet++;
-			
+
 			// set implied explanations and new element
-			for(int i = 0; i < explainsMatrix[prefix.firstUnset][newElem].length; i++) {
+			for (int i = 0; i < explainsMatrix[prefix.firstUnset][newElem].length; i++) {
 				int pos = explainsMatrix[prefix.firstUnset][newElem][i];
 				if (this.elem[pos] == -1) {
 					this.elem[pos] = -2;
 					countSet++;
 				}
-			}	
-			
+			}
+
 			// adapt the side effect size
 			updateFirstUnset();
 			computeScore(this);
-			
+
 			if (log.isDebugEnabled()) {
-				if (log.isDebugEnabled()) {log.debug("extended set " + prefix.toString() + " to " 
-						+ toString());};
+				if (log.isDebugEnabled()) {
+					log.debug("extended set " + prefix.toString() + " to "
+							+ toString());
+				}
+				;
 			}
 		}
-		
-		private void updateFirstUnset () {
-			for(int i = 0; i < elem.length; i++)
+
+		private void updateFirstUnset() {
+			for (int i = 0; i < elem.length; i++)
 				if (elem[i] == -1) {
 					firstUnset = i;
 					return;
 				}
 		}
-		
-		public boolean isDone () {
+
+		public boolean isDone() {
 			return (countSet == elem.length);
 		}
-		
-		public String toString () {
+
+		public String toString() {
 			StringBuilder result = new StringBuilder();
-			
+
 			result.append("SORTED[");
-			for(int i: elem) {
+			for (int i : elem) {
 				result.append(i);
 				result.append(',');
 			}
@@ -146,23 +151,23 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			result.append("] of length " + countSet);
 			result.append(" with min " + min);
 			result.append(" and max " + max);
-			
+
 			return result.toString();
 		}
-		
+
 		@Override
-		public boolean equals (Object o) {
+		public boolean equals(Object o) {
 			if (o == null || !(o instanceof RankedListElement))
 				return false;
 			return rankComp.compare(this, (RankedListElement) o) == 0;
 		}
 
 		public boolean extensionWithoutOverlap() {
-			for(int i = 0; i < explainsMatrix[firstUnset].length; i++) {
+			for (int i = 0; i < explainsMatrix[firstUnset].length; i++) {
 				boolean hasOverlap = false;
 				int[] overlap = explainsMatrix[firstUnset][i];
-				
-				for(int j: overlap)
+
+				for (int j : overlap)
 					if (j < firstUnset)
 						hasOverlap = true;
 				if (!hasOverlap)
@@ -170,11 +175,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			}
 			return false;
 		}
-		
-		public boolean lastAdditionHasOverlap () {
-			for(int i = elem.length - 1; i > 0; i--) {
+
+		public boolean lastAdditionHasOverlap() {
+			for (int i = elem.length - 1; i > 0; i--) {
 				if (elem[i] > -1) {
-					for(int j = 0; j < explainsMatrix[i][elem[i]].length;j++) {
+					for (int j = 0; j < explainsMatrix[i][elem[i]].length; j++) {
 						if (explainsMatrix[i][elem[i]][j] < i)
 							return true;
 					}
@@ -183,34 +188,34 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			}
 			return false;
 		}
-		
-		public boolean hasSame (RankedListElement o, int pos) {
+
+		public boolean hasSame(RankedListElement o, int pos) {
 			int exNum, offset = 0;
 			IntIterator iter;
-			
+
 			// get ids of same explanations
-			for(int i = 0; i < pos; i++)
+			for (int i = 0; i < pos; i++)
 				offset += errorExpl.get(i).size();
 			exNum = offset + o.elem[pos];
-			
+
 			iter = sameExpl.getRowIntIter(exNum);
-			
+
 			// is any of the same explanations used in this ranked list element?
 			while (iter.hasNext()) {
 				int elemNum = iter.next();
 				int candExNum = elemNum, errorPos = 0;
-				while(candExNum >= errorExpl.get(errorPos).size()) {
+				while (candExNum >= errorExpl.get(errorPos).size()) {
 					candExNum -= errorExpl.get(errorPos).size();
 					errorPos++;
 				}
-				if(elem[errorPos] == candExNum)
+				if (elem[errorPos] == candExNum)
 					return true;
 			}
-			
+
 			return false;
 		}
 	}
-	
+
 	public static final Comparator<RankedListElement> rankComp = new Comparator<RankedListElement>() {
 
 		@Override
@@ -218,15 +223,16 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			if (o1 == o2)
 				return 0;
 			if (o1.min != o2.min)
-				return o1.min - o2.min; 
+				return o1.min - o2.min;
 			if (o1.max != o2.max)
 				return o1.max - o2.max;
 			if (o1.countSet != o2.countSet)
 				return o2.countSet - o1.countSet;
-			for(int i = 0; i < o1.elem.length; i++) {
+			for (int i = 0; i < o1.elem.length; i++) {
 				// not the same element, and not elements are the same
 				if (o1.elem[i] != o2.elem[i]) {
-					// check with real element and not placeholder -2 for element set elsewhere
+					// check with real element and not placeholder -2 for
+					// element set elsewhere
 					RankedListElement checker = o1.elem[i] == -2 ? o1 : o2;
 					RankedListElement other = (checker == o1) ? o2 : o1;
 					if (!checker.hasSame(other, i))
@@ -237,23 +243,25 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			return 0;
 		}
 	};
-	
-	// represents an ordering of the explanations for one error and min/max side-effect sizes
+
+	// represents an ordering of the explanations for one error and min/max
+	// side-effect sizes
 	protected class OneErrorExplSet extends IdMap<IBasicExplanation> {
 		private int minSE;
 		private int maxSE;
 		private ISingleMarker error;
-		
-		public OneErrorExplSet (IExplanationSet explSet, ISingleMarker error) {
+
+		public OneErrorExplSet(IExplanationSet explSet, ISingleMarker error) {
 			super();
 			this.error = error;
 			List<IBasicExplanation> expList;
-			
+
 			expList = explSet.getExplanations();
-			
+
 			// sort according scoring function
-			Collections.sort(expList, RankerFactory.getScoreTotalOrderComparator(f));
-			for(IBasicExplanation e: expList)
+			Collections.sort(expList,
+					RankerFactory.getScoreTotalOrderComparator(f));
+			for (IBasicExplanation e : expList)
 				put(e);
 			minSE = f.getScore(expList.get(0));
 			maxSE = f.getScore(expList.get(expList.size() - 1));
@@ -282,48 +290,46 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		public void setError(ISingleMarker error) {
 			this.error = error;
 		}
-		
-		public String toString () {
+
+		public String toString() {
 			StringBuilder result = new StringBuilder();
-			
+
 			result.append("ONE ERROR EXPL for <");
 			result.append(error);
 			result.append(" subsuming expls \n");
 			result.append(this.idToObj.values().toString());
 			result.append("\nwith min " + minSE + " and max " + maxSE);
-			
+
 			return result.toString();
 		}
-			
+
 	}
-	
-	public static final Comparator<OneErrorExplSet> oneElemComp = 
-			new Comparator<AStarExplanationRanker.OneErrorExplSet>() {
+
+	public static final Comparator<OneErrorExplSet> oneElemComp = new Comparator<AStarExplanationRanker.OneErrorExplSet>() {
 
 		@Override
 		public int compare(OneErrorExplSet arg0, OneErrorExplSet arg1) {
 			int span1, span2, comp;
-			
+
 			span1 = arg0.maxSE - arg0.minSE;
 			span2 = arg1.maxSE - arg1.minSE;
 			comp = span2 - span1;
 			if (comp != 0)
 				return comp;
-			
-			comp = arg0.minSE - arg1.minSE; 
+
+			comp = arg0.minSE - arg1.minSE;
 			if (comp != 0)
 				return comp;
-			
-			comp = arg0.maxSE - arg1.maxSE; 
+
+			comp = arg0.maxSE - arg1.maxSE;
 			if (comp != 0)
 				return comp;
-			
-			return MarkerComparators.singleMarkerComp.compare(arg0.error, arg1.error);
-		}	
+
+			return MarkerComparators.singleMarkerComp.compare(arg0.error,
+					arg1.error);
+		}
 	};
-	
-	
-	
+
 	// fields
 	private int iterPos = -1;
 	private int iterDone = -1;
@@ -343,145 +349,151 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private boolean rankingDone = false;
 	private IScoringFunction f;
 	private BitMatrix sameExpl;
-	
-	public AStarExplanationRanker (IScoringFunction f) {
-		sortedSets = new TreeSet<RankedListElement> (rankComp);
-		errorExpl = new ArrayList<OneErrorExplSet> ();
+
+	public AStarExplanationRanker(IScoringFunction f) {
+		sortedSets = new TreeSet<RankedListElement>(rankComp);
+		errorExpl = new ArrayList<OneErrorExplSet>();
 		errors = MarkerFactory.newMarkerSet();
-		errorList = new ArrayList<ISingleMarker> ();
+		errorList = new ArrayList<ISingleMarker>();
 		this.f = f;
 	}
-	
+
 	/**
-	 * Generate OneErrorExplSets for each error and initialize the
-	 * sortedSets
+	 * Generate OneErrorExplSets for each error and initialize the sortedSets
 	 */
-	
+
 	@Override
 	public void initialize(ExplanationCollection coll) {
 		int j, numExpl;
-		
+
 		numSets = 1;
 		this.col = coll;
-		
+
 		numExpl = 0;
-		for(int i: coll.getNumExpls())
+		for (int i : coll.getNumExpls())
 			numExpl += i;
-		
+
 		sameExpl = new BitMatrix(numExpl, numExpl);
-		
+
 		explainsMatrix = new int[col.getErrorExplMap().keySet().size()][][];
-		
+
 		// create set of errors
-		for(ISingleMarker m: col.getErrorExplMap().keySet()) {
+		for (ISingleMarker m : col.getErrorExplMap().keySet()) {
 			errors.add(m);
 		}
-		
+
 		coll.computeRealSEAndExplains();
-		
+
 		// create data structures for the expl sets for each error
-		for(ISingleMarker m: col.getErrorExplMap().keySet()) {
-			IExplanationSet e =  col.getErrorExplMap().get(m);
-			OneErrorExplSet newOne =  new OneErrorExplSet(e, m);
+		for (ISingleMarker m : col.getErrorExplMap().keySet()) {
+			IExplanationSet e = col.getErrorExplMap().get(m);
+			OneErrorExplSet newOne = new OneErrorExplSet(e, m);
 			errorExpl.add(newOne);
 			numSets *= newOne.size();
 		}
-		
+
 		// sort on min-max span to improve pruning
 		Collections.sort(errorExpl, oneElemComp);
-		for(OneErrorExplSet newOne: errorExpl)
+		for (OneErrorExplSet newOne : errorExpl)
 			errorList.add(newOne.error);
-		
+
 		// remove errors from side-effect to guarantee correct ranking
 		j = 0;
-		for(OneErrorExplSet newOne: errorExpl) {
-			generateExplainsMatrix(newOne,j);
+		for (OneErrorExplSet newOne : errorExpl) {
+			generateExplainsMatrix(newOne, j);
 			j++;
 		}
-		
+
 		// find out which explanations are the same
-		List<IBasicExplanation> allExpl = new ArrayList<IBasicExplanation> ();
-		
-		for(OneErrorExplSet newOne: errorExpl) {
-			for(int k = 0; k < newOne.size(); k++)
+		List<IBasicExplanation> allExpl = new ArrayList<IBasicExplanation>();
+
+		for (OneErrorExplSet newOne : errorExpl) {
+			for (int k = 0; k < newOne.size(); k++)
 				allExpl.add(newOne.get(k));
 		}
-		
-		for(int i = 0; i < allExpl.size(); i++) {
-			for(int k = 0; k < allExpl.size(); k++) {
+
+		for (int i = 0; i < allExpl.size(); i++) {
+			for (int k = 0; k < allExpl.size(); k++) {
 				if (i != k && allExpl.get(i).equals(allExpl.get(k)))
 					sameExpl.setSym(i, k);
 			}
 		}
-		if (log.isDebugEnabled()) {log.debug("set same explanations: " + sameExpl.toString());};
-		
+		if (log.isDebugEnabled()) {
+			log.debug("set same explanations: " + sameExpl.toString());
+		}
+		;
+
 		numErrors = errors.size();
-		
+
 		// initialize min/max sums
 		combinedMin = new int[numErrors];
 		combinedMax = new int[numErrors];
-		
-		for(int i = 0; i < combinedMin.length; i++) {
+
+		for (int i = 0; i < combinedMin.length; i++) {
 			OneErrorExplSet one = errorExpl.get(numErrors - i - 1);
 			combinedMin[numErrors - i - 1] = one.minSE;
-			combinedMax[numErrors - i - 1] = one.maxSE; 
+			combinedMax[numErrors - i - 1] = one.maxSE;
 		}
-		
+
 		if (log.isDebugEnabled()) {
-			for(int i = 0; i < numErrors; i++) {
-				if (log.isDebugEnabled()) {log.debug("min " + combinedMin[i] + " max " + combinedMax[i] 
-						+ " for " + errorList.get(i) + "\n" + errorExpl.get(i));};
+			for (int i = 0; i < numErrors; i++) {
+				if (log.isDebugEnabled()) {
+					log.debug("min " + combinedMin[i] + " max "
+							+ combinedMax[i] + " for " + errorList.get(i)
+							+ "\n" + errorExpl.get(i));
+				}
+				;
 			}
 		}
-		
+
 		// initialize the sorted list with one expl, explanations
-		for(int i = 0; i < errorExpl.get(0).size(); i++) {
+		for (int i = 0; i < errorExpl.get(0).size(); i++) {
 			sortedSets.add(new RankedListElement(numErrors, i));
 		}
 
 		init = true;
 	}
 
-	public TreeSet<RankedListElement> getRanking () {
+	public TreeSet<RankedListElement> getRanking() {
 		return sortedSets;
 	}
-	
-	private void generateExplainsMatrix (OneErrorExplSet expl, int pos) {
+
+	private void generateExplainsMatrix(OneErrorExplSet expl, int pos) {
 		List<Integer> overlaps;
 		IBasicExplanation e;
 		IMarkerSet overlap;
-		
+
 		explainsMatrix[pos] = new int[expl.size()][];
-		
-		for(int i = 0; i < expl.size(); i++) {
-			overlaps = new ArrayList<Integer> ();
+
+		for (int i = 0; i < expl.size(); i++) {
+			overlaps = new ArrayList<Integer>();
 			e = expl.get(i);
-	
+
 			// get other errors that are covered
 			overlap = errors.cloneSet().intersect(e.getRealExplains());
-			for(ISingleMarker error: overlap) {
+			for (ISingleMarker error : overlap) {
 				int errorPos = getPosForError(error);
 				if (errorPos != pos)
 					overlaps.add(errorPos);
 			}
 			Collections.sort(overlaps);
-			explainsMatrix[pos][i] = new int [overlaps.size()];
-			for(int j = 0; j < overlaps.size(); j++)
+			explainsMatrix[pos][i] = new int[overlaps.size()];
+			for (int j = 0; j < overlaps.size(); j++)
 				explainsMatrix[pos][i][j] = overlaps.get(j);
-			
+
 			if (log.isDebugEnabled())
-				LoggerUtil.logArray(log, explainsMatrix[pos][i], 
-						"[" + pos + "," + i + "] is ");
+				LoggerUtil.logArray(log, explainsMatrix[pos][i], "[" + pos
+						+ "," + i + "] is ");
 		}
 	}
-	
-	private int getPosForError (ISingleMarker error) {
+
+	private int getPosForError(ISingleMarker error) {
 		return errorList.indexOf(error);
 	}
-	
+
 	private void generateUpTo(int upTo) {
-		
-		while(iterDone <= upTo) {
+
+		while (iterDone <= upTo) {
 			RankedListElement curCand;
 
 			// skip ranked, complete elements
@@ -489,66 +501,73 @@ public class AStarExplanationRanker implements IExplanationRanker {
 				curCand = sortedSets.first();
 			else
 				curCand = sortedSets.higher(lastDoneElem);
-			
+
 			if (curCand == null)
-				throw new NoSuchElementException("trying to access beyond last " +
-						"element of ranking");
-			
+				throw new NoSuchElementException(
+						"trying to access beyond last " + "element of ranking");
+
 			// current best candidate is not complete, expand it
 			if (!curCand.isDone())
 				expandAndInsert(curCand);
-			// current best candidate is complete, check if best incomplete candidate
-			// cannot be better than this one (best.max <= incomplete.min), 
-			// if so increase iterDone until this condition does not hold anymore
+			// current best candidate is complete, check if best incomplete
+			// candidate
+			// cannot be better than this one (best.max <= incomplete.min),
+			// if so increase iterDone until this condition does not hold
+			// anymore
 			else {
 				int curPos = iterDone + 1;
 				RankedListElement inclCand = curCand;
-				
+
 				// find first incomplete set if exists
-				while(curPos != sortedSets.size() && inclCand.isDone()) {
+				while (curPos != sortedSets.size() && inclCand.isDone()) {
 					inclCand = sortedSets.higher(inclCand);
 					curPos++;
 				}
-				
+
 				// everything complete -> we are done with ranking
 				if (inclCand == null) {
 					rankingDone = true;
-					numSets = sortedSets.size();			
+					numSets = sortedSets.size();
 					iterDone = sortedSets.size() - 1;
 					lastDoneElem = sortedSets.last();
 					// requested non existing set?
 					if (iterDone < upTo)
-						throw new NoSuchElementException("trying to access beyond last " +
-								"element of ranking");
+						throw new NoSuchElementException(
+								"trying to access beyond last "
+										+ "element of ranking");
 					return;
 				}
-				
+
 				lastDoneElem = sortedSets.lower(inclCand);
 				iterDone = curPos - 1;
-				
+
 				// expand the best incomplete element
 				expandAndInsert(inclCand);
-			}	
+			}
 		}
 
 	}
-	
+
 	/*
-	 * Add all possible sets from one error to a set,
-	 * remove the original set from the list and add the 
-	 * extended sets to the list.
+	 * Add all possible sets from one error to a set, remove the original set
+	 * from the list and add the extended sets to the list.
 	 */
-	
+
 	private void expandAndInsert(RankedListElement curExp) {
 		boolean disOverlap;
-		
+
 		disOverlap = curExp.extensionWithoutOverlap();
 		sortedSets.remove(curExp);
-		
-		for(int i = 0; i < errorExpl.get(curExp.firstUnset).size(); i++) {
-			RankedListElement newOne = new RankedListElement (curExp, i);
-			if (log.isDebugEnabled()) {log.debug("Was included? : " + sortedSets.contains(newOne) + "\n" + newOne);};
-			if ((!disOverlap || !newOne.lastAdditionHasOverlap()) && !sortedSets.contains(newOne))
+
+		for (int i = 0; i < errorExpl.get(curExp.firstUnset).size(); i++) {
+			RankedListElement newOne = new RankedListElement(curExp, i);
+			if (log.isDebugEnabled()) {
+				log.debug("Was included? : " + sortedSets.contains(newOne)
+						+ "\n" + newOne);
+			}
+			;
+			if ((!disOverlap || !newOne.lastAdditionHasOverlap())
+					&& !sortedSets.contains(newOne))
 				sortedSets.add(newOne);
 		}
 	}
@@ -556,67 +575,68 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public IExplanationSet next() {
 		advanceIter();
-		return getSetForRankedListElem (curIterElem);
+		return getSetForRankedListElem(curIterElem);
 	}
 
 	private void advanceIter() {
 		if (rankingDone && iterPos + 1 >= numSets)
 			throw new NoSuchElementException("only " + numSets + " elements");
-		
+
 		if (iterPos + 1 > iterDone)
 			generateUpTo(iterPos + 1);
-		
+
 		if (iterPos + 1 > iterDone)
 			throw new NoSuchElementException("only " + numSets + " elements");
-		
+
 		iterPos++;
 		if (curIterElem == null)
 			curIterElem = sortedSets.first();
 		else
-			curIterElem = sortedSets.higher(curIterElem);		
+			curIterElem = sortedSets.higher(curIterElem);
 	}
-	
-	
-	private IExplanationSet getSetForRankedListElem (RankedListElement elem) {
-		IExplanationSet result = ExplanationFactory.newExplanationSet(
-				ExplanationComparators.sameElemComp);		
-		
-		for(int i = 0; i < elem.elem.length; i++)
+
+	private IExplanationSet getSetForRankedListElem(RankedListElement elem) {
+		IExplanationSet result = ExplanationFactory
+				.newExplanationSet(ExplanationComparators.sameElemComp);
+
+		for (int i = 0; i < elem.elem.length; i++)
 			if (elem.elem[i] > -1)
 				result.addUnique(errorExpl.get(i).get(elem.elem[i]));
-		
+
 		if (log.isDebugEnabled())
-			if (log.isDebugEnabled()) {log.debug("set for iter is \n"  + result.toString());};
-		
+			if (log.isDebugEnabled()) {
+				log.debug("set for iter is \n" + result.toString());
+			}
+		;
+
 		return result;
 	}
 
-	//TODO memoize unioned side effects?
-	private void computeScore (RankedListElement elem) {
-		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation> ();
-		
+	// TODO memorize united side effects?
+	private void computeScore(RankedListElement elem) {
+		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation>();
+
 		elem.min = 0;
 		elem.max = 0;
-		for(int i = 0; i <  elem.elem.length; i++) {
+		for (int i = 0; i < elem.elem.length; i++) {
 			if (elem.elem[i] > -1)
 				sets.add(errorExpl.get(i).get(elem.elem[i]));
-			else if (elem.elem[i] != -2){
+			else if (elem.elem[i] != -2) {
 				elem.min = Math.max(combinedMin[i], elem.min);
 				elem.max += combinedMax[i];
 			}
 		}
-			
+
 		elem.realScore = f.getScore(sets);
 		if (elem.isDone()) {
 			elem.min = elem.realScore;
 			elem.max = elem.realScore;
-		}
-		else {
+		} else {
 			elem.min = Math.max(elem.realScore, elem.min);
 			elem.max = elem.realScore + elem.max;
 		}
 	}
-		
+
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
@@ -628,10 +648,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			return true;
 		if (!rankingDone && iterPos == iterDone)
 			generateUpTo(iterDone + 1);
-		
+
 		return iterPos < iterDone;
 	}
-	
+
 	@Override
 	public boolean ready() {
 		return init;
@@ -640,7 +660,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public void confirmExplanation(IBasicExplanation correctExpl) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -655,10 +674,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public boolean isFullyRanked () {
+	public boolean isFullyRanked() {
 		return rankingDone;
 	}
-	
+
 	@Override
 	public int getIterPos() {
 		return iterPos + 1;
@@ -668,10 +687,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public IExplanationSet previous() {
 		if (--iterPos < 0)
 			throw new NoSuchElementException("try to get element before first");
-		
+
 		curIterElem = sortedSets.lower(curIterElem);
-		
-		return getSetForRankedListElem (curIterElem);
+
+		return getSetForRankedListElem(curIterElem);
 	}
 
 	@Override
@@ -682,8 +701,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public int getNumberPrefetched() {
 		if (log.isDebugEnabled())
-			if (log.isDebugEnabled()) {log.debug("ITER DONE " + (iterDone + 1) + " incomplete " 
-					+ (sortedSets.size() - iterDone - 1));};
+			if (log.isDebugEnabled()) {
+				log.debug("ITER DONE " + (iterDone + 1) + " incomplete "
+						+ (sortedSets.size() - iterDone - 1));
+			}
+		;
 		return iterDone + 1;
 	}
 
@@ -691,23 +713,23 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public IExplanationSet getRankedExpl(int rank) {
 		int oldIterPos = iterPos;
 		IExplanationSet result;
-		
-		assert(rank > 0 && (!rankingDone || iterDone >= rank));
+
+		assert (rank > 0 && (!rankingDone || iterDone >= rank));
 		if (!rankingDone)
 			generateUpTo(rank);
-		
+
 		if (iterPos > rank)
 			resetIter();
-		
+
 		while (iterPos < rank)
 			advanceIter();
-		
+
 		result = getSetForRankedListElem(curIterElem);
-		
+
 		resetIter();
-		while(iterPos < oldIterPos)
+		while (iterPos < oldIterPos)
 			advanceIter();
-		
+
 		return result;
 	}
 
@@ -715,17 +737,17 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public boolean hasAtLeast(int numElem) {
 		if (rankingDone)
 			return numSets >= numElem;
-		
+
 		try {
 			generateUpTo(numElem - 1);
 			return true;
-		} catch(NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
 			return false;
 		}
 	}
 
 	@Override
-	public int getScore(int rank) { //TODO improve perf by 
+	public int getScore(int rank) { // TODO improve perf by
 		return f.getScore(getRankedExpl(rank));
 	}
 
@@ -733,21 +755,26 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return f;
 	}
 
-	public  void setF(IScoringFunction f) {
+	public void setF(IScoringFunction f) {
 		this.f = f;
 	}
 
 	@Override
 	public void rankFull() {
 		try {
-			generateUpTo (Integer.MAX_VALUE);
+			generateUpTo(Integer.MAX_VALUE);
 		} catch (NoSuchElementException e) {
-			if (log.isDebugEnabled()) {log.debug("ranking done");};
+			if (log.isDebugEnabled()) {
+				log.debug("ranking done");
+			}
+			;
 		}
 		resetIter();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
 	 */
 	@Override

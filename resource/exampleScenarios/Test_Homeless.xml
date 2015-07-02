@@ -64,9 +64,7 @@
 		</Uses>
 		<Foreach>
 			<Atom tableref="tramp"><Var>a</Var><Var>b</Var><Var>c</Var><Var>d</Var></Atom>
-			<Atom tableref="socialworker"><Var>d</Var><Var>e</Var><Var>f</Var></Atom>
 			<Atom tableref="soupkitchen"><Var>c</Var><Var>g</Var><Var>h</Var></Atom>
-			<Atom tableref="soupkitchen"><Var>f</Var><Var>i</Var><Var>j</Var></Atom>
 		</Foreach>
 		<Exists>
 			<Atom tableref="person"><Var>a</Var><Var>g</Var></Atom>
@@ -90,14 +88,12 @@
 	<Transformation id="T1" creates="person">
 		<Implements><Mapping ref="M1" /><Mapping ref="M2" /></Implements>
 		<Code>
-SELECT COALESCE(t.tid::text,'') || '|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k1.tid::text,'') || '|' || COALESCE(k2.tid::text,'') AS tid,
+SELECT '1|' || COALESCE(t.tid::text,'') || '|' || COALESCE(k1.tid::text,'') AS tid,
 	t.nickname AS name, k1.city AS livesin 
-FROM source.tramp ANNOT('M1') t, source.socialworker ANNOT('M1') s, source.soupkitchen ANNOT('M1') k1, source.soupkitchen ANNOT('M1') k2 
-WHERE t.caredforby = s.ssn 
-	AND t.firstseen = k1.location 
-	AND s.worksfor = k2.location 
+FROM source.tramp ANNOT('M1') t, source.soupkitchen ANNOT('M1') k1 
+WHERE t.firstseen = k1.location 
 UNION ALL
-SELECT COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
+SELECT '2|' || COALESCE(s.tid::text,'') || '|' || COALESCE(k.tid::text,'') AS tid,	
 	s.name,	k.city AS livesin
 FROM source.socialworker ANNOT('M2') s, source.soupkitchen ANNOT('M2') k 
 WHERE s.worksfor = k.location
@@ -105,16 +101,17 @@ WHERE s.worksfor = k.location
 	</Transformation>
 </Transformations>
 <ConnectionInfo>
-	<Host>216.47.142.244</Host>
+	<Host>localhost</Host>
 	<DB>vagabond</DB>
-	<User>vagabond</User>
-	<Password>vagabond</Password>
+	<User>shek21</User>
+	<Password/>
 	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
 	<Instance name="tramp">
 		<Row><Value>1</Value><Value>Peter Fullbright</Value><Value>Stinky Pete</Value><Value>GreenPark</Value><Value>777</Value></Row>
 		<Row><Value>2</Value><Value>Harriot Welth</Value><Value>Cartwoman</Value><Value>Manhattan</Value><Value>123</Value></Row>
+		<Row><Value>3</Value><Value>Messi Rionel</Value><Value>messin</Value><Value>GreenPark</Value><Value>666</Value></Row>
 	</Instance>
 	<Instance name="socialworker">
 		<Row><Value>1</Value><Value>123</Value><Value>Jessica Good</Value><Value>GreenPark</Value></Row>
