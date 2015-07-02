@@ -86,7 +86,6 @@ public class CommandLineExplGen {
 
 	private void createExpls(PrintStream out) throws Exception {
 
-	
 		if (options.isUseRanker()) {
 			Iterator<IExplanationSet> iter = null;
 			IExplanationRanker explRank = null;
@@ -267,7 +266,7 @@ public class CommandLineExplGen {
 								+ ++r + " with score " + score
 								+ "\n*********************************\n");
 						System.out.println(set.toString());
-						System.out.println("\nContinue [y/n]?");
+						System.out.println("\nPress y to continue or v to verify this explanationn");
 					}
 					
 					while (!in.ready())
@@ -366,19 +365,16 @@ public class CommandLineExplGen {
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
-						
-		for (int i = 0; i < 1; i++) {
 			
-			long lStartTime = new Date().getTime();
+		long lStartTime = new Date().getTime();
 						
-			if (!inst.execute(args))
-					System.exit(1);
+		if (!inst.execute(args))
+			System.exit(1);
 				
-			long lEndTime = new Date().getTime();
-			long difference= (lEndTime - lStartTime);
-			double secs = ((double) difference) / 1000.0;
-			System.out.printf("Total: %.2f secs\n", secs);
-		}
+		long lEndTime = new Date().getTime();
+		long difference= (lEndTime - lStartTime);
+		double secs = ((double) difference) / 1000.0;
+		System.out.printf("Total: %.2f secs\n", secs);
 		
 		System.exit(0);		 
 	}
