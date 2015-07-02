@@ -155,7 +155,6 @@ public class CommandLineExplGen {
 	}
 		
 	private void printExplanations() throws Exception{
-		
 		boolean cont = true;
 		int r = 0;
 		
@@ -279,16 +278,15 @@ public class CommandLineExplGen {
 				
 				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
 				
-				boolean verifier = read.trim().startsWith("v");
-				if(verifier)
+				if(read.trim().startsWith("v"))
 					removeExplanation(set);
-				cont = read.trim().startsWith("y") || verifier;
+				cont = read.trim().startsWith("y");
 			}
 		}
 	}
 	
 	private void removeExplanation(IExplanationSet set){
-		
+		System.out.println("Pressed v");
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {
