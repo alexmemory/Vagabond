@@ -260,11 +260,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 			// sort according scoring function
 			Collections.sort(expList,
-					RankerFactory.getScoreTotalOrderComparator(f));
+					RankerFactory.getScoreTotalOrderComparator(scoringFunction));
 			for (IBasicExplanation e : expList)
 				put(e);
-			minSE = f.getScore(expList.get(0));
-			maxSE = f.getScore(expList.get(expList.size() - 1));
+			minSE = scoringFunction.getScore(expList.get(0));
+			maxSE = scoringFunction.getScore(expList.get(expList.size() - 1));
 		}
 
 		public int getMinSE() {
@@ -347,7 +347,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private int[] combinedMax;
 	private boolean init = false;
 	private boolean rankingDone = false;
-	private IScoringFunction f;
+	private IScoringFunction scoringFunction;
 	private BitMatrix sameExpl;
 
 	public AStarExplanationRanker(IScoringFunction f) {
@@ -355,7 +355,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		errorExpl = new ArrayList<OneErrorExplSet>();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
-		this.f = f;
+		this.scoringFunction = f;
 	}
 
 	/**
@@ -552,7 +552,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 * Add all possible sets from one error to a set, remove the original set
 	 * from the list and add the extended sets to the list.
 	 */
-
 	private void expandAndInsert(RankedListElement curExp) {
 		boolean disOverlap;
 
@@ -627,7 +626,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			}
 		}
 
-		elem.realScore = f.getScore(sets);
+		elem.realScore = scoringFunction.getScore(sets);
 		if (elem.isDone()) {
 			elem.min = elem.realScore;
 			elem.max = elem.realScore;
@@ -687,9 +686,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public IExplanationSet previous() {
 		if (--iterPos < 0)
 			throw new NoSuchElementException("try to get element before first");
-
 		curIterElem = sortedSets.lower(curIterElem);
-
 		return getSetForRankedListElem(curIterElem);
 	}
 
@@ -700,12 +697,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public int getNumberPrefetched() {
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled()){
 			if (log.isDebugEnabled()) {
 				log.debug("ITER DONE " + (iterDone + 1) + " incomplete "
 						+ (sortedSets.size() - iterDone - 1));
 			}
-		;
+		}
 		return iterDone + 1;
 	}
 
@@ -747,16 +744,16 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getScore(int rank) { // TODO improve perf by
-		return f.getScore(getRankedExpl(rank));
+	public int getScore(int rank) { // TODO improve performance by score
+		return scoringFunction.getScore(getRankedExpl(rank));
 	}
 
 	public IScoringFunction getF() {
-		return f;
+		return scoringFunction;
 	}
 
-	public void setF(IScoringFunction f) {
-		this.f = f;
+	public void setF(IScoringFunction scoringFunction) {
+		this.scoringFunction = scoringFunction;
 	}
 
 	@Override
@@ -767,7 +764,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			if (log.isDebugEnabled()) {
 				log.debug("ranking done");
 			}
-			;
 		}
 		resetIter();
 	}
@@ -779,7 +775,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 */
 	@Override
 	public IScoringFunction getScoreF() {
-		return this.f;
+		return this.scoringFunction;
 	}
 
 }

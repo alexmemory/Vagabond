@@ -294,22 +294,17 @@ public class CommandLineExplGen {
 		if (options.getMarkers() != null)
 			markers = MarkerParser.getInstance().parseSet(options.getMarkers());
 		else if (options.getMarkerFile() != null)
-			markers =
-					MarkerParser.getInstance().parseMarkers(
+			markers = MarkerParser.getInstance().parseMarkers(
 							new FileInputStream(options.getMarkerFile()));
-		else
-			throw new Exception("either marker file (-m) or markers (-M) have"
+		else throw new Exception("either marker file (-m) or markers (-M) have "
 					+ "to be specified");
-
-		if (log.isDebugEnabled()) {log.debug("Markers are :<" + markers + ">");};
-
+		if (log.isDebugEnabled()) {log.debug("Markers are: <" + markers + ">");};
 		return markers;
 	}
 
 	private void loadScenarioOnDB() throws Exception {
 		if (options.isLazy())
-			DatabaseScenarioLoader.getInstance().setOperationalMode(
-					LoadMode.Lazy);
+			DatabaseScenarioLoader.getInstance().setOperationalMode(LoadMode.Lazy);
 		DatabaseScenarioLoader.getInstance().loadScenario(
 				ConnectionManager.getInstance().getConnection(), 
 				options.getCsvLoadPath());
