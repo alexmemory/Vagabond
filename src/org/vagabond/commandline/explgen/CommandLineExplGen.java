@@ -154,7 +154,7 @@ public class CommandLineExplGen {
 	}
 		
 	private void printExplanations() throws Exception{
-		boolean cont = true;
+		boolean continueExe = true;
 		int r = 0;
 		
 		// if a gold standard is given then we just compute precision and recall metrics
@@ -254,7 +254,7 @@ public class CommandLineExplGen {
 		else {
 			BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
-			while (cont && iter.hasNext()) {
+			while (continueExe && iter.hasNext()) {
 				String read;
 				IExplanationSet set = iter.next();
 				double score = -1.0;
@@ -280,7 +280,7 @@ public class CommandLineExplGen {
 				if(read.trim().startsWith("v"))
 					verifyExplanation();
 
-				cont = read.trim().startsWith("y");
+				continueExe = read.trim().startsWith("y");
 			}
 		}
 	}
@@ -363,6 +363,6 @@ public class CommandLineExplGen {
 		if (!inst.execute(args))
 			System.exit(1);
 		printTime("Total", startTime);
-		System.exit(0);		 
+		System.exit(0);		 	
 	}
 }
