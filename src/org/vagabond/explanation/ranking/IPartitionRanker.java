@@ -24,5 +24,5 @@ public interface IPartitionRanker extends Iterator<IExplanationSet> {
 	public long getNumberPrefetched ();
 	public void resetIter();
 	public void rankFull();
-	public IScoringFunction getScoreF();
+	public IScoringFunction getScoringFunction();
 }

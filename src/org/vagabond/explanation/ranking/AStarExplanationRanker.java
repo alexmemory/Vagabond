@@ -774,7 +774,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		return this.scoringFunction;
 	}
 

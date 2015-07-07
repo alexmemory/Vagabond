@@ -572,7 +572,7 @@ public class PartitionRanker implements IPartitionRanker {
 	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		return this.scoreF;
 	}
 

@@ -118,7 +118,7 @@ public class CommandLineExplGen {
 				
 				explRank = RankerFactory.createInitializedRanker(explOptions.getRankerScheme(), col2);
 				iter = explRank;
-				scoringFunction = explRank.getScoreF();
+				scoringFunction = explRank.getScoringFunction();
 			}
 		}
 		// Using Partitioning
@@ -144,7 +144,7 @@ public class CommandLineExplGen {
 				partRank = RankerFactory.createPartRanker(
 								explOptions.getRankerScheme(), p);
 				iter = partRank;
-				scoringFunction = partRank.getScoreF();
+				scoringFunction = partRank.getScoringFunction();
 			}
 		}
 	}
@@ -184,13 +184,13 @@ public class CommandLineExplGen {
 					prec = metric.computePrecision(explRank, i);
 					rec = metric.computeRecall(explRank, i);
 					set = explRank.getRankedExpl(i);
-					score = explRank.getScoreF().getScore(set);
+					score = explRank.getScoringFunction().getScore(set);
 				}
 				else {
 					prec = metric.computePrecision(partRank, i);
 					rec = metric.computeRecall(partRank, i);
 					set = partRank.getRankedExpl(i);
-					score = partRank.getScoreF().getScore(set);
+					score = partRank.getScoringFunction().getScore(set);
 				}				
 				
 				if (!explOptions.isNoShowSets()) {

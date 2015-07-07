@@ -301,7 +301,7 @@ public class DummyRanker implements IExplanationRanker {
 	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
