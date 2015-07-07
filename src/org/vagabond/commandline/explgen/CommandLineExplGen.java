@@ -50,6 +50,11 @@ public class CommandLineExplGen {
 	private IPartitionRanker partRank;
 	private IScoringFunction scoringFunction;
 	
+	private int whichRanker; // 1 for explanation, 2 for skyline, 3 for partition
+	public static final int EXPLANATION_RANKER = 1;
+	public static final int SKYLINE_RANKER = 2;
+	public static final int PARTITION_RANKER = 3;
+	
 	public CommandLineExplGen() {
 		explOptions = new ExplGenOptions();
 		explGenerator = new ExplanationSetGenerator();
@@ -81,6 +86,7 @@ public class CommandLineExplGen {
 	private void createExpls(PrintStream out) throws Exception {
 		if (explOptions.isUseRanker()){ 
 			rankExplanations();
+			setIterator();
 			printExplanations();
 		}
 		else {
@@ -100,15 +106,31 @@ public class CommandLineExplGen {
 		System.out.printf(section + ": %.2f secs\n", getTimeDifference(startTime));
 	}
 	
+	private void setIterator(){
+		switch(whichRanker){
+			case EXPLANATION_RANKER:
+				iter = explRank;
+				scoringFunction = explRank.getScoringFunction();
+				break;
+			case SKYLINE_RANKER:
+				iter = skyRank;
+				break;
+			case PARTITION_RANKER:
+				iter = partRank;
+				scoringFunction = partRank.getScoringFunction();
+				break;
+		}
+	}
+	
 	private void rankExplanations() throws Exception{
 		
 		// No Partitioning
 		if (explOptions.noUsePart()) {
 			
 			ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();
-			long lStartTime = System.nanoTime();
+			long startTime = System.nanoTime();
 			ExplanationCollection col2 = noPartGen.findExplanations(markers);
-			printTime("ExplGen", lStartTime);
+			printTime("ExplGen", startTime);
 	
 			if (explOptions.getRankerScheme() != null){
 
@@ -117,18 +139,16 @@ public class CommandLineExplGen {
 				}
 				
 				explRank = RankerFactory.createInitializedRanker(explOptions.getRankerScheme(), col2);
-				iter = explRank;
-				scoringFunction = explRank.getScoringFunction();
+				whichRanker = EXPLANATION_RANKER;
 			}
 		}
 		// Using Partitioning
 		else {		
 			PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
 			partGen.init();
-			
-			long lStartTime = System.nanoTime();
+			long startTime = System.nanoTime();
 			ExplPartition p = partGen.findExplanations(markers);
-			printTime("ExplGen", lStartTime);
+			printTime("ExplGen", startTime);
 			
 			if (explOptions.getSkylineRankers() != null) {
 				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
@@ -136,15 +156,14 @@ public class CommandLineExplGen {
 				skyRank = RankerFactory.createSkylineRanker(
 								explOptions.getSkylineRankers(),
 								explOptions.getRankerScheme(), p);
-				iter = skyRank;
+				whichRanker = SKYLINE_RANKER;
 			}
 			else {
 				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
 						+ explOptions.getRankerScheme());}
 				partRank = RankerFactory.createPartRanker(
 								explOptions.getRankerScheme(), p);
-				iter = partRank;
-				scoringFunction = partRank.getScoringFunction();
+				whichRanker = PARTITION_RANKER;
 			}
 		}
 	}
@@ -320,9 +339,7 @@ public class CommandLineExplGen {
 	}
 
 	public void printUsage(PrintStream out) {
-		CmdLineParser parser;
-
-		parser = new CmdLineParser(explOptions);
+		CmdLineParser parser = new CmdLineParser(explOptions);
 		parser.printUsage(out);
 	}
 
