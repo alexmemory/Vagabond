@@ -119,7 +119,7 @@ public class CommandLineExplGen {
 
 				if (log.isDebugEnabled()) {
 					log.debug("Create ranker for scheme without partitioning " + options.getRankerScheme());
-				};
+				}
 				
 				explRank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
 				iter = explRank;
@@ -137,7 +137,7 @@ public class CommandLineExplGen {
 			
 			if (options.getSkylineRankers() != null) {
 				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
-						+ Arrays.toString(options.getSkylineRankers()));};
+						+ Arrays.toString(options.getSkylineRankers()));}
 				skyRank = RankerFactory.createSkylineRanker(
 								options.getSkylineRankers(),
 								options.getRankerScheme(), p);
@@ -145,7 +145,7 @@ public class CommandLineExplGen {
 			}
 			else {
 				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
-						+ options.getRankerScheme());};
+						+ options.getRankerScheme());}
 				partRank = RankerFactory.createPartRanker(
 								options.getRankerScheme(), p);
 				iter = partRank;
@@ -276,7 +276,7 @@ public class CommandLineExplGen {
 					Thread.sleep(100);
 				read = in.readLine().trim();
 				
-				if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
+				if (log.isDebugEnabled()) {log.debug("user pressed " + read);}
 				
 				if(read.trim().startsWith("v"))
 					verifyExplanation();
@@ -363,20 +363,20 @@ public class CommandLineExplGen {
 
 		return true;
 	}
+	
+	private static void printTimeByDate(long startTime){
+		long endTime = new Date().getTime();
+		long difference= (endTime - startTime);
+		double secs = ((double) difference) / 1000.0;
+		System.out.printf("Total: %.2f secs\n", secs);
+	}
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
-			
-		long lStartTime = new Date().getTime();
-						
+		long startTime = new Date().getTime();
 		if (!inst.execute(args))
 			System.exit(1);
-				
-		long lEndTime = new Date().getTime();
-		long difference= (lEndTime - lStartTime);
-		double secs = ((double) difference) / 1000.0;
-		System.out.printf("Total: %.2f secs\n", secs);
-		
+		printTimeByDate(startTime);
 		System.exit(0);		 
 	}
 }
