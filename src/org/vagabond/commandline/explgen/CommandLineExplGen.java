@@ -267,8 +267,7 @@ public class CommandLineExplGen {
 		}
 		// use interactive ranking where the user is asked after each CES whether to continue or not
 		else {
-			BufferedReader in =
-					new BufferedReader(new InputStreamReader(System.in));
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			while (continueExe && iter.hasNext()) {
 				String read;
 				IExplanationSet set = iter.next();
