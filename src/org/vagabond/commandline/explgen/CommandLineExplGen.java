@@ -41,13 +41,9 @@ public class CommandLineExplGen {
 
 	static Logger log = Logger.getLogger(CommandLineExplGen.class);
 
-	private ExplGenOptions options;
+	private ExplGenOptions explOptions;
 	private IMarkerSet markers;
-	private ExplanationSetGenerator gen;
-	
-	static String rankSecs = "";
-	static String secsRank = "";
-	
+	private ExplanationSetGenerator explGenerator;
 	private Iterator<IExplanationSet> iter;
 	private IExplanationRanker explRank;
 	private SkylineRanker skyRank;
@@ -55,8 +51,8 @@ public class CommandLineExplGen {
 	private IScoringFunction scoringFunction;
 	
 	public CommandLineExplGen() {
-		options = new ExplGenOptions();
-		gen = new ExplanationSetGenerator();
+		explOptions = new ExplGenOptions();
+		explGenerator = new ExplanationSetGenerator();
 	}
 	 	
 	public void setUpLogger() {
@@ -66,30 +62,30 @@ public class CommandLineExplGen {
 	public void parseOptionsAndLoadScenario(String[] args) throws Exception {
 		parseOptions(args);
 
-		if (options.getXmlDoc() == null)
+		if (explOptions.getXmlDoc() == null)
 			throw new Exception("no mapping scenario XML document "
 					+ "given (-f option)");
-		loadScenario(options.getXmlDoc());
+		loadScenario(explOptions.getXmlDoc());
 		parseOptions(args);
 
 		// setup DB connection
-		ConnectionManager.getInstance().getConnection(options.getDbURL(),
-				options.getDbName(), options.getDbUser(),
-				options.getDbPassword(), options.getPort());
+		ConnectionManager.getInstance().getConnection(explOptions.getDbURL(),
+				explOptions.getDbName(), explOptions.getDbUser(),
+				explOptions.getDbPassword(), explOptions.getPort());
 
-		if (options.isLoadScen())
+		if (explOptions.isLoadScen())
 			loadScenarioOnDB();
 		ScenarioDictionary.getInstance().initFromScenario();
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
-		if (options.isUseRanker()){ 
+		if (explOptions.isUseRanker()){ 
 			rankExplanations();
 			printExplanations();
 		}
 		else {
-			ExplanationCollection col = gen.findExplanations(markers);
-			if (!options.isNoShowSets())
+			ExplanationCollection col = explGenerator.findExplanations(markers);
+			if (!explOptions.isNoShowSets())
 				out.println(col);
 		}
 	}
@@ -107,20 +103,20 @@ public class CommandLineExplGen {
 	private void rankExplanations() throws Exception{
 		
 		// No Partitioning
-		if (options.noUsePart()) {
+		if (explOptions.noUsePart()) {
 			
 			ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();
 			long lStartTime = System.nanoTime();
 			ExplanationCollection col2 = noPartGen.findExplanations(markers);
 			printTime("ExplGen", lStartTime);
 	
-			if (options.getRankerScheme() != null){
+			if (explOptions.getRankerScheme() != null){
 
 				if (log.isDebugEnabled()) {
-					log.debug("Create ranker for scheme without partitioning " + options.getRankerScheme());
+					log.debug("Create ranker for scheme without partitioning " + explOptions.getRankerScheme());
 				}
 				
-				explRank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
+				explRank = RankerFactory.createInitializedRanker(explOptions.getRankerScheme(), col2);
 				iter = explRank;
 				scoringFunction = explRank.getScoreF();
 			}
@@ -134,19 +130,19 @@ public class CommandLineExplGen {
 			ExplPartition p = partGen.findExplanations(markers);
 			printTime("ExplGen", lStartTime);
 			
-			if (options.getSkylineRankers() != null) {
+			if (explOptions.getSkylineRankers() != null) {
 				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
-						+ Arrays.toString(options.getSkylineRankers()));}
+						+ Arrays.toString(explOptions.getSkylineRankers()));}
 				skyRank = RankerFactory.createSkylineRanker(
-								options.getSkylineRankers(),
-								options.getRankerScheme(), p);
+								explOptions.getSkylineRankers(),
+								explOptions.getRankerScheme(), p);
 				iter = skyRank;
 			}
 			else {
 				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
-						+ options.getRankerScheme());}
+						+ explOptions.getRankerScheme());}
 				partRank = RankerFactory.createPartRanker(
-								options.getRankerScheme(), p);
+								explOptions.getRankerScheme(), p);
 				iter = partRank;
 				scoringFunction = partRank.getScoreF();
 			}
@@ -158,9 +154,9 @@ public class CommandLineExplGen {
 		int r = 0;
 		
 		// if a gold standard is given then we just compute precision and recall metrics
-		if (options.getGoldStandard() != null) {
-			int max = options.getMaxRank();
-			IExplanationSet pre = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(options.getGoldStandard());
+		if (explOptions.getGoldStandard() != null) {
+			int max = explOptions.getMaxRank();
+			IExplanationSet pre = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(explOptions.getGoldStandard());
 			IExplanationSet gold = ExplanationFactory.newExplanationSet();
 			RankingMetricPrecisionRecall metric;
 			double prec = 0.0, rec = 0.0;
@@ -184,7 +180,7 @@ public class CommandLineExplGen {
 				IExplanationSet set;
 				double score = 0.0;
 				
-				if (options.noUsePart()) {
+				if (explOptions.noUsePart()) {
 					prec = metric.computePrecision(explRank, i);
 					rec = metric.computeRecall(explRank, i);
 					set = explRank.getRankedExpl(i);
@@ -197,7 +193,7 @@ public class CommandLineExplGen {
 					score = partRank.getScoreF().getScore(set);
 				}				
 				
-				if (!options.isNoShowSets()) {
+				if (!explOptions.isNoShowSets()) {
 					System.out.println("\n\n*********************************\n*" +
 							"\t\t RANKED " 
 							+ ++r + " with score " + score
@@ -210,13 +206,13 @@ public class CommandLineExplGen {
 			}
 		}
 		// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
-		else if (options.isRankNonInteractive()) {
+		else if (explOptions.isRankNonInteractive()) {
 			int i = 1;
-			int max = options.getMaxRank();
+			int max = explOptions.getMaxRank();
 			long beforeRank = System.nanoTime();
 			//only 10mins running for ranking
 			long start = System.currentTimeMillis();
-			long end = options.getTimeLimit() == -1 ? -1 :  start + options.getTimeLimit()*1000;
+			long end = explOptions.getTimeLimit() == -1 ? -1 :  start + explOptions.getTimeLimit()*1000;
 			
 			while ((max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
 				long lStartTime = System.nanoTime();				
@@ -230,7 +226,7 @@ public class CommandLineExplGen {
 				if (scoringFunction != null)
 					score = scoringFunction.getScore(set);
 				
-				if (!options.isNoShowSets()) {
+				if (!explOptions.isNoShowSets()) {
 					System.out.println("\n\n*********************************\n*" +
 							"\t\t RANKED " 
 							+ ++r + " with score " + score
@@ -261,7 +257,7 @@ public class CommandLineExplGen {
 				if (scoringFunction != null)
 					score = scoringFunction.getScore(set);
 				
-				if (!options.isNoShowSets()) {
+				if (!explOptions.isNoShowSets()) {
 					System.out.println("\n\n*********************************\n*" +
 							"\t\t RANKED " 
 							+ ++r + " with score " + score
@@ -290,11 +286,11 @@ public class CommandLineExplGen {
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {
-		if (options.getMarkers() != null)
-			markers = MarkerParser.getInstance().parseSet(options.getMarkers());
-		else if (options.getMarkerFile() != null)
+		if (explOptions.getMarkers() != null)
+			markers = MarkerParser.getInstance().parseSet(explOptions.getMarkers());
+		else if (explOptions.getMarkerFile() != null)
 			markers = MarkerParser.getInstance().parseMarkers(
-							new FileInputStream(options.getMarkerFile()));
+							new FileInputStream(explOptions.getMarkerFile()));
 		else throw new Exception("either marker file (-m) or markers (-M) have "
 					+ "to be specified");
 		if (log.isDebugEnabled()) {log.debug("Markers are: <" + markers + ">");};
@@ -302,31 +298,31 @@ public class CommandLineExplGen {
 	}
 
 	private void loadScenarioOnDB() throws Exception {
-		if (options.isLazy())
+		if (explOptions.isLazy())
 			DatabaseScenarioLoader.getInstance().setOperationalMode(LoadMode.Lazy);
 		DatabaseScenarioLoader.getInstance().loadScenario(
 				ConnectionManager.getInstance().getConnection(), 
-				options.getCsvLoadPath());
+				explOptions.getCsvLoadPath());
 	}
 
 	private void loadScenario(File xmlDoc) throws Exception {
 		ModelLoader.getInstance().loadToInst(xmlDoc);
 		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
-		options.setDBOptions(MapScenarioHolder.getInstance().getScenario());
+		explOptions.setDBOptions(MapScenarioHolder.getInstance().getScenario());
 	}
 
 	private void parseOptions(String[] args) throws CmdLineException {
 		CmdLineParser parser;
 		if (log.isDebugEnabled()) {log.debug("Command line args are: <" + LoggerUtil.arrayToString(args)
 				+ ">");}
-		parser = new CmdLineParser(options);
+		parser = new CmdLineParser(explOptions);
 		parser.parseArgument(args);
 	}
 
 	public void printUsage(PrintStream out) {
 		CmdLineParser parser;
 
-		parser = new CmdLineParser(options);
+		parser = new CmdLineParser(explOptions);
 		parser.printUsage(out);
 	}
 
