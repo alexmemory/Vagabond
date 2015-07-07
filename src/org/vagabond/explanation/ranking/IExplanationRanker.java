@@ -23,7 +23,6 @@ public interface IExplanationRanker extends Iterator<IExplanationSet> {
 	public void rankFull();
 	public IScoringFunction getScoreF();
 	public void confirmExplanation(IBasicExplanation correctExpl); // user confirmed
-	public boolean hasAtLeast(int numElem); // check that this ranker can
-											// produce at least these many
-											// explanation sets
+	public boolean hasAtLeast(int numElem); // check that this ranker can produce 
+											// at least these many explanation sets
 }

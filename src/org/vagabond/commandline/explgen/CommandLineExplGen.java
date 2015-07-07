@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -95,13 +94,13 @@ public class CommandLineExplGen {
 		}
 	}
 	
-	private double getTimeDifference(long startTime){
+	private static double getTimeDifference(long startTime){
 		long endTime = System.nanoTime();
 		long difference = (endTime - startTime);
 		return ((double) difference) / 1000000000.0;
 	}
 	
-	private void printTime(String section, long startTime){
+	private static void printTime(String section, long startTime){
 		System.out.printf(section + ": %.2f secs\n", getTimeDifference(startTime));
 	}
 	
@@ -357,20 +356,13 @@ public class CommandLineExplGen {
 
 		return true;
 	}
-	
-	private static void printTimeByDate(long startTime){
-		long endTime = new Date().getTime();
-		long difference= (endTime - startTime);
-		double secs = ((double) difference) / 1000.0;
-		System.out.printf("Total: %.2f secs\n", secs);
-	}
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
-		long startTime = new Date().getTime();
+		long startTime =  System.nanoTime();
 		if (!inst.execute(args))
 			System.exit(1);
-		printTimeByDate(startTime);
+		printTime("Total", startTime);
 		System.exit(0);		 
 	}
 }
