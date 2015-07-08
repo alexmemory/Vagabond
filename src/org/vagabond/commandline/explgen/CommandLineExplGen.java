@@ -300,10 +300,10 @@ public class CommandLineExplGen {
 				
 				boolean verifyExpl = read.trim().startsWith("v");
 				
-				if(verifyExpl)
+				if(verifyExpl){
 					verifyExplanation(set);
-				
-				Thread.sleep(3000);
+					Thread.sleep(2000); // For you to see the explanations you chose
+				}
 				continueExe = read.trim().startsWith("y") || verifyExpl;
 			}
 		}
