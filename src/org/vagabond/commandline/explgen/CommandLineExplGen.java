@@ -320,8 +320,10 @@ public class CommandLineExplGen {
 			for(String number: numbers){
 				int numberInt = Integer.valueOf(number);
 				if(numberInt >= 0 && numberInt < allExpls.size()){
-					verifiedExplanations.add(allExpls.get(numberInt));
-					System.out.println(allExpls.get(numberInt));
+					IBasicExplanation expl = allExpls.get(numberInt);
+					verifiedExplanations.add(expl);
+					explRank.confirmExplanation(expl);
+					System.out.println(expl.toString());
 					System.out.print("\n");
 				}
 			}

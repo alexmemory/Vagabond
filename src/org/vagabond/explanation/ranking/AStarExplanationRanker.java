@@ -342,7 +342,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private IMarkerSet errors;
 	private List<ISingleMarker> errorList;
 	private int[][][] explainsMatrix;
-	private ExplanationCollection col;
+	private ExplanationCollection explCollection;
 	private int[] combinedMin;
 	private int[] combinedMax;
 	private boolean init = false;
@@ -350,12 +350,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private IScoringFunction scoringFunction;
 	private BitMatrix sameExpl;
 
-	public AStarExplanationRanker(IScoringFunction f) {
+	public AStarExplanationRanker(IScoringFunction function) {
 		sortedSets = new TreeSet<RankedListElement>(rankComp);
 		errorExpl = new ArrayList<OneErrorExplSet>();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
-		this.scoringFunction = f;
+		this.scoringFunction = function;
 	}
 
 	/**
@@ -363,30 +363,30 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 */
 
 	@Override
-	public void initialize(ExplanationCollection coll) {
+	public void initialize(ExplanationCollection collection) {
 		int j, numExpl;
 
 		numSets = 1;
-		this.col = coll;
+		this.explCollection = collection;
 
 		numExpl = 0;
-		for (int i : coll.getNumExpls())
+		for (int i : collection.getNumExpls())
 			numExpl += i;
 
 		sameExpl = new BitMatrix(numExpl, numExpl);
 
-		explainsMatrix = new int[col.getErrorExplMap().keySet().size()][][];
+		explainsMatrix = new int[explCollection.getErrorExplMap().keySet().size()][][];
 
 		// create set of errors
-		for (ISingleMarker m : col.getErrorExplMap().keySet()) {
+		for (ISingleMarker m : explCollection.getErrorExplMap().keySet()) {
 			errors.add(m);
 		}
 
-		coll.computeRealSEAndExplains();
+		collection.computeRealSEAndExplains();
 
-		// create data structures for the expl sets for each error
-		for (ISingleMarker m : col.getErrorExplMap().keySet()) {
-			IExplanationSet e = col.getErrorExplMap().get(m);
+		// create data structures for the explanation sets for each error
+		for (ISingleMarker m : explCollection.getErrorExplMap().keySet()) {
+			IExplanationSet e = explCollection.getErrorExplMap().get(m);
 			OneErrorExplSet newOne = new OneErrorExplSet(e, m);
 			errorExpl.add(newOne);
 			numSets *= newOne.size();
@@ -734,7 +734,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public boolean hasAtLeast(int numElem) {
 		if (rankingDone)
 			return numSets >= numElem;
-
 		try {
 			generateUpTo(numElem - 1);
 			return true;
