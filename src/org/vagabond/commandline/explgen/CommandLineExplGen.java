@@ -302,7 +302,8 @@ public class CommandLineExplGen {
 				
 				if(verifyExpl)
 					verifyExplanation(set);
-
+				
+				Thread.sleep(3000);
 				continueExe = read.trim().startsWith("y") || verifyExpl;
 			}
 		}
@@ -311,7 +312,6 @@ public class CommandLineExplGen {
 	private void verifyExplanation(IExplanationSet set){
 		List<IBasicExplanation> allExpls = set.getExplanations();
 		System.out.println("\nType the explanation numbers between 0 and " + (allExpls.size() - 1));
-		System.out.println("Type q to exit");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			String read = in.readLine().trim();
@@ -330,8 +330,6 @@ public class CommandLineExplGen {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {
