@@ -3,10 +3,14 @@ package org.vagabond.commandline.explgen;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -49,6 +53,7 @@ public class CommandLineExplGen {
 	private SkylineRanker skyRank;
 	private IPartitionRanker partRank;
 	private IScoringFunction scoringFunction;
+	private Set<IBasicExplanation> verifiedExplanations;
 	
 	private int whichRanker; // 1 for explanation, 2 for skyline, 3 for partition
 	public static final int EXPLANATION_RANKER = 1;
@@ -58,6 +63,7 @@ public class CommandLineExplGen {
 	public CommandLineExplGen() {
 		explOptions = new ExplGenOptions();
 		explGenerator = new ExplanationSetGenerator();
+		verifiedExplanations = new HashSet<IBasicExplanation>();
 	}
 	 	
 	public void setUpLogger() {
@@ -142,12 +148,13 @@ public class CommandLineExplGen {
 				whichRanker = EXPLANATION_RANKER;
 			}
 		}
+		
 		// Using Partitioning
 		else {		
 			PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
 			partGen.init();
 			long startTime = System.nanoTime();
-			ExplPartition p = partGen.findExplanations(markers);
+			ExplPartition partition = partGen.findExplanations(markers);
 			printTime("ExplGen", startTime);
 			
 			if (explOptions.getSkylineRankers() != null) {
@@ -155,14 +162,14 @@ public class CommandLineExplGen {
 						+ Arrays.toString(explOptions.getSkylineRankers()));}
 				skyRank = RankerFactory.createSkylineRanker(
 								explOptions.getSkylineRankers(),
-								explOptions.getRankerScheme(), p);
+								explOptions.getRankerScheme(), partition);
 				whichRanker = SKYLINE_RANKER;
 			}
 			else {
 				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
 						+ explOptions.getRankerScheme());}
 				partRank = RankerFactory.createPartRanker(
-								explOptions.getRankerScheme(), p);
+								explOptions.getRankerScheme(), partition);
 				whichRanker = PARTITION_RANKER;
 			}
 		}
@@ -281,7 +288,7 @@ public class CommandLineExplGen {
 							+ ++r + " with score " + score
 							+ "\n*********************************\n");
 					System.out.println(set.toString());
-					System.out.println("\nPress y to continue or v to verify this explanation");
+					System.out.println("\nPress y to continue or v to verify an explanation");
 					System.out.println("Press anything else to exit");
 				}
 				
@@ -291,16 +298,38 @@ public class CommandLineExplGen {
 				
 				if (log.isDebugEnabled()) {log.debug("user pressed " + read);}
 				
-				if(read.trim().startsWith("v"))
-					verifyExplanation();
+				boolean verifyExpl = read.trim().startsWith("v");
+				
+				if(verifyExpl)
+					verifyExplanation(set);
 
-				continueExe = read.trim().startsWith("y");
+				continueExe = read.trim().startsWith("y") || verifyExpl;
 			}
 		}
 	}
 	
-	private void verifyExplanation(){
-		System.out.println("The user pressed v");
+	private void verifyExplanation(IExplanationSet set){
+		List<IBasicExplanation> allExpls = set.getExplanations();
+		System.out.println("\nType the explanation numbers between 0 and " + (allExpls.size() - 1));
+		System.out.println("Type q to exit");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			String read = in.readLine().trim();
+			String[] numbers = read.split(" ");
+			System.out.println("\nYou successfully verified the following explanations:\n");
+			for(String number: numbers){
+				int numberInt = Integer.valueOf(number);
+				verifiedExplanations.add(allExpls.get(numberInt));
+				System.out.println(allExpls.get(numberInt));
+				System.out.print("\n");
+			}
+			System.out.println("The explanations will continue\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {

@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -67,7 +65,6 @@ public class DummyRanker implements IExplanationRanker {
 
 	@Override
 	public void initialize(ExplanationCollection coll) {
-		IMarkerSet errors;
 		
 		this.coll = coll;
 		int numErrors = coll.getNumErrors();
@@ -306,5 +303,4 @@ public class DummyRanker implements IExplanationRanker {
 		return null;
 	}
 
-	
 }
