@@ -319,9 +319,11 @@ public class CommandLineExplGen {
 			System.out.println("\nYou successfully verified the following explanations:\n");
 			for(String number: numbers){
 				int numberInt = Integer.valueOf(number);
-				verifiedExplanations.add(allExpls.get(numberInt));
-				System.out.println(allExpls.get(numberInt));
-				System.out.print("\n");
+				if(numberInt >= 0 && numberInt < allExpls.size()){
+					verifiedExplanations.add(allExpls.get(numberInt));
+					System.out.println(allExpls.get(numberInt));
+					System.out.print("\n");
+				}
 			}
 			System.out.println("The explanations will continue\n");
 		} catch (IOException e) {
