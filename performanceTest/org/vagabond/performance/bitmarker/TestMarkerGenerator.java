@@ -23,19 +23,19 @@ public class TestMarkerGenerator {
 	
 	public static void main(String[] args) {
 		
-		String outputFile = "resource/test/markers.txt";
+//		String outputFile = "resource/test/markers.txt";
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
 		
 		// before we open the file check to see if it already exists
-		boolean alreadyExists = new File(outputFile).exists();
+//		boolean alreadyExists = new File(outputFile).exists();
 		
-		if (alreadyExists) {
-			new File(outputFile).delete();
-		}
+//		if (alreadyExists) {
+//			new File(outputFile).delete();
+//		}
 		
 		try {
 			
-			CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), ' ');
+//			CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), ' ');
 	
 			String[] cols;
 			ResultSet rs;
@@ -45,7 +45,7 @@ public class TestMarkerGenerator {
 				Connection con = TestOptions.getInstance().getConnection();
 				rs = ConnectionManager.getInstance().execQuery(con, 
 						"SELECT tid, attname " + 
-						"FROM (SELECT tid FROM target.testcp1nl0ce0copy1_0 ORDER BY tid LIMIT 100) a, " +
+						"FROM (SELECT tid FROM target.testcp1nl0ce0copy1_0 ORDER BY tid LIMIT 5) a, " +
 							  "(SELECT attname FROM pg_catalog.pg_attribute WHERE attrelid = 'target.testcp1nl0ce0copy1_0'::regclass " +
 							  													"AND attnum > 0 AND NOT attisdropped AND attname <> 'tid' LIMIT 1) b");
 				
@@ -54,9 +54,27 @@ public class TestMarkerGenerator {
 	                String em = rs.getString("tid");
 	                cols = em.split("\n");
 	                for (int i =0; i < cols.length; i++){
-	                	csvOutput.write("A(testcp1nl0ce0copy1_0," + cols[i] + "," + rs.getString("attname")+ ")");
+	                	System.out.println("A(testcp1nl0ce0copy1_0," + cols[i] + "," + rs.getString("attname")+ ")");
 	                }
-	                csvOutput.endRecord();
+//	                csvOutput.endRecord();
+	            }
+	            
+	            ConnectionManager.getInstance().closeRs(rs);
+	            
+				rs = ConnectionManager.getInstance().execQuery(con, 
+						"SELECT tid, attname " + 
+						"FROM (SELECT tid FROM target.testcp1nl0ce0copy1_0 ORDER BY tid LIMIT 5) a, " +
+							  "(SELECT attname FROM pg_catalog.pg_attribute WHERE attrelid = 'target.testcp1nl0ce0copy1_0'::regclass " +
+							  													"AND attnum > 0 AND NOT attisdropped AND attname <> 'tid' LIMIT 1) b");
+				
+
+	            while (rs.next()) {
+	                String em = rs.getString("tid");
+	                cols = em.split("\n");
+	                for (int i =0; i < cols.length; i++){
+	                	System.out.println("A(testcp1nl0ce0copy1_0," + cols[i] + "," + rs.getString("attname")+ ")");
+	                }
+//	                csvOutput.endRecord();
 	            }
 	            
 	            ConnectionManager.getInstance().closeRs(rs);
@@ -69,9 +87,9 @@ public class TestMarkerGenerator {
 				e.printStackTrace();
 			}
 			
-			csvOutput.close();
+//			csvOutput.close();
 			
-			log.debug("------ 'markers' file has been created ------");
+//			log.debug("------ 'markers' file has been created ------");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
