@@ -17,11 +17,11 @@ public class TestDataGenerator {
 		
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
 		
-		
+/*		
 		// Homeless		
-		String outputFile1 = "resource/exampleData/tramp_100.csv";
-		String outputFile2 = "resource/exampleData/socialworker_100.csv";
-		String outputFile3 = "resource/exampleData/soupkitchen_100.csv";
+		String outputFile1 = "resource/exampleData/tramp_1000000.csv";
+		String outputFile2 = "resource/exampleData/socialworker_1000000.csv";
+		String outputFile3 = "resource/exampleData/soupkitchen_1000000.csv";
 		
 		// before we open the file check to see if it already exists
 		boolean alreadyExists1 = new File(outputFile1).exists();
@@ -53,7 +53,7 @@ public class TestDataGenerator {
 			String outPut = "";
 			StringBuilder sb = new StringBuilder();
 
-			for(int j = 1; j < 101; j++) {
+			for(int j = 1; j < 1000001; j++) {
 
 				csvOutput1.write("" + j);
 				csvOutput2.write("" + j);
@@ -126,14 +126,14 @@ public class TestDataGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+*/		
 		
-		
-/*
+
 		// Employee
-		String outputFile4 = "resource/exampleData/employee.csv";
-		String outputFile5 = "resource/exampleData/firm.csv";
-		String outputFile6 = "resource/exampleData/address.csv";
-		String outputFile7 = "resource/exampleData/customer.csv";
+		String outputFile4 = "resource/exampleData/employee_100.csv";
+		String outputFile5 = "resource/exampleData/firm_100.csv";
+		String outputFile6 = "resource/exampleData/address_100.csv";
+		String outputFile7 = "resource/exampleData/customer_100.csv";
 		
 		boolean alreadyExists4 = new File(outputFile4).exists();
 		boolean alreadyExists5 = new File(outputFile5).exists();
@@ -161,40 +161,126 @@ public class TestDataGenerator {
 			CsvWriter csvOutput6 = new CsvWriter(new FileWriter(outputFile6, true), ',');
 			CsvWriter csvOutput7 = new CsvWriter(new FileWriter(outputFile7, true), ',');
 			
-			for (int i = 1; i < 100001; i++) {
-				csvOutput4.write("" + i);
-				csvOutput4.write("eName" + i);
-				csvOutput4.write("eName" + i);
-				csvOutput4.write("FirmName" + i);
+			// write out a few records
+			Random random = new Random();
+
+			char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+			char[] ints = "0123456789".toCharArray();
+			
+			String OutPut = "";
+			String IntOutPut = "";
+			String firmName = "";
+			StringBuilder sb = new StringBuilder();
+
+			for(int j = 1; j < 101; j++) {
+
+				csvOutput4.write("" + j);
+				csvOutput5.write("" + j);
+				csvOutput6.write("" + j);
+				csvOutput7.write("" + j);
 				
-				csvOutput4.write("" + i);
+				// employee
+				for (int l = 0; l < 4; l++) {
+					for (int i = 0; i < 10; i++) {
+						char c = chars[random.nextInt(chars.length)];
+						sb.append(c);
+					}
+					String output = sb.toString();
+					
+					if (l == 0) {
+						csvOutput4.write(output);
+						OutPut = output;
+					}
+					if (l == 1)
+						csvOutput4.write(OutPut);
+					if (l == 2) {
+						csvOutput4.write(output);
+						firmName = output;
+					}
+					if (l == 3) {
+						sb.delete(0, sb.length());
+						for (int i = 0; i < 10; i++) {
+							char num = ints[random.nextInt(ints.length)];
+							sb.append(num);
+						}
+						output = sb.toString();
+						csvOutput4.write(output);
+						IntOutPut = output;
+					}
+					
+					sb.delete(0, sb.length());
+				}
+				
+				// firm
+				for (int l = 0; l < 3; l++) {
+					for (int i = 0; i < 10; i++) {
+						char c = chars[random.nextInt(chars.length)];
+						sb.append(c);
+					}
+					String output = sb.toString();
+					
+					if (l == 0)
+						csvOutput5.write(firmName);
+					
+					if (l == 1)
+						csvOutput5.write(IntOutPut);
+					
+					if (l == 2)
+						csvOutput5.write(OutPut);
+					
+					sb.delete(0, sb.length());
+				}
+
+				// address
+				for (int l = 0; l < 3; l++) {
+					for (int i = 0; i < 10; i++) {
+						char c = chars[random.nextInt(chars.length)];
+						sb.append(c);
+					}
+					String output = sb.toString();
+					
+					if (l != 0)
+						csvOutput6.write(output);
+					
+					if (l == 0)
+						csvOutput6.write(IntOutPut);
+					
+					sb.delete(0, sb.length());
+				}
+				
+				// customer
+				for (int l = 0; l < 3; l++) {
+					for (int i = 0; i < 10; i++) {
+						char c = chars[random.nextInt(chars.length)];
+						sb.append(c);
+					}
+					String output = sb.toString();
+					
+					if (l == 0)
+						csvOutput7.write(output);
+					
+					if (l == 1)
+						csvOutput7.write(IntOutPut);
+					
+					if (l == 2) {
+						sb.delete(0, sb.length());
+						for (int i = 0; i < 10; i++) {
+							char num = ints[random.nextInt(ints.length)];
+							sb.append(num);
+						}
+						output = sb.toString();
+						csvOutput7.write(output);
+					}
+					
+					sb.delete(0, sb.length());
+				}
+
 				csvOutput4.endRecord();
-			}
-			
-			for (int i = 1; i < 100001; i++) {
-				csvOutput5.write("" + i);
-				csvOutput5.write("FirmName" + i);
-				csvOutput5.write("" + i);
-				csvOutput5.write("eName" + i);
 				csvOutput5.endRecord();
-			}
-
-			for (int i = 1; i < 100001; i++) {
-				csvOutput6.write("" + i);
-				csvOutput6.write("" + i);
-				csvOutput6.write("City" + i);
-				csvOutput6.write("Street" + i);
 				csvOutput6.endRecord();
-			}
-
-			for (int i = 1; i < 100001; i++) {
-				csvOutput7.write("" + i);
-				csvOutput7.write("Customer" + i);
-				csvOutput7.write("" + i);
-				csvOutput7.write("Year" + i);
 				csvOutput7.endRecord();
+				sb.delete(0, sb.length());
 			}
-			
 			
 			csvOutput4.close();
 			csvOutput5.close();
@@ -205,7 +291,7 @@ public class TestDataGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		*/
+
 		log.debug("------ CSV file has been created ------");
 	}
 }
