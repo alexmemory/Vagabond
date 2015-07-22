@@ -509,11 +509,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			// current best candidate is not complete, expand it
 			if (!curCand.isDone())
 				expandAndInsert(curCand);
-			// current best candidate is complete, check if best incomplete
-			// candidate
+			
+			// current best candidate is complete, check if best incomplete candidate
 			// cannot be better than this one (best.max <= incomplete.min),
-			// if so increase iterDone until this condition does not hold
-			// anymore
+			// if so, increase iterDone until this condition does not hold anymore
 			else {
 				int curPos = iterDone + 1;
 				RankedListElement inclCand = curCand;
