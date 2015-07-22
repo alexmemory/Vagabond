@@ -44,6 +44,8 @@ import org.vagabond.util.ewah.IntIterator;
  *
  */
 
+//TODO add methods IExplaantioRanker interface and implemnet them here for accessing confirmed expalnations and errors
+
 public class AStarExplanationRanker implements IExplanationRanker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(
@@ -610,7 +612,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return result;
 	}
 
-	// TODO memorize united side effects?
+	//TODO @BSMP: this is what you need to change, add the confirmed explanations here to compute real score involving confirmed explanations
 	private void computeScore(RankedListElement elem) {
 		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation>();
 
@@ -657,7 +659,20 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public void confirmExplanation(IBasicExplanation correctExpl) {
-		// TODO Auto-generated method stub
+		//TODO Auto-generated method stub
+		
+		//TODO 1) keep confirmed explanations and explained errors in separate fields
+		// find all 
+		
+		//TODO 2) NOT THAT (store away current explanation set (at currrent position)) restart next
+		
+		//TODO 3) adapt ExplanationCollection
+		
+		//TODO 4) wipe internal datastructures of the ranker 
+		
+		//TODO 5) call initialize to restart the ranker
+		
+		//TODO 6) merge confirmed explanations for scoring
 	}
 
 	@Override
