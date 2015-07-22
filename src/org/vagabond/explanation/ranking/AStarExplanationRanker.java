@@ -325,7 +325,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	};
 
-	// Fields
+	// TODO Reposition the Fields below
 	
 	private int iterPos = -1;
 	private int iterDone = -1;
@@ -657,21 +657,23 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public void confirmExplanation(IBasicExplanation correctExpl) {
 		
-		//TODO 0) keep confirmed explanations and explained errors in separate fields
+		//TODO 0) keep confirmed explanations in a field
 		
 		confirmedExplanations.add(correctExpl);
 		
-		//TODO 1) find all explanations
+		//TODO 1) keep confirmed errors in another field
 		
-		//TODO 2) NOT THAT (store away current explanation set (at current position)) restart next
+		//TODO 2) find all explanations
 		
-		//TODO 3) adapt ExplanationCollection
+		//TODO 3) NOT THAT (store away current explanation set (at current position)) restart next
 		
-		//TODO 4) wipe internal data structures off the ranker 
+		//TODO 4) adapt ExplanationCollection
 		
-		//TODO 5) call initialize to restart the ranker
+		//TODO 5) wipe internal data structures off the ranker 
+
+		//TODO 6) call initialize to restart the ranker
 		
-		//TODO 6) merge confirmed explanations for scoring
+		//TODO 7) merge confirmed explanations for scoring
 	}
 
 	@Override

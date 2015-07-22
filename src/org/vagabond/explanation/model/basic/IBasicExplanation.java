@@ -19,14 +19,14 @@ public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 		TargetSkeletonMappingError
 	}
 	
-	public ExplanationType getType ();
+	public ExplanationType getType();
 	
 	public ISingleMarker explains();
 	public void setExplains (ISingleMarker explains);
 	public Object getExplanation();
 	
 	public int getTargetSideEffectSize();
-	public IMarkerSet getTargetSideEffects ();
+	public IMarkerSet getTargetSideEffects();
 	
 	public int getRealTargetSideEffectSize();
 	public IMarkerSet getRealTargetSideEffects();
@@ -35,19 +35,19 @@ public interface IBasicExplanation extends Comparable<IBasicExplanation> {
 	public IMarkerSet getRealExplains();
 	public void setRealExplains(IMarkerSet set);
 	
-	public void computeRealTargetSEAndExplains (IMarkerSet errors);
+	public void computeRealTargetSEAndExplains(IMarkerSet errors);
 	
-	public int getSourceSideEffectSize ();
-	public IMarkerSet getSourceSideEffects ();
+	public int getSourceSideEffectSize();
+	public IMarkerSet getSourceSideEffects();
 	
-	public int getMappingSideEffectSize ();
-	public Collection<MappingType> getMappingSideEffects ();
+	public int getMappingSideEffectSize();
+	public Collection<MappingType> getMappingSideEffects();
 	
-	public int getCorrSideEffectSize ();
-	public Collection<CorrespondenceType> getCorrespondenceSideEffects ();
+	public int getCorrSideEffectSize();
+	public Collection<CorrespondenceType> getCorrespondenceSideEffects();
 	
-	public int getTransformationSideEffectSize ();
-	public Collection<TransformationType> getTransformationSideEffects ();
+	public int getTransformationSideEffectSize();
+	public Collection<TransformationType> getTransformationSideEffects();
 	
 	public void recomputeHash();
 }
