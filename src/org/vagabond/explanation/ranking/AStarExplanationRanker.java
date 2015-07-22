@@ -64,9 +64,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		public RankedListElement(int[] elem) {
 			this.elem = elem;
 			countSet = elem.length;
-
 			updateFirstUnset();
-
 			computeScore(this);
 		}
 
@@ -82,19 +80,15 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			for (int i = 0; i < elems.length; i++) {
 				int newElem = elems[i];
 				elem[i] = newElem;
-
 				for (int j = 0; j < explainsMatrix[i][newElem].length; j++) {
 					int pos = explainsMatrix[i][newElem][j];
-
 					if (this.elem[pos] == -1) {
 						this.elem[pos] = -2;
 						countSet++;
 					}
 				}
 			}
-
 			updateFirstUnset();
-
 			computeScore(this);
 		}
 
@@ -108,7 +102,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			this.elem[prefix.firstUnset] = newElem;
 			countSet++;
 
-			// set implied explanations and new element
+			// Set implied explanations and new element
 			for (int i = 0; i < explainsMatrix[prefix.firstUnset][newElem].length; i++) {
 				int pos = explainsMatrix[prefix.firstUnset][newElem][i];
 				if (this.elem[pos] == -1) {
@@ -117,16 +111,14 @@ public class AStarExplanationRanker implements IExplanationRanker {
 				}
 			}
 
-			// adapt the side effect size
+			// Adapt the side effect size
 			updateFirstUnset();
 			computeScore(this);
 
 			if (log.isDebugEnabled()) {
 				if (log.isDebugEnabled()) {
-					log.debug("extended set " + prefix.toString() + " to "
-							+ toString());
+					log.debug("extended set " + prefix.toString() + " to " + toString());
 				}
-				;
 			}
 		}
 
@@ -196,9 +188,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			int exNum, offset = 0;
 			IntIterator iter;
 
-			// get ids of same explanations
+			// get id's for the same explanation
 			for (int i = 0; i < pos; i++)
 				offset += errorExpl.get(i).size();
+			
 			exNum = offset + o.elem[pos];
 
 			iter = sameExpl.getRowIntIter(exNum);
@@ -214,7 +207,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 				if (elem[errorPos] == candExNum)
 					return true;
 			}
-
 			return false;
 		}
 	}
@@ -296,16 +288,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-
 			result.append("ONE ERROR EXPL for <");
 			result.append(error);
 			result.append(" subsuming expls \n");
 			result.append(this.idToObj.values().toString());
 			result.append("\nwith min " + minSE + " and max " + maxSE);
-
 			return result.toString();
 		}
-
 	}
 
 	public static final Comparator<OneErrorExplSet> oneElemComp = new Comparator<AStarExplanationRanker.OneErrorExplSet>() {
@@ -421,10 +410,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 					sameExpl.setSym(i, k);
 			}
 		}
+		
 		if (log.isDebugEnabled()) {
 			log.debug("set same explanations: " + sameExpl.toString());
 		}
-		;
 
 		numErrors = errors.size();
 
