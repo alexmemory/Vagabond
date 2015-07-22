@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -44,7 +46,7 @@ import org.vagabond.util.ewah.IntIterator;
  *
  */
 
-//TODO add methods IExplaantioRanker interface and implement them here for accessing confirmed explanations
+//TODO add methods IExplanatioRanker interface and implement them here for accessing confirmed explanations
 //and errors
 
 public class AStarExplanationRanker implements IExplanationRanker {
@@ -52,7 +54,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	static Logger log = LogProviderHolder.getInstance().getLogger(
 			AStarExplanationRanker.class);
 
-	// represents a set of explanations
+	// Represents a set of explanations
+	
 	public class RankedListElement {
 		public int[] elem;
 		public int min;
@@ -322,7 +325,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	};
 
-	// fields
+	// Fields
+	
 	private int iterPos = -1;
 	private int iterDone = -1;
 	private int numSets = -1;
@@ -341,12 +345,14 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private boolean rankingDone = false;
 	private IScoringFunction scoringFunction;
 	private BitMatrix sameExpl;
+	private Set<IBasicExplanation> confirmedExplanations;
 
 	public AStarExplanationRanker(IScoringFunction function) {
 		sortedSets = new TreeSet<RankedListElement>(rankComp);
 		errorExpl = new ArrayList<OneErrorExplSet>();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
+		confirmedExplanations = new HashSet<IBasicExplanation>();
 		this.scoringFunction = function;
 	}
 
@@ -650,10 +656,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public void confirmExplanation(IBasicExplanation correctExpl) {
-		//TODO Auto-generated method stub
 		
-		//TODO 1) keep confirmed explanations and explained errors in separate fields
-		// find all 
+		//TODO 0) keep confirmed explanations and explained errors in separate fields
+		
+		confirmedExplanations.add(correctExpl);
+		
+		//TODO 1) find all explanations
 		
 		//TODO 2) NOT THAT (store away current explanation set (at current position)) restart next
 		

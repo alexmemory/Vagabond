@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -53,7 +51,6 @@ public class CommandLineExplGen {
 	private SkylineRanker skyRank;
 	private IPartitionRanker partRank;
 	private IScoringFunction scoringFunction;
-	private Set<IBasicExplanation> verifiedExplanations;
 	
 	private int whichRanker; // 1 for explanation, 2 for skyline, 3 for partition
 	public static final int EXPLANATION_RANKER = 1;
@@ -63,7 +60,6 @@ public class CommandLineExplGen {
 	public CommandLineExplGen() {
 		explOptions = new ExplGenOptions();
 		explGenerator = new ExplanationSetGenerator();
-		verifiedExplanations = new HashSet<IBasicExplanation>();
 	}
 	 	
 	public void setUpLogger() {
@@ -188,7 +184,8 @@ public class CommandLineExplGen {
 			double prec = 0.0, rec = 0.0;
 			max = (max == -1) ? Integer.MAX_VALUE : max;
 			int real = 0;
-			// have to copy the set because computing real target SE changes the hash
+			
+			// You have to copy the set because computing real target SE changes the hash
 			for(IBasicExplanation e: pre) {
 				e.computeRealTargetSEAndExplains(markers);
 				gold.add(e);
@@ -196,7 +193,7 @@ public class CommandLineExplGen {
 			
 			metric = new RankingMetricPrecisionRecall(gold);
 			
-			// gather solutions
+			// Gather all solutions/explanations
 			while(iter.hasNext() && real < max) {
 				iter.next();
 				real++;
@@ -231,21 +228,22 @@ public class CommandLineExplGen {
 				System.out.flush();
 			}
 		}
-		// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
+		// Use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
 		else if (explOptions.isRankNonInteractive()) {
 			int i = 1;
 			int max = explOptions.getMaxRank();
 			long beforeRank = System.nanoTime();
-			//only 10mins running for ranking
 			long start = System.currentTimeMillis();
 			long end = explOptions.getTimeLimit() == -1 ? -1 :  start + explOptions.getTimeLimit()*1000;
+			
+			// Only 10mins running for ranking
 			
 			while ((max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
 				long lStartTime = System.nanoTime();				
 				IExplanationSet set = iter.next();
 				double score = -1.0;
 
-				// do check inside timing, because ranking cost may be hidden in this check
+				// Do a quick check inside timing, because ranking cost may be hidden in this check
 				if (!iter.hasNext())
 					break;
 				
@@ -272,7 +270,9 @@ public class CommandLineExplGen {
 			double rankSecs1 = ((double) (afterRank - beforeRank)) / 1000000000.0;
 			System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs1));
 		}
-		// use interactive ranking where the user is asked after each CES whether to continue or not
+		
+		// Use interactive ranking where the user is asked after each CES whether to continue or not
+		
 		else {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			while (continueExe && iter.hasNext()) {
@@ -321,7 +321,6 @@ public class CommandLineExplGen {
 				int numberInt = Integer.valueOf(number);
 				if(numberInt >= 0 && numberInt < allExpls.size()){
 					IBasicExplanation expl = allExpls.get(numberInt);
-					verifiedExplanations.add(expl);
 					explRank.confirmExplanation(expl);
 					System.out.println(expl.toString());
 					System.out.print("\n");
@@ -329,7 +328,6 @@ public class CommandLineExplGen {
 			}
 			System.out.println("The explanations will continue\n");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
