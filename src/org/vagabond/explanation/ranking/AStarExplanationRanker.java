@@ -595,13 +595,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			currentIteratorElement = sortedSets.higher(currentIteratorElement);
 	}
 
-	private IExplanationSet getSetForRankedListElem(RankedListElement elem) {
+	private IExplanationSet getSetForRankedListElem(RankedListElement element) {
 		IExplanationSet result = ExplanationFactory
 				.newExplanationSet(ExplanationComparators.sameElemComp);
 
-		for (int i = 0; i < elem.elem.length; i++)
-			if (elem.elem[i] > -1)
-				result.addUnique(errorExpl.get(i).get(elem.elem[i]));
+		for (int i = 0; i < element.elem.length; i++)
+			if (element.elem[i] > -1)
+				result.addUnique(errorExpl.get(i).get(element.elem[i]));
 
 		if (log.isDebugEnabled())
 			if (log.isDebugEnabled()) {
