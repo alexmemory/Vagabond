@@ -560,19 +560,18 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 * Add all possible sets from one error to a set, remove the original set
 	 * from the list and add the extended sets to the list.
 	 */
-	private void expandAndInsert(RankedListElement curExp) {
+	private void expandAndInsert(RankedListElement currentExplanation) {
 		boolean disOverlap;
 
-		disOverlap = curExp.extensionWithoutOverlap();
-		sortedSets.remove(curExp);
+		disOverlap = currentExplanation.extensionWithoutOverlap();
+		sortedSets.remove(currentExplanation);
 
-		for (int i = 0; i < errorExpl.get(curExp.firstUnset).size(); i++) {
-			RankedListElement newOne = new RankedListElement(curExp, i);
+		for (int i = 0; i < errorExpl.get(currentExplanation.firstUnset).size(); i++) {
+			RankedListElement newOne = new RankedListElement(currentExplanation, i);
 			if (log.isDebugEnabled()) {
 				log.debug("Was included? : " + sortedSets.contains(newOne)
 						+ "\n" + newOne);
 			}
-			;
 			if ((!disOverlap || !newOne.lastAdditionHasOverlap())
 					&& !sortedSets.contains(newOne))
 				sortedSets.add(newOne);
@@ -581,11 +580,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public IExplanationSet next() {
-		advanceIter();
+		advanceIteration();
 		return getSetForRankedListElem(curIterElem);
 	}
 
-	private void advanceIter() {
+	private void advanceIteration() {
 		if (rankingDone && iterPos + 1 >= numSets)
 			throw new NoSuchElementException("only " + numSets + " elements");
 
@@ -749,13 +748,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			resetIter();
 
 		while (iterPos < rank)
-			advanceIter();
+			advanceIteration();
 
 		result = getSetForRankedListElem(curIterElem);
 
 		resetIter();
 		while (iterPos < oldIterPos)
-			advanceIter();
+			advanceIteration();
 
 		return result;
 	}
@@ -773,7 +772,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getScore(int rank) { // TODO improve performance by score
+	public int getScore(int rank) {
 		return scoringFunction.getScore(getRankedExpl(rank));
 	}
 
