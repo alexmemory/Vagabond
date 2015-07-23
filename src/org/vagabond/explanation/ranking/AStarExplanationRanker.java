@@ -614,7 +614,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			if (log.isDebugEnabled()) {
 				log.debug("set for iter is \n" + result.toString());
 			}
-		;
 
 		return result;
 	}
