@@ -48,8 +48,7 @@ import org.vagabond.util.ewah.IntIterator;
 
 public class AStarExplanationRanker implements IExplanationRanker {
 
-	static Logger log = LogProviderHolder.getInstance().getLogger(
-			AStarExplanationRanker.class);
+	static Logger log = LogProviderHolder.getInstance().getLogger(AStarExplanationRanker.class);
 
 	// Represents a set of explanations
 	
@@ -72,11 +71,11 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			elem = new int[maxSize];
 			countSet = elems.length;
 
-			// initialize unset elements with -1
+			// Initialize unset elements with -1
 			for (int i = elems.length; i < maxSize; i++)
 				elem[i] = -1;
 
-			// set elements and implied elements
+			// Set elements and implied elements
 			for (int i = 0; i < elems.length; i++) {
 				int newElem = elems[i];
 				elem[i] = newElem;
@@ -92,19 +91,19 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			computeScore(this);
 		}
 
-		public RankedListElement(RankedListElement prefix, int newElem) {
+		public RankedListElement(RankedListElement prefix, int newElement) {
 			this.elem = Arrays.copyOf(prefix.elem, prefix.elem.length);
 			this.min = prefix.min;
 			this.max = prefix.max;
 			this.countSet = prefix.countSet;
 			this.realScore = prefix.realScore;
 			this.firstUnset = prefix.firstUnset;
-			this.elem[prefix.firstUnset] = newElem;
+			this.elem[prefix.firstUnset] = newElement;
 			countSet++;
 
 			// Set implied explanations and new element
-			for (int i = 0; i < explainsMatrix[prefix.firstUnset][newElem].length; i++) {
-				int pos = explainsMatrix[prefix.firstUnset][newElem][i];
+			for (int i = 0; i < explainsMatrix[prefix.firstUnset][newElement].length; i++) {
+				int pos = explainsMatrix[prefix.firstUnset][newElement][i];
 				if (this.elem[pos] == -1) {
 					this.elem[pos] = -2;
 					countSet++;
@@ -194,7 +193,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			
 			exNum = offset + o.elem[pos];
 
-			iterator = sameExpl.getRowIntIter(exNum);
+			iterator = sameExplanations.getRowIntIter(exNum);
 
 			// Is any of the same explanations used in this ranked list element?
 			
@@ -327,7 +326,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private int iteratorPosition = -1;
 	private int iterationDone = -1;
 	private int numberOfSets = -1;
-	private int numErrors = -1;
+	private int numberOfErrors = -1;
 	private RankedListElement lastDoneElem;
 	private RankedListElement currentIteratorElement;
 	private TreeSet<RankedListElement> sortedSets;
@@ -341,7 +340,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private boolean init = false;
 	private boolean rankingIsDone = false;
 	private IScoringFunction scoringFunction;
-	private BitMatrix sameExpl;
+	private BitMatrix sameExplanations;
 	private Set<IBasicExplanation> confirmedExplanations;
 	private Set<ISingleMarker> confirmedMarkers;
 
@@ -379,7 +378,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		for (int numExpls : collection.getNumExpls())
 			numberOfExplanations += numExpls;
 
-		sameExpl = new BitMatrix(numberOfExplanations, numberOfExplanations);
+		sameExplanations = new BitMatrix(numberOfExplanations, numberOfExplanations);
 
 		explainsMatrix = new int[explCollection.getErrorExplMap().keySet().size()][][];
 
@@ -421,28 +420,28 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		for (int i = 0; i < allExpl.size(); i++) {
 			for (int k = 0; k < allExpl.size(); k++) {
 				if (i != k && allExpl.get(i).equals(allExpl.get(k)))
-					sameExpl.setSym(i, k);
+					sameExplanations.setSym(i, k);
 			}
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("set same explanations: " + sameExpl.toString());
+			log.debug("set same explanations: " + sameExplanations.toString());
 		}
 
-		numErrors = errors.size();
+		numberOfErrors = errors.size();
 
 		// Initialize min/max sums
-		combinedMin = new int[numErrors];
-		combinedMax = new int[numErrors];
+		combinedMin = new int[numberOfErrors];
+		combinedMax = new int[numberOfErrors];
 
 		for (int i = 0; i < combinedMin.length; i++) {
-			OneErrorExplSet one = errorExpl.get(numErrors - i - 1);
-			combinedMin[numErrors - i - 1] = one.minSE;
-			combinedMax[numErrors - i - 1] = one.maxSE;
+			OneErrorExplSet oneError = errorExpl.get(numberOfErrors - i - 1);
+			combinedMin[numberOfErrors - i - 1] = oneError.minSE;
+			combinedMax[numberOfErrors - i - 1] = oneError.maxSE;
 		}
 
 		if (log.isDebugEnabled()) {
-			for (int i = 0; i < numErrors; i++) {
+			for (int i = 0; i < numberOfErrors; i++) {
 				if (log.isDebugEnabled()) {
 					log.debug("min " + combinedMin[i] + " max "
 							+ combinedMax[i] + " for " + errorList.get(i)
@@ -454,7 +453,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 		// initialize the sorted list with one expl, explanations
 		for (int i = 0; i < errorExpl.get(0).size(); i++) {
-			sortedSets.add(new RankedListElement(numErrors, i));
+			sortedSets.add(new RankedListElement(numberOfErrors, i));
 		}
 
 		init = true;
@@ -464,32 +463,32 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return sortedSets;
 	}
 
-	private void generateExplainsMatrix(OneErrorExplSet expl, int pos) {
+	private void generateExplainsMatrix(OneErrorExplSet explanation, int position) {
 		List<Integer> overlaps;
 		IBasicExplanation e;
 		IMarkerSet overlap;
 
-		explainsMatrix[pos] = new int[expl.size()][];
+		explainsMatrix[position] = new int[explanation.size()][];
 
-		for (int i = 0; i < expl.size(); i++) {
+		for (int row = 0; row < explanation.size(); row++) {
 			overlaps = new ArrayList<Integer>();
-			e = expl.get(i);
+			e = explanation.get(row);
 
 			// Get other errors that are covered
 			overlap = errors.cloneSet().intersect(e.getRealExplains());
 			for (ISingleMarker error : overlap) {
-				int errorPos = getPosForError(error);
-				if (errorPos != pos)
-					overlaps.add(errorPos);
+				int errorPosition = getPosForError(error);
+				if (errorPosition != position)
+					overlaps.add(errorPosition);
 			}
 			Collections.sort(overlaps);
-			explainsMatrix[pos][i] = new int[overlaps.size()];
-			for (int j = 0; j < overlaps.size(); j++)
-				explainsMatrix[pos][i][j] = overlaps.get(j);
+			explainsMatrix[position][row] = new int[overlaps.size()];
+			for (int column = 0; column < overlaps.size(); column++)
+				explainsMatrix[position][row][column] = overlaps.get(column);
 
 			if (log.isDebugEnabled())
-				LoggerUtil.logArray(log, explainsMatrix[pos][i], "[" + pos
-						+ "," + i + "] is ");
+				LoggerUtil.logArray(log, explainsMatrix[position][row], "[" + position
+						+ "," + row + "] is ");
 		}
 	}
 
