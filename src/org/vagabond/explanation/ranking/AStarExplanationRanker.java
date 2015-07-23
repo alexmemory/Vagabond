@@ -238,26 +238,36 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	};
 
-	// represents an ordering of the explanations for one error and min/max
+	// Represents an ordering of the explanations for one error and min/max
 	// side-effect sizes
-	protected class OneErrorExplSet extends IdMap<IBasicExplanation> {
+	protected class OneErrorExplanationSet extends IdMap<IBasicExplanation> {
 		private int minSE;
 		private int maxSE;
 		private ISingleMarker error;
 
-		public OneErrorExplSet(IExplanationSet explSet, ISingleMarker error) {
+		public OneErrorExplanationSet(IExplanationSet explanationSet, ISingleMarker error) {
 			super();
 			this.error = error;
-			List<IBasicExplanation> explanationList;
+			sortAndSetExplanations(explanationSet);
+		}
 
-			explanationList = explSet.getExplanations();
-
-			// Sort according the scoring function
+		// Sort according the scoring function
+		
+		private void sortAndSetExplanations(IExplanationSet explanationSet){
+			List<IBasicExplanation> explanationList = explanationSet.getExplanations();
 			
 			Collections.sort(explanationList,
 					RankerFactory.getScoreTotalOrderComparator(scoringFunction));
+			
 			for (IBasicExplanation explanation : explanationList)
 				put(explanation);
+			
+			setMinMax(explanationList);
+		}
+		
+		// Set MinSE and MaxSE according to the explanation list for the error
+		
+		private void setMinMax(List<IBasicExplanation> explanationList){
 			minSE = scoringFunction.getScore(explanationList.get(0));
 			maxSE = scoringFunction.getScore(explanationList.get(explanationList.size() - 1));
 		}
@@ -297,10 +307,10 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	}
 
-	public static final Comparator<OneErrorExplSet> oneElemComp = new Comparator<AStarExplanationRanker.OneErrorExplSet>() {
+	public static final Comparator<OneErrorExplanationSet> oneElemComp = new Comparator<AStarExplanationRanker.OneErrorExplanationSet>() {
 
 		@Override
-		public int compare(OneErrorExplSet arg0, OneErrorExplSet arg1) {
+		public int compare(OneErrorExplanationSet arg0, OneErrorExplanationSet arg1) {
 			int span1 = arg0.maxSE - arg0.minSE;
 			int span2 = arg1.maxSE - arg1.minSE;
 			int comp = span2 - span1;
@@ -330,7 +340,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private RankedListElement lastDoneElem;
 	private RankedListElement currentIteratorElement;
 	private TreeSet<RankedListElement> sortedSets;
-	private List<OneErrorExplSet> errorExpl;
+	private List<OneErrorExplanationSet> errorExpl;
 	private IMarkerSet errors;
 	private List<ISingleMarker> errorList;
 	private int[][][] explainsMatrix;
@@ -352,7 +362,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	
 	private void initializeListsAndSets(){
 		sortedSets = new TreeSet<RankedListElement>(rankComp);
-		errorExpl = new ArrayList<OneErrorExplSet>();
+		errorExpl = new ArrayList<OneErrorExplanationSet>();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
 	}
@@ -392,19 +402,19 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		// Create data structures for the explanation sets for each error
 		for (ISingleMarker m : explCollection.getErrorExplMap().keySet()) {
 			IExplanationSet e = explCollection.getErrorExplMap().get(m);
-			OneErrorExplSet newOne = new OneErrorExplSet(e, m);
+			OneErrorExplanationSet newOne = new OneErrorExplanationSet(e, m);
 			errorExpl.add(newOne);
 			numberOfSets *= newOne.size();
 		}
 
 		// Sort on min-max span to improve pruning
 		Collections.sort(errorExpl, oneElemComp);
-		for (OneErrorExplSet newOne : errorExpl)
+		for (OneErrorExplanationSet newOne : errorExpl)
 			errorList.add(newOne.error);
 
 		// Remove errors from side-effect to guarantee correct ranking
 		j = 0;
-		for (OneErrorExplSet newOne : errorExpl) {
+		for (OneErrorExplanationSet newOne : errorExpl) {
 			generateExplainsMatrix(newOne, j);
 			j++;
 		}
@@ -412,7 +422,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		// Find out which explanations are the same
 		List<IBasicExplanation> allExpl = new ArrayList<IBasicExplanation>();
 
-		for (OneErrorExplSet newOne : errorExpl) {
+		for (OneErrorExplanationSet newOne : errorExpl) {
 			for (int k = 0; k < newOne.size(); k++)
 				allExpl.add(newOne.get(k));
 		}
@@ -435,7 +445,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		combinedMax = new int[numberOfErrors];
 
 		for (int i = 0; i < combinedMin.length; i++) {
-			OneErrorExplSet oneError = errorExpl.get(numberOfErrors - i - 1);
+			OneErrorExplanationSet oneError = errorExpl.get(numberOfErrors - i - 1);
 			combinedMin[numberOfErrors - i - 1] = oneError.minSE;
 			combinedMax[numberOfErrors - i - 1] = oneError.maxSE;
 		}
@@ -463,7 +473,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return sortedSets;
 	}
 
-	private void generateExplainsMatrix(OneErrorExplSet explanation, int position) {
+	private void generateExplainsMatrix(OneErrorExplanationSet explanation, int position) {
 		List<Integer> overlaps;
 		IBasicExplanation e;
 		IMarkerSet overlap;
