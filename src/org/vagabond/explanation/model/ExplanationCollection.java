@@ -186,12 +186,6 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 				return false;
 		}
 		
-//		if (!this.numExpls.equals(oCol.numExpls))
-//			return false;
-//		
-//		if (!this.errorIds.equals(oCol.errorIds))
-//			return false;
-		
 		return true;
 	}
 	

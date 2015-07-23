@@ -330,8 +330,6 @@ public class AStarExplanationRanker implements IExplanationRanker {
 					arg1.error);
 		}
 	};
-
-	// TODO Reposition the Fields below
 	
 	private int iteratorPosition = -1;
 	private int iterationDone = -1;
@@ -621,8 +619,9 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return result;
 	}
 
-	//TODO @BSMP: this is what you need to change
-	//add the confirmed explanations here to compute real score involving confirmed explanations
+	// TODO @BSMP: this is what you need to change
+	// add the confirmed explanations here to compute real score involving 
+	// confirmed explanations
 	private void computeScore(RankedListElement rankedElem) {
 		ArrayList<IBasicExplanation> sets = new ArrayList<IBasicExplanation>();
 
@@ -672,28 +671,27 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public void confirmExplanation(IBasicExplanation correctExpl) {
 		
-		//TODO 0) keep confirmed explanations in a field
+		// Keep confirmed explanations in a field
 		
 		confirmedExplanations.add(correctExpl);
 		
-		//TODO 1) keep confirmed errors in another field
+		// Keep confirmed errors in another field
 		
 		IMarkerSet correctMarkers = correctExpl.getRealExplains();
 		confirmedMarkers.addAll(correctMarkers);
-		
-		//TODO 2) find all
-		
-		//TODO 3) NOT THAT (store away current explanation set (at current position)) restart next
-		
+				
 		//TODO 4) adapt ExplanationCollection
 		
-		//TODO 5) wipe internal data structures off the ranker 
+		//TODO 5) wipe internal data structures of the ranker 
 		
 		errors.removeAll(correctMarkers);
 		errorList.removeAll(correctMarkers);
 		removeMarkersFromOneErrorList(correctMarkers);
 
-		//TODO 6) call initialize to restart the ranker
+		// Call initialize to restart the ranker
+		
+		initializeListsAndSets();
+		initializeCollection(explCollection);
 		
 		//TODO 7) merge confirmed explanations for scoring
 	}
