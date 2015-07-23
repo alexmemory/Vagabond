@@ -46,9 +46,6 @@ import org.vagabond.util.ewah.IntIterator;
  *
  */
 
-//TODO add methods IExplanatioRanker interface and implement them here for accessing confirmed explanations
-//and errors
-
 public class AStarExplanationRanker implements IExplanationRanker {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(
