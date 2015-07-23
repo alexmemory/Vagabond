@@ -477,7 +477,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			// Get other errors that are covered
 			overlap = errors.cloneSet().intersect(e.getRealExplains());
 			for (ISingleMarker error : overlap) {
-				int errorPosition = getPosForError(error);
+				int errorPosition = getPositionForError(error);
 				if (errorPosition != position)
 					overlaps.add(errorPosition);
 			}
@@ -492,7 +492,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		}
 	}
 
-	private int getPosForError(ISingleMarker error) {
+	private int getPositionForError(ISingleMarker error) {
 		return errorList.indexOf(error);
 	}
 
@@ -680,6 +680,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		//TODO 5) wipe internal data structures off the ranker 
 		
 		errors.removeAll(correctMarkers);
+		errorList.removeAll(correctMarkers);
 
 		//TODO 6) call initialize to restart the ranker
 		
