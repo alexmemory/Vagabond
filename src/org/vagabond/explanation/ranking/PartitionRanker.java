@@ -65,17 +65,13 @@ public class PartitionRanker implements IPartitionRanker {
 			
 			if (other instanceof FullExplSummary) {
 				FullExplSummary e = (FullExplSummary) other;
-				
-				assert(iterPos.length == e.iterPos.length);
-				
+				assert(iterPos.length == e.iterPos.length);	
 				for(int i = 0; i < iterPos.length; i++) {
 					if (iterPos[i] != e.iterPos[i])
 						return false;
 				}
-				
 				return true;
 			}
-			
 			return false;
 		}
 		
@@ -86,7 +82,6 @@ public class PartitionRanker implements IPartitionRanker {
 				for(int i = 0; i < iterPos.length; i++)
 					hash ^= iterPos[i];
 			}
-				
 			return hash;
 		}
 

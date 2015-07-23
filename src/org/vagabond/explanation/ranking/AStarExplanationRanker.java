@@ -366,27 +366,29 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		confirmedMarkers = new HashSet<ISingleMarker>();
 	}
 
+	//TODO change explanationCollection
+	
 	/**
 	 * Generate OneErrorExplSets for each error and initialize the sortedSets
 	 */
 	@Override
 	public void initializeCollection(ExplanationCollection collection) {
-		int j, numExpl;
+		int j, numberOfExplanations;
 
 		numSets = 1;
 		this.explCollection = collection;
 
-		numExpl = 0;
-		for (int i : collection.getNumExpls())
-			numExpl += i;
+		numberOfExplanations = 0;
+		for (int numExpls : collection.getNumExpls())
+			numberOfExplanations += numExpls;
 
-		sameExpl = new BitMatrix(numExpl, numExpl);
+		sameExpl = new BitMatrix(numberOfExplanations, numberOfExplanations);
 
 		explainsMatrix = new int[explCollection.getErrorExplMap().keySet().size()][][];
 
 		// create set of errors
-		for (ISingleMarker m : explCollection.getErrorExplMap().keySet()) {
-			errors.add(m);
+		for (ISingleMarker marker : explCollection.getErrorExplMap().keySet()) {
+			errors.add(marker);
 		}
 
 		collection.computeRealSEAndExplains();
@@ -682,6 +684,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		//TODO 4) adapt ExplanationCollection
 		
 		//TODO 5) wipe internal data structures off the ranker 
+		
+		errors.removeAll(correctMarkers);
 
 		//TODO 6) call initialize to restart the ranker
 		
