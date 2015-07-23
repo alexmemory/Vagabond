@@ -380,7 +380,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		int j, numberOfExplanations;
 
 		numberOfSets = 1;
-		this.explCollection = collection;
+		explCollection = collection;
+		
+		// Addition for confirmed errors
+		if(confirmedMarkers != null){
+			for(ISingleMarker marker : confirmedMarkers)
+				explCollection.getErrorExplMap().remove(marker);
+		}
 
 		numberOfExplanations = 0;
 		for (int numExpls : collection.getNumExpls())
@@ -684,10 +690,14 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		//TODO 5) wipe internal data structures of the ranker 
 		
+		/*
+		
 		errors.removeAll(correctMarkers);
 		errorList.removeAll(correctMarkers);
 		removeMarkersFromOneErrorList(correctMarkers);
-
+		
+		*/
+		
 		// Call initialize to restart the ranker
 		
 		initializeListsAndSets();

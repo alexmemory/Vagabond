@@ -303,8 +303,9 @@ public class CommandLineExplGen {
 				if(verifyExpl){
 					verifyExplanation(set);
 					Thread.sleep(2000); // For you to see the explanations you chose
+				} else {
+					continueExe = read.trim().startsWith("y");
 				}
-				continueExe = read.trim().startsWith("y") || verifyExpl;
 			}
 		}
 	}
