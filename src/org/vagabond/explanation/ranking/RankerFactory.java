@@ -63,7 +63,7 @@ public class RankerFactory {
 	
 	public static IExplanationRanker createInitializedRanker (String rankScheme, ExplanationCollection col) {
 		IExplanationRanker result = createRanker (rankScheme);
-		result.initialize(col);
+		result.initializeCollection(col);
 		
 		return result;
 	}

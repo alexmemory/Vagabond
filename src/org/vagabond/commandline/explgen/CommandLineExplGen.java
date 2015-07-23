@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -19,7 +18,6 @@ import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.generation.PartitionExplanationGenerator;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.explanation.marker.IMarkerSet;
-import org.vagabond.explanation.marker.ISingleMarker;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.marker.ScenarioDictionary;
 import org.vagabond.explanation.metrics.RankingMetricPrecisionRecall;
@@ -324,10 +322,7 @@ public class CommandLineExplGen {
 				if(numberInt >= 0 && numberInt < allExpls.size()){
 					IBasicExplanation expl = allExpls.get(numberInt);
 					explRank.confirmExplanation(expl);
-					IMarkerSet markerSet = expl.getRealExplains();
 					System.out.println(expl.toString());
-					System.out.println("Something will be printed here");
-					System.out.println(markerSet.toString());
 					System.out.print("\n");
 				}
 			}

@@ -9,7 +9,7 @@ import org.vagabond.explanation.ranking.scoring.IScoringFunction;
 
 public interface IExplanationRanker extends Iterator<IExplanationSet> {
 
-	public void initialize(ExplanationCollection coll);
+	public void initializeCollection(ExplanationCollection coll);
 	public boolean ready();
 	public IExplanationSet getRankedExpl(int rank);
 	public int getScore(int rank);

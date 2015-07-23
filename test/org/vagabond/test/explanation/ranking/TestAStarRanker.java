@@ -323,7 +323,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		
 		/* create Dummy Ranker */
 		AStarExplanationRanker r = (AStarExplanationRanker) new AStarExplanationRanker(SideEffectSizeScore.inst);
-		r.initialize(col);
+		r.initializeCollection(col);
 		Comparator<RankedListElement> comp = AStarExplanationRanker.rankComp;
 		
 		RankedListElement r1,r2,r3;
@@ -573,9 +573,9 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		
 		/* create Dummy Ranker */
 		AStarExplanationRanker r1 = new AStarExplanationRanker(SideEffectSizeScore.inst);
-		r1.initialize(col);
+		r1.initializeCollection(col);
 		AStarExplanationRanker r2 = new AStarExplanationRanker(SideEffectSizeScore.inst);
-		r2.initialize(col);
+		r2.initializeCollection(col);
 		
 		Comparator<RankedListElement> comp = AStarExplanationRanker.rankComp;
 		

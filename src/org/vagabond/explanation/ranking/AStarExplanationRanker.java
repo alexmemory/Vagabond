@@ -370,7 +370,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	 * Generate OneErrorExplSets for each error and initialize the sortedSets
 	 */
 	@Override
-	public void initialize(ExplanationCollection collection) {
+	public void initializeCollection(ExplanationCollection collection) {
 		int j, numExpl;
 
 		numSets = 1;
@@ -675,7 +675,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		IMarkerSet correctMarkers = correctExpl.getRealExplains();
 		confirmedMarkers.addAll(correctMarkers);
 		
-		//TODO 2) find all explanations
+		//TODO 2) find all
 		
 		//TODO 3) NOT THAT (store away current explanation set (at current position)) restart next
 		

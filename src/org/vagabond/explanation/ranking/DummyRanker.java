@@ -64,7 +64,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public void initialize(ExplanationCollection coll) {
+	public void initializeCollection(ExplanationCollection coll) {
 		
 		this.coll = coll;
 		int numErrors = coll.getNumErrors();

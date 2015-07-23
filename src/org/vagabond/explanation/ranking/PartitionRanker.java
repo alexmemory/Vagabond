@@ -372,7 +372,7 @@ public class PartitionRanker implements IPartitionRanker {
 			if (log.isDebugEnabled())
 				log.debug("number of errors for part " + i + " is: " + col.getNumErrors());
 			rankers[i] = RankerFactory.createRanker(rankScheme);
-			rankers[i].initialize(col);
+			rankers[i].initializeCollection(col);
 		}
 		
 		createdTest = new HashSet<FullExplSummary> ();

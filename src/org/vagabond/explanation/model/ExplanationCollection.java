@@ -76,7 +76,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	
 	public void createRanker (IExplanationRanker ranker) {
 		this.ranker = ranker;
-		ranker.initialize(this);
+		ranker.initializeCollection(this);
 	}
 	
 	public void setRanker (IExplanationRanker ranker) {
