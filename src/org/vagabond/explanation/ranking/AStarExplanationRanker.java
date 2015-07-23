@@ -349,19 +349,26 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private Set<ISingleMarker> confirmedMarkers;
 
 	public AStarExplanationRanker(IScoringFunction function) {
+		initializeListsAndSets();
+		initializeConfirmations();
+		this.scoringFunction = function;
+	}
+	
+	private void initializeListsAndSets(){
 		sortedSets = new TreeSet<RankedListElement>(rankComp);
 		errorExpl = new ArrayList<OneErrorExplSet>();
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
+	}
+	
+	private void initializeConfirmations(){
 		confirmedExplanations = new HashSet<IBasicExplanation>();
 		confirmedMarkers = new HashSet<ISingleMarker>();
-		this.scoringFunction = function;
 	}
 
 	/**
 	 * Generate OneErrorExplSets for each error and initialize the sortedSets
 	 */
-
 	@Override
 	public void initialize(ExplanationCollection collection) {
 		int j, numExpl;
