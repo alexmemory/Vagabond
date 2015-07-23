@@ -27,7 +27,6 @@ import org.vagabond.explanation.ranking.scoring.ScoreExplSetComparator;
 import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.test.AbstractVagabondTest;
 
-
 public class TestAStarRanker extends AbstractVagabondTest {
 
 	static Logger log = Logger.getLogger(TestAStarRanker.class);
@@ -576,8 +575,6 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		r1.initializeCollection(col);
 		AStarExplanationRanker r2 = new AStarExplanationRanker(SideEffectSizeScore.inst);
 		r2.initializeCollection(col);
-		
-		Comparator<RankedListElement> comp = AStarExplanationRanker.rankComp;
 		
 		while(r1.hasNext())
 			r1.next();

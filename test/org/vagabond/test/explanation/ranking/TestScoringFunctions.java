@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Comparator;
 
 import org.junit.Test;
-import org.vagabond.explanation.generation.ExplanationSetGenerator;
 import org.vagabond.explanation.marker.MarkerParser;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -17,9 +16,6 @@ import org.vagabond.explanation.ranking.scoring.SideEffectSizeScore;
 import org.vagabond.test.AbstractVagabondTest;
 
 public class TestScoringFunctions extends AbstractVagabondTest {
-	
-	private ExplanationSetGenerator explSetGen = new ExplanationSetGenerator();
-
 	
 	private void setUp (String filename) throws Exception {
 		loadToDB(filename);

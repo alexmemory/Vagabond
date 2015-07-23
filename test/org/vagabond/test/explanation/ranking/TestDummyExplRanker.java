@@ -12,7 +12,4 @@ public class TestDummyExplRanker extends AbstractVagabondTest {
 	public void testDummyRanker () {
 		
 	}
-	
-	
-	
 }
