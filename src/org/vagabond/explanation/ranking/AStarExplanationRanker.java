@@ -691,10 +691,23 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		
 		errors.removeAll(correctMarkers);
 		errorList.removeAll(correctMarkers);
+		removeMarkersFromOneErrorList(correctMarkers);
 
 		//TODO 6) call initialize to restart the ranker
 		
 		//TODO 7) merge confirmed explanations for scoring
+	}
+	
+	private void removeMarkersFromOneErrorList(IMarkerSet correctMarkers){
+		for(ISingleMarker marker : correctMarkers){
+			Integer markedForDeletion = null;
+			for(int position = 0; position < errorExpl.size(); position++){
+				if(errorExpl.get(position).error == marker)
+					markedForDeletion = position;
+			}
+			if(markedForDeletion != null)
+				errorExpl.remove(markedForDeletion);
+		}
 	}
 
 	@Override
