@@ -43,12 +43,12 @@ public class ExplanationSetGenerator {
 		
 		if (log.isInfoEnabled()) {
 			boolean error = false;
-			for(IExplanationSet outSet: result.getExplSets()) {
+			for(IExplanationSet outSet: result.getExplanationSets()) {
 				for(IBasicExplanation outE: outSet) {
 					if (outE.getType() == ExplanationType.SuperflousMappingError 
 							|| outE.getType() == ExplanationType.SourceSkeletonMappingError
 							|| outE.getType() == ExplanationType.CorrespondenceError) {
-						for(IExplanationSet inSet : result.getExplSets()) {
+						for(IExplanationSet inSet : result.getExplanationSets()) {
 							for(IBasicExplanation inE: inSet) {
 								if (inE.getType() == ExplanationType.SuperflousMappingError 
 										|| inE.getType() == ExplanationType.SourceSkeletonMappingError

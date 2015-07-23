@@ -324,12 +324,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	// TODO Reposition the Fields below
 	
-	private int iterPos = -1;
+	private int iteratorPosition = -1;
 	private int iterationDone = -1;
-	private int numSets = -1;
+	private int numberOfSets = -1;
 	private int numErrors = -1;
 	private RankedListElement lastDoneElem;
-	private RankedListElement curIterElem;
+	private RankedListElement currentIteratorElement;
 	private TreeSet<RankedListElement> sortedSets;
 	private List<OneErrorExplSet> errorExpl;
 	private IMarkerSet errors;
@@ -339,7 +339,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private int[] combinedMin;
 	private int[] combinedMax;
 	private boolean init = false;
-	private boolean rankingDone = false;
+	private boolean rankingIsDone = false;
 	private IScoringFunction scoringFunction;
 	private BitMatrix sameExpl;
 	private Set<IBasicExplanation> confirmedExplanations;
@@ -372,7 +372,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	public void initializeCollection(ExplanationCollection collection) {
 		int j, numberOfExplanations;
 
-		numSets = 1;
+		numberOfSets = 1;
 		this.explCollection = collection;
 
 		numberOfExplanations = 0;
@@ -395,7 +395,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 			IExplanationSet e = explCollection.getErrorExplMap().get(m);
 			OneErrorExplSet newOne = new OneErrorExplSet(e, m);
 			errorExpl.add(newOne);
-			numSets *= newOne.size();
+			numberOfSets *= newOne.size();
 		}
 
 		// Sort on min-max span to improve pruning
@@ -531,8 +531,8 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 				// everything complete -> we are done with ranking
 				if (includeCandidate == null) {
-					rankingDone = true;
-					numSets = sortedSets.size();
+					rankingIsDone = true;
+					numberOfSets = sortedSets.size();
 					iterationDone = sortedSets.size() - 1;
 					lastDoneElem = sortedSets.last();
 					// requested non existing set?
@@ -576,24 +576,24 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	@Override
 	public IExplanationSet next() {
 		advanceIteration();
-		return getSetForRankedListElem(curIterElem);
+		return getSetForRankedListElem(currentIteratorElement);
 	}
 
 	private void advanceIteration() {
-		if (rankingDone && iterPos + 1 >= numSets)
-			throw new NoSuchElementException("only " + numSets + " elements");
+		if (rankingIsDone && iteratorPosition + 1 >= numberOfSets)
+			throw new NoSuchElementException("only " + numberOfSets + " elements");
 
-		if (iterPos + 1 > iterationDone)
-			generateUpTo(iterPos + 1);
+		if (iteratorPosition + 1 > iterationDone)
+			generateUpTo(iteratorPosition + 1);
 
-		if (iterPos + 1 > iterationDone)
-			throw new NoSuchElementException("only " + numSets + " elements");
+		if (iteratorPosition + 1 > iterationDone)
+			throw new NoSuchElementException("only " + numberOfSets + " elements");
 
-		iterPos++;
-		if (curIterElem == null)
-			curIterElem = sortedSets.first();
+		iteratorPosition++;
+		if (currentIteratorElement == null)
+			currentIteratorElement = sortedSets.first();
 		else
-			curIterElem = sortedSets.higher(curIterElem);
+			currentIteratorElement = sortedSets.higher(currentIteratorElement);
 	}
 
 	private IExplanationSet getSetForRankedListElem(RankedListElement elem) {
@@ -647,12 +647,12 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public boolean hasNext() {
-		if (rankingDone && iterPos < iterationDone)
+		if (rankingIsDone && iteratorPosition < iterationDone)
 			return true;
-		if (!rankingDone && iterPos == iterationDone)
+		if (!rankingIsDone && iteratorPosition == iterationDone)
 			generateUpTo(iterationDone + 1);
 
-		return iterPos < iterationDone;
+		return iteratorPosition < iterationDone;
 	}
 
 	@Override
@@ -689,36 +689,36 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public int getNumberOfExplSets() {
-		return numSets;
+		return numberOfSets;
 	}
 
 	@Override
 	public void resetIter() {
-		iterPos = -1;
-		curIterElem = null;
+		iteratorPosition = -1;
+		currentIteratorElement = null;
 	}
 
 	@Override
 	public boolean isFullyRanked() {
-		return rankingDone;
+		return rankingIsDone;
 	}
 
 	@Override
-	public int getIterPos() {
-		return iterPos + 1;
+	public int getIteratorPosition() {
+		return iteratorPosition + 1;
 	}
 
 	@Override
 	public IExplanationSet previous() {
-		if (--iterPos < 0)
+		if (--iteratorPosition < 0)
 			throw new NoSuchElementException("try to get element before first");
-		curIterElem = sortedSets.lower(curIterElem);
-		return getSetForRankedListElem(curIterElem);
+		currentIteratorElement = sortedSets.lower(currentIteratorElement);
+		return getSetForRankedListElem(currentIteratorElement);
 	}
 
 	@Override
 	public boolean hasPrevious() {
-		return iterPos > 0;
+		return iteratorPosition > 0;
 	}
 
 	@Override
@@ -734,34 +734,34 @@ public class AStarExplanationRanker implements IExplanationRanker {
 
 	@Override
 	public IExplanationSet getRankedExpl(int rank) {
-		int oldIterPos = iterPos;
+		int oldIterPos = iteratorPosition;
 		IExplanationSet result;
 
-		assert (rank > 0 && (!rankingDone || iterationDone >= rank));
-		if (!rankingDone)
+		assert (rank > 0 && (!rankingIsDone || iterationDone >= rank));
+		if (!rankingIsDone)
 			generateUpTo(rank);
 
-		if (iterPos > rank)
+		if (iteratorPosition > rank)
 			resetIter();
 
-		while (iterPos < rank)
+		while (iteratorPosition < rank)
 			advanceIteration();
 
-		result = getSetForRankedListElem(curIterElem);
+		result = getSetForRankedListElem(currentIteratorElement);
 
 		resetIter();
-		while (iterPos < oldIterPos)
+		while (iteratorPosition < oldIterPos)
 			advanceIteration();
 
 		return result;
 	}
 
 	@Override
-	public boolean hasAtLeast(int numElem) {
-		if (rankingDone)
-			return numSets >= numElem;
+	public boolean hasAtLeast(int numberOfElements) {
+		if (rankingIsDone)
+			return numberOfSets >= numberOfElements;
 		try {
-			generateUpTo(numElem - 1);
+			generateUpTo(numberOfElements - 1);
 			return true;
 		} catch (NoSuchElementException e) {
 			return false;
@@ -773,11 +773,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return scoringFunction.getScore(getRankedExpl(rank));
 	}
 
-	public IScoringFunction getF() {
-		return scoringFunction;
-	}
-
-	public void setF(IScoringFunction scoringFunction) {
+	public void setScoringFunction(IScoringFunction scoringFunction) {
 		this.scoringFunction = scoringFunction;
 	}
 

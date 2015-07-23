@@ -72,19 +72,19 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		
 	}
 	
-	private void testPosAndIter (AStarExplanationRanker r, int num) {
+	private void testPosAndIter (AStarExplanationRanker aStarRanker, int num) {
 		IExplanationSet one, two;
-		IScoringFunction f = r.getF();
-		r.resetIter();
+		IScoringFunction scoringFunction = aStarRanker.getScoringFunction();
+		aStarRanker.resetIter();
 		
-		assertTrue("has at least " + num, r.hasAtLeast(num - 1));
+		assertTrue("has at least " + num, aStarRanker.hasAtLeast(num - 1));
 		for(int i = 0; i < num; i++)
-			r.next();
+			aStarRanker.next();
 		
-		one = r.next();
-		two = r.getRankedExpl(num);
+		one = aStarRanker.next();
+		two = aStarRanker.getRankedExpl(num);
 		assertEquals("IterPos " + num, one, two);
-		assertEquals("Score for iter " + num, r.getScore(num), f.getScore(two));
+		assertEquals("Score for iter " + num, aStarRanker.getScore(num), scoringFunction.getScore(two));
 	}
 	
 	private void testIterAndDirect(AStarExplanationRanker r1) {
@@ -125,7 +125,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		testSortedOnScore(r1, f);
 		
 		// check that all explanations are valid
-		IExplanationSet ex = col1.getExplSets().iterator().next();
+		IExplanationSet ex = col1.getExplanationSets().iterator().next();
 		
 		while(col1.getRanker().hasNext()) {
 			IExplanationSet set1 = col1.getRanker().next();
@@ -146,7 +146,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		testSortedOnScore(r2, f);
 		
 		// check that all explanation are valid
-		ex = col2.getExplSets().iterator().next();
+		ex = col2.getExplanationSets().iterator().next();
 		
 		while(col2.getRanker().hasNext()) {
 			IExplanationSet set2 = col2.getRanker().next();
@@ -191,7 +191,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		testSortedOnScore(r1, f);
 		
 		// check that all explanations are valid
-		IExplanationSet ex = col1.getExplSets().iterator().next();
+		IExplanationSet ex = col1.getExplanationSets().iterator().next();
 		
 		while(col1.getRanker().hasNext()) {
 			IExplanationSet set1 = col1.getRanker().next();
@@ -212,7 +212,7 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		testSortedOnScore(r2, f);
 		
 		// check that all explanation are valid
-		ex = col2.getExplSets().iterator().next();
+		ex = col2.getExplanationSets().iterator().next();
 		
 		while(col2.getRanker().hasNext()) {
 			IExplanationSet set2 = col2.getRanker().next();
@@ -457,12 +457,12 @@ public class TestAStarRanker extends AbstractVagabondTest {
 		r.hasAtLeast(3);
 		assertFalse(r.hasAtLeast(3));
 		
-		assertEquals (0, r.getIterPos());
+		assertEquals (0, r.getIteratorPosition());
 		s1 = r.next();
 		e1 = ExplanationFactory.newExplanationSet(e12,e31);
 		assertTrue ("1", ExplanationComparators.setSameElemComp.compare(e1, s1) == 0);
 		
-		assertEquals (1, r.getIterPos());
+		assertEquals (1, r.getIteratorPosition());
 		assertTrue (r.hasNext());
 		s2 = r.next();
 		e2 = ExplanationFactory.newExplanationSet(e11,e31);

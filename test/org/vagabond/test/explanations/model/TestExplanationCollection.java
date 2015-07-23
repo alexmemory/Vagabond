@@ -82,7 +82,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		assertEquals(col.getNumCombinations(),2); 
 		assertEquals(col.getDimensions().size(),1);
 		assertEquals(col.getDimensions().get(0),new Integer(2));
-		col.resetIter();
+		col.resetIterator();
 		while(col.hasNext()) {
 			resultSet = col.next();
 			assertTrue(resultSet.getExplains().contains(error));
@@ -220,55 +220,55 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		/* create Dummy Ranker */
 		col.createRanker(new DummyRanker());
 		
-		col.resetIter();
+		col.resetIterator();
 		assertEquals(4, col.getNumCombinations());
-		assertEquals(0, col.getIterPos());
+		assertEquals(0, col.getIteratorPosition());
 		assertEquals ("0,0", ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(0)),
 				col.next());
-		assertEquals(1, col.getIterPos());
+		assertEquals(1, col.getIteratorPosition());
 		assertEquals ("1,0",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(0)),
 				col.next());
-		assertEquals(2, col.getIterPos());
+		assertEquals(2, col.getIteratorPosition());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.next());
-		assertEquals(3, col.getIterPos());
+		assertEquals(3, col.getIteratorPosition());
 		assertTrue(col.hasNext());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(1)),
 				col.next());
 		assertFalse(col.hasNext());
-		assertEquals(4,col.getIterPos());
+		assertEquals(4,col.getIteratorPosition());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.previous());
-		assertEquals(3,col.getIterPos());
+		assertEquals(3,col.getIteratorPosition());
 		
 		col.confirmExplanation(set2.getExplanations().get(1));
-		col.resetIter();
+		col.resetIterator();
 		
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.next());
-		assertEquals(1, col.getIterPos());
+		assertEquals(1, col.getIteratorPosition());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(1), 
 				set2.getExplanations().get(1)),
 				col.next());
-		assertEquals(2, col.getIterPos());
+		assertEquals(2, col.getIteratorPosition());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(
 				set1.getExplanations().get(0), 
 				set2.getExplanations().get(1)),
 				col.previous());
-		assertEquals(1, col.getIterPos());
+		assertEquals(1, col.getIteratorPosition());
 	}
 	
 
@@ -353,15 +353,15 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		
 		/* create Dummy Ranker */
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
-		col.resetIter();
+		col.resetIterator();
 		
-		assertEquals (0, col.getIterPos());
+		assertEquals (0, col.getIteratorPosition());
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.next());
-		assertEquals (1, col.getIterPos());
+		assertEquals (1, col.getIteratorPosition());
 		assertEquals ("0,0",ExplanationFactory.newExplanationSet(e11,e21),
 				col.next());
-		assertEquals (2, col.getIterPos());
+		assertEquals (2, col.getIteratorPosition());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(e12,e22),
 				col.next());
 		assertEquals ("0,1",ExplanationFactory.newExplanationSet(e11,e22),
@@ -448,23 +448,23 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		
 		/* create Dummy Ranker */
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
-		col.resetIter();
+		col.resetIterator();
 		
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.next());
-		assertEquals (1, col.getIterPos());
-		col.resetIter();
-		assertEquals (0, col.getIterPos());
+		assertEquals (1, col.getIteratorPosition());
+		col.resetIterator();
+		assertEquals (0, col.getIteratorPosition());
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.next());
 		col.next();
-		assertEquals (2, col.getIterPos());
+		assertEquals (2, col.getIteratorPosition());
 		assertEquals ("1,0", ExplanationFactory.newExplanationSet(e12,e21),
 				col.previous());
-		assertEquals (1, col.getIterPos());
+		assertEquals (1, col.getIteratorPosition());
 		assertEquals ("0,0",ExplanationFactory.newExplanationSet(e11,e21),
 				col.next());
-		assertEquals (2, col.getIterPos());
+		assertEquals (2, col.getIteratorPosition());
 		assertEquals ("1,1",ExplanationFactory.newExplanationSet(e12,e22),
 				col.next());
 		assertTrue(col.hasNext());
@@ -480,7 +480,7 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		}
 		
 		try {
-			col.resetIter();
+			col.resetIterator();
 			col.previous();
 			assertTrue(false);
 		} catch (NoSuchElementException e) {
@@ -585,12 +585,12 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		
 		/* create SideEffect Ranker */
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
-		col.resetIter();
+		col.resetIterator();
 		
-		assertEquals (0, col.getIterPos());
+		assertEquals (0, col.getIteratorPosition());
 		assertTrue ("e13", ExplanationComparators.sameElemComp.compare(col.next().iterator().next(),
 				e13) == 0);
-		assertEquals (1, col.getIterPos());
+		assertEquals (1, col.getIteratorPosition());
 		assertEquals ("e11,e22",ExplanationFactory.newExplanationSet(e11,e22),
 				col.next());
 		assertFalse(col.hasNext()); 
@@ -696,19 +696,19 @@ public class TestExplanationCollection extends AbstractVagabondTest {
 		
 		/* create Dummy Ranker */
 		col.createRanker(new AStarExplanationRanker(SideEffectSizeScore.inst));
-		col.resetIter();
+		col.resetIterator();
 		
 		IExplanationSet s1,s2,e1,e2;
 		
 		assertTrue(col.getRanker().hasAtLeast(2));
 		assertFalse(col.getRanker().hasAtLeast(3));
 		
-		assertEquals (0, col.getIterPos());
+		assertEquals (0, col.getIteratorPosition());
 		s1 = col.next();
 		e1 = ExplanationFactory.newExplanationSet(e12,e31);
 		assertTrue ("1", ExplanationComparators.setSameElemComp.compare(e1, s1) == 0);
 		
-		assertEquals (1, col.getIterPos());
+		assertEquals (1, col.getIteratorPosition());
 		assertTrue (col.hasNext());
 		s2 = col.next();
 		e2 = ExplanationFactory.newExplanationSet(e11,e31);

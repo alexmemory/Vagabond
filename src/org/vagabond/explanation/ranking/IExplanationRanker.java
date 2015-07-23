@@ -13,7 +13,7 @@ public interface IExplanationRanker extends Iterator<IExplanationSet> {
 	public boolean ready();
 	public IExplanationSet getRankedExpl(int rank);
 	public int getScore(int rank);
-	public int getIterPos();
+	public int getIteratorPosition();
 	public IExplanationSet previous();
 	public boolean hasPrevious();
 	public int getNumberOfExplSets();

@@ -234,7 +234,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getIterPos() {
+	public int getIteratorPosition() {
 		return curIterPos + 1;
 	}
 
