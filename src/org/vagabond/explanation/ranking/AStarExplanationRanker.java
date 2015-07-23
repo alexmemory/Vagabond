@@ -346,6 +346,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 	private IScoringFunction scoringFunction;
 	private BitMatrix sameExpl;
 	private Set<IBasicExplanation> confirmedExplanations;
+	private Set<ISingleMarker> confirmedMarkers;
 
 	public AStarExplanationRanker(IScoringFunction function) {
 		sortedSets = new TreeSet<RankedListElement>(rankComp);
@@ -353,6 +354,7 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		errors = MarkerFactory.newMarkerSet();
 		errorList = new ArrayList<ISingleMarker>();
 		confirmedExplanations = new HashSet<IBasicExplanation>();
+		confirmedMarkers = new HashSet<ISingleMarker>();
 		this.scoringFunction = function;
 	}
 
@@ -662,6 +664,9 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		confirmedExplanations.add(correctExpl);
 		
 		//TODO 1) keep confirmed errors in another field
+		
+		IMarkerSet correctMarkers = correctExpl.getRealExplains();
+		confirmedMarkers.addAll(correctMarkers);
 		
 		//TODO 2) find all explanations
 		
