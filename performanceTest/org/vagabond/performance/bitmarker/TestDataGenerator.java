@@ -17,7 +17,7 @@ public class TestDataGenerator {
 		
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
 		
-/*		
+	
 		// Homeless		
 		String outputFile1 = "resource/exampleData/tramp_1000000.csv";
 		String outputFile2 = "resource/exampleData/socialworker_1000000.csv";
@@ -126,14 +126,14 @@ public class TestDataGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-*/		
+		
 		
 
 		// Employee
-		String outputFile4 = "resource/exampleData/employee_100.csv";
-		String outputFile5 = "resource/exampleData/firm_100.csv";
-		String outputFile6 = "resource/exampleData/address_100.csv";
-		String outputFile7 = "resource/exampleData/customer_100.csv";
+		String outputFile4 = "resource/exampleData/employee_100000.csv";
+		String outputFile5 = "resource/exampleData/firm_100000.csv";
+		String outputFile6 = "resource/exampleData/address_100000.csv";
+		String outputFile7 = "resource/exampleData/customer_100000.csv";
 		
 		boolean alreadyExists4 = new File(outputFile4).exists();
 		boolean alreadyExists5 = new File(outputFile5).exists();
@@ -165,14 +165,14 @@ public class TestDataGenerator {
 			Random random = new Random();
 
 			char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-			char[] ints = "0123456789".toCharArray();
+			char[] ints = "012345678901234567890123456789".toCharArray();
 			
 			String OutPut = "";
 			String IntOutPut = "";
 			String firmName = "";
 			StringBuilder sb = new StringBuilder();
 
-			for(int j = 1; j < 101; j++) {
+			for(int j = 1; j < 100001; j++) {
 
 				csvOutput4.write("" + j);
 				csvOutput5.write("" + j);
@@ -217,7 +217,6 @@ public class TestDataGenerator {
 						char c = chars[random.nextInt(chars.length)];
 						sb.append(c);
 					}
-					String output = sb.toString();
 					
 					if (l == 0)
 						csvOutput5.write(firmName);
