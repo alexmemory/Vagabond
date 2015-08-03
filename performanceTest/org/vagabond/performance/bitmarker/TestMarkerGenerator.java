@@ -1,13 +1,16 @@
 package org.vagabond.performance.bitmarker;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -31,10 +34,11 @@ public class TestMarkerGenerator {
 		
 //		String outputFile = "resource/test/markers.txt";
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
+		String num = args[0];
 		
 		// before we open the file check to see if it already exists
 //		boolean alreadyExists = new File(outputFile).exists();
-		
+				
 //		if (alreadyExists) {
 //			new File(outputFile).delete();
 //		}
@@ -61,8 +65,8 @@ public class TestMarkerGenerator {
 				ConnectionManager.getInstance().closeRs(rs);
 
 				
-				// Generate markers
-				for (int k = 0; k < 50; k++) {
+				// Generate markers       
+				for (int k = 0; k < Integer.parseInt(num); k++) {
 					
 					// Randomly pick a table
 					rs = ConnectionManager.getInstance().execQuery(con, 
