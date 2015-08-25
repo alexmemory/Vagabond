@@ -21,6 +21,7 @@ import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 import org.vagabond.xmlmodel.MappingType;
 import org.vagabond.xmlmodel.RelAtomType;
 import org.vagabond.xmlmodel.RelationType;
+import org.vagabond.xmlmodel.SKFunction;
 import org.vagabond.xmlmodel.StringRefType;
 import org.vagabond.xmlmodel.TransformationType;
 
@@ -164,6 +165,23 @@ public class MapScenarioHolder {
 		
 		return result;
 	}
+	
+	public XmlObject[] getSKArguments (SKFunction f) 
+			throws Exception {
+		int numElements = f.sizeOfFunctionArray() + f.sizeOfSKFunctionArray() + f.sizeOfVarArray();
+		XmlObject[] result = new XmlObject[numElements];
+		
+		XmlCursor c = f.newCursor();
+		c.toChild(0);
+		for(int i = 0; i < numElements; i++) {
+			XmlObject o = (XmlObject) c.getObject();
+			result[i] = o;
+			c.toNextSibling();
+		}
+		
+		return result;
+	}
+	
 	
 	public List<TransformationType> getTransCreatingRel (String relname) 
 			throws Exception {
