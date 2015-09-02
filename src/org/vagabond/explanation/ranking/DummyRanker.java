@@ -64,7 +64,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public void initialize(ExplanationCollection coll) {
+	public void initializeCollection(ExplanationCollection coll) {
 		
 		this.coll = coll;
 		int numErrors = coll.getNumErrors();
@@ -80,17 +80,6 @@ public class DummyRanker implements IExplanationRanker {
 		Arrays.fill(fixedPos, false);
 		
 		coll.computeRealSEAndExplains();
-//		errors = MarkerFactory.newMarkerSet(coll.getErrorExplMap().keySet());
-//		for(ISingleMarker error: errors) {
-//			IExplanationSet explSet = coll.getErrorExplMap().get(error);
-//			// remove errors from side effects and add them to explains
-//			for(IBasicExplanation e: explSet) {
-//				e.setRealTargetSideEffects(e.getTargetSideEffects().cloneSet()
-//						.diff(errors));
-//				e.getRealExplains().union(
-//						e.getTargetSideEffects().cloneSet().intersect(errors));
-//			}
-//		}
 		
 		init = true;
 	}
@@ -245,7 +234,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getIterPos() {
+	public int getIteratorPosition() {
 		return curIterPos + 1;
 	}
 

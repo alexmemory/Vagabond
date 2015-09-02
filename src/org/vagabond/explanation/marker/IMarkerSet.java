@@ -16,7 +16,7 @@ public interface IMarkerSet extends Set<ISingleMarker> {
 	public boolean add (int relId, int attrId, int tidId);
 	public boolean contains (String relName, String tid) throws Exception;
 	public String toUserString();
-	public IMarkerSet cloneSet ();
-	public MarkerSummary getSummary ();
+	public IMarkerSet cloneSet();
+	public MarkerSummary getSummary();
 	public IMarkerSet subset (MarkerSummary sum);
 }

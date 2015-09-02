@@ -23,9 +23,9 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	static Logger log = LogProviderHolder.getInstance().getLogger(AbstractBasicExplanation.class);
 	
 	private static IMarkerSet sourceSEDummy;
-	private static  Collection<MappingType> mapSEDummy;
-	private static  Collection<CorrespondenceType> corrSEDummy;
-	private static  Collection<TransformationType> transSEDummy;
+	private static Collection<MappingType> mapSEDummy;
+	private static Collection<CorrespondenceType> corrSEDummy;
+	private static Collection<TransformationType> transSEDummy;
 
 	private boolean haveComputedRealSE = false;
 	protected IAttributeValueMarker error;
@@ -54,7 +54,6 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 		this.error = (IAttributeValueMarker) error;
 		realExplains = MarkerFactory.newMarkerSet(error);
 	}
-	
 	
 	@Override
 	public ISingleMarker explains() {
@@ -199,7 +198,6 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	public int hashCode () {
 		if (!hashed)
 			computeHash();
-		
 		return hash;
 	}
 	
@@ -214,13 +212,6 @@ public abstract class AbstractBasicExplanation implements IBasicExplanation {
 	}
 	
 	protected void computeHash () {
-//		if (realExplains.isEmpty()) {
-//			hash = fnv(error.hashCode());
-//		}
-//		else {
-//			hash = fnv(realExplains);
-//			hash = fnv(realTargetSE, hash);	
-//		}
 		hash = fnv(getType());
 	}
 	

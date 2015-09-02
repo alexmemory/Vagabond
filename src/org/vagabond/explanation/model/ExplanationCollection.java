@@ -76,7 +76,7 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 	
 	public void createRanker (IExplanationRanker ranker) {
 		this.ranker = ranker;
-		ranker.initialize(this);
+		ranker.initializeCollection(this);
 	}
 	
 	public void setRanker (IExplanationRanker ranker) {
@@ -97,15 +97,15 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		return errorIds.getSize();
 	}
 	
-	public Collection<IExplanationSet> getExplSets () {
+	public Collection<IExplanationSet> getExplanationSets() {
 		return explMap.values();
 	}
 	
-	public Map<ISingleMarker, IExplanationSet> getErrorExplMap () {
+	public Map<ISingleMarker, IExplanationSet> getErrorExplMap() {
 		return explMap;
 	}
 	
-	public IdMap<ISingleMarker> getErrorIdMap () {
+	public IdMap<ISingleMarker> getErrorIdMap() {
 		return errorIds;
 	}
 
@@ -119,12 +119,12 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 		ranker.remove();
 	}
 	
-	public void resetIter () {
+	public void resetIterator() {
 		ranker.resetIter();
 	}
 	
-	public int getIterPos () {
-		return ranker.getIterPos();
+	public int getIteratorPosition () {
+		return ranker.getIteratorPosition();
 	}
 
 	public boolean hasPrevious() {
@@ -185,12 +185,6 @@ public class ExplanationCollection implements Iterator<IExplanationSet> {
 			if (this.getNumExpls(error) != oCol.getNumExpls(error))
 				return false;
 		}
-		
-//		if (!this.numExpls.equals(oCol.numExpls))
-//			return false;
-//		
-//		if (!this.errorIds.equals(oCol.errorIds))
-//			return false;
 		
 		return true;
 	}

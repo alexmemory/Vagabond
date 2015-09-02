@@ -63,8 +63,7 @@ public class RankerFactory {
 	
 	public static IExplanationRanker createInitializedRanker (String rankScheme, ExplanationCollection col) {
 		IExplanationRanker result = createRanker (rankScheme);
-		result.initialize(col);
-		
+		result.initializeCollection(col);
 		return result;
 	}
 	
@@ -76,7 +75,6 @@ public class RankerFactory {
 	public static IPartitionRanker createPartRanker (String rankScheme, ExplPartition part) {
 		IPartitionRanker result = createPartRanker(rankScheme);
 		result.initialize(part);
-		
 		return result;
 	}
 	
@@ -84,7 +82,6 @@ public class RankerFactory {
 			ExplPartition part) {
 		SkylineRanker result = new SkylineRanker(rankSchemes, finalScheme);
 		result.initialize(part);
-		
 		return result;
 	}
 	
