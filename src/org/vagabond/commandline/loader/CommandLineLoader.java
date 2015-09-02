@@ -44,6 +44,9 @@ public class CommandLineLoader {
 	
 	private void loadScenario (File xmlDoc) 
 			throws Exception {
+		boolean validation = ! options.isNoValidation(); 
+
+		ModelLoader.getInstance().setValidation(validation);
 		map = ModelLoader.getInstance().load(xmlDoc);
 		options.setDBOptions(map.getScenario());
 	}
