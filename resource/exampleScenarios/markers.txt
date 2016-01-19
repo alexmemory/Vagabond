@@ -1,0 +1,2 @@
+A(person,1,name)
+A(person,2,name)

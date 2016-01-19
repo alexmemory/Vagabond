@@ -59,6 +59,19 @@
 			<xs:field xpath="@tableref" />
 		</xs:keyref>
 
+		<xs:keyref name="RefFDsToRels" refer="this:RelId">
+			<xs:selector
+				xpath=".//Schemas/*/FD" />
+			<xs:field xpath="@tableref" />
+		</xs:keyref>
+
+		<xs:keyref name="RefIDsToRels" refer="this:RelId">
+			<xs:selector
+				xpath=".//Schemas/*/ID/From | .//Schemas/*/ID/To" />
+			<xs:field xpath="@tableref" />
+		</xs:keyref>
+
+		
 		<xs:keyref name="RefCorrToRels" refer="this:RelId">
 			<xs:selector xpath=".//Correspondences/Correspondence/From | .//Correspondences/Correspondence/To" />
 			<xs:field xpath="@tableref" />
@@ -89,6 +102,7 @@
 			<xs:field xpath="@name" />
 		</xs:keyref>
 
+		
 
 	</xs:element>
 
@@ -143,6 +157,8 @@
 				minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="FD" type="this:FDType" minOccurs="0"
 				maxOccurs="unbounded" />
+			<xs:element name="ID" type="this:IDType" minOccurs="0"
+				maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -182,6 +198,14 @@
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" />
 		<xs:attribute name="tableref" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="IDType">
+	  <xs:sequence>
+		<xs:element name="From" type="this:AttrRefType" />
+		<xs:element name="To" type="this:AttrRefType" />
+	  </xs:sequence>
+	  <xs:attribute name="id" type="xs:string" />
 	</xs:complexType>
 
 	<xs:complexType name="FuncOrAttrRefType">

@@ -22,7 +22,7 @@ public class TestMarkerGenerator {
 	static Logger log = Logger.getLogger(TestMarkerGenerator.class);
 	
 	public static void main(String[] args) {
-		
+		System.get		
 		String outputFile = "resource/test/markers.txt";
 		PropertyConfigurator.configure("resource/test/perfLog4jproperties.txt");
 		

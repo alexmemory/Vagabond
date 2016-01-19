@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.vagabond.commandline.loader.LoaderOptions;
 import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;

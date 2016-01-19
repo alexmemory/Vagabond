@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.vagabond.explanation.marker.IMarkerSet;
 import org.vagabond.explanation.marker.ISingleMarker;
-import org.vagabond.explanation.marker.MarkerFactory;
 import org.vagabond.explanation.model.ExplanationCollection;
 import org.vagabond.explanation.model.ExplanationFactory;
 import org.vagabond.explanation.model.IExplanationSet;
@@ -66,8 +64,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public void initialize(ExplanationCollection coll) {
-		IMarkerSet errors;
+	public void initializeCollection(ExplanationCollection coll) {
 		
 		this.coll = coll;
 		int numErrors = coll.getNumErrors();
@@ -83,17 +80,6 @@ public class DummyRanker implements IExplanationRanker {
 		Arrays.fill(fixedPos, false);
 		
 		coll.computeRealSEAndExplains();
-//		errors = MarkerFactory.newMarkerSet(coll.getErrorExplMap().keySet());
-//		for(ISingleMarker error: errors) {
-//			IExplanationSet explSet = coll.getErrorExplMap().get(error);
-//			// remove errors from side effects and add them to explains
-//			for(IBasicExplanation e: explSet) {
-//				e.setRealTargetSideEffects(e.getTargetSideEffects().cloneSet()
-//						.diff(errors));
-//				e.getRealExplains().union(
-//						e.getTargetSideEffects().cloneSet().intersect(errors));
-//			}
-//		}
 		
 		init = true;
 	}
@@ -248,7 +234,7 @@ public class DummyRanker implements IExplanationRanker {
 	}
 
 	@Override
-	public int getIterPos() {
+	public int getIteratorPosition() {
 		return curIterPos + 1;
 	}
 
@@ -301,10 +287,9 @@ public class DummyRanker implements IExplanationRanker {
 	 * @see org.vagabond.explanation.ranking.IExplanationRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
 }

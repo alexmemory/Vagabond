@@ -39,7 +39,8 @@ public class ModelLoader {
 			ModelLoader.class.getName());
 
 	private static ModelLoader instance = new ModelLoader();
-
+	private boolean validation = true;
+	
 	private ModelLoader() {
 
 	}
@@ -100,7 +101,8 @@ public class ModelLoader {
 		MappingScenarioDocument doc;
 
 		doc = MappingScenarioDocument.Factory.parse(in);
-		validate(doc);
+		if (isValidation())
+			validate(doc);
 
 		return doc;
 	}
@@ -399,6 +401,14 @@ public class ModelLoader {
 
 	public void storeModel(String fileName) throws Exception {
 		storeModel(fileName, MapScenarioHolder.getInstance().getDocument());
+	}
+
+	public boolean isValidation() {
+		return validation;
+	}
+
+	public void setValidation(boolean validation) {
+		this.validation = validation;
 	}
 
 }

@@ -65,17 +65,13 @@ public class PartitionRanker implements IPartitionRanker {
 			
 			if (other instanceof FullExplSummary) {
 				FullExplSummary e = (FullExplSummary) other;
-				
-				assert(iterPos.length == e.iterPos.length);
-				
+				assert(iterPos.length == e.iterPos.length);	
 				for(int i = 0; i < iterPos.length; i++) {
 					if (iterPos[i] != e.iterPos[i])
 						return false;
 				}
-				
 				return true;
 			}
-			
 			return false;
 		}
 		
@@ -86,7 +82,6 @@ public class PartitionRanker implements IPartitionRanker {
 				for(int i = 0; i < iterPos.length; i++)
 					hash ^= iterPos[i];
 			}
-				
 			return hash;
 		}
 
@@ -372,7 +367,7 @@ public class PartitionRanker implements IPartitionRanker {
 			if (log.isDebugEnabled())
 				log.debug("number of errors for part " + i + " is: " + col.getNumErrors());
 			rankers[i] = RankerFactory.createRanker(rankScheme);
-			rankers[i].initialize(col);
+			rankers[i].initializeCollection(col);
 		}
 		
 		createdTest = new HashSet<FullExplSummary> ();
@@ -572,7 +567,7 @@ public class PartitionRanker implements IPartitionRanker {
 	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		return this.scoreF;
 	}
 

@@ -113,7 +113,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(m);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		assertEquals(set, col.getExplSets().iterator().next());
+		assertEquals(set, col.getExplanationSets().iterator().next());
 		assertEquals(expCol, col);
 	}
 	
@@ -195,8 +195,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(m);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		col.resetIter();
-		assertEquals(set, col.getExplSets().iterator().next());
+		col.resetIterator();
+		assertEquals(set, col.getExplanationSets().iterator().next());
 	}
 	
 	@Test
@@ -256,8 +256,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(m);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		col.resetIter();
-		assertEquals(set, col.getExplSets().iterator().next());
+		col.resetIterator();
+		assertEquals(set, col.getExplanationSets().iterator().next());
 		
 		assertEquals(expCol, col);
 	}
@@ -392,7 +392,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(errSet);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		col.resetIter();
+		col.resetIterator();
 		
 		assertEquals(expCol, col);
 	}
@@ -439,8 +439,8 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(m);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		col.resetIter();
-		assertEquals(set, col.getExplSets().iterator().next());
+		col.resetIterator();
+		assertEquals(set, col.getExplanationSets().iterator().next());
 		
 		assertEquals(expCol, col);
 	}
@@ -511,7 +511,7 @@ public class TestExplSetGen extends AbstractVagabondTest {
 		col = gen.findExplanations(errSet);
 		if (log.isDebugEnabled()) {log.debug(col);};
 		
-		col.resetIter();
+		col.resetIterator();
 		
 		assertEquals(expCol, col);		
 	}

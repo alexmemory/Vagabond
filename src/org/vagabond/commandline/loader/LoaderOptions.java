@@ -44,6 +44,12 @@ public class LoaderOptions {
 	@Option(name="-c", usage="data files (CSV) are load from this directory")
 	private File csvLoadPath = null;
 	
+	@Option(name="--no-validation", usage="deactivate validations of Tramp XML mapping file")
+	private boolean noValidation = false;
+	
+	@Option(name="--no-target", usage="don't create target schema and instance")
+	private boolean noTarget = false;
+	
 	private boolean[] dbOptionsSet = { false, false, false, false };
 	
 	public LoaderOptions() {
@@ -139,6 +145,14 @@ public class LoaderOptions {
 
 	public void setCsvLoadPath(File csvLoadPath) {
 		this.csvLoadPath = csvLoadPath;
+	}
+
+	public boolean isNoValidation() {
+		return noValidation;
+	}
+
+	public void setNoValidation(boolean noValidation) {
+		this.noValidation = noValidation;
 	}
 	
 	

@@ -593,7 +593,7 @@ public class SkylineRanker implements IPartitionRanker {
 	 * @see org.vagabond.explanation.ranking.IPartitionRanker#getScoreF()
 	 */
 	@Override
-	public IScoringFunction getScoreF() {
+	public IScoringFunction getScoringFunction() {
 		return null;
 	}
 	

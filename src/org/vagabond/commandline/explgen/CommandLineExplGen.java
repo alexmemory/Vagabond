@@ -3,18 +3,12 @@ package org.vagabond.commandline.explgen;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -49,16 +43,23 @@ public class CommandLineExplGen {
 
 	static Logger log = Logger.getLogger(CommandLineExplGen.class);
 
-	private ExplGenOptions options;
+	private ExplGenOptions explOptions;
 	private IMarkerSet markers;
-	private ExplanationSetGenerator gen;
+	private ExplanationSetGenerator explGenerator;
+	private Iterator<IExplanationSet> iter;
+	private IExplanationRanker explRank;
+	private SkylineRanker skyRank;
+	private IPartitionRanker partRank;
+	private IScoringFunction scoringFunction;
 	
-	static String rankSecs = "";
-	static String secsRank = "";
+	private int whichRanker; // 1 for explanation, 2 for skyline, 3 for partition
+	public static final int EXPLANATION_RANKER = 1;
+	public static final int SKYLINE_RANKER = 2;
+	public static final int PARTITION_RANKER = 3;
 	
 	public CommandLineExplGen() {
-		options = new ExplGenOptions();
-		gen = new ExplanationSetGenerator();
+		explOptions = new ExplGenOptions();
+		explGenerator = new ExplanationSetGenerator();
 	}
 	 	
 	public void setUpLogger() {
@@ -68,272 +69,306 @@ public class CommandLineExplGen {
 	public void parseOptionsAndLoadScenario(String[] args) throws Exception {
 		parseOptions(args);
 
-		if (options.getXmlDoc() == null)
+		if (explOptions.getXmlDoc() == null)
 			throw new Exception("no mapping scenario XML document "
 					+ "given (-f option)");
-		loadScenario(options.getXmlDoc());
+		loadScenario(explOptions.getXmlDoc());
 		parseOptions(args);
 
 		// setup DB connection
-		ConnectionManager.getInstance().getConnection(options.getDbURL(),
-				options.getDbName(), options.getDbUser(),
-				options.getDbPassword(), options.getPort());
+		ConnectionManager.getInstance().getConnection(explOptions.getDbURL(),
+				explOptions.getDbName(), explOptions.getDbUser(),
+				explOptions.getDbPassword(), explOptions.getPort());
 
-		if (options.isLoadScen())
+		if (explOptions.isLoadScen())
 			loadScenarioOnDB();
 		ScenarioDictionary.getInstance().initFromScenario();
 	}
 
 	private void createExpls(PrintStream out) throws Exception {
-
+		if (explOptions.isUseRanker()){ 
+			rankExplanations();
+			setIterator();
+			printExplanations();
+		}
+		else {
+			ExplanationCollection col = explGenerator.findExplanations(markers);
+			if (!explOptions.isNoShowSets())
+				out.println(col);
+		}
+	}
 	
-		if (options.isUseRanker()) {
-			Iterator<IExplanationSet> iter = null;
-			IExplanationRanker explRank = null;
-			SkylineRanker skyRank  = null;
-			IPartitionRanker partRank = null;
-			IScoringFunction f = null;
+	private static double getTimeDifference(long startTime){
+		long endTime = System.nanoTime();
+		long difference = (endTime - startTime);
+		return ((double) difference) / 1000000000.0;
+	}
+	
+	private static void printTime(String section, long startTime){
+		System.out.printf(section + ": %.2f secs\n", getTimeDifference(startTime));
+	}
+	
+	private void setIterator(){
+		switch(whichRanker){
+			case EXPLANATION_RANKER:
+				iter = explRank;
+				scoringFunction = explRank.getScoringFunction();
+				break;
+			case SKYLINE_RANKER:
+				iter = skyRank;
+				break;
+			case PARTITION_RANKER:
+				iter = partRank;
+				scoringFunction = partRank.getScoringFunction();
+				break;
+		}
+	}
+	
+	private void rankExplanations() throws Exception{
+		
+		// No Partitioning
+		if (explOptions.noUsePart()) {
 			
-			// No Partitioning
-			if (options.noUsePart()) {
-				ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();			
-				ExplanationCollection col2;
-				{
-					long lStartTime = System.nanoTime();
-				
-					col2 = noPartGen.findExplanations(markers);
+			ExplanationSetGenerator noPartGen =	new ExplanationSetGenerator();
+			long startTime = System.nanoTime();
+			ExplanationCollection col2 = noPartGen.findExplanations(markers);
+			printTime("ExplGen", startTime);
 	
-					long lEndTime = System.nanoTime();
-					long difference= (lEndTime - lStartTime);
-					double secs = ((double) difference) / 1000000000.0;
-					System.out.printf("ExplGen: %.2f secs\n", secs);
-				}
-	
-				
-							
-				if (options.getRankerScheme() != null){
+			if (explOptions.getRankerScheme() != null){
 
-					if (log.isDebugEnabled()) {
-						log.debug("Create ranker for scheme without partitioning " + options.getRankerScheme());
-					};
-					
-					explRank = RankerFactory.createInitializedRanker(options.getRankerScheme(), col2);
-					iter = explRank;
-					f = explRank.getScoreF();
+				if (log.isDebugEnabled()) {
+					log.debug("Create ranker for scheme without partitioning " + explOptions.getRankerScheme());
 				}
+				
+				explRank = RankerFactory.createInitializedRanker(explOptions.getRankerScheme(), col2);
+				whichRanker = EXPLANATION_RANKER;
 			}
-			else {		
-				PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
-				partGen.init();
-				ExplPartition p;
+		}
+		
+		// Using Partitioning
+		else {		
+			PartitionExplanationGenerator partGen =	new PartitionExplanationGenerator();
+			partGen.init();
+			long startTime = System.nanoTime();
+			ExplPartition partition = partGen.findExplanations(markers);
+			printTime("ExplGen", startTime);
+			
+			if (explOptions.getSkylineRankers() != null) {
+				if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
+						+ Arrays.toString(explOptions.getSkylineRankers()));}
+				skyRank = RankerFactory.createSkylineRanker(
+								explOptions.getSkylineRankers(),
+								explOptions.getRankerScheme(), partition);
+				whichRanker = SKYLINE_RANKER;
+			}
+			else {
+				if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
+						+ explOptions.getRankerScheme());}
+				partRank = RankerFactory.createPartRanker(
+								explOptions.getRankerScheme(), partition);
+				whichRanker = PARTITION_RANKER;
+			}
+		}
+	}
+		
+	private void printExplanations() throws Exception{
+		boolean continueExe = true;
+		int r = 0;
+		
+		// if a gold standard is given then we just compute precision and recall metrics
+		if (explOptions.getGoldStandard() != null) {
+			int max = explOptions.getMaxRank();
+			IExplanationSet pre = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(explOptions.getGoldStandard());
+			IExplanationSet gold = ExplanationFactory.newExplanationSet();
+			RankingMetricPrecisionRecall metric;
+			double prec = 0.0, rec = 0.0;
+			max = (max == -1) ? Integer.MAX_VALUE : max;
+			int real = 0;
+			
+			// You have to copy the set because computing real target SE changes the hash
+			for(IBasicExplanation e: pre) {
+				e.computeRealTargetSEAndExplains(markers);
+				gold.add(e);
+			}
+			
+			metric = new RankingMetricPrecisionRecall(gold);
+			
+			// Gather all solutions/explanations
+			while(iter.hasNext() && real < max) {
+				iter.next();
+				real++;
+			}
+			
+			for(int i = 0; i < real; i++) {
+				IExplanationSet set;
+				double score = 0.0;
 				
-				{
-					long lStartTime = System.nanoTime();
-				
-					p = partGen.findExplanations(markers);
-	
-					long lEndTime = System.nanoTime();
-					long difference= (lEndTime - lStartTime);
-					double secs = ((double) difference) / 1000000000.0;
-					System.out.printf("ExplGen: %.2f secs\n", secs);
-				}
-				
-				if (options.getSkylineRankers() != null) {
-					if (log.isDebugEnabled()) {log.debug("Create skyline ranker for scheme "
-							+ Arrays.toString(options.getSkylineRankers()));};
-					skyRank = RankerFactory.createSkylineRanker(
-									options.getSkylineRankers(),
-									options.getRankerScheme(), p);
-					iter = skyRank;
+				if (explOptions.noUsePart()) {
+					prec = metric.computePrecision(explRank, i);
+					rec = metric.computeRecall(explRank, i);
+					set = explRank.getRankedExpl(i);
+					score = explRank.getScoringFunction().getScore(set);
 				}
 				else {
-					if (log.isDebugEnabled()) {log.debug("Create ranker for scheme "
-							+ options.getRankerScheme());};
-					partRank = RankerFactory.createPartRanker(
-									options.getRankerScheme(), p);
-					iter = partRank;
-					f = partRank.getScoreF();
+					prec = metric.computePrecision(partRank, i);
+					rec = metric.computeRecall(partRank, i);
+					set = partRank.getRankedExpl(i);
+					score = partRank.getScoringFunction().getScore(set);
+				}				
+				
+				if (!explOptions.isNoShowSets()) {
+					System.out.println("\n\n*********************************\n*" +
+							"\t\t RANKED " 
+							+ ++r + " with score " + score
+							+ "\n*********************************\n");
+					System.out.println(set.toString());
 				}
+				
+				System.out.printf("top: %d, prec: %f, rec: %f\n", i+1, prec, rec);
+				System.out.flush();
 			}
+		}
+		// Use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
+		else if (explOptions.isRankNonInteractive()) {
+			int i = 1;
+			int max = explOptions.getMaxRank();
+			long beforeRank = System.nanoTime();
+			long start = System.currentTimeMillis();
+			long end = explOptions.getTimeLimit() == -1 ? -1 :  start + explOptions.getTimeLimit()*1000;
 			
-			boolean cont = true;
-			int r = 0;
+			// Only 10mins running for ranking
 			
-			// if a gold standard is given then we just compute precision and recall metrics
-			if (options.getGoldStandard() != null) {
-				int max = options.getMaxRank();
-				IExplanationSet pre = ExplanationAndErrorXMLLoader.getInstance().loadExplanations(options.getGoldStandard());
-				IExplanationSet gold = ExplanationFactory.newExplanationSet();
-				RankingMetricPrecisionRecall metric;
-				double prec = 0.0, rec = 0.0;
-				max = (max == -1) ? Integer.MAX_VALUE : max;
-				int real = 0;
-				// have to copy the set because computing real target SE changes the hash
-				for(IBasicExplanation e: pre) {
-					e.computeRealTargetSEAndExplains(markers);
-					gold.add(e);
-				}
-				
-				metric = new RankingMetricPrecisionRecall(gold);
-				
-				// gather solutions
-				while(iter.hasNext() && real < max) {
-					iter.next();
-					real++;
-				}
-				
-				for(int i = 0; i < real; i++) {
-					IExplanationSet set;
-					double score = 0.0;
-					
-					if (options.noUsePart()) {
-						prec = metric.computePrecision(explRank, i);
-						rec = metric.computeRecall(explRank, i);
-						set = explRank.getRankedExpl(i);
-						score = explRank.getScoreF().getScore(set);
-					}
-					else {
-						prec = metric.computePrecision(partRank, i);
-						rec = metric.computeRecall(partRank, i);
-						set = partRank.getRankedExpl(i);
-						score = partRank.getScoreF().getScore(set);
-					}				
-					
-					if (!options.isNoShowSets()) {
-						System.out.println("\n\n*********************************\n*" +
-								"\t\t RANKED " 
-								+ ++r + " with score " + score
-								+ "\n*********************************\n");
-						System.out.println(set.toString());
-					}
-					
-					System.out.printf("top: %d, prec: %f, rec: %f\n", i+1, prec, rec);
-					System.out.flush();
-				}
-			}
-			// use non-interactive ranking where we produced the top maxRank CES (or all if maxRank is -1)
-			else if (options.isRankNonInteractive()) {
-				int i = 1;
-				int max = options.getMaxRank();
-				long beforeRank = System.nanoTime();
-				//only 10mins running for ranking
-				long start = System.currentTimeMillis();
-				long end = options.getTimeLimit() == -1 ? -1 :  start + options.getTimeLimit()*1000;
-				
-				while ((max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
-					long lStartTime = System.nanoTime();				
-					IExplanationSet set = iter.next();
-					double score = -1.0;
+			while ((max == -1 || i <= max) && (end < 0 || System.currentTimeMillis() < end)) {
+				long lStartTime = System.nanoTime();				
+				IExplanationSet set = iter.next();
+				double score = -1.0;
 
-					// do check inside timing, because ranking cost may be hidden in this check
-					if (!iter.hasNext())
-						break;
-					
-					if (f != null)
-						score = f.getScore(set);
-					
-					if (!options.isNoShowSets()) {
-						System.out.println("\n\n*********************************\n*" +
-								"\t\t RANKED " 
-								+ ++r + " with score " + score
-								+ "\n*********************************\n");
-						System.out.println(set.toString());
-					}
-										
-					long lEndTime = System.nanoTime();
-					long difference= (lEndTime - lStartTime);
-					double secs = ((double) difference) / 1000000000.0;
-					
-					System.out.println(String.format("%d: %.8f secs", i, secs));
-					System.out.flush();
-					i++;
+				// Do a quick check inside timing, because ranking cost may be hidden in this check
+				if (!iter.hasNext())
+					break;
+				
+				if (scoringFunction != null)
+					score = scoringFunction.getScore(set);
+				
+				if (!explOptions.isNoShowSets()) {
+					System.out.println("\n\n*********************************\n*" +
+							"\t\t RANKED " 
+							+ ++r + " with score " + score
+							+ "\n*********************************\n");
+					System.out.println(set.toString());
 				}
-				long afterRank = System.nanoTime();
-				double rankSecs1 = ((double) (afterRank - beforeRank)) / 1000000000.0;
-				System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs1));
+				
+				long lEndTime = System.nanoTime();
+				long difference= (lEndTime - lStartTime);
+				double secs = ((double) difference) / 1000000000.0;
+				
+				System.out.println(String.format("%d: %.8f secs", i, secs));
+				System.out.flush();
+				i++;
 			}
-			// use interactive ranking where the user is asked after each CES whether to continue or not
-			else {
-				BufferedReader in =
-						new BufferedReader(new InputStreamReader(System.in));
-				while (cont && iter.hasNext()) {
-					String read;
-					IExplanationSet set = iter.next();
-					double score = -1.0;
-					if (f != null)
-						score = f.getScore(set);
-					
-					if (!options.isNoShowSets()) {
-						System.out.println("\n\n*********************************\n*" +
-								"\t\t RANKED " 
-								+ ++r + " with score " + score
-								+ "\n*********************************\n");
-						System.out.println(set.toString());
-						System.out.println("\nContinue [y/n]?");
-					}
-					
-					while (!in.ready())
-						Thread.sleep(100);
-					read = in.readLine().trim();
-					
-					if (log.isDebugEnabled()) {log.debug("user pressed " + read);};
-					cont = !read.trim().startsWith("n");
+			long afterRank = System.nanoTime();
+			double rankSecs1 = ((double) (afterRank - beforeRank)) / 1000000000.0;
+			System.out.println(String.format("Ranking(%d): %.8f secs", i-1, rankSecs1));
+		}
+		
+		// Use interactive ranking where the user is asked after each CES whether to continue or not
+		
+		else {
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			while (continueExe && iter.hasNext()) {
+				String read;
+				IExplanationSet set = iter.next();
+				double score = -1.0;
+				if (scoringFunction != null)
+					score = scoringFunction.getScore(set);
+				
+				if (!explOptions.isNoShowSets()) {
+					System.out.println("\n\n*********************************\n*" +
+							"\t\t RANKED " 
+							+ ++r + " with score " + score
+							+ "\n*********************************\n");
+					System.out.println(set.toString());
+					System.out.println("\nPress y to continue or v to verify an explanation");
+					System.out.println("Press anything else to exit");
+				}
+				
+				while (!in.ready())
+					Thread.sleep(100);
+				read = in.readLine().trim();
+				
+				if (log.isDebugEnabled()) {log.debug("user pressed " + read);}
+				
+				boolean verifyExpl = read.trim().startsWith("v");
+				
+				if(verifyExpl){
+					verifyExplanation(set);
+					Thread.sleep(2000); // For you to see the explanations you chose
+				} else {
+					continueExe = read.trim().startsWith("y");
 				}
 			}
 		}
-		else {
-			ExplanationCollection col;
-
-			col = gen.findExplanations(markers);
-			if (!options.isNoShowSets())
-				out.println(col);
+	}
+	
+	private void verifyExplanation(IExplanationSet set){
+		List<IBasicExplanation> allExpls = set.getExplanations();
+		System.out.println("\nType the explanation numbers between 0 and " + (allExpls.size() - 1));
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			String read = in.readLine().trim();
+			String[] numbers = read.split(" ");
+			System.out.println("\nYou successfully verified the following explanations:\n");
+			for(String number: numbers){
+				int numberInt = Integer.valueOf(number);
+				if(numberInt >= 0 && numberInt < allExpls.size()){
+					IBasicExplanation expl = allExpls.get(numberInt);
+					explRank.confirmExplanation(expl);
+					System.out.println(expl.toString());
+					System.out.print("\n");
+				}
+			}
+			System.out.println("The explanations will continue\n");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	private IMarkerSet loadMarkers() throws Exception {
-		if (options.getMarkers() != null)
-			markers = MarkerParser.getInstance().parseSet(options.getMarkers());
-		else if (options.getMarkerFile() != null)
-			markers =
-					MarkerParser.getInstance().parseMarkers(
-							new FileInputStream(options.getMarkerFile()));
-		else
-			throw new Exception("either marker file (-m) or markers (-M) have"
+		if (explOptions.getMarkers() != null)
+			markers = MarkerParser.getInstance().parseSet(explOptions.getMarkers());
+		else if (explOptions.getMarkerFile() != null)
+			markers = MarkerParser.getInstance().parseMarkers(
+							new FileInputStream(explOptions.getMarkerFile()));
+		else throw new Exception("either marker file (-m) or markers (-M) have "
 					+ "to be specified");
-
-		if (log.isDebugEnabled()) {log.debug("Markers are :<" + markers + ">");};
-
+		if (log.isDebugEnabled()) {log.debug("Markers are: <" + markers + ">");};
 		return markers;
 	}
 
 	private void loadScenarioOnDB() throws Exception {
-		if (options.isLazy())
-			DatabaseScenarioLoader.getInstance().setOperationalMode(
-					LoadMode.Lazy);
+		if (explOptions.isLazy())
+			DatabaseScenarioLoader.getInstance().setOperationalMode(LoadMode.Lazy);
 		DatabaseScenarioLoader.getInstance().loadScenario(
 				ConnectionManager.getInstance().getConnection(), 
-				options.getCsvLoadPath());
+				explOptions.getCsvLoadPath());
 	}
 
 	private void loadScenario(File xmlDoc) throws Exception {
 		ModelLoader.getInstance().loadToInst(xmlDoc);
 		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
-		options.setDBOptions(MapScenarioHolder.getInstance().getScenario());
+		explOptions.setDBOptions(MapScenarioHolder.getInstance().getScenario());
 	}
 
 	private void parseOptions(String[] args) throws CmdLineException {
 		CmdLineParser parser;
-
 		if (log.isDebugEnabled()) {log.debug("Command line args are: <" + LoggerUtil.arrayToString(args)
-				+ ">");};
-		parser = new CmdLineParser(options);
+				+ ">");}
+		parser = new CmdLineParser(explOptions);
 		parser.parseArgument(args);
 	}
 
 	public void printUsage(PrintStream out) {
-		CmdLineParser parser;
-
-		parser = new CmdLineParser(options);
+		CmdLineParser parser = new CmdLineParser(explOptions);
 		parser.printUsage(out);
 	}
 
@@ -366,21 +401,10 @@ public class CommandLineExplGen {
 
 	public static void main(String[] args) {
 		CommandLineExplGen inst = new CommandLineExplGen();
-						
-		for (int i = 0; i < 1; i++) {
-			
-			long lStartTime = new Date().getTime();
-						
-			if (!inst.execute(args))
-					System.exit(1);
-				
-			long lEndTime = new Date().getTime();
-			long difference= (lEndTime - lStartTime);
-			double secs = ((double) difference) / 1000.0;
-			System.out.printf("Total: %.2f secs\n", secs);
-		}
-		
-		System.exit(0);
-		 
+		long startTime =  System.nanoTime();
+		if (!inst.execute(args))
+			System.exit(1);
+		printTime("Total", startTime);
+		System.exit(0);		 	
 	}
 }
