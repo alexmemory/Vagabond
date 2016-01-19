@@ -99,10 +99,10 @@ FROM source.socialworker ANNOT('M2') s
 	</Transformation>
 </Transformations>
 <ConnectionInfo>
-	<Host>216.47.142.244</Host>
+	<Host>127.0.0.1</Host>
 	<DB>vagabond</DB>
-	<User>vagabond</User>
-	<Password>vagabond</Password>
+	<User>postgres</User>
+	<Password></Password>
 	<Port>5432</Port>
 </ConnectionInfo>
 <Data>
