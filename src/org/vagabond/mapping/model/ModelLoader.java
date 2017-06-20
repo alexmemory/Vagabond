@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlOptions;
+import org.vagabond.mapping.scenarioToDB.SchemaCodeGenerator;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.AttrDefType;
 import org.vagabond.xmlmodel.CorrespondenceType;
@@ -150,7 +151,7 @@ public class ModelLoader {
 		boolean hasTrans = doc.getMappingScenario().isSetTransformations();
 		boolean hasCorrs = doc.getMappingScenario().isSetCorrespondences();
 		boolean hasData = doc.getMappingScenario().isSetData();
-		
+		boolean loadTarget = doc.getMappingScenario().getData().isSetLoadTargetData();
 		SchemaType src = doc.getMappingScenario().getSchemas().getSourceSchema();
 		SchemaType trg = doc.getMappingScenario().getSchemas().getTargetSchema();
 		
@@ -158,8 +159,10 @@ public class ModelLoader {
 			throw new ValidationException("no target relations");
 
 		// check that each source relation has an attached data element
-		if (hasData)
-			validateData(scen, numSourceRels);
+		if (hasData) {
+			int numExpectedRels = numSourceRels + ((loadTarget) ? numTargetRels : 0);
+			validateData(scen, numExpectedRels);
+		}
 		
 		if (hasCorrs)
 			validateCorr(scen);
@@ -330,22 +333,29 @@ public class ModelLoader {
 		}
 	}
 	
-	private void validateData(MapScenarioHolder scen, int numSourceRels)
+	private void validateData(MapScenarioHolder scen, int numRels)
 			throws ValidationException {
 		int numData;
 		MappingScenarioDocument doc = scen.getDocument();
 		
-		// build set of source relation names
+		// build set of relation names to expect
 		Set<String> relsExpected = new HashSet<String> ();
 		for(RelationType rel: doc.getMappingScenario()
 				.getSchemas().getSourceSchema().getRelationArray()) {
 			relsExpected.add(rel.getName());
 		}
 		
+		if (doc.getMappingScenario().getData().isSetLoadTargetData()) {
+			for(RelationType rel: doc.getMappingScenario()
+					.getSchemas().getTargetSchema().getRelationArray()) {
+				relsExpected.add(rel.getName());
+			}	
+		}
+		
 		// check number of data element = number of source relations
 		numData = doc.getMappingScenario().getData().getInstanceArray().length + 
 				doc.getMappingScenario().getData().getInstanceFileArray().length;
-		if (numData != numSourceRels)
+		if (numData != numRels)
 			throw new ValidationException("need the same amount of data elements as source relations");
 		
 		for(RelInstanceType i: doc.getMappingScenario().getData().getInstanceArray()) {

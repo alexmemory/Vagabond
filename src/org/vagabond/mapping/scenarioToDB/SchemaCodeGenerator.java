@@ -32,6 +32,10 @@ import org.vagabond.xmlmodel.TransformationsType;
 public class SchemaCodeGenerator {
 
 	static Logger log = LogProviderHolder.getInstance().getLogger(SchemaCodeGenerator.class);
+
+	public static String EXTRA_TARGET_REL_POSTFIX = "_load";
+	public static String SOURCE_SCHEMA_NAME = "source";
+	public static String TARGET_SCHEMA_NAME = "target";
 	
 	private static SchemaCodeGenerator instance;
 	
@@ -58,9 +62,9 @@ public class SchemaCodeGenerator {
 		StringBuffer result = new StringBuffer ();
 		
 		getSchemasCode(map, result, false);
-		getInstanceCode(map, "source", result);
+		getInstanceCode(map, SOURCE_SCHEMA_NAME, result);
 		getAllSourceForeignKeysCode(map.getSchemas().getSourceSchema(), 
-				"source", result);
+				SOURCE_SCHEMA_NAME, result);
 		
 		return result.toString();
 	}
@@ -68,8 +72,8 @@ public class SchemaCodeGenerator {
 	public String getCheckCode(MappingScenario map) {		
 		return QueryHolder.getQuery("Loader.CheckScenario")
 				.parameterize(
-				getSchemaCheckCode(map.getSchemas().getSourceSchema(), "source"),
-				getSchemaCheckCode(map.getSchemas().getTargetSchema(), "target"));
+				getSchemaCheckCode(map.getSchemas().getSourceSchema(), SOURCE_SCHEMA_NAME),
+				getSchemaCheckCode(map.getSchemas().getTargetSchema(), TARGET_SCHEMA_NAME));
 	}
 	
 	public String getSchemaCheckCode (SchemaType schema, String name) {
@@ -88,28 +92,50 @@ public class SchemaCodeGenerator {
 	
 	public String getInstanceDelCode (MappingScenario map) {
 		StringBuffer result = new StringBuffer();
+		boolean hasTargetData = map.getData().isSetLoadTargetData();
+		boolean exchangeTargetData = map.getData().isSetExchangeData();
 		
 		for(RelationType rel: map.getSchemas().getSourceSchema()
 				.getRelationArray()) {
 			result.append(QueryHolder.getQuery("Loader.EmptyRel")
-					.parameterize(rel.getName()));
+					.parameterize(SOURCE_SCHEMA_NAME, rel.getName()));
+		}
+		
+		if (hasTargetData) {
+			for(RelationType rel: map.getSchemas().getSourceSchema()
+					.getRelationArray()) {
+				String relName = exchangeTargetData ? getExtraTargetDataRelName(rel.getName()) : rel.getName(); 
+				result.append(QueryHolder.getQuery("Loader.EmptyRel")
+						.parameterize(TARGET_SCHEMA_NAME, relName));
+			}				
 		}
 		
 		return result.toString();
 	}
 	
+	public String getExtraTargetDataRelName (String relName) {
+		return relName + EXTRA_TARGET_REL_POSTFIX;
+	}
+	
 	public String getInstanceCheckCode (MappingScenario map) throws Exception {
 		StringBuffer subq = new StringBuffer();
-	
+		boolean isExAndTarget = isExangeDataAndLoadTargetData(map);
+		
 		for (RelInstanceType inst: map.getData().getInstanceArray()) {
-			subq.append(getRelDataCheckCode(inst.getName(), 
+			String relName = inst.isSetTargetRelation() && isExAndTarget 
+					? getExtraTargetDataRelName(inst.getName()) : inst.getName();
+			String schema = inst.isSetTargetRelation() ? TARGET_SCHEMA_NAME : SOURCE_SCHEMA_NAME;
+			subq.append(getRelDataCheckCode(relName, schema, 
 					inst.getRowArray().length));
 			subq.append(" UNION ALL ");
 		}
 		
 		for (RelInstanceFileType inst: map.getData().getInstanceFileArray()) {
 			int card = getCSVCard(inst);
-			subq.append(getRelDataCheckCode(inst.getName(), 
+			String relName = inst.isSetTargetRelation() && isExAndTarget 
+					? getExtraTargetDataRelName(inst.getName()) : inst.getName();
+			String schema = inst.isSetTargetRelation() ? TARGET_SCHEMA_NAME : SOURCE_SCHEMA_NAME;
+			subq.append(getRelDataCheckCode(relName, schema,
 					card));
 			subq.append(" UNION ALL ");
 		}
@@ -136,9 +162,9 @@ public class SchemaCodeGenerator {
 		return count;
 	}
 
-	public String getRelDataCheckCode (String relName, int card) {
+	public String getRelDataCheckCode (String relName, String schema, int card) {
 		return QueryHolder.getQuery("Loader.CheckRelData")
-				.parameterize("" + card, relName);
+				.parameterize("" + card, schema, relName);
 	}
 	
 	/**
@@ -184,10 +210,14 @@ public class SchemaCodeGenerator {
 	
 	private void getSchemasCode (MappingScenario map, StringBuffer result, 
 			boolean addFKeys) {
-		getSchemaCode(map.getSchemas().getSourceSchema(), "source", result,
-				addFKeys);
+		getSchemaCode(map.getSchemas().getSourceSchema(), SOURCE_SCHEMA_NAME, result,
+				addFKeys, map);
+		if (isExangeDataAndLoadTargetData(map))
+			getSchemaCode(map.getSchemas().getTargetSchema(), TARGET_SCHEMA_NAME, 
+					result, addFKeys, map);
 		result.append('\n');
-		getTargetSchemaCode(map, "target", result);
+		if (map.getData().isSetExchangeData())
+			getTargetSchemaCode(map, TARGET_SCHEMA_NAME, result);
 	}
 	
 	/**
@@ -197,8 +227,8 @@ public class SchemaCodeGenerator {
 	 * @return
 	 */
 	
-	public String getSchemaCode (SchemaType schema) {
-		return getSchemaCode (schema, null);
+	public String getSchemaCode (SchemaType schema, MappingScenario map) {
+		return getSchemaCode (schema, null, map);
 	}
 	
 	/**
@@ -209,10 +239,10 @@ public class SchemaCodeGenerator {
 	 * @return
 	 */
 	
-	public String getSchemaCode (SchemaType schema, String schemaName) {
+	public String getSchemaCode (SchemaType schema, String schemaName, MappingScenario map) {
 		StringBuffer result = new StringBuffer();
 		
-		getSchemaCode(schema, schemaName, result, true);
+		getSchemaCode(schema, schemaName, result, true, map);
 		
 		return result.toString();
 	}
@@ -228,10 +258,17 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getSchemaCode (SchemaType schema, String schemaName, 
-			StringBuffer result, boolean addForeignKeys) {
+			StringBuffer result, boolean addForeignKeys, MappingScenario map) {
+		boolean isSource = schemaName != null 
+				&& schemaName.equals(SOURCE_SCHEMA_NAME);
+		boolean loadTarget = !isSource && isExangeDataAndLoadTargetData(map);
+
+				
 		if (schemaName == null) {
 			for(RelationType rel: schema.getRelationArray()) {
-				result.append("DROP TABLE IF EXISTS " + rel.getName() +" CASCADE;\n");
+				String relName = loadTarget ? 
+						getExtraTargetDataRelName(rel.getName()) : rel.getName();
+				result.append("DROP TABLE IF EXISTS " + rel +" CASCADE;\n");
 			}
 			result.append('\n');
 		}
@@ -240,13 +277,13 @@ public class SchemaCodeGenerator {
 		}
 		
 		for(RelationType rel: schema.getRelationArray()) {
-			getRelationCode(rel, schemaName, result);
+			getRelationCode(rel, schemaName, result, loadTarget);
 			result.append("\n");
 		}
 		
-		if (addForeignKeys)
+		if (addForeignKeys && isSource)
 			getAllSourceForeignKeysCode(schema, schemaName, result);
-		
+		//TODO ok not to create FKs for target?
 		if (log.isDebugEnabled()) {log.debug("created DDL script for schema " + schemaName + ":\n" + result.toString());};
 	}
 	
@@ -258,8 +295,9 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private String getCreateSchemaCode (String schemaName) {
-		return "DROP SCHEMA IF EXISTS " + schemaName + " CASCADE;\n" +
-				"CREATE SCHEMA " + schemaName + ";\n\n";
+		return QueryHolder.getQuery("Loader.CreateSchema").parameterize(schemaName);
+//		return "DROP SCHEMA IF EXISTS " + schemaName + " CASCADE;\n" +
+//				"CREATE SCHEMA " + schemaName + ";\n\n";
 	}
 	
 	/**
@@ -271,10 +309,12 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getRelationCode (RelationType rel, String schemaName, 
-			StringBuffer result) {
+			StringBuffer result, boolean loadTarget) {
+		String relName = loadTarget ? 
+				getExtraTargetDataRelName(rel.getName()) : rel.getName();
 		schemaName = getSchemaString (schemaName);
 		
-		result.append("CREATE TABLE " + schemaName + rel.getName() + "(\n");
+		result.append("CREATE TABLE " + schemaName + relName + "(\n");
 		
 		result.append("tid INT8 NOT NULL,\n");
 		for(AttrDefType attr : rel.getAttrArray()) {
@@ -403,7 +443,6 @@ public class SchemaCodeGenerator {
 	 */
 	
 	public String getTargetSchemaCode (MappingScenario scenario, String schemaName) {
-		TransformationsType transes;
 		StringBuffer result = new StringBuffer();
 		
 		getTargetSchemaCode(scenario, schemaName, result);
@@ -422,14 +461,17 @@ public class SchemaCodeGenerator {
 	private void getTargetSchemaCode (MappingScenario scenario, String schemaName, 
 			StringBuffer result) {
 		TransformationsType transes;
+
+//		schemaName = getSchemaString(schemaName);
+		if (!isExangeDataAndLoadTargetData(scenario)) {
+			result.append(getCreateSchemaCode(schemaName));		
+		}
 		
-		result.append(getCreateSchemaCode(schemaName));
-		schemaName = getSchemaString(schemaName);
 		transes = scenario.getTransformations();
 		
 		if (scenario.isSetTransformations())
 			for(TransformationType trans: transes.getTransformationArray()) {
-				getTransViewCode(trans, schemaName, result);
+				getTransViewCode(trans, schemaName, result, scenario);
 			}
 	}
 	
@@ -442,10 +484,42 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getTransViewCode (TransformationType trans, 
-			String schemaName, StringBuffer result) {
-		result.append("CREATE VIEW " + schemaName + trans.getCreates() + " AS (\n");
-		result.append(trans.getCode().trim());
-		result.append("\n);\n\n");
+			String schemaName, StringBuffer result, MappingScenario scenario) {
+		String code;
+		boolean union = isExangeDataAndLoadTargetData(scenario);
+		
+		if (union) {
+			String relName = trans.getCreates();
+			StringBuffer projection = new StringBuffer();
+			
+			RelationType rel = getTargetRel(scenario, relName);
+			for(AttrDefType attr : rel.getAttrArray()) {
+				if(projection.length() > 1)
+					projection.append(", ");
+				projection.append(attr.getName());
+			}
+			
+			String loadRelName = getExtraTargetDataRelName(relName); 
+			code = QueryHolder.getQuery("Loader.CreateViewUnionTable").parameterize(
+					schemaName, relName, trans.getCode().trim(), projection.toString(), loadRelName);
+		}
+		else {
+			trans.getCreates();
+			code = QueryHolder.getQuery("Loader.CreateView").parameterize(schemaName, 
+					trans.getCreates(), trans.getCode().trim());
+		}
+		result.append(code +"\n\n");
+//		result.append("CREATE VIEW " + schemaName + trans.getCreates() + " AS (\n");
+//		result.append(trans.getCode().trim());
+//		result.append("\n);\n\n");
+	}
+	
+	private RelationType getTargetRel (MappingScenario map, String name) {
+		for(RelationType t: map.getSchemas().getTargetSchema().getRelationArray()) {
+			if (t.getName().equals(name))
+				return t;
+		}
+		return null;
 	}
 	
 	/**
@@ -458,7 +532,7 @@ public class SchemaCodeGenerator {
 	
 	private String getSchemaString (String schemaName) {
 		if (schemaName == null)
-			return "";
+			return "public.";
 		return schemaName + ".";
 	}
 
@@ -505,11 +579,11 @@ public class SchemaCodeGenerator {
 		schemaName = getSchemaString(schemaName);
 	
 		for (RelInstanceType inst: map.getData().getInstanceArray()) {
-			getInserts(schemaName, inst, result);
+			getInserts(schemaName, inst, result, map);
 		}
 		
 		for (RelInstanceFileType inst: map.getData().getInstanceFileArray()) {
-			getCopy(schemaName, inst, result);
+			getCopy(schemaName, inst, result, map);
 		}
 	}
 	
@@ -522,11 +596,23 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getInserts (String schemaName, 
-			RelInstanceType inst, StringBuffer result) {
+			RelInstanceType inst, StringBuffer result, MappingScenario map) {
+		String relName = isExangeDataAndLoadTargetData(map) ? getExtraTargetDataRelName(inst.getName()) : inst.getName();
 		for(Row row: inst.getRowArray()) {
-			getRowInsert (schemaName, inst.getName(), row, result);
+			getRowInsert (schemaName, relName, row, result);
 		}
 		result.append("\n");
+	}
+	
+	/**
+	 * Is exchange of data and 
+	 * 
+	 * @param map
+	 * @return
+	 */
+	
+	public boolean isExangeDataAndLoadTargetData (MappingScenario map) {
+		return map.getData().isSetLoadTargetData() && map.getData().isSetExchangeData();
 	}
 	
 	/**
@@ -541,7 +627,7 @@ public class SchemaCodeGenerator {
 	public String getRowInsert (String schemaName, String relName, Row row) {
 		StringBuffer result;
 		
-		schemaName = getSchemaString(schemaName);
+//		schemaName = getSchemaString(schemaName);
 		result = new StringBuffer();
 		getRowInsert(schemaName, relName, row, result);
 		
@@ -560,7 +646,7 @@ public class SchemaCodeGenerator {
 	
 	private void getRowInsert (String schemaName, String relName, Row row, 
 			StringBuffer result) {
-		result.append("INSERT INTO " + schemaName + relName + " VALUES (");
+		result.append("INSERT INTO " + schemaName + "." + relName + " VALUES (");
 		
 		for(String val : row.getValueArray()) {
 			if(val.equals("NULL"))
@@ -581,14 +667,14 @@ public class SchemaCodeGenerator {
 	 * @throws Exception 
 	 */
 	
-	public String getCopy (String schemaName, RelInstanceFileType inst, File p) throws Exception {
+	public String getCopy (String schemaName, RelInstanceFileType inst, File p, MappingScenario map) throws Exception {
 		StringBuffer result;
 		
 		result = new StringBuffer();
 		if (p == null)
-			getCopy(schemaName, inst, result);
+			getCopy(schemaName, inst, result, map);
 		else
-			getCopy(schemaName, inst, result, p);
+			getCopy(schemaName, inst, result, p, map);
 		
 		if (log.isDebugEnabled()) {log.debug("Created COPY command: " + result.toString());};
 		
@@ -604,27 +690,40 @@ public class SchemaCodeGenerator {
 	 */
 	
 	private void getCopy (String schemaName, 
-			RelInstanceFileType inst, StringBuffer result) throws Exception {
+			RelInstanceFileType inst, StringBuffer result, MappingScenario map) throws Exception {
 		String delim;
 		String path;
+		boolean isTarget = inst.isSetTargetRelation();
+		String relName = isTarget && isExangeDataAndLoadTargetData(map) ? 
+				getExtraTargetDataRelName(inst.getName()) : inst.getName();
+		String schema = isTarget ? TARGET_SCHEMA_NAME : SOURCE_SCHEMA_NAME;
 		
 		delim = inst.getColumnDelim();
 		path = getPath(inst);
-		
-		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
-				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+
+		result.append(QueryHolder.getQuery("Loader.Copy")
+				.parameterize(schema, relName, path, delim));
+
+//		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
+//				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
 	}
 
 	private void getCopy (String schemaName, 
-			RelInstanceFileType inst, StringBuffer result, File actualPath) throws Exception {
+			RelInstanceFileType inst, StringBuffer result, File actualPath, MappingScenario map) throws Exception {
 		String delim;
 		String path;
+		boolean isTarget = inst.isSetTargetRelation();
+		String relName = isTarget && isExangeDataAndLoadTargetData(map) ? 
+				getExtraTargetDataRelName(inst.getName()) : inst.getName();
+		String schema = isTarget ? TARGET_SCHEMA_NAME : SOURCE_SCHEMA_NAME;
 		
 		delim = inst.getColumnDelim();
 		path = getPath(inst, actualPath);
 		
-		result.append("COPY source."+ inst.getName() + " FROM '" + path + "' " +
-				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
+		result.append(QueryHolder.getQuery("Loader.Copy")
+					.parameterize(schema, relName, path, delim));
+//		result.append("COPY source."+ relName + " FROM '" + path + "' " +
+//				"WITH CSV DELIMITER '" + delim + "' NULL AS 'NULL';\n");
 	}
 	
 	private String getPath(RelInstanceFileType inst, File p) {

@@ -21,13 +21,36 @@ FROM (${1}) AS sub
 </entry>
 
 <entry key="CheckRelData">
-SELECT count(*) = ${1} AS res FROM source.${2}
+SELECT count(*) = ${1} AS res FROM ${2}.${3}
 </entry>
 
 <entry key="EmptyRel">
-DELETE FROM FROM source.${2};
+DELETE FROM FROM ${1}.${2};
 </entry>
 
+<entry key="Copy">
+COPY ${1}.${2} FROM '${3}' WITH CSV DELIMITER '${4}' NULL AS 'NULL';
+</entry>
 
+<entry key="CreateSchema">
+DROP SCHEMA IF EXISTS ${1} CASCADE;
+CREATE SCHEMA ${1};
+</entry>
+
+<entry key="CreateView">
+CREATE VIEW ${1}.${2} AS
+(
+${3}
+);
+</entry>
+
+<entry key="CreateViewUnionTable">
+CREATE VIEW ${1}.${2} AS
+(
+(${3})
+UNION ALL
+(SELECT ${4} FROM ${1}.${5})
+);
+</entry>
 
 </properties>

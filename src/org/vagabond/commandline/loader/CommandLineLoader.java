@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.vagabond.explanation.generation.QueryHolder;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.mapping.model.ModelLoader;
 import org.vagabond.mapping.model.serialize.mapfile.MapFileSerializer;
@@ -48,6 +49,7 @@ public class CommandLineLoader {
 
 		ModelLoader.getInstance().setValidation(validation);
 		map = ModelLoader.getInstance().load(xmlDoc);
+		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
 		options.setDBOptions(map.getScenario());
 	}
 	

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.vagabond.mapping.model.MapScenarioHolder;
 import org.vagabond.util.LogProviderHolder;
 import org.vagabond.xmlmodel.DataType;
+import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
 import org.vagabond.xmlmodel.RelInstanceFileType;
 import org.vagabond.xmlmodel.RelInstanceType;
 import org.vagabond.xmlmodel.RelInstanceType.Row;
@@ -81,7 +82,7 @@ public class DatabaseScenarioLoader {
 			if (!dataLoaded(dbCon, map) && !noData) {
 				executeDDL(dbCon, SchemaCodeGenerator.getInstance()
 						.getInstanceDelCode(map.getScenario()));
-				loadData(dbCon, map.getScenario().getData(), csvPath);
+				loadData(dbCon, map.getScenario().getData(), csvPath, map.getScenario());
 			}
 			return;
 		}
@@ -92,10 +93,11 @@ public class DatabaseScenarioLoader {
 		executeDDL(dbCon, ddl);
 		
 		if (map.hasData() && !noData)
-			loadData (dbCon, map.getScenario().getData(), csvPath);
+			loadData (dbCon, map.getScenario().getData(), csvPath, map.getScenario());
 		
 		ddl = SchemaCodeGenerator.getInstance().getAllSourceForeignKeysCode
-				(map.getScenario().getSchemas().getSourceSchema(), "source");
+				(map.getScenario().getSchemas().getSourceSchema(), 
+						SchemaCodeGenerator.SOURCE_SCHEMA_NAME);
 		if (log.isDebugEnabled()) {log.debug("execute Foreign Key DDL:\n" + ddl);};
 		executeDDL(dbCon, ddl);
 	}
@@ -141,21 +143,27 @@ public class DatabaseScenarioLoader {
 		st.close();
 	}
 	
-	private void loadData (Connection dbCon, DataType data, File csvPath) throws Exception {
+	private void loadData (Connection dbCon, DataType data, File csvPath, MappingScenario map) throws Exception {
 		Statement st;
 		st = dbCon.createStatement();
-		
+		boolean isTargetLoadAndExchange = SchemaCodeGenerator.getInstance().
+				isExangeDataAndLoadTargetData(map);
 		for (RelInstanceType inst: data.getInstanceArray()) {
 			for(Row row: inst.getRowArray()) {
+				String relName = isTargetLoadAndExchange ? 
+						SchemaCodeGenerator.getInstance().
+								getExtraTargetDataRelName(inst.getName()) : 
+						inst.getName();
 				st.execute(SchemaCodeGenerator.getInstance().
-						getRowInsert("source", inst.getName(), row));
+						getRowInsert(SchemaCodeGenerator.SOURCE_SCHEMA_NAME, 
+								relName, row));
 			}
 		}
 		
 		for (RelInstanceFileType inst: data.getInstanceFileArray()) {
 			
 			st.execute(SchemaCodeGenerator.getInstance().
-					getCopy("source", inst, csvPath));
+					getCopy(SchemaCodeGenerator.SOURCE_SCHEMA_NAME, inst, csvPath, map));
 		}
 		
 		st.close();
