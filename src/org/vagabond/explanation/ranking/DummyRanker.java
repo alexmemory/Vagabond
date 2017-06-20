@@ -292,4 +292,13 @@ public class DummyRanker implements IExplanationRanker {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IExplanationRanker#confirmExplanations(org.vagabond.explanation.model.IExplanationSet)
+	 */
+	@Override
+	public void confirmExplanations(IExplanationSet confirmedExpls) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

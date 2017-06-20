@@ -341,14 +341,25 @@
 	<!-- ************ Data Types ************************* -->
 
 	<xs:complexType name="DataType">
+	  <xs:sequence>
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="Instance" type="this:RelInstanceType" />
 			<xs:element name="InstanceFile" type="this:RelInstanceFileType" />
 		</xs:choice>
+		<xs:element name="ExchangeData" minOccurs="0" maxOccurs="1">
+		  <xs:complexType />
+		</xs:element>
+		<xs:element name="LoadTargetData" minOccurs="0" maxOccurs="1">
+		  <xs:complexType />
+		</xs:element>
+	  </xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="RelInstanceType">
 		<xs:sequence>
+			<xs:element name="TargetRelation" minOccurs="0" maxOccurs="1">
+		  		<xs:complexType />
+			</xs:element>
 			<xs:element name="Row" minOccurs="1" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
@@ -363,6 +374,9 @@
 
 	<xs:complexType name="RelInstanceFileType">
 		<xs:sequence>
+			<xs:element name="TargetRelation" minOccurs="0" maxOccurs="1">
+		  		<xs:complexType />
+			</xs:element>
 			<xs:element name="Path" type="xs:string" />
 			<xs:element name="FileName" type="xs:string" />
 			<xs:element name="ColumnDelim" type="xs:string" minOccurs="0" />

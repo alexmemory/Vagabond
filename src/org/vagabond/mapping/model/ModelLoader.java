@@ -135,6 +135,11 @@ public class ModelLoader {
 		
 		stricterValidation(doc);
 	}
+	
+	public void validateWithDBAccess(MappingScenarioDocument doc) throws Exception {
+		validate(doc);
+		//TODO load schema and validate that transformation attribute names are the same as the schema ones.
+	}
 
 	public void stricterValidation (MappingScenarioDocument doc) throws Exception {
 		SchemasType schemas = doc.getMappingScenario().getSchemas();

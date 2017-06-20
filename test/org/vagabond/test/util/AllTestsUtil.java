@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
 		TestNewBitMatrixAndBitset.class,
 		TestBloomFilter.class,
 		TestFNVHash.class,
-		TestGraph.class
+		TestGraph.class,
+		TestPropertyWrapper.class
         })
 public class AllTestsUtil {
 }

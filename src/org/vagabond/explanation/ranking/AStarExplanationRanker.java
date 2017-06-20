@@ -830,4 +830,13 @@ public class AStarExplanationRanker implements IExplanationRanker {
 		return this.scoringFunction;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.vagabond.explanation.ranking.IExplanationRanker#confirmExplanations(org.vagabond.explanation.model.IExplanationSet)
+	 */
+	@Override
+	public void confirmExplanations(IExplanationSet confirmedExpls) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
