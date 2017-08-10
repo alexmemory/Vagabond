@@ -1,10 +1,15 @@
 package org.vagabond.commandline.loader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.sql.Connection;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -20,6 +25,8 @@ public class CommandLineLoader {
 
 	static Logger log = Logger.getLogger(CommandLineLoader.class);
 	
+	public static final String LOG4JPROPERIES_DEFAULT_LOCATION = "resource/log4jproperties.txt";
+	
 	private LoaderOptions options;
 	private MapScenarioHolder map;
 	
@@ -28,20 +35,75 @@ public class CommandLineLoader {
 	}
 
 	public void setUpLogger () {
-		PropertyConfigurator.configure("resource/log4jproperties.txt");
+		defaultLogConfig();
 	}
+	
+	public void defaultLogConfig() {
+		// standard appender is console
+		ConsoleAppender console = new ConsoleAppender(); 
+		String PATTERN = "%d [%p] %l %m%n";
+		console.setLayout(new PatternLayout(PATTERN)); 
+		console.setThreshold(Level.ERROR);
+		console.activateOptions();
+		Logger.getRootLogger().addAppender(console);
+	}
+	
 	
 	public void parseOptionsAndLoadScenario (String[] args) 
 			throws Exception {
 		parseOptions(args);
+		reconfigLog();	
 		
 		if (options.getXmlDoc() == null)
 			throw new CmdLineException("no mapping scenario XML document " +
 					"given (-f option)");
 		loadScenario (options.getXmlDoc());
-		
-		parseOptions(args);
+
+		parseOptions(args);	
 	}
+	
+	/**
+	 *  read log4j properties from user defined location or default location
+	 * @throws FileNotFoundException 
+	 */
+	public void reconfigLog() throws FileNotFoundException {
+		File location = options.getLogConfig();
+		Level llevel = options.getLoglevel();
+		Logger.getRootLogger().removeAllAppenders();
+		
+		// user provided log location?
+		if (location != null) {
+			if (!location.exists())
+			{
+				System.err.printf("User provided log location does not exist: %s", location);
+				System.exit(1);
+			}
+			PropertyConfigurator.configure(location.getAbsolutePath());
+			log.info("user has provided log level location: " +  location);
+		}
+		// user has given a global log level
+		else if (llevel != null) {
+			ConsoleAppender c = new ConsoleAppender();
+			c.setLayout(new PatternLayout("%-4r [%t] %-5p %l - %m%n"));
+			c.setThreshold(llevel);
+			c.activateOptions();
+			Logger.getRootLogger().addAppender(c);			
+		
+			log.info("user set log level to " + llevel.toString());
+		}
+		// do we have a log file at the default location
+		else if (new File(LOG4JPROPERIES_DEFAULT_LOCATION).exists())
+		{
+			PropertyConfigurator.configure(LOG4JPROPERIES_DEFAULT_LOCATION);
+			log.info("use default log properties location " + LOG4JPROPERIES_DEFAULT_LOCATION);
+		}
+		// just set everything to error log level
+		else {
+			defaultLogConfig();
+		}
+	}
+	
+	
 	
 	private void loadScenario (File xmlDoc) 
 			throws Exception {
@@ -49,7 +111,7 @@ public class CommandLineLoader {
 
 		ModelLoader.getInstance().setValidation(validation);
 		map = ModelLoader.getInstance().load(xmlDoc);
-		QueryHolder.getInstance().loadFromDir(new File("resource/queries"));
+		QueryHolder.getInstance().loadFromDirFallbackResource(new File("resource/queries"), QueryHolder.DEFAULT_QUERY_LIST_FILE);
 		options.setDBOptions(map.getScenario());
 	}
 	

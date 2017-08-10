@@ -2,9 +2,12 @@ package org.vagabond.commandline.loader;
 
 import java.io.File;
 
+import org.apache.log4j.Level;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.OptionHandlerRegistry;
 import org.vagabond.xmlmodel.ConnectionInfoType;
 import org.vagabond.xmlmodel.MappingScenarioDocument.MappingScenario;
+
 
 public class LoaderOptions {
 
@@ -50,10 +53,23 @@ public class LoaderOptions {
 	@Option(name="--no-target", usage="don't create target schema and instance")
 	private boolean noTarget = false;
 	
+	@Option(name = "-logconfig", usage = "path to log4j configuration file to use")
+	private File logConfig = null;
+	
+	@Option(name = "-loglevel", usage ="set a global log level if no log4j configuration file is specificed")
+	private
+	Level loglevel = null;
+
+	
 	private boolean[] dbOptionsSet = { false, false, false, false };
+
+	// register option handler for log level 
+	static {
+		OptionHandlerRegistry.getRegistry().registerHandler(Level.class, Log4jLevelOptionHandler.class);
+	}
 	
 	public LoaderOptions() {
-		
+		OptionHandlerRegistry.getRegistry().registerHandler(Level.class, Log4jLevelOptionHandler.class);
 	}
 	
 	public void setDBOptions (MappingScenario map) {
@@ -153,6 +169,22 @@ public class LoaderOptions {
 
 	public void setNoValidation(boolean noValidation) {
 		this.noValidation = noValidation;
+	}
+
+	public File getLogConfig() {
+		return logConfig;
+	}
+
+	public void setLogConfig(File logConfig) {
+		this.logConfig = logConfig;
+	}
+
+	public Level getLoglevel() {
+		return loglevel;
+	}
+
+	public void setLoglevel(Level loglevel) {
+		this.loglevel = loglevel;
 	}
 	
 	

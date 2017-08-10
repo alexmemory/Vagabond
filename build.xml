@@ -171,6 +171,10 @@
 	</target>
 
 	<target name="JarForOtherProjects" depends="Compile,GenerateXMLbindings">
+		<copy todir="${binarydir}">
+			<fileset dir="${resourcedir}/queries">
+			</fileset>
+		</copy>
 		<jar destfile="${builddir}/trampexgen.jar" basedir="${binarydir}">
 			<manifest>
 				<attribute name="Main-Class" value="${loaderMainClass}" />
